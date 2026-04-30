@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/qr_scanner_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    tools:context=".qr.QrScannerActivity">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/camera_preview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:implementationMode="performance"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:scaleType="fillCenter" />
+
+    <View
+        android:id="@+id/scan_frame"
+        android:layout_width="252dp"
+        android:layout_height="252dp"
+        android:background="@drawable/qr_scanner_frame_background"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/scanner_top_panel"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="@dimen/chrome_outer_margin"
+        android:layout_marginTop="@dimen/chrome_outer_margin"
+        android:layout_marginEnd="@dimen/chrome_outer_margin"
+        android:background="@drawable/qr_scanner_panel_background"
+        android:elevation="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/close_button"
+            android:layout_width="@dimen/browser_icon_button_size"
+            android:layout_height="@dimen/browser_icon_button_size"
+            android:background="@drawable/solipsism_blend_button_background"
+            android:contentDescription="@android:string/cancel"
+            android:padding="8dp"
+            app:srcCompat="@drawable/ic_action_back"
+            app:tint="?attr/iconColor" />
+
+        <TextView
+            android:id="@+id/scanner_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:text="@string/qr_scanner_title"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface" />
+
+        <ImageView
+            android:layout_width="@dimen/browser_icon_button_size"
+            android:layout_height="@dimen/browser_icon_button_size"
+            android:background="@drawable/settings_icon_background"
+            android:contentDescription="@null"
+            android:padding="8dp"
+            app:srcCompat="@drawable/ic_action_qr_code"
+            app:tint="?attr/iconColor" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/scanner_hint"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="48dp"
+        android:background="@drawable/qr_scanner_panel_background"
+        android:elevation="12dp"
+        android:gravity="center"
+        android:padding="18dp"
+        android:text="@string/qr_scanner_hint"
+        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+        android:textColor="?attr/colorOnSurface"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

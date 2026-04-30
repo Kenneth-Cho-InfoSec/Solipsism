@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta content="en-us" http-equiv="Content-Language"/>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>${TITLE}</title>
+</head>
+<style>
+    :root {
+        --body-bg: {COLOR}
+        --box-bg: {COLOR}
+        --box-txt: {COLOR}
+    }
+
+    body {
+        background: var(--body-bg);
+        text-align: center;
+        margin: 0px;
+    }
+
+    input {
+        color: var(--box-txt);
+    }
+    
+    #search_input {
+        height: 35px;
+        width: 100%;
+        outline: none;
+        border: none;
+        font-size: 16px;
+        background-color: transparent;
+    }
+    
+    span {
+        display: block;
+        overflow: hidden;
+        padding-left: 5px;
+        vertical-align: middle;
+    }
+    
+    .search_bar {
+        display: table;
+        vertical-align: middle;
+        width: 90%;
+        height: 40px;
+        max-width: 500px;
+        margin: 0 auto;
+        background-color: var(--box-bg);
+        font-family: Arial;
+        color: var(--box-txt);
+        -moz-border-radius: 8px;
+        -webkit-border-radius: 8px;
+        border-radius: 8px;
+    }
+    
+    #search_submit {
+        outline: none;
+        height: 37px;
+        float: right;
+        color: var(--box-txt);
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        background-color: transparent;
+    }
+    
+    .outer {
+        display: table;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+    
+    .middle {
+        display: table-cell;
+        vertical-align: middle;
+    }
+    
+    .inner {
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10%;
+        width: 100%;
+    }
+    
+    img.smaller {
+        width: 50%;
+        max-width: 300px;
+    }
+
+
+</style>
+
+<body>
+<div class="outer">
+    <div class="middle">
+        <div class="inner">
+            <img id="image_url" class="smaller" src="${IMAGE}">
+            </br>
+            </br>
+            <form onsubmit="return search()" class="search_bar" autocomplete="off">
+                <input type="submit" id="search_submit" value="Search">
+                <span>
+                        <input class="search" type="text" value="" id="search_input"/>
+                    </span>
+            </form>
+            </br>
+            </br>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+        function search() {
+            if (document.getElementById("search_input").value != "") {
+                window.location.href = "${BASE_URL}" + document.getElementById("search_input").value;
+                document.getElementById("search_input").value = "";
+            }
+            return false;
+        }
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginStart="@dimen/chrome_outer_margin"
+        android:layout_marginTop="@dimen/chrome_outer_margin"
+        android:layout_marginEnd="@dimen/chrome_outer_margin"
+        android:background="?toolbarSettingsBackground"
+        android:elevation="0dp"
+        android:minHeight="?attr/actionBarSize"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        custom:contentInsetEnd="0dp"
+        custom:contentInsetStart="0dp"
+        custom:popupTheme="@style/ThemeOverlay.Solipsism.Toolbar.Surface" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/material_grid_margin"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="Large Text"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+            <TextView
+                android:id="@+id/textViewBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="Medium Text"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/debug_title">
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_debug"
+            android:key="leak_canary_enabled"
+            android:title="@string/debug_leak_canary"/>
+    </PreferenceCategory>
+</PreferenceScreen>

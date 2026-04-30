@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    tools:context=".browser.BrowserActivity">
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout
+            android:id="@+id/ui_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/browser_surface"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <FrameLayout
+                    android:id="@+id/content_frame"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="54dp"
+                    android:background="?attr/colorSurface"
+                    android:clipChildren="true" />
+
+                <ProgressBar
+                    android:id="@+id/progress_view"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/progress_bar_height"
+                    android:layout_marginEnd="54dp"
+                    android:background="@color/transparent"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progressTint="?attr/colorAccent" />
+
+                <FrameLayout
+                    android:id="@+id/address_overlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="72dp"
+                    android:layout_gravity="top"
+                    android:layout_marginStart="@dimen/chrome_outer_margin"
+                    android:layout_marginTop="@dimen/chrome_outer_margin"
+                    android:layout_marginEnd="66dp"
+                    android:background="@drawable/solipsism_search_overlay_background"
+                    android:elevation="10dp"
+                    android:padding="@dimen/chrome_inner_margin"
+                    android:visibility="gone">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/search_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/search_background_expressive"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:descendantFocusability="beforeDescendants"
+                        android:focusableInTouchMode="true">
+
+                        <ImageView
+                            android:id="@+id/search_ssl_status"
+                            android:layout_width="@dimen/browser_icon_button_size"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:contentDescription="@string/action_site_info"
+                            android:padding="8dp"
+                            android:visibility="gone"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="?attr/iconColor" />
+
+                        <com.krystelligence.solipsism.search.SearchView
+                            android:id="@+id/search"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:background="@null"
+                            android:completionThreshold="1"
+                            android:dropDownAnchor="@+id/address_overlay"
+                            android:dropDownWidth="match_parent"
+                            android:gravity="start|center_vertical"
+                            android:hint="@string/search_hint"
+                            android:imeOptions="actionGo"
+                            android:importantForAutofill="no"
+                            android:inputType="textUri"
+                            android:maxLines="1"
+                            android:popupBackground="@drawable/search_dropdown_background"
+                            android:popupElevation="0dp"
+                            android:selectAllOnFocus="true"
+                            android:textColor="?attr/autoCompleteTitleColor"
+                            android:textColorHint="?attr/autoCompleteUrlColor"
+                            android:textCursorDrawable="@null"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/search_ssl_status"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_goneMarginLeft="12dp" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </FrameLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/toolbar_layout"
+                    android:layout_width="54dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:background="@drawable/solipsism_rail_background"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:elevation="8dp"
+                    android:fitsSystemWindows="true"
+                    android:paddingStart="7dp"
+                    android:paddingTop="44dp"
+                    android:paddingEnd="7dp"
+                    android:paddingBottom="22dp"
+                    android:tag="solipsism_fixed_chrome">
+
+                    <FrameLayout
+                        android:id="@+id/home_button"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/solipsism_blend_button_background"
+                        android:clickable="true"
+                        android:contentDescription="@string/tabs"
+                        android:focusable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <ImageView
+                            android:id="@+id/home_image_view"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/home"
+                            android:visibility="gone"
+                            app:srcCompat="@drawable/ic_action_home"
+                            app:tint="?attr/iconColor" />
+
+                        <com.krystelligence.solipsism.icon.TabCountView
+                            android:id="@+id/tab_count_view"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            app:tabIconBorderRadius="6dp"
+                            app:tabIconBorderWidth="2dp"
+                            app:tabIconColor="?attr/iconColor"
+                            app:tabIconTextSize="14dp" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:id="@+id/address_rail"
+                        android:layout_width="40dp"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="26dp"
+                        android:layout_marginBottom="18dp"
+                        android:background="@drawable/solipsism_address_rail_background"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        app:layout_constraintBottom_toTopOf="@+id/rail_nav"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/home_button">
+
+                        <ImageView
+                            android:id="@+id/settings_button"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:clickable="true"
+                            android:contentDescription="@string/action_scan_qr"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/ic_action_qr_code"
+                            app:tint="?attr/iconColor" />
+
+                        <TextView
+                            android:id="@+id/vertical_url_text"
+                            android:layout_width="142dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/solipsism_url_button_background"
+                            android:clickable="true"
+                            android:ellipsize="end"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:rotation="90"
+                            android:singleLine="true"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="16sp"
+                            tools:text="solipsism.com" />
+
+                        <ImageView
+                            android:id="@+id/search_refresh"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:clickable="true"
+                            android:contentDescription="@string/action_refresh"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/ic_action_refresh"
+                            app:tint="?attr/iconColor" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/rail_nav"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent">
+
+                        <ImageView
+                            android:id="@+id/action_back"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:clickable="true"
+                            android:contentDescription="@string/action_back"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/ic_action_back"
+                            app:tint="?attr/iconColor" />
+
+                        <ImageView
+                            android:id="@+id/action_forward"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginTop="6dp"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:clickable="true"
+                            android:contentDescription="@string/action_forward"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/ic_action_forward"
+                            app:tint="?attr/iconColor" />
+
+                        <ImageView
+                            android:id="@+id/action_home"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginTop="6dp"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:clickable="true"
+                            android:contentDescription="@string/action_homepage"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/ic_action_home"
+                            app:tint="?attr/iconColor" />
+
+                        <ImageView
+                            android:id="@+id/action_add_bookmark"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:clickable="true"
+                            android:contentDescription="@string/action_add_bookmark"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            android:visibility="gone"
+                            app:srcCompat="@drawable/state_ic_bookmark"
+                            app:tint="?attr/iconColor" />
+
+                        <ImageView
+                            android:id="@+id/action_page_tools"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:clickable="true"
+                            android:contentDescription="@string/dialog_tools_title"
+                            android:focusable="true"
+                            android:padding="8dp"
+                            android:visibility="gone"
+                            app:srcCompat="@drawable/ic_page_tools"
+                            app:tint="?attr/iconColor" />
+
+                        <com.google.android.material.appbar.MaterialToolbar
+                            android:id="@+id/toolbar"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginTop="6dp"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:minHeight="36dp"
+                            android:padding="0dp"
+                            app:contentInsetEnd="0dp"
+                            app:contentInsetStart="0dp"
+                            app:popupTheme="@style/ThemeOverlay.Solipsism.Toolbar.Surface"
+                            app:titleTextColor="@color/transparent" />
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:id="@+id/find_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/material_grid_touch_medium"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="@dimen/chrome_outer_margin"
+                    android:layout_marginEnd="66dp"
+                    android:layout_marginBottom="@dimen/chrome_outer_margin"
+                    android:background="@drawable/find_bar_background"
+                    android:elevation="10dp"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    android:weightSum="1">
+
+                    <TextView
+                        android:id="@+id/find_query"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:paddingStart="@dimen/material_grid_margin"
+                        android:paddingEnd="@dimen/material_grid_margin"
+                        android:textAppearance="?android:attr/textAppearanceListItem"
+                        android:textSize="18sp" />
+
+                    <ImageButton
+                        android:id="@+id/find_previous"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/solipsism_blend_button_background"
+                        android:contentDescription="@null"
+                        app:srcCompat="@drawable/ic_action_collapse"
+                        app:tint="?attr/iconColor" />
+
+                    <ImageButton
+                        android:id="@+id/find_next"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/solipsism_blend_button_background"
+                        android:contentDescription="@null"
+                        app:srcCompat="@drawable/ic_action_expand"
+                        app:tint="?attr/iconColor" />
+
+                    <ImageButton
+                        android:id="@+id/find_quit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/solipsism_blend_button_background"
+                        android:contentDescription="@null"
+                        app:srcCompat="@drawable/ic_action_delete"
+                        app:tint="?attr/iconColor" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/desktop_tabs_list"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tab_drawer"
+            android:layout_width="@dimen/navigation_drawer_max_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:layout_margin="@dimen/chrome_outer_margin"
+            android:background="@drawable/solipsism_panel_background"
+            android:clickable="true"
+            android:fitsSystemWindows="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:padding="@dimen/chrome_inner_margin"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@drawable/browser_sheet_section_background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/tab_header_button"
+                    android:layout_width="@dimen/browser_icon_button_size"
+                    android:layout_height="@dimen/browser_icon_button_size"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/solipsism_blend_button_background_selected"
+                    android:contentDescription="@string/tabs"
+                    android:scaleType="center"
+                    app:srcCompat="@drawable/ic_action_tabs"
+                    app:tint="?attr/iconColor" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/material_grid_margin"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:minHeight="?android:attr/listPreferredItemHeight"
+                    android:text="@string/tabs"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+                <ImageView
+                    android:id="@+id/new_tab_button"
+                    android:layout_width="@dimen/browser_icon_button_size"
+                    android:layout_height="@dimen/browser_icon_button_size"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/solipsism_blend_button_background"
+                    android:contentDescription="@string/action_new_tab"
+                    android:padding="8dp"
+                    android:scaleType="center"
+                    app:srcCompat="@drawable/ic_action_plus"
+                    app:tint="?attr/iconColor" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/drawer_tabs_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:overScrollMode="ifContentScrolls" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bookmark_drawer"
+            android:layout_width="@dimen/navigation_drawer_max_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/chrome_outer_margin"
+            android:background="@drawable/solipsism_panel_background"
+            android:clickable="true"
+            android:fitsSystemWindows="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:padding="@dimen/chrome_inner_margin"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:id="@+id/bookmark_title_layout"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@drawable/browser_sheet_section_background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/bookmark_back_button"
+                    android:layout_width="@dimen/browser_icon_button_size"
+                    android:layout_height="@dimen/browser_icon_button_size"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/solipsism_blend_button_background_selected"
+                    android:contentDescription="@string/action_back"
+                    android:scaleType="center"
+                    app:srcCompat="@drawable/ic_action_star"
+                    app:tint="?attr/iconColor" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/material_grid_margin"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:minHeight="?android:attr/listPreferredItemHeight"
+                    android:text="@string/action_bookmarks"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/bookmark_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:divider="@null"
+                android:dividerHeight="0dp" />
+        </LinearLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tab_item_background"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/material_grid_touch_large"
+    android:layout_marginStart="@dimen/chrome_inner_margin"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="@dimen/chrome_inner_margin"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/tab_background"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingTop="4dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="4dp"
+    android:weightSum="1">
+
+    <ImageView
+        android:id="@+id/faviconTab"
+        android:layout_width="@dimen/material_grid_small_icon"
+        android:layout_height="@dimen/material_grid_small_icon"
+        android:layout_marginEnd="12dp"
+        android:contentDescription="@null"
+        android:gravity="center_vertical" />
+
+    <TextView
+        android:id="@+id/textTab"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.Solipsism.TabTitle" />
+
+    <FrameLayout
+        android:id="@+id/deleteAction"
+        android:layout_width="@dimen/browser_icon_button_size"
+        android:layout_height="match_parent"
+        android:background="@drawable/icon_button_background"
+        android:foreground="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/close_tab"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_action_delete"
+            app:tint="?attr/iconColor" />
+    </FrameLayout>
+</LinearLayout>

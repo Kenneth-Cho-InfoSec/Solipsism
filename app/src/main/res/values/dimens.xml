@@ -1,0 +1,35 @@
+<resources>
+
+    <dimen name="material_grid_margin">16dp</dimen>
+    <dimen name="material_grid_unit">8dp</dimen>
+
+    <dimen name="material_grid_small_icon">24dp</dimen>
+
+    <dimen name="material_grid_touch_small">36dp</dimen>
+    <dimen name="material_grid_touch_medium">48dp</dimen>
+    <dimen name="material_grid_touch_large">56dp</dimen>
+    <dimen name="material_grid_touch_xlarge">72dp</dimen>
+    <dimen name="material_grid_touch_xxlarge">88dp</dimen>
+
+    <dimen name="dialog_max_size">350dp</dimen>
+    <dimen name="dialog_padding">24dp</dimen>
+
+    <dimen name="navigation_drawer_max_width">328dp</dimen>
+    <dimen name="chrome_outer_margin">12dp</dimen>
+    <dimen name="chrome_inner_margin">8dp</dimen>
+    <dimen name="browser_panel_corner_radius">28dp</dimen>
+    <dimen name="browser_row_corner_radius">20dp</dimen>
+    <dimen name="browser_chip_corner_radius">18dp</dimen>
+    <dimen name="browser_icon_button_size">40dp</dimen>
+    <dimen name="browser_handle_width">36dp</dimen>
+    <dimen name="browser_handle_height">4dp</dimen>
+
+    <dimen name="toolbar_height_portrait">56dp</dimen>
+    <dimen name="toolbar_height_landscape">52dp</dimen>
+    <dimen name="navigation_drawer_minimum_space">56dp</dimen>
+
+    <dimen name="desktop_tab_width">175dp</dimen>
+    <dimen name="desktop_tab_height">40dp</dimen>
+
+    <dimen name="progress_bar_height">2dp</dimen>
+</resources>

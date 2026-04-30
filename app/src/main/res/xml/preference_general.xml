@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/settings_general">
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_action_desktop"
+            android:key="cb_images"
+            android:title="@string/block"/>
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_download"
+            android:key="savedata"
+            android:title="@string/save_data" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_settings_globe"
+            android:key="cb_javascript"
+            android:title="@string/java"/>
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_invert"
+            android:key="cb_colormode"
+            android:title="@string/color_mode"/>
+        <Preference
+            android:icon="@drawable/ic_settings_globe"
+            android:key="proxy"
+            android:title="@string/http_proxy"/>
+        <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="agent"
+            android:title="@string/agent"/>
+        <Preference
+            android:icon="@drawable/ic_settings_download"
+            android:key="download"
+            android:title="@string/download"/>
+        <Preference
+            android:icon="@drawable/ic_action_home"
+            android:key="home"
+            android:title="@string/home"/>
+        <Preference
+            android:icon="@drawable/ic_settings_globe"
+            android:key="search"
+            android:title="@string/search"/>
+        <Preference
+            android:icon="@drawable/ic_settings_help"
+            android:key="suggestions_choice"
+            android:title="@string/search_suggestions"/>
+    </PreferenceCategory>
+</PreferenceScreen>

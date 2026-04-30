@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/settings_advanced">
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_plus"
+            android:key="allow_new_window"
+            android:summary="@string/recommended"
+            android:title="@string/window" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_settings_privacy"
+            android:key="allow_cookies"
+            android:summary="@string/recommended"
+            android:title="@string/cookies" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_privacy"
+            android:key="incognito_cookies"
+            android:title="@string/incognito_cookies" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_tabs"
+            android:key="restore_tabs"
+            android:title="@string/restore" />
+        <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="text_encoding"
+            android:title="@string/text_encoding" />
+        <Preference
+            android:icon="@drawable/ic_action_desktop"
+            android:key="rendering_mode"
+            android:title="@string/rendering_mode" />
+        <Preference
+            android:icon="@drawable/ic_settings_globe"
+            android:key="url_contents"
+            android:title="@string/url_contents" />
+    </PreferenceCategory>
+</PreferenceScreen>

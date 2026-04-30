@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path name="cache_share" path="shared/" />
+    <files-path name="generated_html" path="generated-html/" />
+    <external-files-path name="external_files" path="." />
+    <external-cache-path name="external_cache" path="shared/" />
+    <external-path name="public_downloads" path="Download/" />
+</paths>

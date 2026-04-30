@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Settings themes -->
+    <style name="Theme.SettingsTheme" parent="Theme.LightTheme">
+        <item name="android:windowBackground">@null</item>
+        <item name="toolbarSettingsBackground">@drawable/toolbar_expressive</item>
+    </style>
+
+    <style name="Theme.SettingsTheme.Dark" parent="Theme.DarkTheme">
+        <item name="android:windowBackground">@null</item>
+        <item name="toolbarSettingsBackground">@drawable/toolbar_expressive</item>
+
+        <!-- Dark settings has a special primary dark -->
+        <item name="colorPrimaryDark">@color/secondary_color_settings_dark</item>
+    </style>
+
+    <style name="Theme.SettingsTheme.Black" parent="Theme.BlackTheme">
+        <item name="android:windowBackground">@null</item>
+        <item name="toolbarSettingsBackground">@drawable/toolbar_expressive</item>
+    </style>
+
+    <!-- Regular themes -->
+    <style name="Theme.LightTheme" parent="Theme.BaseLightTheme">
+        <item name="searchBackground">@drawable/search_background_expressive</item>
+        <item name="listBackground">@drawable/list_bg</item>
+        <item name="progressBackgroundColor">@color/md3_primary_container</item>
+        <item name="sheetBackground">@color/md3_surface_container</item>
+        <item name="sheetHeaderBackground">@color/md3_surface_container_high</item>
+        <item name="sheetFooterBackground">@color/md3_surface_container_high</item>
+        <item name="sheetHandleColor">@color/md3_outline</item>
+    </style>
+
+    <style name="Theme.DarkTheme" parent="Theme.BaseDarkTheme">
+        <item name="searchBackground">@drawable/search_background_expressive</item>
+        <item name="listBackground">@drawable/list_bg</item>
+        <item name="progressBackgroundColor">@color/md3_dark_primary_container</item>
+        <item name="sheetBackground">@color/md3_dark_surface_container</item>
+        <item name="sheetHeaderBackground">@color/md3_dark_surface_container_high</item>
+        <item name="sheetFooterBackground">@color/md3_dark_surface_container_high</item>
+        <item name="sheetHandleColor">@color/md3_dark_outline</item>
+    </style>
+
+    <style name="Theme.BlackTheme" parent="Theme.BaseBlackTheme">
+        <item name="searchBackground">@drawable/search_background_expressive</item>
+        <item name="listBackground">@drawable/list_bg</item>
+        <item name="progressBackgroundColor">@color/black</item>
+        <item name="sheetBackground">@color/md3_black_surface_container</item>
+        <item name="sheetHeaderBackground">@color/md3_black_surface_container_high</item>
+        <item name="sheetFooterBackground">@color/md3_black_surface_container_high</item>
+        <item name="sheetHandleColor">@color/md3_dark_outline</item>
+    </style>
+
+    <!-- Base Themes -->
+    <style name="Theme.BaseLightTheme" parent="Theme.Material3Expressive.Light.NoActionBar">
+
+        <!-- Theme Colors -->
+        <item name="colorPrimary">@color/md3_surface</item>
+        <item name="colorPrimaryContainer">@color/md3_primary_container</item>
+        <item name="colorPrimaryDark">@color/md3_surface_container</item>
+        <item name="colorAccent">@color/md3_primary</item>
+        <item name="colorSecondary">@color/md3_secondary</item>
+        <item name="colorSecondaryContainer">@color/md3_secondary_container</item>
+        <item name="colorTertiary">@color/md3_tertiary</item>
+        <item name="colorTertiaryContainer">@color/md3_tertiary_container</item>
+        <item name="colorSurface">@color/md3_surface</item>
+        <item name="colorSurfaceContainerLow">@color/md3_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/md3_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/md3_surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/md3_surface_container_highest</item>
+        <item name="colorOnPrimary">@color/md3_on_primary</item>
+        <item name="colorOnSecondary">@color/md3_on_secondary</item>
+        <item name="colorOnTertiary">@color/md3_on_tertiary</item>
+        <item name="colorOnSurface">@color/md3_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/md3_on_surface_variant</item>
+        <item name="colorOutline">@color/md3_outline</item>
+        <item name="colorOutlineVariant">@color/md3_outline_variant</item>
+        <item name="colorError">@color/md3_error</item>
+        <item name="android:colorBackground">@color/md3_surface</item>
+        <item name="android:navigationBarColor">@color/md3_surface_container</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.Solipsism</item>
+        <item name="popupMenuStyle">@style/Widget.Solipsism.PopupMenu</item>
+        <item name="toolbarStyle">@style/Widget.Solipsism.Toolbar</item>
+        <item name="toolbarSurfaceStyle">@style/Widget.Solipsism.Toolbar.Surface</item>
+        <item name="drawerBackground">@color/md3_surface_container</item>
+        <item name="dividerColor">@color/md3_outline_variant</item>
+
+        <item name="iconColor">@color/icon_light_theme</item>
+        <item name="iconColorState">@color/state_color_icons_light</item>
+
+        <item name="autoCompleteBackgroundColor">@color/md3_surface_container_high</item>
+        <item name="autoCompleteTitleColor">@color/md3_on_surface</item>
+        <item name="autoCompleteUrlColor">@color/md3_on_surface_variant</item>
+
+        <item name="selectedBackground">@color/md3_primary_container</item>
+
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+
+        <!-- Overflow menu -->
+        <item name="actionOverflowButtonStyle">@style/overFlowButtonStyle</item>
+
+        <!-- Alert dialogs -->
+        <item name="alertDialogTheme">@style/MaterialDialogStyle.Light</item>
+        <item name="materialAlertDialogTheme">@style/MaterialDialogStyle.Light</item>
+
+    </style>
+
+    <style name="Theme.BaseDarkTheme" parent="Theme.Material3Expressive.Dark.NoActionBar">
+
+        <!-- Theme colors -->
+        <item name="colorPrimary">@color/md3_dark_surface</item>
+        <item name="colorPrimaryContainer">@color/md3_dark_primary_container</item>
+        <item name="colorPrimaryDark">@color/md3_dark_surface_container</item>
+        <item name="colorAccent">@color/md3_dark_primary</item>
+        <item name="colorSecondary">@color/md3_dark_secondary</item>
+        <item name="colorSecondaryContainer">@color/md3_dark_secondary_container</item>
+        <item name="colorTertiary">@color/md3_dark_tertiary</item>
+        <item name="colorTertiaryContainer">@color/md3_dark_tertiary_container</item>
+        <item name="colorSurface">@color/md3_dark_surface</item>
+        <item name="colorSurfaceContainerLow">@color/md3_dark_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/md3_dark_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/md3_dark_surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/md3_dark_surface_container_highest</item>
+        <item name="colorOnPrimary">@color/md3_dark_on_primary</item>
+        <item name="colorOnSecondary">@color/md3_dark_on_secondary</item>
+        <item name="colorOnTertiary">@color/md3_dark_on_tertiary</item>
+        <item name="colorOnSurface">@color/md3_dark_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/md3_dark_on_surface_variant</item>
+        <item name="colorOutline">@color/md3_dark_outline</item>
+        <item name="colorOutlineVariant">@color/md3_dark_outline_variant</item>
+        <item name="colorError">@color/md3_dark_error</item>
+        <item name="android:colorBackground">@color/md3_dark_surface</item>
+        <item name="android:navigationBarColor">@color/md3_dark_surface_container</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.Solipsism</item>
+        <item name="popupMenuStyle">@style/Widget.Solipsism.PopupMenu</item>
+        <item name="toolbarStyle">@style/Widget.Solipsism.Toolbar</item>
+        <item name="toolbarSurfaceStyle">@style/Widget.Solipsism.Toolbar.Surface</item>
+        <item name="drawerBackground">@color/md3_dark_surface_container</item>
+        <item name="dividerColor">@color/md3_dark_outline_variant</item>
+
+        <item name="iconColor">@color/icon_dark_theme</item>
+        <item name="iconColorState">@color/state_color_icons_dark</item>
+
+        <item name="autoCompleteBackgroundColor">@color/md3_dark_surface_container_high</item>
+        <item name="autoCompleteTitleColor">@color/md3_dark_on_surface</item>
+        <item name="autoCompleteUrlColor">@color/md3_dark_on_surface_variant</item>
+
+        <item name="selectedBackground">@color/md3_dark_primary_container</item>
+
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+
+        <!-- Overflow menu -->
+        <item name="actionOverflowButtonStyle">@style/overFlowButtonStyle</item>
+
+        <!-- Alert dialogs -->
+        <item name="alertDialogTheme">@style/MaterialDialogStyle.Dark</item>
+        <item name="materialAlertDialogTheme">@style/MaterialDialogStyle.Dark</item>
+    </style>
+
+    <style name="Theme.BaseBlackTheme" parent="Theme.Material3Expressive.Dark.NoActionBar">
+
+        <!-- Theme Colors -->
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/md3_dark_primary_container</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/md3_dark_primary</item>
+        <item name="colorSecondary">@color/md3_dark_secondary</item>
+        <item name="colorSecondaryContainer">@color/md3_dark_secondary_container</item>
+        <item name="colorTertiary">@color/md3_dark_tertiary</item>
+        <item name="colorTertiaryContainer">@color/md3_dark_tertiary_container</item>
+        <item name="colorSurface">@color/black</item>
+        <item name="colorSurfaceContainerLow">@color/md3_black_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/md3_black_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/md3_black_surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/md3_black_surface_container_highest</item>
+        <item name="colorOnPrimary">@color/md3_dark_on_primary</item>
+        <item name="colorOnSecondary">@color/md3_dark_on_secondary</item>
+        <item name="colorOnTertiary">@color/md3_dark_on_tertiary</item>
+        <item name="colorOnSurface">@color/md3_dark_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/md3_dark_on_surface_variant</item>
+        <item name="colorOutline">@color/md3_dark_outline</item>
+        <item name="colorOutlineVariant">@color/md3_dark_outline_variant</item>
+        <item name="colorError">@color/md3_dark_error</item>
+        <item name="android:colorBackground">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.Solipsism</item>
+        <item name="popupMenuStyle">@style/Widget.Solipsism.PopupMenu</item>
+        <item name="toolbarStyle">@style/Widget.Solipsism.Toolbar</item>
+        <item name="toolbarSurfaceStyle">@style/Widget.Solipsism.Toolbar.Surface</item>
+        <item name="drawerBackground">@color/md3_black_surface_container</item>
+        <item name="dividerColor">@color/md3_black_surface_container_highest</item>
+
+        <item name="iconColor">@color/icon_dark_theme</item>
+        <item name="iconColorState">@color/state_color_icons_dark</item>
+
+        <item name="autoCompleteBackgroundColor">@color/md3_black_surface_container_high</item>
+        <item name="autoCompleteTitleColor">@color/md3_dark_on_surface</item>
+        <item name="autoCompleteUrlColor">@color/md3_dark_on_surface_variant</item>
+
+        <item name="selectedBackground">@color/md3_dark_primary_container</item>
+
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+
+        <!-- Overflow menu -->
+        <item name="actionOverflowButtonStyle">@style/overFlowButtonStyle</item>
+
+        <!-- Alert dialogs -->
+        <item name="alertDialogTheme">@style/MaterialDialogStyle.Black</item>
+        <item name="materialAlertDialogTheme">@style/MaterialDialogStyle.Black</item>
+    </style>
+
+    <!-- AlertDialog Theming -->
+    <style name="MaterialDialogStyle.Light" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorAccent">@color/md3_primary</item>
+        <item name="colorSurface">?attr/colorSurfaceContainerHighest</item>
+        <item name="colorOnSurface">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="MaterialDialogStyle.Dark" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorAccent">@color/md3_dark_primary</item>
+        <item name="colorSurface">@color/md3_dark_surface_container_high</item>
+        <item name="colorOnSurface">@color/md3_dark_on_surface</item>
+    </style>
+
+    <style name="MaterialDialogStyle.Black" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorAccent">@color/md3_dark_primary</item>
+        <item name="colorSurface">@color/gray_dark</item>
+        <item name="colorOnSurface">@color/md3_dark_on_surface</item>
+    </style>
+
+    <style name="Widget.Solipsism.Toolbar" parent="Widget.Material3Expressive.Toolbar.AppBarWithSearch">
+        <item name="android:background">@drawable/toolbar_expressive</item>
+        <item name="titleTextColor">?attr/colorOnSurface</item>
+        <item name="subtitleTextColor">?attr/colorOnSurfaceVariant</item>
+        <item name="navigationIconTint">?attr/colorOnSurface</item>
+        <item name="popupTheme">@style/ThemeOverlay.Solipsism.Toolbar.Surface</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
+    <style name="Widget.Solipsism.Toolbar.Surface" parent="Widget.Material3Expressive.Toolbar.Surface">
+        <item name="android:background">@drawable/toolbar_expressive</item>
+    </style>
+
+    <style name="ThemeOverlay.Solipsism.Toolbar.Surface" parent="ThemeOverlay.Material3Expressive.Toolbar.Surface">
+        <item name="android:popupMenuStyle">@style/Widget.Solipsism.PopupMenu</item>
+        <item name="popupMenuStyle">@style/Widget.Solipsism.PopupMenu</item>
+        <item name="colorSurface">?attr/colorSurfaceContainerHighest</item>
+    </style>
+
+    <style name="Widget.Solipsism.PopupMenu" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupBackground">@drawable/popup_menu_background_expressive</item>
+        <item name="android:popupElevation">12dp</item>
+        <item name="android:dropDownSelector">@drawable/popup_menu_item_background_expressive</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="PreferenceThemeOverlay.Solipsism" parent="@style/PreferenceThemeOverlay">
+        <item name="preferenceCategoryStyle">@style/Preference.Category.Solipsism</item>
+        <item name="preferenceStyle">@style/Preference.Solipsism</item>
+        <item name="checkBoxPreferenceStyle">@style/Preference.CheckBoxPreference.Solipsism</item>
+        <item name="dialogPreferenceStyle">@style/Preference.DialogPreference.Solipsism</item>
+        <item name="switchPreferenceCompatStyle">@style/Preference.SwitchPreferenceCompat.Solipsism</item>
+        <item name="preferenceFragmentCompatStyle">@style/PreferenceFragment.Solipsism</item>
+        <item name="preferenceFragmentStyle">@style/PreferenceFragment.Solipsism</item>
+        <item name="preferenceFragmentListStyle">@style/PreferenceFragmentList.Solipsism</item>
+        <item name="preferenceCategoryTitleTextAppearance">@style/TextAppearance.Solipsism.PreferenceCategory</item>
+    </style>
+
+    <style name="Preference.Solipsism" parent="@style/Preference.Material">
+        <item name="singleLineTitle">false</item>
+        <item name="android:layout">@layout/preference_material</item>
+    </style>
+
+    <style name="Preference.DialogPreference.Solipsism" parent="@style/Preference.DialogPreference.Material">
+        <item name="android:layout">@layout/preference_material</item>
+    </style>
+
+    <style name="Preference.CheckBoxPreference.Solipsism" parent="@style/Preference.CheckBoxPreference.Material">
+        <item name="android:layout">@layout/preference_material</item>
+    </style>
+
+    <style name="Preference.SwitchPreferenceCompat.Solipsism" parent="@style/Preference.SwitchPreferenceCompat.Material">
+        <item name="android:layout">@layout/preference_material</item>
+        <item name="android:widgetLayout">@layout/preference_widget_switch_compat</item>
+    </style>
+
+    <style name="Preference.Category.Solipsism" parent="@style/Preference.Category.Material">
+        <item name="android:layout">@layout/preference_category_material</item>
+    </style>
+
+    <style name="PreferenceFragment.Solipsism" parent="@style/PreferenceFragment.Material">
+        <item name="android:divider">@android:color/transparent</item>
+    </style>
+
+    <style name="PreferenceFragmentList.Solipsism" parent="@style/PreferenceFragmentList.Material" />
+
+    <style name="TextAppearance.Solipsism.PreferenceCategory" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Solipsism.PreferenceTitle" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Solipsism.PreferenceSummary" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="TextAppearance.Solipsism.DialogTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.Solipsism.DialogItem" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.Solipsism.TabTitle" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.Solipsism.TabTitle.Selected" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Solipsism.RowPrimary" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.Solipsism.RowSecondary" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <!-- Overflow Menu Customization -->
+    <style name="overFlowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:background">@drawable/solipsism_blend_button_background</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <!-- Text Customization -->
+    <style name="boldText">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="normalText">
+        <item name="android:textStyle">normal</item>
+    </style>
+
+</resources>

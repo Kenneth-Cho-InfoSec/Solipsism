@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/settings_display">
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_action_expand"
+            android:key="fullScreenOption"
+            android:title="@string/fullScreenOption" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_desktop"
+            android:key="fullscreen"
+            android:title="@string/fullscreen" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_action_invert"
+            android:key="black_status_bar"
+            android:title="@string/settings_black_status_bar" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_desktop"
+            android:key="wideViewPort"
+            android:summary="@string/recommended"
+            android:title="@string/wideViewPort" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_desktop"
+            android:key="overViewMode"
+            android:summary="@string/recommended"
+            android:title="@string/overViewMode" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_text"
+            android:key="text_reflow"
+            android:title="@string/reflow" />
+        <Preference
+            android:icon="@drawable/ic_action_invert"
+            android:key="app_theme"
+            android:title="@string/theme" />
+        <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="text_size"
+            android:title="@string/title_text_size" />
+    </PreferenceCategory>
+</PreferenceScreen>
