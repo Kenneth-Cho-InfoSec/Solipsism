@@ -1,5 +1,9 @@
 # Solipsism
 
+<p align="center">
+  <img src="docs/logo.png" alt="Solipsism browser logo" width="220">
+</p>
+
 Solipsism is a focused Android browser with a calm right-rail interface, full WebView browsing, native tabs, bookmarks, history, downloads, incognito browsing, ad blocking, search suggestions, settings, and a built-in QR scanner for opening links directly in the current tab.
 
 ## Highlights
