@@ -47,8 +47,8 @@ android {
 
         named("release") {
             multiDexEnabled = false
-            isMinifyEnabled = !isCi
-            isShrinkResources = !isCi
+            isMinifyEnabled = false
+            isShrinkResources = false
             setProguardFiles(listOf("proguard-project.txt"))
             enableUnitTestCoverage = false
             enableAndroidTestCoverage = false

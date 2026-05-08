@@ -67,3 +67,18 @@
 
 -dontwarn androidx.window.extensions.**
 -dontwarn androidx.window.sidecar.**
+
+# Mezzanine uses generated reader classes and canonical interface names at runtime.
+-keep class com.anthonycr.mezzanine.** { *; }
+-keepnames class com.anthonycr.mezzanine.**
+-keep class com.krystelligence.solipsism.html.bookmark.BookmarkPageReader { *; }
+-keep class com.krystelligence.solipsism.html.homepage.HomePageReader { *; }
+-keep class com.krystelligence.solipsism.html.ListPageReader { *; }
+-keep class com.krystelligence.solipsism.js.InvertPage { *; }
+-keep class com.krystelligence.solipsism.js.TextReflow { *; }
+-keep class com.krystelligence.solipsism.js.ThemeColor { *; }
+
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
