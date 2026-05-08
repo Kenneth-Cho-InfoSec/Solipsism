@@ -73,3 +73,19 @@ data class PartialBrowserViewState(
     // find
     val findInPage: String?
 )
+
+fun BrowserViewState.asPartial(): PartialBrowserViewState = PartialBrowserViewState(
+    displayUrl = displayUrl,
+    sslState = sslState,
+    isRefresh = isRefresh,
+    progress = progress,
+    enableFullMenu = enableFullMenu,
+    themeColor = themeColor,
+    isForwardEnabled = isForwardEnabled,
+    isBackEnabled = isBackEnabled,
+    bookmarks = bookmarks,
+    isBookmarked = isBookmarked,
+    isBookmarkEnabled = isBookmarkEnabled,
+    isRootFolder = isRootFolder,
+    findInPage = findInPage
+)

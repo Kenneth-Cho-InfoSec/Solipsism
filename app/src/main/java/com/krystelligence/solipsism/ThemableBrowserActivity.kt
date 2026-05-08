@@ -25,6 +25,8 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
 
     private var themeId: AppTheme = AppTheme.LIGHT
     private var tabConfiguration: TabConfiguration = TabConfiguration.DRAWER_BOTTOM
+    private var solipsismRailSize: Int = 72
+    private var solipsismRailOnLeft: Boolean = false
     private var shouldRunOnResumeActions = false
 
     /**
@@ -38,6 +40,8 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
         injector.inject(this)
         themeId = userPreferences.useTheme
         tabConfiguration = userPreferences.tabConfiguration
+        solipsismRailSize = userPreferences.solipsismRailSize
+        solipsismRailOnLeft = userPreferences.solipsismRailOnLeft
 
         // set the theme
         setTheme(
@@ -97,7 +101,12 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
         resetPreferences()
         shouldRunOnResumeActions = true
         val nextTabConfiguration = userPreferences.tabConfiguration
-        if (themeId != userPreferences.useTheme || tabConfiguration != nextTabConfiguration) {
+        if (
+            themeId != userPreferences.useTheme ||
+            tabConfiguration != nextTabConfiguration ||
+            solipsismRailSize != userPreferences.solipsismRailSize ||
+            solipsismRailOnLeft != userPreferences.solipsismRailOnLeft
+        ) {
             restart()
         }
     }

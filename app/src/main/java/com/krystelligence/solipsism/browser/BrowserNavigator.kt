@@ -9,6 +9,7 @@ import com.krystelligence.solipsism.browser.download.PendingDownload
 import com.krystelligence.solipsism.extensions.copyToClipboard
 import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.log.Logger
+import com.krystelligence.solipsism.qr.QrShowActivity
 import com.krystelligence.solipsism.settings.activity.SettingsActivity
 import com.krystelligence.solipsism.utils.IntentUtils
 import com.krystelligence.solipsism.utils.Utils
@@ -85,6 +86,13 @@ class BrowserNavigator @Inject constructor(
 
     override fun launchIncognito(url: String?) {
         IncognitoBrowserActivity.launch(activity, url)
+    }
+
+    override fun showQrCode(url: String) {
+        val intent = Intent(activity, QrShowActivity::class.java).apply {
+            putExtra(QrShowActivity.EXTRA_URL, url)
+        }
+        activity.startActivity(intent)
     }
 
     companion object {

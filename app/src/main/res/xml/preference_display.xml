@@ -42,5 +42,13 @@
             android:icon="@drawable/ic_settings_text"
             android:key="text_size"
             android:title="@string/title_text_size" />
+        <Preference
+            android:icon="@drawable/ic_action_desktop"
+            android:key="rail_size"
+            android:title="@string/settings_rail_size" />
+        <Preference
+            android:icon="@drawable/ic_action_forward"
+            android:key="rail_position"
+            android:title="@string/settings_rail_position" />
     </PreferenceCategory>
 </PreferenceScreen>

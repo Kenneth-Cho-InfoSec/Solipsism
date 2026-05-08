@@ -27,7 +27,6 @@
     <string name="action_forward">Напред</string>
     <string name="settings">Поставке</string>
     <string name="location">Приступ локацији</string>
-    <string name="password">Сачувај лозинке</string>
     <string name="agent">Идентификација</string>
     <string name="home">Почетна страница</string>
     <string name="fullscreen">Цео екран</string>
@@ -41,27 +40,18 @@
     <string name="block">Блокирај слике</string>
     <string name="window">Дозволи сајтовима да отварају нове прозоре</string>
     <string name="cookies">Омогући колачиће</string>
-    <string name="size">Величина текста</string>
     <string name="recommended">Препоручљиво</string>
     <string name="search">Мотор претраге</string>
     <string name="search_hint">Тражи</string>
     <string name="wideViewPort">Широки приказ</string>
     <string name="overViewMode">Учитај странице у режиму прегледа</string>
     <string name="restore">Врати изгубљене језичке по покретању</string>
-    <string name="supported_browsers_title">Подржани прегледачи</string>
-    <string name="stock_browser">Уграђени прегледач</string>
-    <string name="stock_browser_unavailable">Нема уграђеног прегледача</string>
-    <string name="stock_browser_available">Откривен подржани уграђени прегледач</string>
     <string name="fullScreenOption">Сакриј траку стања током прегледања</string>
     <string name="clear_cookies">Очисти колачиће</string>
     <string name="clear_history">Очисти историјат</string>
-    <string name="dialog_image">Шта желите да урадите са овом сликом?</string>
     <string name="action_download">Преузми</string>
     <string name="action_open">Отвори</string>
-    <string name="dialog_link">Шта желите да урадите са овом везом?</string>
     <string name="dialog_title_share">Подели ову страницу</string>
-    <string name="dialog_history_long_press">Шта желите да урадите са овом ставком историјата?</string>
-    <string name="dialog_bookmark">Шта желите да урадите са овим обележивачем?</string>
     <string name="action_delete">Обриши</string>
     <string name="action_blank">Празна страница</string>
     <string name="agent_default">Подразумевана</string>
@@ -73,7 +63,6 @@
     <string name="dialog_download">Желите ли да преузмете овај фајл? (%1$s)</string>
     <string name="action_cancel">Одустани</string>
     <string name="title_warning">Упозорење</string>
-    <string name="dialog_adobe_not_installed">Адобов Флеш није откривен.\nИнсталирајте Флеш Плејер.</string>
     <string name="title_user_agent">Идентификација</string>
     <string name="title_download_location">Фасцикла преузимања</string>
     <string name="title_custom_homepage">Посебна домаћа страница</string>
@@ -85,17 +74,9 @@
     <string name="action_yes">Да</string>
     <string name="action_no">Не</string>
     <string name="title_text_size">Величина текста</string>
-    <string name="size_largest">Највећи</string>
-    <string name="size_large">Велики</string>
-    <string name="size_normal">Нормални</string>
-    <string name="size_small">Мали</string>
-    <string name="size_smallest">Најмањи</string>
     <string name="title_error">Грешка</string>
-    <string name="dialog_import_error">Ниједан прегледач за увоз обележивача није откривен.</string>
     <string name="hint_title">Име</string>
     <string name="hint_url">УРЛ</string>
-    <string name="title_edit_bookmark">Уређивање обележивача</string>
-    <string name="action_edit">Уреди</string>
     <string name="action_incognito">Нови приватни језичак</string>
     <string name="action_homepage">Подразумевана</string>
     <string name="action_back">Назад</string>
@@ -109,8 +90,6 @@
     <string name="download_sdcard_busy_dlg_title">УСБ складиште није доступно</string>
     <string name="download_sdcard_busy_dlg_msg">Складиште је заузето. Да дозволите преузимања, додирните „Искључи УСБ складиште“ у обавештењу.</string>
     <string name="incognito_cookies">Омогући колачиће у приватном режиму</string>
-    <string name="action_manual">Ручно</string>
-    <string name="action_auto">Аутоматски</string>
     <string name="action_follow_me">Контактирајте ме</string>
     <string name="url_twitter">twitter.com/ACRDevelopment</string>
     <string name="clear_cache">Очисти кеш</string>
@@ -118,8 +97,6 @@
     <string name="message_import">Обележивачи су увезени</string>
     <string name="message_clear_history">Историјат је очишћен</string>
     <string name="message_cookies_cleared">Колачићи су очишћени</string>
-    <string name="max_tabs">Досегнут макс. број језичака</string>
-    <string name="message_text_copied">Текст копиран на клипборд</string>
     <string name="message_link_copied">Веза копирана на клипборд</string>
     <string name="search_engine_custom">Посебна адреса</string>
     <string name="message_blocked_local">Учитавање локалног фајла је блокирано</string>
@@ -152,7 +129,6 @@
     <string name="manual_proxy">Ручне поставке проксија</string>
     <string name="host">Домаћин:</string>
     <string name="port">Порт:</string>
-    <string name="use_tor_prompt">Изгледа да имате Орбот инсталиран. Желите ли да користите Тор?</string>
     <string name="install_orbot">Инсталирајте Орбот да бисте користили Тор.</string>
     <string name="yes">Да</string>
     <string name="no">Не</string>
@@ -165,15 +141,12 @@
     <string name="freeware">Фривер</string>
     <string name="android_open_source_project">Андроид пројекат отвореног кôда</string>
     <string name="hphosts_ad_server_list">hpHosts списак рекламних сервера</string>
-    <string name="reopening_recent_tab">Поново отворени претходни језичак</string>
     <string name="rendering_mode">Исцртавање</string>
     <string name="name_inverted">Инверзно</string>
     <string name="name_grayscale">Сивило</string>
     <string name="name_inverted_grayscale">Инверзно сивило</string>
     <string name="name_increase_contrast">Појачан контраст</string>
     <string name="name_normal">Нормално</string>
-    <string name="sync_history">Синхронизуј историјат са Гуглом</string>
-    <string name="title_file_chooser">Бирач фајлова</string>
     <string name="library_netcipher">NetCipher</string>
     <string name="license_gnu">Гнуова Мања општа јавна лиценца</string>
     <string name="export_bookmarks">Извези обележиваче у резерву</string>
@@ -181,7 +154,6 @@
     <string name="bookmark_export_path">Обележивачи извезени у</string>
     <string name="bookmark_settings">Поставке обележивача</string>
     <string name="import_bookmark_error">Не могу да увезем обележиваче из фајла</string>
-    <string name="title_chooser">Изаберите фајл</string>
     <string name="settings_general">Опште поставке</string>
     <string name="settings_display">Поставке приказа</string>
     <string name="settings_privacy">Поставке приватности</string>
@@ -192,8 +164,6 @@
     <string name="close_other_tabs">Затвори друге језичке</string>
     <string name="third_party">Блокирај колачиће треће стране</string>
     <string name="color_mode">Режим боје</string>
-    <string name="loading">Учитавам&#8230;</string>
-    <string name="loading_failed">Нисам могао ништа да учитам са странице.</string>
     <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Јава ХТМЛ рашчлањивач</string>
     <string name="mit_license">МИТ лиценца</string>
@@ -204,7 +174,6 @@
         <item >УРЛ</item>
         <item >Наслов</item>
     </string-array>
-    <string name="invert_color">Обрнута боја</string>
     <string name="tabs">Језичци</string>
     <string name="theme">Тема</string>
     <string name="light_theme">Светла</string>
@@ -212,15 +181,11 @@
     <string name="black_theme">Црна (АМОЛЕД)</string>
     <string name="folder">Назив фасцикле</string>
     <string name="action_folder">Фасцикла</string>
-    <string name="action_rename">Преименуј</string>
     <string name="title_rename_folder">Преименуј фасциклу</string>
-    <string name="dialog_folder">Шта желите да урадите са овом фасциклом?</string>
     <string name="clear_web_storage">Очисти веб складиште</string>
     <string name="clear_web_storage_exit">Очисти веб складиште по затварању</string>
     <string name="message_web_storage_cleared">Веб складиште је очишћено</string>
-    <string name="hosts_source">Извор hosts фајла за блокирање реклама</string>
     <string name="settings_adblock">Поставке Адблока</string>
-    <string name="tabs_in_drawer">Језичци у фиоци навигације</string>
     <string name="do_not_track">Захтевај „Не прати ме“</string>
     <string name="remove_identifying_headers">Уклони идентификујућа заглавља</string>
     <string name="action_add_to_homescreen">Додај на почетни екран</string>

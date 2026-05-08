@@ -28,7 +28,7 @@ class RecyclerViewDialogItemAdapter(
 
     override fun onBindViewHolder(holder: DialogItemViewHolder, position: Int) {
         val item = listItems[position]
-        holder.icon.setImageDrawable(item.icon)
+        item.icon?.let(holder.icon::setImageResource) ?: holder.icon.setImageDrawable(null)
         item.colorTint?.let { holder.icon.setColorFilter(it, PorterDuff.Mode.SRC_IN) }
         holder.title.setText(item.title)
         holder.itemView.setOnClickListener { onItemClickListener?.invoke(item) }

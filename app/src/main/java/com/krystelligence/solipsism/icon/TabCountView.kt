@@ -69,6 +69,10 @@ class TabCountView @JvmOverloads constructor(
         invalidate()
     }
 
+    fun updateTabCount(count: Int) {
+        updateCount(count)
+    }
+
     override fun onDraw(canvas: Canvas) {
         val text: String = if (count > MAX_DISPLAYABLE_NUMBER) {
             context.getString(R.string.infinity)

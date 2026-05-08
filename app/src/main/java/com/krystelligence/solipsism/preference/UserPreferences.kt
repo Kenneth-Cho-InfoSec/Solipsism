@@ -231,12 +231,19 @@ class UserPreferences @Inject constructor(
     )
 
     var tabConfiguration by preferences.enumPreference(
-        TAB_CONFIGURATION, if (showTabsInDrawer) {
-            TabConfiguration.DRAWER_BOTTOM
-        } else {
-            TabConfiguration.DESKTOP
-        }
+        TAB_CONFIGURATION,
+        TabConfiguration.SOLIPSISM
     )
+
+    /**
+     * The width, in dp, of the Solipsism rail.
+     */
+    var solipsismRailSize by preferences.intPreference(SOLIPSISM_RAIL_SIZE, 72)
+
+    /**
+     * True if the Solipsism rail should be pinned to the left edge, false if pinned right.
+     */
+    var solipsismRailOnLeft by preferences.booleanPreference(SOLIPSISM_RAIL_ON_LEFT, false)
 
     /**
      * True if the browser should send a do not track (DNT) header with every GET request, false
@@ -344,6 +351,8 @@ private const val TEXT_ENCODING = "textEncoding"
 private const val CLEAR_WEB_STORAGE_EXIT = "clearWebStorageExit"
 private const val SHOW_TABS_IN_DRAWER = "showTabsInDrawer"
 private const val TAB_CONFIGURATION = "tabConfiguration"
+private const val SOLIPSISM_RAIL_SIZE = "solipsismRailSize"
+private const val SOLIPSISM_RAIL_ON_LEFT = "solipsismRailOnLeft"
 private const val DO_NOT_TRACK = "doNotTrack"
 private const val SAVE_DATA = "saveData"
 private const val IDENTIFYING_HEADERS = "removeIdentifyingHeaders"

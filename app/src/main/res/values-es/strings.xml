@@ -9,7 +9,6 @@
     <string name="action_forward">Adelante</string>
     <string name="settings">Ajustes</string>
     <string name="location">Permitir acceso a tu ubicación</string>
-    <string name="password">Almacenar tus contraseñas</string>
     <string name="agent">Agente de usuario</string>
     <string name="home">Página de inicio</string>
     <string name="fullscreen">Modo de pantalla completa</string>
@@ -23,26 +22,18 @@
     <string name="block">Bloquear imágenes</string>
     <string name="window">Permitir a los sitios abrir nuevas ventanas</string>
     <string name="cookies">Habilitar cookies</string>
-    <string name="size">Tamaño de la tipografía</string>
     <string name="recommended">(Recomendado)</string>
     <string name="search">Motor de búsqueda</string>
     <string name="search_hint">Buscar</string>
     <string name="wideViewPort">Utilizar viewport normal</string>
     <string name="overViewMode">Visualizar la página de lejos al cargar</string>
     <string name="restore">Restaurar pestañas cerradas al iniciar</string>
-    <string name="supported_browsers_title">Navegadores compatibles</string>
-    <string name="stock_browser">Navegador de sistema</string>
-    <string name="stock_browser_unavailable">Navegador de sistema no detectado</string>
-    <string name="stock_browser_available">Detectado navegador de sistema soportado</string>
     <string name="fullScreenOption">Ocultar barra de estado al navegar</string>
     <string name="clear_cookies">Limpiar cookies</string>
     <string name="clear_history">Limpiar historial</string>
-    <string name="dialog_image">¿Qué quieres hacer con esta imagen?</string>
     <string name="action_download">Descargar</string>
     <string name="action_open">Abrir</string>
-    <string name="dialog_link">¿Qué quieres hacer con este enlace?</string>
     <string name="dialog_title_share">Compartir esta página</string>
-    <string name="dialog_bookmark">¿Qué quieres hacer con este marcador?</string>
     <string name="action_delete">Eliminar</string>
     <string name="action_blank">Página en blanco</string>
     <string name="agent_default">Por defecto</string>
@@ -54,7 +45,6 @@
     <string name="dialog_download">¿Quieres descargar este archivo? (%1$s)</string>
     <string name="action_cancel">Cancelar</string>
     <string name="title_warning">Aviso</string>
-    <string name="dialog_adobe_not_installed">No se detecta Adobe Flash Player.\nPor favor, instálalo.</string>
     <string name="title_user_agent">Agente de usuario</string>
     <string name="title_download_location">Ruta para las descargas</string>
     <string name="title_custom_homepage">Página de inicio personalizada</string>
@@ -66,17 +56,9 @@
     <string name="action_yes">Sí</string>
     <string name="action_no">No</string>
     <string name="title_text_size">Tamaño de la tipografía</string>
-    <string name="size_largest">Muy grande</string>
-    <string name="size_large">Grande</string>
-    <string name="size_normal">Normal</string>
-    <string name="size_small">Pequeño</string>
-    <string name="size_smallest">Muy pequeño</string>
     <string name="title_error">Error</string>
-    <string name="dialog_import_error">No se ha detectado navegador del cual importar marcadores.</string>
     <string name="hint_title">Título</string>
     <string name="hint_url">Dirección URL</string>
-    <string name="title_edit_bookmark">Editar marcador</string>
-    <string name="action_edit">Editar</string>
     <string name="action_incognito">Nueva pestaña de incógnito</string>
     <string name="action_homepage">Por defecto</string>
     <string name="action_back">Atrás</string>
@@ -88,8 +70,6 @@
     <string name="download_sdcard_busy_dlg_title">Almacenamiento USB no disponible</string>
     <string name="download_sdcard_busy_dlg_msg">El almacenamiento está ocupado. Para permitir las descargar, desactiva el almacenamiento USB desde el área de notificación.</string>
     <string name="incognito_cookies">Habilitar cookies en el modo incógnito</string>
-    <string name="action_manual">Manual</string>
-    <string name="action_auto">Auto</string>
     <string name="action_follow_me">Contáctame</string>
     <string name="url_twitter">twitter.com/RestainoAnthony</string>
     <string name="clear_cache">Limpiar caché</string>
@@ -97,8 +77,6 @@
     <string name="message_import">Los marcadores se han importado</string>
     <string name="message_clear_history">El historial se ha borrado</string>
     <string name="message_cookies_cleared">Las cookies se han borrado</string>
-    <string name="max_tabs">Se ha alcanzado el máximo de pestañas</string>
-    <string name="message_text_copied">El texto se ha copiado al portapapeles</string>
     <string name="message_link_copied">El enlace se ha copiado al portapapeles</string>
     <string name="search_engine_custom">Dirección personalizada</string>
     <string name="message_blocked_local">Se ha bloqueado la carga del archivo local</string>
@@ -126,7 +104,6 @@
     <string name="manual_proxy">Proxy manual</string>
     <string name="host">Host:</string>
     <string name="port">Puerto:</string>
-    <string name="use_tor_prompt">Parece que tienes Orbot instalado. ¿Quieres usar Tor?</string>
     <string name="install_orbot">Por favor, instala Orbot para usar Tor.</string>
     <string name="yes">Sí</string>
     <string name="no">No</string>
@@ -139,15 +116,12 @@
     <string name="freeware">Software gratuito</string>
     <string name="android_open_source_project">Android Open Source Project</string>
     <string name="hphosts_ad_server_list">hpHosts Ad Server List</string>
-    <string name="reopening_recent_tab">Pestaña reabierta</string>
     <string name="rendering_mode">Modo de renderizado</string>
     <string name="name_inverted">Invertido</string>
     <string name="name_grayscale">Escala de grises</string>
     <string name="name_inverted_grayscale">Escala de grises invertida</string>
     <string name="name_increase_contrast">Aumentar contraste</string>
     <string name="name_normal">Normal</string>
-    <string name="sync_history">Sincronizar historial con Google</string>
-    <string name="title_file_chooser">Selector de archivos</string>
     <string name="library_netcipher">NetCipher</string>
     <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">Exportar marcadores a una copia de seguridad</string>
@@ -155,7 +129,6 @@
     <string name="bookmark_export_path">Marcadores exportados a</string>
     <string name="bookmark_settings">Ajustes de marcadores</string>
     <string name="import_bookmark_error">No se pudo importar los marcadores del archivo</string>
-    <string name="title_chooser">Elige un archivo</string>
     <string name="settings_general">Ajustes generales</string>
     <string name="settings_display">Ajustes de pantalla</string>
     <string name="settings_privacy">Ajustes de privacidad</string>
@@ -166,8 +139,6 @@
     <string name="close_other_tabs">Cerrar las demás pestañas</string>
     <string name="third_party">Bloquear cookies de terceras partes</string>
     <string name="color_mode">Habilitar modo de color</string>
-    <string name="loading">Cargando&#8230;</string>
-    <string name="loading_failed">No se pudo cargar la página.</string>
     <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
     <string name="mit_license">MIT License</string>
@@ -178,7 +149,6 @@
         <item>Dirección URL</item>
         <item>Título</item>
     </string-array>
-    <string name="invert_color">Invertir color</string>
     <string name="dark_theme">Tema oscuro</string>
     <string name="tabs">Pestañas</string>
     <string name="theme">Tema de la app</string>
@@ -186,17 +156,11 @@
     <string name="black_theme">Tema negro (AMOLED)</string>
     <string name="folder">Nombre de la carpeta</string>
     <string name="action_folder">Carpeta</string>
-    <string name="action_rename">Renombrar</string>
     <string name="title_rename_folder">Renombrar carpeta</string>
-    <string name="dialog_folder">¿Qué te gustaría hacer con esta carpeta?</string>
-    <string name="dialog_history_long_press">¿Qué quieres hacer con este elemento del historial?</string>
     <string name="clear_web_storage">Borrar almacenamiento web</string>
     <string name="clear_web_storage_exit">Borrar almacenamiento web al salir</string>
     <string name="message_web_storage_cleared">Almacenamiento web borrado</string>
-    <string name="hosts_source">Fuente de bloqueo de anuncios del archivo hosts</string>
     <string name="settings_adblock">Ajustes de bloqueo de anuncios</string>
-    <string name="tabs_in_drawer">Mostrar pestañas en el cajón de navegación</string>
-    <string name="swap_bookmarks_and_tabs">Cambiar marcador y tabuladores</string>
     <string name="do_not_track">Solicitar \'Do Not Track\'</string>
     <string name="remove_identifying_headers">Remover encabezados de identificación</string>
     <string name="action_add_to_homescreen">Añadir a pantalla de inicio</string>

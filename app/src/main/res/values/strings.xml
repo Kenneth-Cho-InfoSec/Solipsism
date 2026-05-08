@@ -18,7 +18,6 @@
     <string name="qr_scanner_permission_denied">Camera permission is needed to scan QR codes.</string>
     <string name="settings">Settings</string>
     <string name="location">Location access</string>
-    <string name="password">Save your passwords</string>
     <string name="agent">User agent</string>
     <string name="home">Homepage</string>
     <string name="fullscreen">Full-screen mode</string>
@@ -32,28 +31,21 @@
     <string name="block">Block images</string>
     <string name="window">Allow sites to open new windows</string>
     <string name="cookies">Enable cookies</string>
-    <string name="size">Text size</string>
     <string name="recommended">Recommended</string>
     <string name="search">Search engine</string>
     <string name="search_hint">Search</string>
     <string name="wideViewPort">Use wide viewport</string>
     <string name="overViewMode">Load pages in overview mode</string>
     <string name="restore">Restore lost tabs on start</string>
-    <string name="supported_browsers_title">Supported browsers</string>
-    <string name="stock_browser">Stock browser</string>
-    <string name="stock_browser_unavailable">No stock browser detected</string>
-    <string name="stock_browser_available">Supported stock browser detected</string>
     <string name="fullScreenOption">Hide status bar while browsing</string>
     <string name="clear_cookies">Clear browser cookies</string>
     <string name="clear_history">Clear browser history</string>
-    <string name="dialog_image">What would you like to do with this image?</string>
     <string name="action_download">Download</string>
     <string name="action_open">Open</string>
-    <string name="dialog_link">What would you like to do with this link?</string>
     <string name="dialog_title_share">Share this page</string>
-    <string name="dialog_history_long_press">What would you like to do with this history item?</string>
-    <string name="dialog_bookmark">What would you like to do with this bookmark?</string>
     <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_rename">Rename</string>
     <string name="action_blank">Blank page</string>
     <string name="agent_default">Default</string>
     <string name="agent_desktop">Desktop</string>
@@ -65,7 +57,6 @@
     <string name="unknown_size">Unknown size</string>
     <string name="action_cancel">Cancel</string>
     <string name="title_warning">Warning</string>
-    <string name="dialog_adobe_not_installed">Adobe Flash Player was not detected.\nPlease install Flash Player.</string>
     <string name="title_user_agent">User agent</string>
     <string name="title_download_location">Download location</string>
     <string name="title_custom_homepage">Custom homepage</string>
@@ -77,17 +68,10 @@
     <string name="action_yes">Yes</string>
     <string name="action_no">No</string>
     <string name="title_text_size">Text size</string>
-    <string name="size_largest">Largest</string>
-    <string name="size_large">Large</string>
-    <string name="size_normal">Normal</string>
-    <string name="size_small">Small</string>
-    <string name="size_smallest">Smallest</string>
     <string name="title_error">Error</string>
-    <string name="dialog_import_error">No browser was detected to import bookmarks from.</string>
     <string name="hint_title">Title</string>
     <string name="hint_url">URL</string>
-    <string name="title_edit_bookmark">Edit bookmark</string>
-    <string name="action_edit">Edit</string>
+    <string name="title_file_chooser">Choose file</string>
     <string name="action_incognito">New incognito tab</string>
     <string name="action_homepage">Default</string>
     <string name="action_back">Back</string>
@@ -102,8 +86,6 @@
     <string name="download_sdcard_busy_dlg_msg">The storage is busy. To allow downloads, touch \'Turn Off USB Storage\' in the notification.</string>
     <string name="incognito_cookies">Enable cookies in incognito mode</string>
     <string name="incognito_cookies_pie">Incognito mode runs in a separate process that is reset after each session. Incognito cookie preferences are now controlled by the regular cookie preferences.</string>
-    <string name="action_manual">Manual</string>
-    <string name="action_auto">Auto</string>
     <string name="action_follow_me">Contact me</string>
     <string name="url_twitter">twitter.com/RestainoAnthony</string>
     <string name="clear_cache">Clear cache</string>
@@ -111,8 +93,6 @@
     <string name="message_import">Bookmarks were imported</string>
     <string name="message_clear_history">History cleared</string>
     <string name="message_cookies_cleared">Cookies cleared</string>
-    <string name="max_tabs">Max tabs reached</string>
-    <string name="message_text_copied">Text copied to clipboard</string>
     <string name="message_link_copied">Link copied to clipboard</string>
     <string name="message_blocked_local">Local file has been blocked from loading</string>
     <string name="licenses">Open Source Licenses</string>
@@ -126,27 +106,11 @@
 
     <string name="block_ads_upsell_source">Upgrade to Solipsism Plus to choose</string>
 
-    <string name="block_remote_frequency_daily">Daily</string>
-    <string name="block_remote_frequency_weekly">Weekly</string>
-    <string name="block_remote_frequency_monthly">Monthly</string>
-
-    <string-array name="block_ad_frequency_list">
-        <item>@string/block_remote_frequency_daily</item>
-        <item>@string/block_remote_frequency_weekly</item>
-        <item>@string/block_remote_frequency_monthly</item>
-    </string-array>
-
     <string name="block_source_default">Default hosts</string>
     <string name="block_source_local">Local hosts file</string>
     <string name="block_source_local_description">File: %1$s</string>
     <string name="block_source_remote">Remote hosts file</string>
     <string name="block_source_remote_description">URL: %1$s</string>
-
-    <string-array name="block_ad_source_list">
-        <item>@string/block_source_default</item>
-        <item>@string/block_source_local</item>
-        <item>@string/block_source_remote</item>
-    </string-array>
 
     <!-- Common actions -->
     <string name="action_message_canceled">Action canceled.</string>
@@ -189,7 +153,6 @@
     <string name="manual_proxy">Manual proxy</string>
     <string name="host">Host:</string>
     <string name="port">Port:</string>
-    <string name="use_tor_prompt">It looks like you have Orbot installed. Do you want to use Tor?</string>
     <string name="install_orbot">Please install Orbot in order to proxy with Tor.</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -202,15 +165,12 @@
     <string name="freeware">Freeware</string>
     <string name="android_open_source_project">Android Open Source Project</string>
     <string name="hphosts_ad_server_list">hpHosts Ad Server List</string>
-    <string name="reopening_recent_tab">Reopened old tab</string>
     <string name="rendering_mode">Rendering mode</string>
     <string name="name_inverted">Inverted</string>
     <string name="name_grayscale">Grayscale</string>
     <string name="name_inverted_grayscale">Inverted grayscale</string>
     <string name="name_increase_contrast">Increase contrast</string>
     <string name="name_normal">Normal</string>
-    <string name="sync_history">Sync history with Google</string>
-    <string name="title_file_chooser">File chooser</string>
     <string name="library_netcipher">NetCipher</string>
     <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">Export bookmarks to backup</string>
@@ -219,8 +179,6 @@
     <string name="bookmark_export_failure">Sorry, bookmarks could not be exported!</string>
     <string name="bookmark_settings">Bookmark Settings</string>
     <string name="import_bookmark_error">Could not import bookmarks from file</string>
-    <string name="message_bookmark_added">Bookmark added.</string>
-    <string name="title_chooser">Choose a file</string>
     <string name="settings_general">General Settings</string>
     <string name="settings_display">Display Settings</string>
     <string name="settings_privacy">Privacy Settings</string>
@@ -231,8 +189,6 @@
     <string name="close_other_tabs">Close other tabs</string>
     <string name="third_party">Block 3rd party cookies</string>
     <string name="color_mode">Enable color mode</string>
-    <string name="loading">Loading&#8230;</string>
-    <string name="loading_failed">Couldn\'t load anything from the page.</string>
     <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
     <string name="mit_license">MIT License</string>
@@ -243,25 +199,27 @@
         <item>URL</item>
         <item>Title</item>
     </string-array>
-    <string name="invert_color">Invert color</string>
     <string name="dark_theme">Dark theme</string>
     <string name="settings_black_status_bar">Black status bar</string>
     <string name="tabs">Tabs</string>
     <string name="theme">App theme</string>
     <string name="light_theme">Light theme</string>
     <string name="black_theme">Black theme (AMOLED)</string>
+    <string name="settings_rail_size">Rail size</string>
+    <string name="settings_rail_size_small">Small</string>
+    <string name="settings_rail_size_medium">Medium</string>
+    <string name="settings_rail_size_large">Large</string>
+    <string name="settings_rail_position">Rail position</string>
+    <string name="settings_rail_position_left">Left</string>
+    <string name="settings_rail_position_right">Right</string>
+    <string name="settings_rail_size_super_compact">Super Compact</string>
     <string name="folder">Folder name</string>
     <string name="action_folder">Folder</string>
-    <string name="action_rename">Rename</string>
     <string name="title_rename_folder">Rename folder</string>
-    <string name="dialog_folder">What would you like to do with this folder?</string>
     <string name="clear_web_storage">Clear web storage</string>
     <string name="clear_web_storage_exit">Clear web storage on exit</string>
     <string name="message_web_storage_cleared">Web storage cleared</string>
-    <string name="hosts_source">Hosts file ad blocking source</string>
     <string name="settings_adblock">Ad Block Settings</string>
-    <string name="tabs_in_drawer">Show tabs in navigation drawer</string>
-    <string name="swap_bookmarks_and_tabs">Swap bookmark and tab drawers</string>
     <string name="do_not_track">Request \'Do Not Track\'</string>
     <string name="save_data">Request \'Save-Data\'</string>
     <string name="remove_identifying_headers">Remove identifying headers</string>
@@ -270,13 +228,7 @@
     <string name="message_added_to_homescreen">Shortcut added to home screen</string>
     <string name="shortcut_message_failed_to_add">Sorry, your launcher does not support shortcuts.</string>
     <string name="action_delete_all_bookmarks">Delete all bookmarks</string>
-    <string name="upsell_plus_version">Upgrade to Solipsism Plus to block ads</string>
     <string name="message_open_download_fail">This file doesn\'t exist anymore</string>
-
-    <string name="tab_style_title">Tab Style</string>
-    <string name="tab_style_desktop">Desktop</string>
-    <string name="tab_style_side_drawer">Side Drawer</string>
-    <string name="tab_style_bottom_drawer">Bottom Drawer</string>
 
     <string name="faq">FAQ</string>
     <string name="faq_description">Frequently asked questions</string>
@@ -291,8 +243,11 @@
     <string name="dialog_open_background_tab">Open in background tab</string>
     <string name="dialog_open_incognito_tab">Open in incognito tab</string>
     <string name="dialog_remove_bookmark">Remove bookmark</string>
+    <string name="dialog_bookmark">Bookmark</string>
+    <string name="dialog_folder">Folder</string>
     <string name="dialog_edit_bookmark">Edit bookmark</string>
     <string name="dialog_remove_from_history">Remove from history</string>
+    <string name="dialog_history_long_press">History</string>
     <string name="dialog_download_image">Download image</string>
     <string name="dialog_copy_link">Copy link</string>
     <string name="dialog_rename_folder">Rename folder</string>
@@ -343,11 +298,12 @@
     <string name="ssl_info_expires_on">Expires on</string>
     
     <!-- Search in page -->
-    <string name="search_in_page_query">\'%1$s\'</string>
 
     <!-- Frozen tabs -->
     <string name="tab_frozen">Frozen…</string>
 
     <!-- Search -->
     <string name="search_insert_suggestion">Insert suggestion</string>
+
+    <string name="permission_description_storage">Storage permission is required to download files to your device.</string>
 </resources>

@@ -1,7 +1,7 @@
 package com.krystelligence.solipsism.dialog
 
-import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 
 
@@ -11,7 +11,8 @@ import androidx.annotation.StringRes
  * defaults to true and allows the consumer to control the visibility of the item in the list.
  */
 class DialogItem(
-    val icon: Drawable? = null,
+    @param:DrawableRes
+    val icon: Int? = null,
     @param:ColorInt
     val colorTint: Int? = null,
     @param:StringRes

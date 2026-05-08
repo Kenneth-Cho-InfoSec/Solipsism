@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import com.krystelligence.solipsism.utils.Utils;
 import com.krystelligence.solipsism.utils.FileUtils;
+import com.krystelligence.solipsism.utils.Utils;
 import androidx.annotation.NonNull;
 import io.reactivex.rxjava3.core.Single;
 
@@ -64,8 +64,6 @@ class FetchUrlMimeType {
                 if (mUserAgent != null && !mUserAgent.isEmpty()) {
                     connection.setRequestProperty("User-Agent", mUserAgent);
                 }
-                connection.setConnectTimeout(10000);
-                connection.setReadTimeout(10000);
                 connection.connect();
                 // We could get a redirect here, but if we do lets let
                 // the download manager take care of it, and thus trust that
@@ -105,6 +103,7 @@ class FetchUrlMimeType {
                     URLUtil.guessFileName(mUri, contentDisposition, mimeType)
                 );
                 mRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                mRequest.setTitle(filename);
             }
 
             // Start the download

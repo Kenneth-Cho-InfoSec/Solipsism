@@ -91,7 +91,7 @@ class BrowserPresenter @Inject constructor(
 ) {
 
     private var view: BrowserContract.View? = null
-    private var viewState: BrowserViewState = BrowserViewState(
+    var viewState: BrowserViewState = BrowserViewState(
         displayUrl = "",
         isRefresh = true,
         sslState = SslState.None,
@@ -1301,7 +1301,7 @@ class BrowserPresenter @Inject constructor(
 
             BrowserContract.ImageLongPressEvent.DOWNLOAD -> navigator.download(
                 PendingDownload(
-                    url = longPress.targetUrl.orEmpty(),
+                    url = longPress.hitUrl.orEmpty(),
                     userAgent = null,
                     contentDisposition = "attachment",
                     mimeType = null,
@@ -1316,6 +1316,20 @@ class BrowserPresenter @Inject constructor(
      */
     fun onFileChooserResult(activityResult: ActivityResult) {
         currentTab?.handleFileChooserResult(activityResult)
+    }
+
+    /**
+     * Call when the user clicks on the QR button.
+     */
+    fun onQrButtonClick() {
+        view?.launchQrScanner()
+    }
+
+    /**
+     * Call when the user long presses on the QR button.
+     */
+    fun onQrButtonLongClick() {
+        currentTab?.url?.takeIf { !it.isSpecialUrl() }?.let(navigator::showQrCode)
     }
 
     private fun BrowserContract.View?.updateState(state: BrowserViewState) {

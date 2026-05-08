@@ -224,21 +224,27 @@
 
     <!-- AlertDialog Theming -->
     <style name="MaterialDialogStyle.Light" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/black</item>
         <item name="colorAccent">@color/md3_primary</item>
-        <item name="colorSurface">?attr/colorSurfaceContainerHighest</item>
-        <item name="colorOnSurface">?attr/colorOnSurface</item>
+        <item name="colorSurface">@color/md3_surface_container_highest</item>
+        <item name="colorOnSurface">@color/md3_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/md3_on_surface_variant</item>
     </style>
 
     <style name="MaterialDialogStyle.Dark" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/white</item>
         <item name="colorAccent">@color/md3_dark_primary</item>
         <item name="colorSurface">@color/md3_dark_surface_container_high</item>
         <item name="colorOnSurface">@color/md3_dark_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/md3_dark_on_surface_variant</item>
     </style>
 
     <style name="MaterialDialogStyle.Black" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/white</item>
         <item name="colorAccent">@color/md3_dark_primary</item>
         <item name="colorSurface">@color/gray_dark</item>
         <item name="colorOnSurface">@color/md3_dark_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/md3_dark_on_surface_variant</item>
     </style>
 
     <style name="Widget.Solipsism.Toolbar" parent="Widget.Material3Expressive.Toolbar.AppBarWithSearch">
@@ -354,12 +360,5 @@
     </style>
 
     <!-- Text Customization -->
-    <style name="boldText">
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="normalText">
-        <item name="android:textStyle">normal</item>
-    </style>
 
 </resources>

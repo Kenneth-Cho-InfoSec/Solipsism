@@ -73,7 +73,7 @@ class Browser2Module {
 
     @Provides
     fun providesUiConfiguration(): UiConfiguration = UiConfiguration(
-        tabConfiguration = TabConfiguration.DRAWER_SIDE,
+        tabConfiguration = TabConfiguration.SOLIPSISM,
         bookmarkConfiguration = BookmarkConfiguration.RIGHT
     )
 

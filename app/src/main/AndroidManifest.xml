@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -30,21 +32,25 @@
         android:name="android.hardware.touchscreen"
         android:required="false" />
 
-    <application
-        android:name=".BrowserApp"
-        android:allowBackup="false"
-        android:hardwareAccelerated="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher"
-        android:taskAffinity="com.krystelligence.solipsism.AffinityDefault"
-        android:usesCleartextTraffic="true">
+<application
+    android:name=".BrowserApp"
+    android:allowBackup="false"
+    android:hardwareAccelerated="true"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:roundIcon="@mipmap/ic_launcher"
+    android:taskAffinity="com.krystelligence.solipsism.AffinityDefault"
+    android:usesCleartextTraffic="true"
+    android:requestLegacyExternalStorage="true">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="barcode" />
 
         <activity
             android:name="com.krystelligence.solipsism.DefaultBrowserActivity"
@@ -173,6 +179,14 @@
             android:exported="false"
             android:label="@string/qr_scanner_title"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.LightTheme" />
+
+        <activity
+            android:name=".qr.QrShowActivity"
+            android:colorMode="wideColorGamut"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard"
+            android:exported="false"
+            android:label="@string/action_share"
             android:theme="@style/Theme.LightTheme" />
 
         <provider

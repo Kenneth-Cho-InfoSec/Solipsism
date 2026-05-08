@@ -148,10 +148,24 @@
                                     android:textColorHint="?attr/autoCompleteUrlColor"
                                     android:textCursorDrawable="@null"
                                     android:textSize="16sp"
-                                    app:layout_constraintEnd_toStartOf="@+id/search_refresh"
+                                    app:layout_constraintEnd_toStartOf="@+id/search_qr"
                                     app:layout_constraintStart_toEndOf="@+id/search_ssl_status"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:layout_goneMarginLeft="8dp" />
+
+                                <ImageView
+                                    android:id="@+id/search_qr"
+                                    android:layout_width="@dimen/browser_icon_button_size"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/icon_button_background"
+                                    android:clickable="true"
+                                    android:contentDescription="@string/action_scan_qr"
+                                    android:focusable="true"
+                                    android:padding="6dp"
+                                    app:layout_constraintEnd_toStartOf="@+id/search_refresh"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:srcCompat="@drawable/ic_action_qr_code"
+                                    app:tint="?attr/iconColor" />
 
                                 <ImageView
                                     android:id="@+id/search_refresh"
@@ -399,6 +413,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/material_grid_margin"
+                    android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:minHeight="?android:attr/listPreferredItemHeight"

@@ -71,6 +71,8 @@ interface ViewDelegate {
 
     val searchRefresh: ImageView
 
+    val searchQr: ImageView?
+
     val actionAddBookmark: ImageView
 
     val actionPageTools: ImageView

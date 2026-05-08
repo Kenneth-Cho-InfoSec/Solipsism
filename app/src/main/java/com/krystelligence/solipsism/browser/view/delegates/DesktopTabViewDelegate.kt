@@ -44,6 +44,7 @@ class DesktopTabViewDelegate(binding: BrowserActivityDesktopBinding) : ViewDeleg
     override val actionHome: ImageView = binding.actionHome
     override val newTabButton: ImageView = binding.newTabButton
     override val searchRefresh: ImageView = binding.searchRefresh
+    override val searchQr: ImageView = binding.searchQr
     override val actionAddBookmark: ImageView = binding.actionAddBookmark
     override val actionPageTools: ImageView = binding.actionPageTools
     override val tabHeaderButton: ImageView = binding.tabHeaderButton

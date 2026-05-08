@@ -8,5 +8,6 @@ import com.krystelligence.solipsism.preference.IntEnum
 enum class TabConfiguration(override val value: Int) : IntEnum {
     DESKTOP(0),
     DRAWER_SIDE(1),
-    DRAWER_BOTTOM(2)
+    DRAWER_BOTTOM(2),
+    SOLIPSISM(3)
 }

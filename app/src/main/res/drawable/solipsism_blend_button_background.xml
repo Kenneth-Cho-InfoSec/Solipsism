@@ -3,7 +3,7 @@
     android:color="?attr/colorSecondaryContainer">
     <item>
         <shape android:shape="rectangle">
-            <corners android:radius="20dp" />
+            <corners android:radius="18dp" />
             <solid android:color="@color/transparent" />
         </shape>
     </item>

@@ -56,8 +56,6 @@ android {
             ndk {
                 abiFilters.add("arm64-v8a")
                 abiFilters.add("armeabi-v7a")
-                abiFilters.add("armeabi")
-                abiFilters.add("mips")
             }
         }
     }
@@ -126,7 +124,8 @@ dependencies {
     implementation("com.anthonycr.mezzanine:core:$mezzanineVersion")
     implementation("com.google.android.material:material:1.14.0-beta01")
     implementation("com.google.dagger:dagger:$daggerVersion")
-    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1")
+    implementation("com.google.zxing:core:3.5.3")
     implementation("com.guolindev.permissionx:permissionx:1.8.1")
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
     implementation("com.squareup.okio:okio:3.17.0")
@@ -137,6 +136,7 @@ dependencies {
     implementation("io.reactivex.rxjava3:rxjava:3.1.12")
     implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
     implementation("javax.inject:javax.inject:1")
+    //noinspection GradleDependency
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.jsoup:jsoup:1.22.2")

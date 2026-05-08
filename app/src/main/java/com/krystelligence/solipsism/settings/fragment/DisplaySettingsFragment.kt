@@ -41,6 +41,18 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             onClick = ::showTextSizePicker
         )
 
+        clickableDynamicPreference(
+            preference = SETTINGS_RAIL_SIZE,
+            summary = userPreferences.solipsismRailSize.toRailSizeDisplayString(),
+            onClick = ::showRailSizePicker
+        )
+
+        clickableDynamicPreference(
+            preference = SETTINGS_RAIL_POSITION,
+            summary = userPreferences.solipsismRailOnLeft.toRailPositionDisplayString(),
+            onClick = ::showRailPositionPicker
+        )
+
         togglePreference(
             preference = SETTINGS_HIDESTATUSBAR,
             isChecked = userPreferences.hideStatusBarEnabled,
@@ -131,12 +143,62 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         }.resizeAndShow()
     }
 
+    private fun showRailSizePicker(summaryUpdater: SummaryUpdater) {
+        MaterialAlertDialogBuilder(requireActivity()).apply {
+            setTitle(R.string.settings_rail_size)
+            val values = listOf(
+                Pair(RAIL_SIZE_SUPER_COMPACT, getString(R.string.settings_rail_size_super_compact)),
+                Pair(RAIL_SIZE_SMALL, getString(R.string.settings_rail_size_small)),
+                Pair(RAIL_SIZE_MEDIUM, getString(R.string.settings_rail_size_medium)),
+                Pair(RAIL_SIZE_LARGE, getString(R.string.settings_rail_size_large))
+            )
+            withSingleChoiceItems(values, userPreferences.solipsismRailSize.coerceToKnownRailSize()) {
+                userPreferences.solipsismRailSize = it
+                summaryUpdater.updateSummary(it.toRailSizeDisplayString())
+            }
+            setPositiveButton(resources.getString(R.string.action_ok), null)
+        }.resizeAndShow()
+    }
+
+    private fun showRailPositionPicker(summaryUpdater: SummaryUpdater) {
+        MaterialAlertDialogBuilder(requireActivity()).apply {
+            setTitle(R.string.settings_rail_position)
+            val values = listOf(
+                Pair(false, getString(R.string.settings_rail_position_right)),
+                Pair(true, getString(R.string.settings_rail_position_left))
+            )
+            withSingleChoiceItems(values, userPreferences.solipsismRailOnLeft) {
+                userPreferences.solipsismRailOnLeft = it
+                summaryUpdater.updateSummary(it.toRailPositionDisplayString())
+            }
+            setPositiveButton(resources.getString(R.string.action_ok), null)
+        }.resizeAndShow()
+    }
+
     private fun AppTheme.toDisplayString(): String = getString(
         when (this) {
             AppTheme.LIGHT -> R.string.light_theme
             AppTheme.DARK -> R.string.dark_theme
             AppTheme.BLACK -> R.string.black_theme
         }
+    )
+
+    private fun Int.toRailSizeDisplayString(): String = getString(
+        when (coerceToKnownRailSize()) {
+            RAIL_SIZE_SUPER_COMPACT -> R.string.settings_rail_size_super_compact
+            RAIL_SIZE_SMALL -> R.string.settings_rail_size_small
+            RAIL_SIZE_LARGE -> R.string.settings_rail_size_large
+            else -> R.string.settings_rail_size_medium
+        }
+    )
+
+    private fun Int.coerceToKnownRailSize(): Int = when (this) {
+        RAIL_SIZE_SUPER_COMPACT, RAIL_SIZE_SMALL, RAIL_SIZE_MEDIUM, RAIL_SIZE_LARGE -> this
+        else -> RAIL_SIZE_MEDIUM
+    }
+
+    private fun Boolean.toRailPositionDisplayString(): String = getString(
+        if (this) R.string.settings_rail_position_left else R.string.settings_rail_position_right
     )
 
     private class TextSeekBarListener(
@@ -162,7 +224,14 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_REFLOW = "text_reflow"
         private const val SETTINGS_THEME = "app_theme"
         private const val SETTINGS_TEXTSIZE = "text_size"
+        private const val SETTINGS_RAIL_SIZE = "rail_size"
+        private const val SETTINGS_RAIL_POSITION = "rail_position"
         private const val SETTINGS_BLACK_STATUS = "black_status_bar"
+
+        private const val RAIL_SIZE_SUPER_COMPACT = 30
+        private const val RAIL_SIZE_SMALL = 60
+        private const val RAIL_SIZE_MEDIUM = 72
+        private const val RAIL_SIZE_LARGE = 88
 
         private const val XX_LARGE = 30.0f
         private const val X_LARGE = 26.0f

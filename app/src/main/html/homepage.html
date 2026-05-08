@@ -15,103 +15,132 @@
         --box-txt: {COLOR}
     }
 
+    * {
+        box-sizing: border-box;
+    }
+
     body {
-        background: var(--body-bg);
-        text-align: center;
-        margin: 0px;
+        min-height: 100vh;
+        margin: 0;
+        color: #ffffff;
+        background:
+            linear-gradient(180deg, rgba(12, 18, 20, 0.16), rgba(12, 18, 20, 0.74)),
+            url("https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1100&q=85")
+            center center / cover no-repeat,
+            var(--body-bg);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    input {
-        color: var(--box-txt);
+    .page {
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-end;
+        padding: 28px;
     }
-    
-    #search_input {
-        height: 35px;
+
+    .home {
         width: 100%;
-        outline: none;
-        border: none;
-        font-size: 16px;
-        background-color: transparent;
+        max-width: 620px;
+        padding-bottom: 12vh;
     }
-    
-    span {
-        display: block;
-        overflow: hidden;
-        padding-left: 5px;
-        vertical-align: middle;
+
+    .kicker {
+        margin: 0 0 12px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.86;
     }
-    
+
+    h1 {
+        margin: 0;
+        max-width: 12ch;
+        font-size: 48px;
+        line-height: 1.02;
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+
+    .subhead {
+        max-width: 32ch;
+        margin: 16px 0 28px;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 17px;
+        line-height: 1.42;
+    }
+
     .search_bar {
-        display: table;
-        vertical-align: middle;
-        width: 90%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 56px;
+        max-width: 560px;
+        padding: 8px 10px 8px 16px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        border-radius: 28px;
+        box-shadow: 0 18px 52px rgba(0, 0, 0, 0.24);
+    }
+
+    #image_url {
+        width: 24px;
+        height: 24px;
+        flex: 0 0 auto;
+    }
+
+    #search_input {
+        min-width: 0;
+        width: 100%;
         height: 40px;
-        max-width: 500px;
-        margin: 0 auto;
-        background-color: var(--box-bg);
-        font-family: Arial;
-        color: var(--box-txt);
-        -moz-border-radius: 8px;
-        -webkit-border-radius: 8px;
-        border-radius: 8px;
-    }
-    
-    #search_submit {
         outline: none;
-        height: 37px;
-        float: right;
-        color: var(--box-txt);
-        font-size: 16px;
-        font-weight: bold;
         border: none;
-        background-color: transparent;
-    }
-    
-    .outer {
-        display: table;
-        position: absolute;
-        height: 100%;
-        width: 100%;
-    }
-    
-    .middle {
-        display: table-cell;
-        vertical-align: middle;
-    }
-    
-    .inner {
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 10%;
-        width: 100%;
-    }
-    
-    img.smaller {
-        width: 50%;
-        max-width: 300px;
+        color: #17201d;
+        background: transparent;
+        font-size: 16px;
     }
 
+    #search_submit {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 auto;
+        border: none;
+        border-radius: 21px;
+        color: #ffffff;
+        background: #16211e;
+        font-size: 18px;
+        font-weight: 700;
+    }
 
+    @media (max-width: 480px) {
+        .page {
+            padding: 22px;
+        }
+
+        h1 {
+            font-size: 38px;
+        }
+
+        .home {
+            padding-bottom: 10vh;
+        }
+    }
 </style>
 
 <body>
-<div class="outer">
-    <div class="middle">
-        <div class="inner">
-            <img id="image_url" class="smaller" src="${IMAGE}">
-            </br>
-            </br>
-            <form onsubmit="return search()" class="search_bar" autocomplete="off">
-                <input type="submit" id="search_submit" value="Search">
-                <span>
-                        <input class="search" type="text" value="" id="search_input"/>
-                    </span>
-            </form>
-            </br>
-            </br>
-        </div>
-    </div>
-</div>
+<main class="page">
+    <section class="home">
+        <p class="kicker">Solipsism</p>
+        <h1>Where to next?</h1>
+        <p class="subhead">Search the web, jump to a site, or start with a clean view.</p>
+        <form onsubmit="return search()" class="search_bar" autocomplete="off">
+            <img id="image_url" src="${IMAGE}" alt="">
+            <input class="search" type="text" value="" id="search_input" placeholder="Search or enter address"/>
+            <input type="submit" id="search_submit" value="Go">
+        </form>
+    </section>
+</main>
 <script type="text/javascript">
         function search() {
             if (document.getElementById("search_input").value != "") {

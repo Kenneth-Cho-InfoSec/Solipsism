@@ -27,7 +27,6 @@
     <string name="action_forward">Előre</string>
     <string name="settings">Beállítások</string>
     <string name="location">Hely hozzáférés</string>
-    <string name="password">Jelszavak mentése</string>
     <string name="agent">Felhasználó Ügynök</string>
     <string name="home">Főoldal</string>
     <string name="fullscreen">Teljes képernyős mód</string>
@@ -41,27 +40,18 @@
     <string name="block">Képek blokkolása</string>
     <string name="window">Engedélyezés,hogy a webhelyek új lapot nyithassanak meg</string>
     <string name="cookies">Cookie-k bekapcsolása</string>
-    <string name="size">Szövegméret</string>
     <string name="recommended">Ajánlott</string>
     <string name="search">Keresőmotor</string>
     <string name="search_hint">Keresés</string>
     <string name="wideViewPort">Széles nézőport használata</string>
     <string name="overViewMode">Oldalak betöltése áttekinthető módban</string>
     <string name="restore">Elvesztett lapok visszaállítása induláskor</string>
-    <string name="supported_browsers_title">Támogatott Böngészők</string>
-    <string name="stock_browser">Gyári Böngésző</string>
-    <string name="stock_browser_unavailable">Nincs gyári böngésző észlelve</string>
-    <string name="stock_browser_available">Támogatott gyári böngésző észlelve</string>
     <string name="fullScreenOption">Állapotsáv elrejtése böngészés közben</string>
     <string name="clear_cookies">Cookie-k törlése</string>
     <string name="clear_history">Clear Browser History</string>
-    <string name="dialog_image">Mit szeretnél csinálni ezzel a képpel?</string>
     <string name="action_download">Letöltés</string>
     <string name="action_open">Megnyitás</string>
-    <string name="dialog_link">Mit szeretnél csinálni ezzel a linkkel?</string>
     <string name="dialog_title_share">Oldal megosztása</string>
-    <string name="dialog_history_long_press">Mit szeretnél csinálni, ezzel az előzménnyel?</string>
-    <string name="dialog_bookmark">Mit szeretnél csinálni, ezzel a könyvjelzővel?</string>
     <string name="action_delete">Törlés</string>
     <string name="action_blank">Üres oldal</string>
     <string name="agent_default">Alapértelmezett</string>
@@ -73,7 +63,6 @@
     <string name="dialog_download">Le szeretnéd tölteni ezt a fájlt? (%1$s)</string>
     <string name="action_cancel">Mégse</string>
     <string name="title_warning">Figyelmeztetés</string>
-    <string name="dialog_adobe_not_installed">Az Adobe Flash Player nincs észlelve.\nKérjük telepítse a Flash Player-t.</string>
     <string name="title_user_agent">Felhasználói ügynök</string>
     <string name="title_download_location">Letöltési hely</string>
     <string name="title_custom_homepage">Egyéni honlap</string>
@@ -85,17 +74,9 @@
     <string name="action_yes">Igen</string>
     <string name="action_no">Nem</string>
     <string name="title_text_size">Szöveg méret</string>
-    <string name="size_largest">Legnagyobb</string>
-    <string name="size_large">Nagy</string>
-    <string name="size_normal">Normál</string>
-    <string name="size_small">Kicsi</string>
-    <string name="size_smallest">Legkisebb</string>
     <string name="title_error">Hiba</string>
-    <string name="dialog_import_error">Nincs felismert böngésző,amelyből importálni lehet a könyvjelzőket.</string>
     <string name="hint_title">Cím</string>
     <string name="hint_url">URL</string>
-    <string name="title_edit_bookmark">Könyvjelző szerkesztése</string>
-    <string name="action_edit">Szerkesztés</string>
     <string name="action_incognito">Új Inkognitó Lap</string>
     <string name="action_homepage">Alapértelmezett</string>
     <string name="action_back">Vissza</string>
@@ -109,8 +90,6 @@
     <string name="download_sdcard_busy_dlg_title">USB-tár nem elérhető</string>
     <string name="download_sdcard_busy_dlg_msg" >A tároló dolgozik.Hogy engedélyezze a letöltéseket , érintse meg az USB-tár kikapcsolását az értesítésnél.</string>
     <string name="incognito_cookies">Cookie-k engedélyezése inkognitó módban</string>
-    <string name="action_manual">Kézi</string>
-    <string name="action_auto">Automata</string>
     <string name="action_follow_me">Vedd fel velem a kapcsolatot</string>
     <string name="url_twitter">twitter.com/RestainoAnthony</string>
     <string name="clear_cache">Gyorsítótár törlése</string>
@@ -118,8 +97,6 @@
     <string name="message_import">Könyvjelzők importálva</string>
     <string name="message_clear_history">Előzmények törölve</string>
     <string name="message_cookies_cleared">Cookie-k törölve</string>
-    <string name="max_tabs">Maximálisan megnyitható lapok száma elérve</string>
-    <string name="message_text_copied">Szöveg másolva a vágólapra</string>
     <string name="message_link_copied">Link másolva a vágólapra</string>
     <string name="search_engine_custom">Egyéni URL</string>
     <string name="message_blocked_local">Helyi fájl betöltése blokkolva</string>
@@ -152,7 +129,6 @@
     <string name="manual_proxy">Manuális proxy</string>
     <string name="host">Hoszt:</string>
     <string name="port">Port:</string>
-    <string name="use_tor_prompt">Úgy tűnik, hogy önnek telepítve van az Orbot. Szeretné használni a Tor-t?</string>
     <string name="install_orbot">Kérjük telepítse az Orbot-ot annak érdekében, hogy működjön a proxy a Tor-ral.</string>
     <string name="yes">Igen</string>
     <string name="no">Nem</string>
@@ -165,15 +141,12 @@
     <string name="freeware">Freeware</string>
     <string name="android_open_source_project">Android Open Source Project</string>
     <string name="hphosts_ad_server_list">hpHosts Ad Server Lista</string>
-    <string name="reopening_recent_tab">Régi lapok megnyitása</string>
     <string name="rendering_mode">Megjelenítési mód</string>
     <string name="name_inverted">Negatív</string>
     <string name="name_grayscale">Szürkeárnyalatos</string>
     <string name="name_inverted_grayscale">Negatív szürkeárnyalatos</string>
     <string name="name_increase_contrast">Kontraszt Növelése</string>
     <string name="name_normal">Normál</string>
-    <string name="sync_history">Előzmények szinkronizálása Google-val</string>
-    <string name="title_file_chooser">Fájl választó</string>
     <string name="library_netcipher">NetCipher</string>
     <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">Könyvjelzők exportálása biztonsági mentésbe</string>
@@ -181,7 +154,6 @@
     <string name="bookmark_export_path">Könyvjelző exportálva</string>
     <string name="bookmark_settings">Könyvjelző beállítások</string>
     <string name="import_bookmark_error">Nem sikerült importálni a könyvjelzőket a fájlból</string>
-    <string name="title_chooser">Válasszon egy fájlt</string>
     <string name="settings_general">Általános Beállítások</string>
     <string name="settings_display">Megjelenítési Beállítások</string>
     <string name="settings_privacy">Adatvédelmi Beállítások</string>
@@ -192,8 +164,6 @@
     <string name="close_other_tabs">Másik lapok bezárása</string>
     <string name="third_party">Harmadik féltől származó Cookie-k letiltása</string>
     <string name="color_mode">Színes mód engedélyezése</string>
-    <string name="loading">Betöltés&#8230;</string>
-    <string name="loading_failed">Nem sikerült semmit betölteni az oldalról.</string>
     <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
     <string name="mit_license">MIT Licenc</string>
@@ -204,7 +174,6 @@
         <item>URL</item>
         <item>Cím</item>
     </string-array>
-    <string name="invert_color">Negatív szín</string>
     <string name="dark_theme">Sötét téma</string>
     <string name="tabs">Lapok</string>
     <string name="theme">Alkalmazás Téma</string>
@@ -212,15 +181,11 @@
     <string name="black_theme">Fekete Téma (AMOLED)</string>
     <string name="folder">Mappanév</string>
     <string name="action_folder">Mappa</string>
-    <string name="action_rename">Átnevez</string>
     <string name="title_rename_folder">Mappa átnevezése</string>
-    <string name="dialog_folder">Mit szeretnél csinálni, ezzel a mappával?</string>
     <string name="clear_web_storage">Webtárhely törlése</string>
     <string name="clear_web_storage_exit">Webtárhely törlése kilépéskor</string>
     <string name="message_web_storage_cleared">Webtárhely törölve</string>
-    <string name="hosts_source">Reklámblokkoló hosztfájl forrása</string>
     <string name="settings_adblock">Reklámblokkoló beállítások</string>
-    <string name="tabs_in_drawer">Oldalak mutatása a navigációs fiókban</string>
     <string name="do_not_track">\'Ne kövessen nyomon\' kérése</string>
     <string name="remove_identifying_headers">Azonosító fejléc eltávolítása</string>
     <string name="action_add_to_homescreen">Hozzáadás a kezdőképernyőhöz</string>

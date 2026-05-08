@@ -26,7 +26,6 @@
     <string name="action_forward">Avançar</string>
     <string name="settings">Configurações</string>
     <string name="location">Acesso de localização</string>
-    <string name="password">Salvar senhas</string>
     <string name="agent">Agente</string>
     <string name="home">Página inicial</string>
     <string name="fullscreen">Modo de tela completa</string>
@@ -40,24 +39,18 @@
     <string name="block">Bloquear imagens</string>
     <string name="window">Permitir que sites abram novas janelas</string>
     <string name="cookies">Ativar cookies</string>
-    <string name="size">Tamanho do texto</string>
     <string name="recommended">Recomendado</string>
     <string name="search">Mecanismo de pesquisa</string>
     <string name="search_hint">Pesquisa</string>
     <string name="wideViewPort">Utilizar viewport amplo</string>
     <string name="overViewMode">Carregar páginas no modo panorâmico</string>
     <string name="restore">Restaurar abas ao iniciar</string>
-    <string name="stock_browser_unavailable">Navegador não detectado</string>
-    <string name="stock_browser_available">Navegador detetado</string>
     <string name="fullScreenOption">Ocultar barra de estado ao navegar</string>
     <string name="clear_cookies">Limpar cookies</string>
     <string name="clear_history">Limpar histórico</string>
-    <string name="dialog_image">O que gostaria de fazer com esta imagem?</string>
     <string name="action_download">Salvar</string>
     <string name="action_open">Abrir</string>
-    <string name="dialog_link">O que gostaria de fazer com este link?</string>
     <string name="dialog_title_share">Compartilhar esta página</string>
-    <string name="dialog_bookmark">O que gostaria de fazer com este favorito?</string>
     <string name="action_delete">Remover</string>
     <string name="action_blank">Página vazia</string>
     <string name="agent_default">Padrão</string>
@@ -69,7 +62,6 @@
     <string name="dialog_download">Gostaria de transferir este arquivo? (%1$s)</string>
     <string name="action_cancel">Cancelar</string>
     <string name="title_warning">Aviso</string>
-    <string name="dialog_adobe_not_installed">O Adobe Flash Player não foi detectado.\nNecessário instalar o Flash Player.</string>
     <string name="title_user_agent">Agente de utilizador</string>
     <string name="title_download_location">Local das transferências</string>
     <string name="title_custom_homepage">Página inicial personalizada</string>
@@ -81,17 +73,9 @@
     <string name="action_yes">Sim</string>
     <string name="action_no">Não</string>
     <string name="title_text_size">Tamanho do texto</string>
-    <string name="size_largest">Maior</string>
-    <string name="size_large">Grande</string>
-    <string name="size_normal">Normal</string>
-    <string name="size_small">Pequeno</string>
-    <string name="size_smallest">Menor</string>
     <string name="title_error">Erro</string>
-    <string name="dialog_import_error">Não foi detectado qualquer navegador para importar os favoritos.</string>
     <string name="hint_title">Título</string>
     <string name="hint_url">URL</string>
-    <string name="title_edit_bookmark">Editar favorito</string>
-    <string name="action_edit">Editar</string>
     <string name="action_incognito">Nova aba anônima</string>
     <string name="action_homepage">Padrão</string>
     <string name="action_back">Voltar</string>
@@ -103,8 +87,6 @@
     <string name="download_sdcard_busy_dlg_title">Cartão SD não disponível</string>
     <string name="download_sdcard_busy_dlg_msg">O cartão SD está ocupado. Para poder transferir arquivos, desative a opção Desativar armazenamento USB na notificação.</string>
     <string name="incognito_cookies">Permitir cookies no modo anônimo</string>
-    <string name="action_manual">Manual</string>
-    <string name="action_auto">Automático</string>
     <string name="action_follow_me">Contato</string>
     <string name="url_twitter">twitter.com/RestainoAnthony</string>
     <string name="clear_cache">Limpar cache</string>
@@ -112,8 +94,6 @@
     <string name="message_import">Favoritos importados</string>
     <string name="message_clear_history">Histórico removido</string>
     <string name="message_cookies_cleared">Cookies removidos</string>
-    <string name="max_tabs">Atingido número máximo de abas</string>
-    <string name="message_text_copied">Texto copiado para a área de transferência</string>
     <string name="message_link_copied">Link copiado para a área de transferência</string>
     <string name="search_engine_custom">URL personalizado</string>
     <string name="message_blocked_local">Bloqueado o carregamento do arquivo local</string>
@@ -138,7 +118,6 @@
     <string name="manual_proxy">Proxy manual</string>
     <string name="host">Servidor:</string>
     <string name="port">Porta:</string>
-    <string name="use_tor_prompt">Parece que você tem o Orbot instalado. Gostaria de utilizar a rede Tor?</string>
     <string name="install_orbot">Por favor instale o Orbot para poder utilizar a rede Tor.</string>
     <string name="yes">Sim</string>
     <string name="no">Não</string>
@@ -151,14 +130,11 @@
     <string name="freeware">Freeware</string>
     <string name="android_open_source_project">Projeto Android Open Source</string>
     <string name="hphosts_ad_server_list">hpHosts Ad Server List</string>
-    <string name="reopening_recent_tab">Reabrir última aba</string>
     <string name="rendering_mode">Modo de renderização</string>
     <string name="name_inverted">Invertido</string>
     <string name="name_grayscale">Escala cinza</string>
     <string name="name_inverted_grayscale">Escala cinza invertida</string>
     <string name="name_normal">Normal</string>
-    <string name="sync_history">Sincronizar histórico com Google</string>
-    <string name="title_file_chooser">Seletor de arquivos</string>
     <string name="library_netcipher">NetCipher</string>
     <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">Exportar favoritos para backup</string>
@@ -166,7 +142,6 @@
     <string name="bookmark_export_path">Favoritos salvos em</string>
     <string name="bookmark_settings">Configurações de favoritos</string>
     <string name="import_bookmark_error">Não foi possível importar os favoritos do arquivo</string>
-    <string name="title_chooser">Escolha um arquivo</string>
     <string name="settings_general">Configurações gerais</string>
     <string name="settings_display">Configurações de exibição</string>
     <string name="settings_privacy">Configurações de privacidade</string>
@@ -176,8 +151,6 @@
     <string name="close_all_tabs">Fechar todas as abas</string>
     <string name="third_party">Bloquear cookies de terceiros</string>
     <string name="color_mode">Ativar modo de cor</string>
-    <string name="loading">A carregar&#8230;</string>
-    <string name="loading_failed">A página não foi carregada.</string>
     <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
     <string name="mit_license">MIT License</string>
@@ -187,7 +160,6 @@
         <item>URL</item>
         <item>Título</item>
     </string-array>
-    <string name="invert_color">Inverter cores</string>
     <string name="dark_theme">Tema escuro</string>
     <string name="tabs">Abas</string>
 </resources>

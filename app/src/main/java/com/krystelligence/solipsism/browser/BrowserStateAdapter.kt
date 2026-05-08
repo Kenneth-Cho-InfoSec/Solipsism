@@ -5,7 +5,6 @@ import com.krystelligence.solipsism.database.Bookmark
 import com.krystelligence.solipsism.database.HistoryEntry
 import com.krystelligence.solipsism.database.downloads.DownloadEntry
 import com.krystelligence.solipsism.ssl.SslCertificateInfo
-import com.krystelligence.solipsism.ssl.showSslDialog
 import android.content.Intent
 import android.view.View
 import com.krystelligence.solipsism.browser.view.targetUrl.LongPress
@@ -156,5 +155,9 @@ class BrowserStateAdapter(private val browserActivity: BrowserActivity) : Browse
 
     override fun clearSearchFocus() {
         browserActivity.clearSearchFocus()
+    }
+
+    override fun launchQrScanner() {
+        browserActivity.launchQrScanner()
     }
 }

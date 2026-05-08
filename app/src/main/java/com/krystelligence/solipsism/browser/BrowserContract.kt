@@ -170,6 +170,11 @@ interface BrowserContract {
          * Clear focus from the search view if it has focus.
          */
         fun clearSearchFocus()
+
+        /**
+         * Launch the QR scanner.
+         */
+        fun launchQrScanner()
     }
 
     /**
@@ -284,6 +289,11 @@ interface BrowserContract {
          * launch the incognito browser and load the provided [url].
          */
         fun launchIncognito(url: String?)
+
+        /**
+         * Show a QR code for the provided [url].
+         */
+        fun showQrCode(url: String)
     }
 
     /**
