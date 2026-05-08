@@ -55,7 +55,7 @@ import com.krystelligence.solipsism.qr.QrScannerActivity
 import com.krystelligence.solipsism.search.SuggestionsAdapter
 import com.krystelligence.solipsism.ssl.SslCertificateInfo
 import com.krystelligence.solipsism.ssl.createSslDrawableForState
-import com.krystelligence.solipsism.ssl.showSslDialog
+import com.krystelligence.solipsism.ssl.showSslDialog as showSslCertificateDialog
 import com.krystelligence.solipsism.utils.ProxyUtils
 import com.krystelligence.solipsism.utils.value
 import android.content.Intent
@@ -346,16 +346,6 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                     }
                 })
             }
-        }
-
-        if (uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
-            binding.desktopTabsList.adapter = null
-            binding.desktopTabsList.layoutManager =
-                LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
-            binding.desktopTabsList.itemAnimator?.takeIfInstance<SimpleItemAnimator>()
-                ?.supportsChangeAnimations = false
-            binding.drawerTabsList.isVisible = false
-            activeRecyclerView = binding.desktopTabsList
         }
 
         bookmarksAdapter = BookmarkRecyclerViewAdapter(
@@ -655,7 +645,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     override fun renderTabs(tabs: List<TabViewState>) {
         tabsAdapter.submitList(tabs)
-        if (uiConfiguration.tabConfiguration == TabConfiguration.DRAWER_BOTTOM) {
+        if (uiConfiguration.tabConfiguration == TabConfiguration.DRAWER_BOTTOM ||
+            uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
             binding.tabCountView.updateTabCount(tabs.size)
         }
     }
@@ -839,7 +830,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     override fun showSslDialog(sslCertificateInfo: SslCertificateInfo) {
-        showSslDialog(sslCertificateInfo)
+        showSslCertificateDialog(sslCertificateInfo)
     }
 
     private fun showAddressOverlay() {

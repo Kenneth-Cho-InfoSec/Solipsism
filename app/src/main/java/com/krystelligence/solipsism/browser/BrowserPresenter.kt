@@ -1122,7 +1122,8 @@ class BrowserPresenter @Inject constructor(
     fun onTabCountViewClick() {
         if (uiConfiguration.tabConfiguration == TabConfiguration.DRAWER_SIDE) {
             view?.openTabDrawer()
-        } else if (uiConfiguration.tabConfiguration == TabConfiguration.DRAWER_BOTTOM) {
+        } else if (uiConfiguration.tabConfiguration == TabConfiguration.DRAWER_BOTTOM ||
+            uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
             if (isTabDrawerOpen) {
                 view?.closeTabDrawer()
             } else {
