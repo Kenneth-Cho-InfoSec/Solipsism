@@ -32,18 +32,6 @@
         app:summary="@string/settings_about_explain"
         app:title="@string/settings_about" />
     <Preference
-        app:icon="@drawable/ic_settings_help"
-        app:summary="@string/faq_description"
-        app:title="@string/faq">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="http://acrdevelopment.org/solipsism/faq">
-            <extra
-                android:name="SOURCE"
-                android:value="SELF" />
-        </intent>
-    </Preference>
-    <Preference
         app:icon="@drawable/ic_settings_debug"
         app:fragment="com.krystelligence.solipsism.settings.fragment.DebugSettingsFragment"
         app:key="DEBUG"

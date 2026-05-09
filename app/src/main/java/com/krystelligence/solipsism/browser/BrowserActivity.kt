@@ -60,6 +60,7 @@ import com.krystelligence.solipsism.utils.ProxyUtils
 import com.krystelligence.solipsism.utils.value
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.view.Gravity
@@ -100,6 +101,9 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private lateinit var tabsAdapter: ListAdapter<TabViewState, TabViewHolder>
     private lateinit var bookmarksAdapter: BookmarkRecyclerViewAdapter
     private var activeRecyclerView: RecyclerView? = null
+    private var customView: View? = null
+    private var customViewHidSystemUi = false
+    private var previousSystemUiVisibility = 0
 
     private var menuItemShare: MenuItem? = null
     private var menuItemCopyLink: MenuItem? = null
@@ -125,6 +129,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         if (result.resultCode == RESULT_OK && scannedValue != null) {
             presenter.onSearch(scannedValue)
         }
+    }
+
+    private val fileChooserLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        presenter.onFileChooserResult(result)
     }
 
     private fun applySolipsismRailPreferences() {
@@ -432,7 +442,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.verticalUrlText?.setOnClickListener { showAddressOverlay() }
         (binding.verticalUrlText?.parent as? View)?.setOnClickListener { showAddressOverlay() }
         binding.settingsButton?.setOnClickListener {
-            presenter.onRefreshOrStopClick()
+            presenter.onReloadClick()
         }
 
         binding.searchQr?.setOnClickListener { presenter.onQrButtonClick() }
@@ -571,23 +581,41 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
      * @see BrowserContract.View.showFileChooser
      */
     override fun showFileChooser(intent: Intent) {
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.title_file_chooser)), 1)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        fileChooserLauncher.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
     }
 
     /**
      * @see BrowserContract.View.showCustomView
      */
     override fun showCustomView(view: View) {
+        customView?.let(binding.contentFrame::removeView)
+        customView = view
         binding.contentFrame.addView(view)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            customViewHidSystemUi = true
+            previousSystemUiVisibility = window.decorView.systemUiVisibility
+            binding.toolbarLayout.isVisible = false
+            window.decorView.systemUiVisibility = previousSystemUiVisibility or
+                View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        }
     }
 
     /**
      * @see BrowserContract.View.hideCustomView
      */
     override fun hideCustomView() {
-        val view = binding.contentFrame.getChildAt(binding.contentFrame.childCount - 1)
-        if (view != null && view != binding.contentFrame && view != binding.progressView && view != binding.addressOverlay && view != binding.toolbarLayout && view != binding.findBar) {
-            binding.contentFrame.removeView(view)
+        customView?.let(binding.contentFrame::removeView)
+        customView = null
+        if (customViewHidSystemUi) {
+            binding.toolbarLayout.isVisible = true
+            window.decorView.systemUiVisibility = previousSystemUiVisibility
+            customViewHidSystemUi = false
         }
     }
 

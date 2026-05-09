@@ -4,9 +4,9 @@ import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.tab.view.BackgroundDrawable
 import com.krystelligence.solipsism.extensions.desaturate
 import com.krystelligence.solipsism.extensions.inflater
+import com.krystelligence.solipsism.utils.ThemeUtils
 import android.graphics.Bitmap
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -88,7 +88,7 @@ class DrawerTabRecyclerViewAdapter(
                 R.style.TextAppearance_Solipsism_TabTitle_Selected
             )
             viewHolder.txtTitle.setTextColor(
-                ContextCompat.getColor(viewHolder.itemView.context, R.color.md3_on_surface)
+                ThemeUtils.getColor(viewHolder.itemView.context, R.attr.colorOnSurface)
             )
         } else {
             TextViewCompat.setTextAppearance(
@@ -96,7 +96,7 @@ class DrawerTabRecyclerViewAdapter(
                 R.style.TextAppearance_Solipsism_TabTitle
             )
             viewHolder.txtTitle.setTextColor(
-                ContextCompat.getColor(viewHolder.itemView.context, R.color.md3_on_surface_variant)
+                ThemeUtils.getColor(viewHolder.itemView.context, R.attr.colorOnSurface)
             )
         }
     }

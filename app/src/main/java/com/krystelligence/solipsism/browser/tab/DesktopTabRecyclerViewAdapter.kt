@@ -3,13 +3,13 @@ package com.krystelligence.solipsism.browser.tab
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.extensions.desaturate
 import com.krystelligence.solipsism.extensions.inflater
+import com.krystelligence.solipsism.utils.ThemeUtils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -106,7 +106,7 @@ class DesktopTabRecyclerViewAdapter(
                 R.style.TextAppearance_Solipsism_TabTitle_Selected
             )
             viewHolder.txtTitle.setTextColor(
-                ContextCompat.getColor(viewHolder.itemView.context, R.color.md3_on_surface)
+                ThemeUtils.getColor(viewHolder.itemView.context, R.attr.colorOnSurface)
             )
         } else {
             TextViewCompat.setTextAppearance(
@@ -114,7 +114,7 @@ class DesktopTabRecyclerViewAdapter(
                 R.style.TextAppearance_Solipsism_TabTitle
             )
             viewHolder.txtTitle.setTextColor(
-                ContextCompat.getColor(viewHolder.itemView.context, R.color.md3_on_surface_variant)
+                ThemeUtils.getColor(viewHolder.itemView.context, R.attr.colorOnSurface)
             )
         }
     }

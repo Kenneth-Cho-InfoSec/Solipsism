@@ -651,6 +651,10 @@ class BrowserPresenter @Inject constructor(
         }
     }
 
+    fun onReloadClick() {
+        reload()
+    }
+
     private fun reload() {
         val currentUrl = currentTab?.url
         if (currentUrl?.isSpecialUrl() == true) {

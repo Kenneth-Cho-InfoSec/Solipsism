@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+Version 5.1.2 *(2026-05-09)*
+----------------------------
+- Fixed the rail reload button so pages reload instead of leaving the loading bar stuck.
+- Restored WebView file upload results from Android's file picker.
+- Improved dark mode readability for tab cards and removed colored UI outlines.
+- Removed the FAQ settings entry.
+- Limited immersive fullscreen hiding of system bars and the rail to landscape video fullscreen.
+
 Version 5.1.0 *(2019-10-01)*
 ----------------------------
 - Made copy link action available in incognito mode.
