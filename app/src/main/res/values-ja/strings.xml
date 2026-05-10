@@ -76,8 +76,8 @@
     <string name="download_sdcard_busy_dlg_title">USB ストレージが使用できません</string>
     <string name="download_sdcard_busy_dlg_msg">ストレージがビジー状態です。ダウンロードするには、ステータスバーの \"USB ストレージをオフにする\" をタップしてください</string>
     <string name="incognito_cookies">シークレットタブで Cookie を有効にする</string>
-    <string name="action_follow_me">問い合わせ先</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">キャッシュを消去する</string>
     <string name="message_cache_cleared">キャッシュを消去しました</string>
     <string name="message_import">ブックマークをインポートしました</string>

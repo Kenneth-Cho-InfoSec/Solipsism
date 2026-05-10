@@ -73,8 +73,8 @@
     <string name="download_sdcard_busy_dlg_title">Карта памяти недоступна</string>
     <string name="download_sdcard_busy_dlg_msg">Карта памяти подключена к ПК. Для начала загрузки отключите её от ПК, нажав на уведомление.</string>
     <string name="incognito_cookies">Включить куки в режиме инкогнито</string>
-    <string name="action_follow_me">Связаться с разработчиками</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Очистить кэш</string>
     <string name="message_cache_cleared">Кэш очищен</string>
     <string name="message_import">Закладки импортированы</string>

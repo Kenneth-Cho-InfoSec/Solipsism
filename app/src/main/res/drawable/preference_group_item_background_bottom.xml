@@ -3,7 +3,11 @@
     android:color="?attr/colorSurfaceContainerHighest">
     <item>
         <shape android:shape="rectangle">
-            <corners android:radius="6dp" />
+            <corners
+                android:topLeftRadius="6dp"
+                android:topRightRadius="6dp"
+                android:bottomLeftRadius="24dp"
+                android:bottomRightRadius="24dp" />
             <solid android:color="?attr/colorSurfaceContainerLow" />
         </shape>
     </item>

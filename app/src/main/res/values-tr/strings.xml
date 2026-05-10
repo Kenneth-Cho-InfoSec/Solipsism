@@ -76,8 +76,8 @@
     <string name="download_sdcard_busy_dlg_title">USB depolamasına erişilemez</string>
     <string name="download_sdcard_busy_dlg_msg">Depolama meşgul. İndirmeleri aktif etmek için bildirimler ekranından USB depolamasını kapatın.</string>
     <string name="incognito_cookies">Gizli modda çerezleri etkinleştir</string>
-    <string name="action_follow_me">Benimle iletişim kurun</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Önbelleği temizle</string>
     <string name="message_cache_cleared">Önbellek temizlendi</string>
     <string name="message_import">Yer işaretleri içe aktarıldı</string>

@@ -61,6 +61,7 @@ import com.krystelligence.solipsism.utils.value
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.view.Gravity
@@ -367,6 +368,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.bookmarkListView.layoutManager = LinearLayoutManager(this)
 
         presenter.onViewAttached(BrowserStateAdapter(this))
+        maybeShowFirstRunDonationDialog()
 
         val suggestionsAdapter = SuggestionsAdapter(this, isIncognito = isIncognito()).apply {
             onSuggestionInsertClick = {
@@ -735,6 +737,9 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun showDownloadOptionsDialog(download: DownloadEntry) {
         BrowserDialog.show(
             this, download.title,
+            DialogItem(title = R.string.action_donate) {
+                openDonationPage()
+            },
             DialogItem(title = R.string.dialog_delete_download) {
                 presenter.onDownloadOptionClick(download, BrowserContract.DownloadOptionEvent.DELETE)
             },
@@ -742,6 +747,27 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                 presenter.onDownloadOptionClick(download, BrowserContract.DownloadOptionEvent.DELETE_ALL)
             }
         )
+    }
+
+    private fun maybeShowFirstRunDonationDialog() {
+        val preferences = getSharedPreferences(DONATION_PREFERENCES, MODE_PRIVATE)
+        if (preferences.getBoolean(DONATION_PROMPT_SHOWN, false) || isIncognito()) {
+            return
+        }
+
+        preferences.edit().putBoolean(DONATION_PROMPT_SHOWN, true).apply()
+        mainHandler.post {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.donation_prompt_title)
+                .setMessage(R.string.donation_prompt_message)
+                .setPositiveButton(R.string.action_donate) { _, _ -> openDonationPage() }
+                .setNegativeButton(R.string.action_not_now, null)
+                .resizeAndShow()
+        }
+    }
+
+    private fun openDonationPage() {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(KO_FI_URL)))
     }
 
     override fun showHistoryOptionsDialog(historyEntry: HistoryEntry) {
@@ -896,3 +922,6 @@ private const val MIN_SOLIPSISM_RAIL_WIDTH_DP = SUPER_COMPACT_RAIL_WIDTH_DP
 private const val MAX_SOLIPSISM_RAIL_WIDTH_DP = 96
 private const val ADDRESS_OVERLAY_RAIL_GAP_DP = 14
 private const val FIND_BAR_RAIL_GAP_DP = 14
+private const val DONATION_PREFERENCES = "solipsism_donation"
+private const val DONATION_PROMPT_SHOWN = "donationPromptShown"
+private const val KO_FI_URL = "https://ko-fi.com/kennethchoinfosec"

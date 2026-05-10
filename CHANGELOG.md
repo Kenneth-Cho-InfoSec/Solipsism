@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 5.1.3 *(2026-05-10)*
+----------------------------
+- Added Ko-fi donation prompts and actions.
+- Added settings search and accessibility settings.
+- Refined settings sections into clustered cards with position-aware rounded corners.
+- Improved tab memory handling so background tabs are retained more reliably.
+
 Version 5.1.2 *(2026-05-09)*
 ----------------------------
 - Fixed the rail reload button so pages reload instead of leaving the loading bar stuck.

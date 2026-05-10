@@ -90,8 +90,8 @@
     <string name="download_sdcard_busy_dlg_title">USB opslag niet beschikbaar</string>
     <string name="download_sdcard_busy_dlg_msg">Opslag is bezet. Om downloads toe te laten, gelieve USB opslag uit te zetten in het notificatiecentrum.</string>
     <string name="incognito_cookies">Cookies activeren in incognito modus</string>
-    <string name="action_follow_me">Contacteer Mij</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Wis cache</string>
     <string name="message_cache_cleared">Cache gewist</string>
     <string name="message_import">Bladwijzers zijn geïmporteerd</string>

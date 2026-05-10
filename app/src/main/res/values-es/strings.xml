@@ -70,8 +70,8 @@
     <string name="download_sdcard_busy_dlg_title">Almacenamiento USB no disponible</string>
     <string name="download_sdcard_busy_dlg_msg">El almacenamiento está ocupado. Para permitir las descargar, desactiva el almacenamiento USB desde el área de notificación.</string>
     <string name="incognito_cookies">Habilitar cookies en el modo incógnito</string>
-    <string name="action_follow_me">Contáctame</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Limpiar caché</string>
     <string name="message_cache_cleared">La caché se ha borrado</string>
     <string name="message_import">Los marcadores se han importado</string>

@@ -72,8 +72,8 @@
     <string name="download_sdcard_busy_dlg_title">USB storage μη διαθέσιμο</string>
     <string name="download_sdcard_busy_dlg_msg" >Η συσκευή αποθήκευσης είναι απασχολημένη. Για να επιτρέψετε λήψεις πατήστε το Κλείσιμο USB Storage στις ειδοποιήσεις.</string>
     <string name="incognito_cookies">Ενεργοποίηση Cookies στην Ανώνυμη περιήγηση</string>
-    <string name="action_follow_me">Επικοινωνήστε μαζί μου</string>
-    <string name="url_twitter">twitter.com/ACRDevelopment</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Καθαρισμός cache</string>
     <string name="message_cache_cleared">Cache καθαρίστηκε</string>
     <string name="message_import">Εισήχθησαν οι σελιδοδείκτες</string>

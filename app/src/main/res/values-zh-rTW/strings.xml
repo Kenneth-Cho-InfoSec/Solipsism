@@ -76,8 +76,8 @@
     <string name="download_sdcard_busy_dlg_title">USB 儲存裝置無法使用</string>
     <string name="download_sdcard_busy_dlg_msg">此儲存裝置處於忙碌中，若要下載請點觸通知中的「關閉 USB 儲存裝置」。</string>
     <string name="incognito_cookies">在無痕模式中啟用 Cookies</string>
-    <string name="action_follow_me">聯絡作者</string>
-    <string name="url_twitter">twitter.com/ACRDevelopment</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">清除快取</string>
     <string name="message_cache_cleared">已清除快取</string>
     <string name="message_import">書籤已匯入</string>

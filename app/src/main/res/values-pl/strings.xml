@@ -127,8 +127,8 @@
 	<string name="message_import">Zakładki zostały zaimportowane</string>
 	<string name="message_cache_cleared">Pamięć podręczna została wyczyszczona</string>
 	<string name="clear_cache">Wyczyść pamięć podręczną</string>
-	<string name="url_twitter">twitter.com/ACRDevelopment</string>
-	<string name="action_follow_me">Skontaktuj się z autorem</string>
+	<string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
+	<string name="action_follow_me">Support on Ko-fi</string>
     <string name="incognito_cookies">Włącz ciasteczka w trybie Incognito</string>
 	<string name="download_sdcard_busy_dlg_msg">Pamięć USB jest zablokowana. By umożliwić pobieranie plików, dotknij \"Wyłącz pamięć USB\" w powiadomieniu.</string>
 	<string name="download_sdcard_busy_dlg_title">Pamięć USB niedostępna</string>

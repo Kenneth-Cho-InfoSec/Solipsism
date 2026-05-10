@@ -90,8 +90,8 @@
     <string name="download_sdcard_busy_dlg_title">Nessuna unità USB disponibile</string>
     <string name="download_sdcard_busy_dlg_msg">Unità USB occupata. Per continuare il download, spegnere l\'unità USB dalla notifica.</string>
     <string name="incognito_cookies">Abilita i cookie nella modalità incognito</string>
-    <string name="action_follow_me">Contattami</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Cancella la cache</string>
     <string name="message_cache_cleared">Cache cancellata</string>
     <string name="message_import">Segnalibri importati</string>

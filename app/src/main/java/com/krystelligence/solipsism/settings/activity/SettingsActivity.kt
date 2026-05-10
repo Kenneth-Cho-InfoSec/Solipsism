@@ -4,20 +4,38 @@
 package com.krystelligence.solipsism.settings.activity
 
 import com.krystelligence.solipsism.R
+import com.krystelligence.solipsism.settings.fragment.AbstractSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.RootSettingsFragment
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.MenuItem
+import android.widget.EditText
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 
 class SettingsActivity : ThemableSettingsActivity(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
+    private var settingsSearchQuery = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_root)
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        findViewById<EditText>(R.id.settings_search).addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                settingsSearchQuery = s?.toString().orEmpty()
+                applySettingsSearch()
+            }
+
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+        supportFragmentManager.addOnBackStackChangedListener(::applySettingsSearch)
 
         supportFragmentManager
             .beginTransaction()
@@ -48,7 +66,14 @@ class SettingsActivity : ThemableSettingsActivity(),
             .replace(R.id.root, fragment)
             .addToBackStack(null)
             .commit()
+        supportFragmentManager.executePendingTransactions()
+        applySettingsSearch()
         return true
+    }
+
+    private fun applySettingsSearch() {
+        (supportFragmentManager.findFragmentById(R.id.root) as? AbstractSettingsFragment)
+            ?.applySettingsSearch(settingsSearchQuery)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

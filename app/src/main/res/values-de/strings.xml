@@ -76,8 +76,8 @@
     <string name="download_sdcard_busy_dlg_title">USB-Speicher nicht verfügbar</string>
     <string name="download_sdcard_busy_dlg_msg">Speicher in Benutzung. Um das Herunterladen zu ermöglichen, schalten Sie den USB-Speicher in der Benachrichtigung aus.</string>
     <string name="incognito_cookies">Cookies im Inkognito-Modus aktivieren</string>
-    <string name="action_follow_me">Kontakt</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Cache löschen</string>
     <string name="message_cache_cleared">Cache gelöscht</string>
     <string name="message_import">Lesezeichen wurden importiert</string>

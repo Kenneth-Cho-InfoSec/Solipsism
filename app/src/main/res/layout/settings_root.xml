@@ -19,7 +19,25 @@
         android:paddingEnd="8dp"
         app:contentInsetEnd="0dp"
         app:contentInsetStart="0dp"
-        app:popupTheme="@style/ThemeOverlay.Solipsism.Toolbar.Surface" />
+        app:popupTheme="@style/ThemeOverlay.Solipsism.Toolbar.Surface">
+
+        <EditText
+            android:id="@+id/settings_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:hint="@string/settings_search_hint"
+            android:imeOptions="actionSearch"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="52dp"
+            android:paddingEnd="20dp"
+            android:singleLine="true"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant"
+            android:textSize="16sp" />
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <FrameLayout
         android:id="@+id/root"

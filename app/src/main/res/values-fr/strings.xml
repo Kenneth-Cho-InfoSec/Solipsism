@@ -91,8 +91,8 @@
     <string name="download_sdcard_busy_dlg_title">Stockage USB indisponible</string>
     <string name="download_sdcard_busy_dlg_msg">Le stockage est occupé. Pour autoriser les téléchargements, appuyez sur Désactiver le stockage USB dans la notification.</string>
     <string name="incognito_cookies">Activer les cookies en mode incognito</string>
-    <string name="action_follow_me">Contact</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Effacer le cache</string>
     <string name="message_cache_cleared">Cache effacé</string>
     <string name="message_import">Favoris ont été importés</string>

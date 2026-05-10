@@ -2,6 +2,8 @@ package com.krystelligence.solipsism.browser.download
 
 import android.Manifest
 import android.app.Dialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.text.format.Formatter
 import android.webkit.MimeTypeMap
@@ -127,12 +129,17 @@ class DownloadPermissionsHelper @Inject constructor(
             .setNegativeButton(
                 activity.resources.getString(R.string.action_cancel),
                 dialogClickListener
-            ).show()
+            )
+            .setNeutralButton(R.string.action_donate) { _, _ ->
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(KO_FI_URL)))
+            }
+            .show()
         setDialogSize(activity, dialog)
         logger.log(TAG, "Downloading: $fileName")
     }
 
     companion object {
         private const val TAG = "DownloadPermissionsHelper"
+        private const val KO_FI_URL = "https://ko-fi.com/kennethchoinfosec"
     }
 }

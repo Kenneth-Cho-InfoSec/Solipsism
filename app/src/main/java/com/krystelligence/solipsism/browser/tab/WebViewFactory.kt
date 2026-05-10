@@ -66,6 +66,7 @@ class WebViewFactory @Inject constructor(
             isFocusableInTouchMode = true
             isFocusable = true
             setBackgroundColor(Color.WHITE)
+            setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false)
 
             importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_YES
 

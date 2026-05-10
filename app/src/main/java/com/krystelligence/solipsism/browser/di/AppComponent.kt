@@ -9,6 +9,7 @@ import com.krystelligence.solipsism.device.BuildInfo
 import com.krystelligence.solipsism.dialog.SolipsismDialogBuilder
 import com.krystelligence.solipsism.search.SuggestionsAdapter
 import com.krystelligence.solipsism.settings.activity.ThemableSettingsActivity
+import com.krystelligence.solipsism.settings.fragment.AccessibilitySettingsFragment
 import com.krystelligence.solipsism.settings.fragment.AdBlockSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.AdvancedSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.BookmarkSettingsFragment
@@ -66,6 +67,8 @@ interface AppComponent {
     fun inject(displaySettingsFragment: DisplaySettingsFragment)
 
     fun inject(adBlockSettingsFragment: AdBlockSettingsFragment)
+
+    fun inject(accessibilitySettingsFragment: AccessibilitySettingsFragment)
 
     fun provideBloomFilterAdBlocker(): BloomFilterAdBlocker
 

@@ -90,8 +90,8 @@
     <string name="download_sdcard_busy_dlg_title">УСБ складиште није доступно</string>
     <string name="download_sdcard_busy_dlg_msg">Складиште је заузето. Да дозволите преузимања, додирните „Искључи УСБ складиште“ у обавештењу.</string>
     <string name="incognito_cookies">Омогући колачиће у приватном режиму</string>
-    <string name="action_follow_me">Контактирајте ме</string>
-    <string name="url_twitter">twitter.com/ACRDevelopment</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Очисти кеш</string>
     <string name="message_cache_cleared">Кеш је очишћен</string>
     <string name="message_import">Обележивачи су увезени</string>

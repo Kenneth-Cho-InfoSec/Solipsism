@@ -2,38 +2,50 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Preference
-        app:icon="@drawable/ic_settings_shield"
-        app:fragment="com.krystelligence.solipsism.settings.fragment.AdBlockSettingsFragment"
-        app:title="@string/settings_adblock" />
-    <Preference
-        app:icon="@drawable/ic_action_settings"
-        app:fragment="com.krystelligence.solipsism.settings.fragment.GeneralSettingsFragment"
-        app:title="@string/settings_general" />
-    <Preference
-        app:icon="@drawable/ic_action_star"
-        app:fragment="com.krystelligence.solipsism.settings.fragment.BookmarkSettingsFragment"
-        app:title="@string/bookmark_settings" />
-    <Preference
-        app:icon="@drawable/ic_action_desktop"
-        app:fragment="com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment"
-        app:title="@string/settings_display" />
-    <Preference
-        app:icon="@drawable/ic_settings_privacy"
-        app:fragment="com.krystelligence.solipsism.settings.fragment.PrivacySettingsFragment"
-        app:title="@string/settings_privacy" />
-    <Preference
-        app:icon="@drawable/ic_settings_globe"
-        app:fragment="com.krystelligence.solipsism.settings.fragment.AdvancedSettingsFragment"
-        app:title="@string/settings_advanced" />
-    <Preference
-        app:icon="@drawable/ic_settings_info"
-        app:fragment="com.krystelligence.solipsism.settings.fragment.AboutSettingsFragment"
-        app:summary="@string/settings_about_explain"
-        app:title="@string/settings_about" />
-    <Preference
-        app:icon="@drawable/ic_settings_debug"
-        app:fragment="com.krystelligence.solipsism.settings.fragment.DebugSettingsFragment"
-        app:key="DEBUG"
-        app:title="@string/debug_title" />
+    <PreferenceCategory android:title="@string/settings_cluster_basics">
+        <Preference
+            app:icon="@drawable/ic_action_settings"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.GeneralSettingsFragment"
+            app:title="@string/settings_general" />
+        <Preference
+            app:icon="@drawable/ic_settings_globe"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.AdvancedSettingsFragment"
+            app:summary="@string/settings_advanced_explain"
+            app:title="@string/settings_advanced" />
+        <Preference
+            app:icon="@drawable/ic_settings_privacy"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.PrivacySettingsFragment"
+            app:summary="@string/settings_privacy_explain"
+            app:title="@string/settings_privacy" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_cluster_other">
+        <Preference
+            app:icon="@drawable/ic_settings_shield"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.AdBlockSettingsFragment"
+            app:title="@string/settings_adblock" />
+        <Preference
+            app:icon="@drawable/ic_action_star"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.BookmarkSettingsFragment"
+            app:title="@string/bookmark_settings" />
+        <Preference
+            app:icon="@drawable/ic_action_desktop"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment"
+            app:title="@string/settings_display" />
+        <Preference
+            app:icon="@drawable/ic_settings_text"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.AccessibilitySettingsFragment"
+            app:title="@string/settings_accessibility" />
+        <Preference
+            app:icon="@drawable/ic_settings_info"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.AboutSettingsFragment"
+            app:summary="@string/settings_about_explain"
+            app:title="@string/settings_about" />
+        <Preference
+            app:icon="@drawable/ic_settings_debug"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.DebugSettingsFragment"
+            app:key="DEBUG"
+            app:summary="@string/settings_debug_explain"
+            app:title="@string/debug_title" />
+    </PreferenceCategory>
 </PreferenceScreen>

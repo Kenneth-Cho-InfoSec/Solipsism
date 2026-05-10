@@ -90,8 +90,8 @@
     <string name="download_sdcard_busy_dlg_title">USB-tár nem elérhető</string>
     <string name="download_sdcard_busy_dlg_msg" >A tároló dolgozik.Hogy engedélyezze a letöltéseket , érintse meg az USB-tár kikapcsolását az értesítésnél.</string>
     <string name="incognito_cookies">Cookie-k engedélyezése inkognitó módban</string>
-    <string name="action_follow_me">Vedd fel velem a kapcsolatot</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Gyorsítótár törlése</string>
     <string name="message_cache_cleared">Gyorsítótár törölve</string>
     <string name="message_import">Könyvjelzők importálva</string>

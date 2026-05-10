@@ -71,8 +71,8 @@
     <string name="download_sdcard_busy_dlg_title">USB 저장소 사용할 수 없음</string>
     <string name="download_sdcard_busy_dlg_msg" >저장소가 사용중입니다. 다운로드를 하려면 USB 저장소를 끄세요.</string>
     <string name="incognito_cookies">사생활 보호 모드에서 쿠키 사용</string>
-    <string name="action_follow_me">개발자에게 연락하기</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">캐시 지우기</string>
     <string name="message_cache_cleared">캐시를 지웠습니다</string>
     <string name="message_import">즐겨찾기를 가져왔습니다</string>

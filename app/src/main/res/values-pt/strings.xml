@@ -89,8 +89,8 @@
     <string name="download_sdcard_busy_dlg_title">Cartão SD não disponível</string>
     <string name="download_sdcard_busy_dlg_msg">O cartão SD está ocupado. Para poder descarregar ficheiros, desative a opção Desativar armazenamento USB na notificação.</string>
     <string name="incognito_cookies">Permitir cookies no modo incógnito</string>
-    <string name="action_follow_me">Contactos</string>
-    <string name="url_twitter">twitter.com/RestainoAnthony</string>
+    <string name="action_follow_me">Support on Ko-fi</string>
+    <string name="url_twitter">https://ko-fi.com/kennethchoinfosec</string>
     <string name="clear_cache">Limpar cache</string>
     <string name="message_cache_cleared">Cache limpa</string>
     <string name="message_import">Marcadores importados</string>

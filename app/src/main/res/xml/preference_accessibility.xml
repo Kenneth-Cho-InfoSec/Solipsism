@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/settings_accessibility">
+        <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="accessibility_text_size"
+            android:summary="@string/settings_accessibility_text_size_summary"
+            android:title="@string/title_text_size" />
+        <Preference
+            android:icon="@drawable/ic_action_invert"
+            android:key="accessibility_rendering_mode"
+            android:summary="@string/settings_accessibility_rendering_summary"
+            android:title="@string/rendering_mode" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_text"
+            android:key="accessibility_text_reflow"
+            android:summary="@string/settings_accessibility_reflow_summary"
+            android:title="@string/reflow" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_desktop"
+            android:key="accessibility_wide_viewport"
+            android:summary="@string/settings_accessibility_wide_viewport_summary"
+            android:title="@string/wideViewPort" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_desktop"
+            android:key="accessibility_overview_mode"
+            android:summary="@string/settings_accessibility_overview_summary"
+            android:title="@string/overViewMode" />
+    </PreferenceCategory>
+</PreferenceScreen>
