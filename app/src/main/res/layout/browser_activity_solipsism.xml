@@ -55,9 +55,9 @@
                     android:layout_marginStart="@dimen/chrome_outer_margin"
                     android:layout_marginTop="@dimen/chrome_outer_margin"
                     android:layout_marginEnd="86dp"
-                    android:background="@drawable/solipsism_search_overlay_background"
+                    android:background="@android:color/transparent"
                     android:elevation="10dp"
-                    android:padding="@dimen/chrome_inner_margin"
+                    android:padding="0dp"
                     android:visibility="gone">
 
                     <androidx.constraintlayout.widget.ConstraintLayout

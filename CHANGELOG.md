@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+Version 5.1.4 *(2026-05-10)*
+----------------------------
+- Fixed fullscreen video layout so landscape video can occupy the full screen.
+- Removed the dark backdrop behind the horizontal URL bar.
+- Added smoother Material-style URL bar reveal motion and more physical rail button feedback.
+- Added the refreshed wallpaper homepage with bookmark shortcuts, embedded Google Sans Flex title text, and homepage wallpaper controls.
+- Added history Clear All and Decoy Mode actions.
+- Added donation copy to the download dialog and improved settings cluster headings.
+
 Version 5.1.3 *(2026-05-10)*
 ----------------------------
 - Added Ko-fi donation prompts and actions.

@@ -9,6 +9,7 @@ import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.extensions.resizeAndShow
 import com.krystelligence.solipsism.extensions.withSingleChoiceItems
 import com.krystelligence.solipsism.preference.UserPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
@@ -16,12 +17,18 @@ import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.io.File
 import javax.inject.Inject
 
 class DisplaySettingsFragment : AbstractSettingsFragment() {
 
     @Inject internal lateinit var userPreferences: UserPreferences
+    private var wallpaperSummaryUpdater: SummaryUpdater? = null
+    private val wallpaperPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(::copyHomepageWallpaper)
+    }
 
     override fun providePreferencesXmlResource() = R.xml.preference_display
 
@@ -39,6 +46,12 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         clickablePreference(
             preference = SETTINGS_TEXTSIZE,
             onClick = ::showTextSizePicker
+        )
+
+        clickableDynamicPreference(
+            preference = SETTINGS_HOMEPAGE_WALLPAPER,
+            summary = userPreferences.homepageWallpaperMode.toWallpaperModeDisplayString(),
+            onClick = ::showHomepageWallpaperPicker
         )
 
         clickableDynamicPreference(
@@ -175,6 +188,43 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         }.resizeAndShow()
     }
 
+    private fun showHomepageWallpaperPicker(summaryUpdater: SummaryUpdater) {
+        wallpaperSummaryUpdater = summaryUpdater
+        MaterialAlertDialogBuilder(requireActivity()).apply {
+            setTitle(R.string.settings_homepage_wallpaper)
+            val values = listOf(
+                Pair(HOMEPAGE_WALLPAPER_DEFAULT, getString(R.string.settings_homepage_wallpaper_default)),
+                Pair(HOMEPAGE_WALLPAPER_CUSTOM, getString(R.string.settings_homepage_wallpaper_custom)),
+                Pair(HOMEPAGE_WALLPAPER_BLACK, getString(R.string.settings_homepage_wallpaper_black))
+            )
+            withSingleChoiceItems(values, userPreferences.homepageWallpaperMode.coerceToKnownWallpaperMode()) {
+                when (it) {
+                    HOMEPAGE_WALLPAPER_CUSTOM -> wallpaperPicker.launch(arrayOf("image/*"))
+                    else -> {
+                        userPreferences.homepageWallpaperMode = it
+                        summaryUpdater.updateSummary(it.toWallpaperModeDisplayString())
+                    }
+                }
+            }
+            setPositiveButton(resources.getString(R.string.action_ok), null)
+        }.resizeAndShow()
+    }
+
+    private fun copyHomepageWallpaper(uri: Uri) {
+        val targetDirectory = File(requireContext().filesDir, HOMEPAGE_WALLPAPER_DIRECTORY).apply {
+            mkdirs()
+        }
+        val targetFile = File(targetDirectory, HOMEPAGE_WALLPAPER_FILE)
+        requireContext().contentResolver.openInputStream(uri)?.use { input ->
+            targetFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        } ?: return
+        userPreferences.homepageWallpaperPath = targetFile.absolutePath
+        userPreferences.homepageWallpaperMode = HOMEPAGE_WALLPAPER_CUSTOM
+        wallpaperSummaryUpdater?.updateSummary(HOMEPAGE_WALLPAPER_CUSTOM.toWallpaperModeDisplayString())
+    }
+
     private fun AppTheme.toDisplayString(): String = getString(
         when (this) {
             AppTheme.LIGHT -> R.string.light_theme
@@ -201,6 +251,19 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         if (this) R.string.settings_rail_position_left else R.string.settings_rail_position_right
     )
 
+    private fun Int.toWallpaperModeDisplayString(): String = getString(
+        when (coerceToKnownWallpaperMode()) {
+            HOMEPAGE_WALLPAPER_CUSTOM -> R.string.settings_homepage_wallpaper_custom
+            HOMEPAGE_WALLPAPER_BLACK -> R.string.settings_homepage_wallpaper_black
+            else -> R.string.settings_homepage_wallpaper_default
+        }
+    )
+
+    private fun Int.coerceToKnownWallpaperMode(): Int = when (this) {
+        HOMEPAGE_WALLPAPER_DEFAULT, HOMEPAGE_WALLPAPER_CUSTOM, HOMEPAGE_WALLPAPER_BLACK -> this
+        else -> HOMEPAGE_WALLPAPER_DEFAULT
+    }
+
     private class TextSeekBarListener(
         private val sampleText: TextView
     ) : SeekBar.OnSeekBarChangeListener {
@@ -224,9 +287,16 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_REFLOW = "text_reflow"
         private const val SETTINGS_THEME = "app_theme"
         private const val SETTINGS_TEXTSIZE = "text_size"
+        private const val SETTINGS_HOMEPAGE_WALLPAPER = "homepage_wallpaper"
         private const val SETTINGS_RAIL_SIZE = "rail_size"
         private const val SETTINGS_RAIL_POSITION = "rail_position"
         private const val SETTINGS_BLACK_STATUS = "black_status_bar"
+
+        private const val HOMEPAGE_WALLPAPER_DEFAULT = 0
+        private const val HOMEPAGE_WALLPAPER_CUSTOM = 1
+        private const val HOMEPAGE_WALLPAPER_BLACK = 2
+        private const val HOMEPAGE_WALLPAPER_DIRECTORY = "homepage-wallpaper"
+        private const val HOMEPAGE_WALLPAPER_FILE = "custom-homepage-wallpaper"
 
         private const val RAIL_SIZE_SUPER_COMPACT = 30
         private const val RAIL_SIZE_SMALL = 60

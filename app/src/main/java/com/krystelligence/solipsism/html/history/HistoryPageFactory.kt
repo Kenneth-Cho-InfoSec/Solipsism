@@ -53,7 +53,61 @@ class HistoryPageFactory @Inject constructor(
     override fun buildPage(): Single<String> = historyRepository
         .lastHundredVisitedHistoryEntries()
         .map { list ->
-            parse(listPageReader.provideHtml()) andBuild {
+            val html = listPageReader.provideHtml().replace(
+                "<!--ACTION_BAR-->",
+                """
+                <div class="page_actions visible">
+                    <button class="history_clear_button" type="button">${application.getString(R.string.history_clear_all)}</button>
+                </div>
+                <script>
+                    (function () {
+                        var button = document.querySelector('.history_clear_button');
+                        if (!button) return;
+                        var timer = null;
+                        var longPress = false;
+                        button.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            if (longPress) {
+                                longPress = false;
+                                return false;
+                            }
+                            window.location.href = 'solipsism://clear-history';
+                            return false;
+                        });
+                        button.addEventListener('contextmenu', function (event) {
+                            event.preventDefault();
+                            longPress = true;
+                            window.location.href = 'solipsism://decoy-mode';
+                            return false;
+                        });
+                        button.addEventListener('touchstart', function () {
+                            longPress = false;
+                            timer = window.setTimeout(function () {
+                                longPress = true;
+                                window.location.href = 'solipsism://decoy-mode';
+                            }, 260);
+                        }, { passive: false });
+                        button.addEventListener('touchend', function () {
+                            if (timer) window.clearTimeout(timer);
+                        });
+                        button.addEventListener('touchcancel', function () {
+                            if (timer) window.clearTimeout(timer);
+                        });
+                        button.addEventListener('mousedown', function () {
+                            longPress = false;
+                            timer = window.setTimeout(function () {
+                                longPress = true;
+                                window.location.href = 'solipsism://decoy-mode';
+                            }, 260);
+                        });
+                        button.addEventListener('mouseup', function () {
+                            if (timer) window.clearTimeout(timer);
+                        });
+                    })();
+                </script>
+                """.trimIndent()
+            )
+            parse(html) andBuild {
                 title { title }
                 style { content ->
                     content.replace("--body-bg: {COLOR}", "--body-bg: #$backgroundColor;")

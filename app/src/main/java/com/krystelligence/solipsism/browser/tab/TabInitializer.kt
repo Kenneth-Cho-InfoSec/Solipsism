@@ -73,6 +73,21 @@ class HomePageInitializer @Inject constructor(
 }
 
 /**
+ * An initializer that always displays Solipsism's visual start page, ignoring the configurable
+ * homepage shortcut preference.
+ */
+@Reusable
+class VisualHomePageInitializer @Inject constructor(
+    private val startPageInitializer: StartPageInitializer
+) : TabInitializer {
+
+    override fun initialize(webView: WebView, headers: Map<String, String>) {
+        startPageInitializer.initialize(webView, headers)
+    }
+
+}
+
+/**
  * An initializer that displays the start page.
  */
 @Reusable

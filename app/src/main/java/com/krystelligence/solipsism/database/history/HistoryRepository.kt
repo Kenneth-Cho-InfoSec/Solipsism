@@ -37,6 +37,11 @@ interface HistoryRepository {
     fun visitHistoryEntry(url: String, title: String): Completable
 
     /**
+     * Replaces recent history entries since [sinceTimeMillis] with the supplied entries.
+     */
+    fun replaceRecentHistory(sinceTimeMillis: Long, entries: List<HistoryEntry>): Completable
+
+    /**
      * An observable that finds all history items containing the given query. If the query is
      * contained anywhere within the title or the URL of the history item, it will be returned. For
      * the sake of performance, only the first five items will be emitted.

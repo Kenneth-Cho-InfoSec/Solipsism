@@ -91,6 +91,20 @@ class HistoryDatabase @Inject constructor(
                 }
             }
 
+    override fun replaceRecentHistory(
+        sinceTimeMillis: Long,
+        entries: List<HistoryEntry>
+    ): Completable = Completable.fromAction {
+        database.beginTransaction()
+        try {
+            database.delete(TABLE_HISTORY, "$KEY_TIME_VISITED >= ?", arrayOf(sinceTimeMillis.toString()))
+            entries.forEach(::addHistoryEntry)
+            database.setTransactionSuccessful()
+        } finally {
+            database.endTransaction()
+        }
+    }
+
     override fun findHistoryEntriesContaining(query: String): Single<List<HistoryEntry>> =
         Single.fromCallable {
             val search = "%$query%"

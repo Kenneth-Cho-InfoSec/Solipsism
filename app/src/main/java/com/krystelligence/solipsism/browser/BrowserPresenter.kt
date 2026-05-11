@@ -56,7 +56,9 @@ import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.kotlin.plusAssign
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.kotlin.toObservable
+import java.net.URLEncoder
 import javax.inject.Inject
+import kotlin.random.Random
 import kotlin.system.exitProcess
 
 /**
@@ -1119,6 +1121,32 @@ class BrowserPresenter @Inject constructor(
         }
     }
 
+    fun onClearAllHistoryClick() {
+        compositeDisposable += historyRepository.deleteHistory()
+            .andThen(historyPageFactory.deleteHistoryPage())
+            .subscribeOn(databaseScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy {
+                if (currentTab?.url?.isHistoryUrl() == true) {
+                    reload()
+                }
+            }
+    }
+
+    fun onHistoryDecoyModeConfirmed() {
+        val fourHoursAgo = System.currentTimeMillis() - DECOY_WINDOW_MILLIS
+        val entries = createDecoyHistoryEntries(fourHoursAgo, System.currentTimeMillis())
+        compositeDisposable += historyRepository.replaceRecentHistory(fourHoursAgo, entries)
+            .andThen(historyPageFactory.deleteHistoryPage())
+            .subscribeOn(databaseScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy {
+                if (currentTab?.url?.isHistoryUrl() == true) {
+                    reload()
+                }
+            }
+    }
+
     /**
      * Call when the user clicks on the tab count button (or home button in desktop mode, or
      * incognito icon in incognito mode).
@@ -1337,6 +1365,25 @@ class BrowserPresenter @Inject constructor(
         currentTab?.url?.takeIf { !it.isSpecialUrl() }?.let(navigator::showQrCode)
     }
 
+    private fun createDecoyHistoryEntries(startTime: Long, endTime: Long): List<HistoryEntry> {
+        val random = Random(System.currentTimeMillis())
+        val selectedQueries = DECOY_QUERIES.shuffled(random)
+        var visitedAt = startTime + random.nextLong(4 * 60 * 1000L, 14 * 60 * 1000L)
+        var index = 0
+        val entries = mutableListOf<HistoryEntry>()
+        while (visitedAt < endTime && index < selectedQueries.size) {
+            val query = selectedQueries[index++]
+            val encodedQuery = URLEncoder.encode(query, "UTF-8")
+            entries += HistoryEntry(
+                url = DECOY_GOOGLE_SEARCH + encodedQuery,
+                title = query.replaceFirstChar { it.uppercase() },
+                lastTimeVisited = visitedAt
+            )
+            visitedAt += random.nextLong(7 * 60 * 1000L, 28 * 60 * 1000L)
+        }
+        return entries
+    }
+
     private fun BrowserContract.View?.updateState(state: BrowserViewState) {
         viewState = state
         this?.renderState(viewState)
@@ -1345,5 +1392,30 @@ class BrowserPresenter @Inject constructor(
     private fun BrowserContract.View?.updateTabs(tabs: List<TabViewState>) {
         tabListState = tabs
         this?.renderTabs(tabListState)
+    }
+
+    companion object {
+        private const val DECOY_WINDOW_MILLIS = 4 * 60 * 60 * 1000L
+        private const val DECOY_GOOGLE_SEARCH = "https://www.google.com/search?q="
+        private val DECOY_QUERIES = listOf(
+            "best budget headphones 2026",
+            "how to clean phone screen safely",
+            "weather tomorrow",
+            "easy pasta dinner ideas",
+            "android privacy settings",
+            "local coffee shops near me",
+            "train times this weekend",
+            "movie releases 2026",
+            "healthy breakfast recipes",
+            "usb c cable differences",
+            "how to back up photos",
+            "weekend city walks",
+            "simple home workout",
+            "news headlines today",
+            "battery saving tips android",
+            "how to remove sticker residue",
+            "cheap flights in summer",
+            "best note taking apps"
+        )
     }
 }

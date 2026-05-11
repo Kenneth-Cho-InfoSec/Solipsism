@@ -9,6 +9,7 @@ import com.krystelligence.solipsism.browser.ui.TabConfiguration
 import com.krystelligence.solipsism.browser.view.RenderingMode
 import com.krystelligence.solipsism.constant.DEFAULT_ENCODING
 import com.krystelligence.solipsism.constant.SCHEME_BOOKMARKS
+import com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
 import com.krystelligence.solipsism.device.ScreenSize
 import com.krystelligence.solipsism.preference.delegates.booleanPreference
 import com.krystelligence.solipsism.preference.delegates.enumPreference
@@ -84,7 +85,7 @@ class UserPreferences @Inject constructor(
     /**
      * The URL of the selected homepage.
      */
-    var homepage by preferences.stringPreference(HOMEPAGE, SCHEME_BOOKMARKS)
+    var homepage by preferences.stringPreference(HOMEPAGE, SCHEME_HOMEPAGE)
 
     /**
      * True if cookies should be enabled in incognito mode, false otherwise.
@@ -246,6 +247,16 @@ class UserPreferences @Inject constructor(
     var solipsismRailOnLeft by preferences.booleanPreference(SOLIPSISM_RAIL_ON_LEFT, false)
 
     /**
+     * The homepage wallpaper mode: bundled default image, custom user image, or black background.
+     */
+    var homepageWallpaperMode by preferences.intPreference(HOMEPAGE_WALLPAPER_MODE, 0)
+
+    /**
+     * The copied local file path of the user's custom homepage wallpaper, when selected.
+     */
+    var homepageWallpaperPath by preferences.nullableStringPreference(HOMEPAGE_WALLPAPER_PATH)
+
+    /**
      * True if the browser should send a do not track (DNT) header with every GET request, false
      * otherwise.
      */
@@ -311,6 +322,12 @@ class UserPreferences @Inject constructor(
      * The remote URL from which ad blocking hosts should be read, depending on the [hostsSource].
      */
     var hostsRemoteFile by preferences.nullableStringPreference(HOSTS_REMOTE_FILE)
+
+    init {
+        if (homepage == SCHEME_BOOKMARKS) {
+            homepage = SCHEME_HOMEPAGE
+        }
+    }
 }
 
 private const val WEB_RTC = "webRtc"
@@ -353,6 +370,8 @@ private const val SHOW_TABS_IN_DRAWER = "showTabsInDrawer"
 private const val TAB_CONFIGURATION = "tabConfiguration"
 private const val SOLIPSISM_RAIL_SIZE = "solipsismRailSize"
 private const val SOLIPSISM_RAIL_ON_LEFT = "solipsismRailOnLeft"
+private const val HOMEPAGE_WALLPAPER_MODE = "homepageWallpaperMode"
+private const val HOMEPAGE_WALLPAPER_PATH = "homepageWallpaperPath"
 private const val DO_NOT_TRACK = "doNotTrack"
 private const val SAVE_DATA = "saveData"
 private const val IDENTIFYING_HEADERS = "removeIdentifyingHeaders"

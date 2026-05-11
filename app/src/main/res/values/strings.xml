@@ -55,6 +55,7 @@
     <string name="action_ok">OK</string>
     <string name="dialog_download">Do you want to download this file? (%1$s)</string>
     <string name="unknown_size">Unknown size</string>
+    <string name="download_donation_message">Please consider donating to support development.</string>
     <string name="action_cancel">Cancel</string>
     <string name="title_warning">Warning</string>
     <string name="title_user_agent">User agent</string>
@@ -218,6 +219,15 @@
     <string name="settings_rail_position_left">Left</string>
     <string name="settings_rail_position_right">Right</string>
     <string name="settings_rail_size_super_compact">Super Compact</string>
+    <string name="settings_homepage_wallpaper">Homepage wallpaper</string>
+    <string name="settings_homepage_wallpaper_default">Default image</string>
+    <string name="settings_homepage_wallpaper_custom">Custom image</string>
+    <string name="settings_homepage_wallpaper_black">Blacked out</string>
+    <string name="history_clear_all">Clear All History</string>
+    <string name="history_decoy_mode_title">Start Decoy Mode?</string>
+    <string name="history_decoy_mode_message">Replace browsing history from the last 4 hours with fake, randomized realistic searches?</string>
+    <string name="history_decoy_mode_start">Start Decoy Mode</string>
+    <string name="history_decoy_mode_done">Decoy history created</string>
     <string name="folder">Folder name</string>
     <string name="action_folder">Folder</string>
     <string name="title_rename_folder">Rename folder</string>

@@ -314,7 +314,7 @@
     <style name="PreferenceFragmentList.Solipsism" parent="@style/PreferenceFragmentList.Material" />
 
     <style name="TextAppearance.Solipsism.PreferenceCategory" parent="TextAppearance.Material3.LabelLarge">
-        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
         <item name="android:textStyle">bold</item>
     </style>
 

@@ -13,6 +13,15 @@
         --body-bg: {COLOR}
         --box-bg: {COLOR}
         --box-txt: {COLOR}
+        --home-wallpaper: {WALLPAPER}
+    }
+
+    @font-face {
+        font-family: "Google Sans Flex Offline";
+        src: {GOOGLE_SANS_FONT};
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
     }
 
     * {
@@ -24,133 +33,126 @@
         margin: 0;
         color: #ffffff;
         background:
-            linear-gradient(180deg, rgba(12, 18, 20, 0.16), rgba(12, 18, 20, 0.74)),
-            url("https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1100&q=85")
-            center center / cover no-repeat,
+            linear-gradient(180deg, rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.76)),
+            var(--home-wallpaper),
             var(--body-bg);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family: "Google Sans", "Google Sans Medium", Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     .page {
         min-height: 100vh;
         display: flex;
-        align-items: flex-end;
+        flex-direction: column;
+        justify-content: space-between;
         padding: 28px;
+    }
+
+    .shortcuts {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        width: 100%;
+        max-width: 720px;
+        margin: 8px auto 0;
+    }
+
+    .shortcut {
+        min-width: 0;
+        min-height: 84px;
+        padding: 12px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 22px;
+        background: rgba(18, 24, 24, 0.46);
+        color: #ffffff;
+        text-align: center;
+        text-decoration: none;
+        -webkit-backdrop-filter: blur(18px);
+        backdrop-filter: blur(18px);
+    }
+
+    .shortcut_icon {
+        display: inline-flex;
+        width: 34px;
+        height: 34px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 17px;
+        background: rgba(255, 255, 255, 0.20);
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    .shortcut_title {
+        display: block;
+        margin-top: 8px;
+        overflow: hidden;
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1.18;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .home {
         width: 100%;
         max-width: 620px;
-        padding-bottom: 12vh;
+        margin: 0 auto;
+        padding-bottom: 10vh;
     }
 
-    .kicker {
-        margin: 0 0 12px;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        opacity: 0.86;
-    }
-
-    h1 {
+    .browser_title {
         margin: 0;
-        max-width: 12ch;
-        font-size: 48px;
-        line-height: 1.02;
-        font-weight: 800;
-        letter-spacing: 0;
+        color: rgba(255, 255, 255, 0.94);
+        font-family: "Google Sans Flex Offline", "Google Sans", "Google Sans Medium", Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 34px;
+        font-weight: 500;
+        line-height: 1.12;
     }
 
-    .subhead {
-        max-width: 32ch;
-        margin: 16px 0 28px;
-        color: rgba(255, 255, 255, 0.86);
-        font-size: 17px;
-        line-height: 1.42;
-    }
-
-    .search_bar {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 100%;
-        min-height: 56px;
-        max-width: 560px;
-        padding: 8px 10px 8px 16px;
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.65);
-        border-radius: 28px;
-        box-shadow: 0 18px 52px rgba(0, 0, 0, 0.24);
-    }
-
-    #image_url {
-        width: 24px;
-        height: 24px;
-        flex: 0 0 auto;
-    }
-
-    #search_input {
-        min-width: 0;
-        width: 100%;
-        height: 40px;
-        outline: none;
-        border: none;
-        color: #17201d;
-        background: transparent;
-        font-size: 16px;
-    }
-
-    #search_submit {
-        width: 42px;
-        height: 42px;
-        flex: 0 0 auto;
-        border: none;
-        border-radius: 21px;
-        color: #ffffff;
-        background: #16211e;
-        font-size: 18px;
-        font-weight: 700;
+    .motto {
+        margin: 8px 0 0;
+        color: rgba(255, 255, 255, 0.72);
+        font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 1.35;
     }
 
     @media (max-width: 480px) {
         .page {
-            padding: 22px;
+            padding: 18px;
         }
 
-        h1 {
-            font-size: 38px;
+        .shortcuts {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .browser_title {
+            font-size: 28px;
         }
 
         .home {
-            padding-bottom: 10vh;
+            padding-bottom: 8vh;
         }
     }
 </style>
 
 <body>
 <main class="page">
+    <nav id="bookmark_shortcuts" class="shortcuts">
+        <a id="shortcut_template" class="shortcut" href="${URL}">
+            <span id="shortcut_icon" class="shortcut_icon">S</span>
+            <span id="shortcut_title" class="shortcut_title">${TITLE}</span>
+        </a>
+    </nav>
     <section class="home">
-        <p class="kicker">Solipsism</p>
-        <h1>Where to next?</h1>
-        <p class="subhead">Search the web, jump to a site, or start with a clean view.</p>
-        <form onsubmit="return search()" class="search_bar" autocomplete="off">
-            <img id="image_url" src="${IMAGE}" alt="">
-            <input class="search" type="text" value="" id="search_input" placeholder="Search or enter address"/>
-            <input type="submit" id="search_submit" value="Go">
-        </form>
+        <p class="browser_title">Solipism Browser</p>
+        <p class="motto">Ex se sola veritas fluit</p>
     </section>
 </main>
-<script type="text/javascript">
-        function search() {
-            if (document.getElementById("search_input").value != "") {
-                window.location.href = "${BASE_URL}" + document.getElementById("search_input").value;
-                document.getElementById("search_input").value = "";
-            }
-            return false;
-        }
-
-</script>
 </body>
 
 </html>

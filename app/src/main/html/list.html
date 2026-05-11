@@ -71,9 +71,39 @@
         -o-text-overflow: ellipsis;
         -ms-text-overflow: ellipsis;
     }
+
+    .page_actions {
+        display: none;
+        padding: 16px 14px 10px;
+        font-family: Arial;
+    }
+
+    .page_actions.visible {
+        display: block;
+    }
+
+    .history_clear_button {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 18px;
+        border: 0;
+        border-radius: 22px;
+        background: var(--divider-color);
+        color: var(--title-color);
+        font-size: 14px;
+        font-weight: 700;
+        font-family: Arial;
+        text-decoration: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+    }
 </style>
 
 <body>
+<!--ACTION_BAR-->
 <div id="content">
 
     <div id=repeated class=box>

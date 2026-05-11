@@ -44,6 +44,10 @@
             android:title="@string/title_text_size" />
         <Preference
             android:icon="@drawable/ic_action_desktop"
+            android:key="homepage_wallpaper"
+            android:title="@string/settings_homepage_wallpaper" />
+        <Preference
+            android:icon="@drawable/ic_action_desktop"
             android:key="rail_size"
             android:title="@string/settings_rail_size" />
         <Preference

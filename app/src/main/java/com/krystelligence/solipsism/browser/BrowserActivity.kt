@@ -73,6 +73,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.view.animation.PathInterpolator
 import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -103,6 +104,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private lateinit var bookmarksAdapter: BookmarkRecyclerViewAdapter
     private var activeRecyclerView: RecyclerView? = null
     private var customView: View? = null
+    private var customViewOriginalOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     private var customViewHidSystemUi = false
     private var previousSystemUiVisibility = 0
 
@@ -121,6 +123,14 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     private val inputMethodManager: InputMethodManager by lazy {
         getSystemService(InputMethodManager::class.java)
+    }
+
+    private val expressiveSpatialInterpolator by lazy {
+        PathInterpolator(0.2f, 0f, 0f, 1f)
+    }
+
+    private val expressiveEffectsInterpolator by lazy {
+        PathInterpolator(0.3f, 0f, 0.8f, 0.15f)
     }
 
     private val qrScannerLauncher = registerForActivityResult(
@@ -411,6 +421,20 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.findPrevious.setOnClickListener { presenter.onFindPrevious() }
         binding.findNext.setOnClickListener { presenter.onFindNext() }
         binding.findQuit.setOnClickListener { presenter.onFindDismiss() }
+        listOfNotNull(
+            binding.homeButton,
+            binding.actionBack,
+            binding.actionForward,
+            binding.actionHome,
+            binding.newTabButton,
+            binding.searchRefresh,
+            binding.searchQr,
+            binding.actionAddBookmark,
+            binding.tabHeaderButton,
+            binding.bookmarkBackButton,
+            binding.settingsButton,
+            binding.verticalUrlText?.parent as? View
+        ).forEach(::applyPhysicalPressFeedback)
 
         binding.homeButton.setOnClickListener { presenter.onTabCountViewClick() }
         binding.actionBack.setOnClickListener { presenter.onBackClick() }
@@ -591,13 +615,23 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
      * @see BrowserContract.View.showCustomView
      */
     override fun showCustomView(view: View) {
-        customView?.let(binding.contentFrame::removeView)
+        customView?.let(binding.root::removeView)
         customView = view
-        binding.contentFrame.addView(view)
+        customViewOriginalOrientation = requestedOrientation
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        view.setBackgroundColor(color(android.R.color.black))
+        binding.root.addView(
+            view,
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        binding.root.bringChildToFront(view)
+        binding.uiLayout.isVisible = false
+        binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        view.requestLayout()
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             customViewHidSystemUi = true
             previousSystemUiVisibility = window.decorView.systemUiVisibility
-            binding.toolbarLayout.isVisible = false
             window.decorView.systemUiVisibility = previousSystemUiVisibility or
                 View.SYSTEM_UI_FLAG_FULLSCREEN or
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
@@ -612,10 +646,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
      * @see BrowserContract.View.hideCustomView
      */
     override fun hideCustomView() {
-        customView?.let(binding.contentFrame::removeView)
+        customView?.let(binding.root::removeView)
         customView = null
+        binding.uiLayout.isVisible = true
+        binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+        requestedOrientation = customViewOriginalOrientation
         if (customViewHidSystemUi) {
-            binding.toolbarLayout.isVisible = true
             window.decorView.systemUiVisibility = previousSystemUiVisibility
             customViewHidSystemUi = false
         }
@@ -887,14 +923,106 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         showSslCertificateDialog(sslCertificateInfo)
     }
 
+    fun clearAllHistoryFromHistoryPage() {
+        presenter.onClearAllHistoryClick()
+    }
+
+    fun showHistoryDecoyModePrompt() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.history_decoy_mode_title)
+            .setMessage(R.string.history_decoy_mode_message)
+            .setPositiveButton(R.string.history_decoy_mode_start) { _, _ ->
+                presenter.onHistoryDecoyModeConfirmed()
+            }
+            .setNegativeButton(R.string.action_cancel, null)
+            .show()
+    }
+
     private fun showAddressOverlay() {
-        binding.addressOverlay?.isVisible = true
+        val overlay = binding.addressOverlay ?: return
+        val searchContainer = binding.searchContainer
+        overlay.animate().cancel()
+        searchContainer.animate().cancel()
+        if (!overlay.isVisible) {
+            overlay.alpha = 0f
+            overlay.translationY = -overlay.height.coerceAtLeast(72.dp).toFloat()
+            overlay.scaleX = 0.98f
+            overlay.scaleY = 0.98f
+            searchContainer.elevation = 0f
+            searchContainer.translationZ = 0f
+            overlay.isVisible = true
+        }
+        overlay.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(ADDRESS_OVERLAY_ENTER_DURATION_MS)
+            .setInterpolator(expressiveSpatialInterpolator)
+            .start()
+        searchContainer.animate()
+            .translationZ(18.dp.toFloat())
+            .setStartDelay(ADDRESS_OVERLAY_SHADOW_DELAY_MS)
+            .setDuration(ADDRESS_OVERLAY_SHADOW_DURATION_MS)
+            .setInterpolator(expressiveSpatialInterpolator)
+            .withEndAction {
+                searchContainer.elevation = 18.dp.toFloat()
+            }
+            .start()
         binding.search.requestFocus()
         inputMethodManager.showSoftInput(binding.search, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun hideAddressOverlay() {
-        binding.addressOverlay?.isVisible = false
+        val overlay = binding.addressOverlay ?: return
+        val searchContainer = binding.searchContainer
+        overlay.animate().cancel()
+        searchContainer.animate().cancel()
+        searchContainer.animate()
+            .translationZ(0f)
+            .setDuration(ADDRESS_OVERLAY_EXIT_DURATION_MS)
+            .setInterpolator(expressiveEffectsInterpolator)
+            .withEndAction {
+                searchContainer.elevation = 0f
+            }
+            .start()
+        overlay.animate()
+            .alpha(0f)
+            .translationY(-overlay.height.coerceAtLeast(72.dp).toFloat() * 0.35f)
+            .scaleX(0.98f)
+            .scaleY(0.98f)
+            .setDuration(ADDRESS_OVERLAY_EXIT_DURATION_MS)
+            .setInterpolator(expressiveEffectsInterpolator)
+            .withEndAction {
+                overlay.isVisible = false
+                overlay.translationY = 0f
+                overlay.scaleX = 1f
+                overlay.scaleY = 1f
+                searchContainer.translationZ = 0f
+            }
+            .start()
+    }
+
+    private fun applyPhysicalPressFeedback(view: View) {
+        view.setOnTouchListener { touchedView, event ->
+            when (event.actionMasked) {
+                android.view.MotionEvent.ACTION_DOWN -> touchedView.animate()
+                    .scaleX(0.94f)
+                    .scaleY(0.94f)
+                    .setDuration(PRESS_FEEDBACK_DURATION_MS)
+                    .setInterpolator(expressiveEffectsInterpolator)
+                    .start()
+
+                android.view.MotionEvent.ACTION_UP,
+                android.view.MotionEvent.ACTION_CANCEL -> touchedView.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(RELEASE_FEEDBACK_DURATION_MS)
+                    .setInterpolator(expressiveSpatialInterpolator)
+                    .start()
+            }
+            false
+        }
     }
 
     private fun ImageView.updateVisibilityForDrawable() {
@@ -925,3 +1053,9 @@ private const val FIND_BAR_RAIL_GAP_DP = 14
 private const val DONATION_PREFERENCES = "solipsism_donation"
 private const val DONATION_PROMPT_SHOWN = "donationPromptShown"
 private const val KO_FI_URL = "https://ko-fi.com/kennethchoinfosec"
+private const val ADDRESS_OVERLAY_ENTER_DURATION_MS = 360L
+private const val ADDRESS_OVERLAY_EXIT_DURATION_MS = 180L
+private const val ADDRESS_OVERLAY_SHADOW_DELAY_MS = 90L
+private const val ADDRESS_OVERLAY_SHADOW_DURATION_MS = 320L
+private const val PRESS_FEEDBACK_DURATION_MS = 95L
+private const val RELEASE_FEEDBACK_DURATION_MS = 260L

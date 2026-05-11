@@ -119,7 +119,8 @@ class DownloadPermissionsHelper @Inject constructor(
         }
 
         val builder = MaterialAlertDialogBuilder(activity)
-        val message: String = activity.getString(R.string.dialog_download, downloadSize)
+        val message = activity.getString(R.string.dialog_download, downloadSize) +
+            "\n\n" + activity.getString(R.string.download_donation_message)
         val dialog: Dialog = builder.setTitle(fileName)
             .setMessage(message)
             .setPositiveButton(

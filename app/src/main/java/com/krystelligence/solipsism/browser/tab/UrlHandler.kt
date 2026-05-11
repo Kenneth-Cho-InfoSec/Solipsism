@@ -2,6 +2,7 @@ package com.krystelligence.solipsism.browser.tab
 
 import com.krystelligence.solipsism.BuildConfig
 import com.krystelligence.solipsism.R
+import com.krystelligence.solipsism.browser.BrowserActivity
 import com.krystelligence.solipsism.browser.di.IncognitoMode
 import com.krystelligence.solipsism.constant.FILE
 import com.krystelligence.solipsism.extensions.snackbar
@@ -42,6 +43,14 @@ class UrlHandler @Inject constructor(
         url: String,
         headers: Map<String, String>
     ): Boolean {
+        if (url == HISTORY_CLEAR_URL) {
+            (activity as? BrowserActivity)?.clearAllHistoryFromHistoryPage()
+            return true
+        }
+        if (url == HISTORY_DECOY_URL) {
+            (activity as? BrowserActivity)?.showHistoryDecoyModePrompt()
+            return true
+        }
         if (incognitoMode) {
             // If we are in incognito, immediately load, we don't want the url to leave the app
             return continueLoadingUrl(view, url, headers)
@@ -136,5 +145,7 @@ class UrlHandler @Inject constructor(
 
     companion object {
         private const val TAG = "UrlHandler"
+        private const val HISTORY_CLEAR_URL = "solipsism://clear-history"
+        private const val HISTORY_DECOY_URL = "solipsism://decoy-mode"
     }
 }
