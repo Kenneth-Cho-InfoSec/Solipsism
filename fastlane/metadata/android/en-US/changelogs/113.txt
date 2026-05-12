@@ -1,0 +1,5 @@
+* Prepared the app for F-Droid submission
+* Replaced Google Play Services barcode scanning with ZXing-only QR decoding
+* Added upstream Fastlane listing metadata
+* Compact Material-style overflow menu with fixed circular shortcut buttons
+* Added DuckDuckGo-based "I am feeling lucky" action

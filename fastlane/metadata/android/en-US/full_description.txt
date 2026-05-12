@@ -1,0 +1,17 @@
+Solipsism Browser is a rail-first Android WebView browser designed around one-handed browsing. Navigation, tabs, search, QR scanning, refresh, and the overflow menu live in a compact side rail that can be placed on the left or right.
+
+The browser focuses on mobile ergonomics, privacy-aware controls, and a tactile Material Design 3 Expressive-inspired interface.
+
+Features include:
+
+* Left or right browser rail with multiple sizes, including Super Compact mode
+* WebView tabs, tab overview, bookmarks, history, downloads, and find in page
+* Full URL editor opened from the vertical URL rail
+* Built-in QR scanner powered by ZXing
+* Install Website as App support through Android pinned shortcuts
+* Incognito browsing, ad blocking, cookie controls, WebRTC settings, and clear-on-exit options
+* Decoy Mode for replacing recent browsing history with randomized realistic browsing sessions
+* Custom homepage with wallpaper and bookmark shortcuts
+* Fullscreen video handling for landscape playback
+
+Solipsism Browser does not include advertising SDKs, analytics SDKs, Firebase, or Google Play Services dependencies.

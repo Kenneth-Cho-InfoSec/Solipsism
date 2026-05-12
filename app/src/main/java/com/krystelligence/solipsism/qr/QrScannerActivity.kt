@@ -22,11 +22,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import com.google.mlkit.vision.barcode.BarcodeScanner
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.common.InputImage
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.DecodeHintType
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.NotFoundException
+import com.google.zxing.PlanarYUVLuminanceSource
+import com.google.zxing.common.HybridBinarizer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -35,11 +37,8 @@ class QrScannerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityQrScannerBinding
     private lateinit var cameraExecutor: ExecutorService
 
-    private val barcodeScanner: BarcodeScanner by lazy {
-        val options = BarcodeScannerOptions.Builder()
-            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-            .build()
-        BarcodeScanning.getClient(options)
+    private val qrReader = MultiFormatReader().apply {
+        setHints(mapOf(DecodeHintType.POSSIBLE_FORMATS to listOf(BarcodeFormat.QR_CODE)))
     }
 
     @Volatile
@@ -101,27 +100,16 @@ class QrScannerActivity : AppCompatActivity() {
         )
     }
 
-    @androidx.annotation.OptIn(markerClass = [ExperimentalGetImage::class])
     private fun analyzeImage(imageProxy: ImageProxy) {
         if (resultReturned) {
             imageProxy.close()
             return
         }
 
-        val mediaImage = imageProxy.image
-        if (mediaImage == null) {
-            imageProxy.close()
-            return
-        }
-
-        val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-        barcodeScanner.process(image)
-            .addOnSuccessListener { barcodes ->
-                val scannedValue = barcodes
-                    .firstNotNullOfOrNull { barcode -> barcode.url?.url ?: barcode.rawValue }
-                    ?.trim()
-
-                if (!scannedValue.isNullOrEmpty() && !resultReturned) {
+        try {
+            decodeQrValue(imageProxy)?.trim()
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { scannedValue ->
                     resultReturned = true
                     setResult(
                         RESULT_OK,
@@ -129,15 +117,36 @@ class QrScannerActivity : AppCompatActivity() {
                     )
                     finish()
                 }
-            }
-            .addOnCompleteListener {
-                imageProxy.close()
-            }
+        } finally {
+            qrReader.reset()
+            imageProxy.close()
+        }
+    }
+
+    private fun decodeQrValue(imageProxy: ImageProxy): String? {
+        val yPlane = imageProxy.planes.firstOrNull() ?: return null
+        val buffer = yPlane.buffer
+        val data = ByteArray(buffer.remaining())
+        buffer.get(data)
+        val source = PlanarYUVLuminanceSource(
+            data,
+            imageProxy.width,
+            imageProxy.height,
+            0,
+            0,
+            imageProxy.width,
+            imageProxy.height,
+            false
+        )
+        return try {
+            qrReader.decodeWithState(BinaryBitmap(HybridBinarizer(source))).text
+        } catch (_: NotFoundException) {
+            null
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        barcodeScanner.close()
         cameraExecutor.shutdown()
     }
 
