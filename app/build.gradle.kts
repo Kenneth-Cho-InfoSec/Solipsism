@@ -13,7 +13,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "5.1.4"
+        versionName = "5.1.5"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -67,7 +67,7 @@ android {
             dimension = "capabilities"
             buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"true\")")
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 109
+            versionCode = 111
         }
 
         if (!isCi) {
@@ -75,7 +75,7 @@ android {
                 dimension = "capabilities"
                 buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"false\")")
                 applicationId = "com.krystelligence.solipsism"
-                versionCode = 110
+                versionCode = 112
             }
         }
     }

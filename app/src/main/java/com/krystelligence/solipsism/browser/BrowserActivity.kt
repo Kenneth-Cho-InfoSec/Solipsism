@@ -60,15 +60,21 @@ import com.krystelligence.solipsism.utils.ProxyUtils
 import com.krystelligence.solipsism.utils.value
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.annotation.SuppressLint
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -76,7 +82,11 @@ import android.view.inputmethod.InputMethodManager
 import android.view.animation.PathInterpolator
 import android.widget.AdapterView
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -107,6 +117,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private var customViewOriginalOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     private var customViewHidSystemUi = false
     private var previousSystemUiVisibility = 0
+    private var browserMenuPopup: PopupWindow? = null
 
     private var menuItemShare: MenuItem? = null
     private var menuItemCopyLink: MenuItem? = null
@@ -161,24 +172,26 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             gravity = if (railOnLeft) Gravity.START else Gravity.END
         }
         binding.toolbarLayout.setPaddingRelative(
-            if (superCompact) 2.dp else 10.dp,
+            if (superCompact) 1.dp else 10.dp,
             if (superCompact) 30.dp else 42.dp,
-            if (superCompact) 2.dp else 10.dp,
+            if (superCompact) 1.dp else 10.dp,
             if (superCompact) 16.dp else 28.dp
         )
+        binding.tabCountView.setShowCount(!superCompact)
 
         if (superCompact) {
-            val railButtonSize = 26.dp
-            val urlButtonSize = 24.dp
-            val navButtonSize = 27.dp
-            val addressRailWidth = 26.dp
+            val railButtonSize = 28.dp
+            val urlButtonSize = 27.dp
+            val navButtonSize = 28.dp
+            val addressRailWidth = 28.dp
+            val iconPadding = 5.dp
 
             binding.homeButton.setSquareSize(railButtonSize)
-            binding.tabCountView.setSquareSize(22.dp)
+            binding.tabCountView.setSquareSize(24.dp)
             binding.verticalUrlText?.updateLayoutParams<ViewGroup.LayoutParams> {
-                width = 108.dp
+                width = 148.dp
             }
-            binding.verticalUrlText?.textSize = 12f
+            binding.verticalUrlText?.textSize = 11.5f
             binding.settingsButton?.setSquareSize(urlButtonSize)
             binding.searchRefresh.setSquareSize(urlButtonSize)
             binding.actionBack.setSquareSize(navButtonSize)
@@ -187,14 +200,27 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             binding.actionAddBookmark.setSquareSize(navButtonSize)
             binding.toolbar.setSquareSize(navButtonSize)
             binding.toolbar.minimumHeight = navButtonSize
+            binding.toolbar.overflowIcon = drawable(R.drawable.ic_action_more_vertical)?.also {
+                it.tint(color(R.color.solipsism_rail_text))
+            }
+            binding.toolbar.contentInsetStartWithNavigation = 0
+            binding.toolbar.setContentInsetsRelative(0, 0)
+            listOfNotNull(
+                binding.settingsButton,
+                binding.searchRefresh,
+                binding.actionBack,
+                binding.actionForward,
+                binding.actionHome,
+                binding.actionAddBookmark
+            ).forEach { it.setPadding(iconPadding, iconPadding, iconPadding, iconPadding) }
 
             (binding.verticalUrlText?.parent as? View)?.apply {
                 updateLayoutParams<ViewGroup.MarginLayoutParams> {
                     width = addressRailWidth
-                    topMargin = 12.dp
-                    bottomMargin = 12.dp
+                    topMargin = 8.dp
+                    bottomMargin = 8.dp
                 }
-                setPaddingRelative(1.dp, 5.dp, 1.dp, 5.dp)
+                setPaddingRelative(1.dp, 4.dp, 1.dp, 4.dp)
             }
             (binding.actionBack.parent as? View)?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 width = addressRailWidth
@@ -246,6 +272,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private fun View.setTopMargin(topMargin: Int) {
         updateLayoutParams<ViewGroup.MarginLayoutParams> {
             this.topMargin = topMargin
+        }
+    }
+
+    private fun View.setStartMargin(startMargin: Int) {
+        updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginStart = startMargin
         }
     }
 
@@ -308,6 +340,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             .incognitoMode(isIncognito())
             .build()
             .inject(this)
+        configureSolipsismOverflowMenu()
 
         if (uiConfiguration.tabConfiguration == TabConfiguration.DESKTOP) {
             tabsAdapter = DesktopTabRecyclerViewAdapter(
@@ -420,7 +453,21 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
         binding.findPrevious.setOnClickListener { presenter.onFindPrevious() }
         binding.findNext.setOnClickListener { presenter.onFindNext() }
-        binding.findQuit.setOnClickListener { presenter.onFindDismiss() }
+        binding.findQuit.setOnClickListener {
+            binding.findBar.isVisible = false
+            binding.findQuery.clearFocus()
+            inputMethodManager.hideSoftInputFromWindow(binding.findQuery.windowToken, 0)
+            presenter.onFindDismiss()
+        }
+        binding.findQuery.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                presenter.onFindInPage(s?.toString().orEmpty())
+            }
+
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
         listOfNotNull(
             binding.homeButton,
             binding.actionBack,
@@ -467,6 +514,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.searchSslStatus.setOnClickListener { presenter.onSslIconClick() }
         binding.verticalUrlText?.setOnClickListener { showAddressOverlay() }
         (binding.verticalUrlText?.parent as? View)?.setOnClickListener { showAddressOverlay() }
+        installUrlRailGestures()
         binding.settingsButton?.setOnClickListener {
             presenter.onReloadClick()
         }
@@ -504,14 +552,30 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         intentExtractor.extractUrlFromIntent(intent)?.let(presenter::onNewAction)
     }
 
+    @SuppressLint("DiscouragedPrivateApi")
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        if (::uiConfiguration.isInitialized &&
+            uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM
+        ) {
+            return false
+        }
         menuInflater.inflate(R.menu.main, menu)
+        runCatching {
+            menu.javaClass
+                .getDeclaredMethod("setOptionalIconsVisible", Boolean::class.javaPrimitiveType)
+                .invoke(menu, true)
+        }
         menuItemShare = menu.findItem(R.id.action_share)
         menuItemCopyLink = menu.findItem(R.id.action_copy)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        if (::uiConfiguration.isInitialized &&
+            uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM
+        ) {
+            return false
+        }
         menuItemShare?.isVisible = presenter.viewState.enableFullMenu
         menuItemCopyLink?.isVisible = presenter.viewState.enableFullMenu
         return super.onPrepareOptionsMenu(menu)
@@ -528,8 +592,172 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             R.id.action_copy -> presenter.onMenuClick(MenuSelection.COPY_LINK)
             R.id.action_bookmarks -> presenter.onMenuClick(MenuSelection.BOOKMARKS)
             R.id.action_settings -> presenter.onMenuClick(MenuSelection.SETTINGS)
+            R.id.action_add_to_homescreen -> presenter.onMenuClick(MenuSelection.ADD_TO_HOME)
+            R.id.action_add_bookmark -> presenter.onMenuClick(MenuSelection.ADD_BOOKMARK)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun configureSolipsismOverflowMenu() {
+        if (uiConfiguration.tabConfiguration != TabConfiguration.SOLIPSISM) {
+            return
+        }
+        binding.toolbar.menu.clear()
+        binding.toolbar.navigationIcon = drawable(R.drawable.ic_action_more_vertical)?.also {
+            it.tint(color(R.color.solipsism_rail_text))
+        }
+        binding.toolbar.setNavigationOnClickListener { showBrowserOverflowMenu() }
+        binding.toolbar.setOnClickListener { showBrowserOverflowMenu() }
+    }
+
+    private fun showBrowserOverflowMenu() {
+        browserMenuPopup?.dismiss()
+        val menuView = buildBrowserOverflowMenuView()
+        val popupWidth = resources.displayMetrics.widthPixels
+            .coerceAtMost(BROWSER_MENU_MAX_WIDTH_DP.dp + (BROWSER_MENU_SCREEN_MARGIN_DP * 2).dp) -
+            (BROWSER_MENU_SCREEN_MARGIN_DP * 2).dp
+        browserMenuPopup = PopupWindow(
+            menuView,
+            popupWidth,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            true
+        ).apply {
+            setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+            elevation = 18.dp.toFloat()
+            isOutsideTouchable = true
+            setAnimationStyle(android.R.style.Animation_Dialog)
+        }
+
+        val location = IntArray(2)
+        binding.toolbar.getLocationOnScreen(location)
+        val x = if (userPreferences.solipsismRailOnLeft) {
+            BROWSER_MENU_SCREEN_MARGIN_DP.dp
+        } else {
+            resources.displayMetrics.widthPixels - popupWidth - BROWSER_MENU_SCREEN_MARGIN_DP.dp
+        }
+        val y = (location[1] - 12.dp).coerceAtLeast(BROWSER_MENU_SCREEN_MARGIN_DP.dp)
+        browserMenuPopup?.showAtLocation(binding.root, Gravity.TOP or Gravity.START, x, y)
+        menuView.alpha = 0f
+        menuView.scaleX = 0.96f
+        menuView.scaleY = 0.96f
+        menuView.animate()
+            .alpha(1f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(220L)
+            .setInterpolator(expressiveSpatialInterpolator)
+            .start()
+    }
+
+    private fun buildBrowserOverflowMenuView(): View {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = drawable(R.drawable.browser_overflow_menu_background)
+            clipToOutline = true
+            elevation = 18.dp.toFloat()
+            setPadding(9.dp, 9.dp, 9.dp, 9.dp)
+        }
+
+        container.addView(LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            val quickActions = listOf(
+                OverflowAction(R.drawable.ic_action_back, R.string.action_back, MenuSelection.BACK),
+                OverflowAction(R.drawable.ic_action_star, R.string.action_add_bookmark, MenuSelection.ADD_BOOKMARK),
+                OverflowAction(R.drawable.ic_settings_download, R.string.action_downloads, MenuSelection.DOWNLOADS),
+                OverflowAction(R.drawable.ic_settings_info, R.string.action_site_info, null) {
+                    presenter.onSslIconClick()
+                },
+                OverflowAction(R.drawable.ic_action_refresh, R.string.action_refresh, null) {
+                    presenter.onReloadClick()
+                }
+            )
+            quickActions.forEachIndexed { index, action ->
+                addView(createQuickActionButton(action).apply {
+                    if (index > 0) {
+                        setStartMargin(6.dp)
+                    }
+                })
+            }
+        })
+
+        container.addView(createMenuRow(R.drawable.ic_action_plus, R.string.action_new_tab, MenuSelection.NEW_TAB))
+        container.addView(createMenuRow(R.drawable.incognito_mode, R.string.action_incognito, MenuSelection.NEW_INCOGNITO_TAB))
+        container.addView(createMenuRow(R.drawable.ic_action_invert, R.string.action_feeling_lucky, MenuSelection.FEELING_LUCKY))
+        container.addView(createMenuRow(R.drawable.ic_webpage, R.string.action_add_to_homescreen, MenuSelection.ADD_TO_HOME))
+        container.addView(createMenuDivider())
+        container.addView(createMenuRow(R.drawable.ic_history, R.string.action_history, MenuSelection.HISTORY))
+        container.addView(createMenuRow(R.drawable.ic_settings_download, R.string.action_downloads, MenuSelection.DOWNLOADS))
+        container.addView(createMenuDivider())
+        container.addView(createMenuRow(R.drawable.ic_bookmark, R.string.action_bookmarks, MenuSelection.BOOKMARKS))
+        container.addView(createMenuRow(R.drawable.ic_search, R.string.action_find, MenuSelection.FIND))
+        container.addView(createMenuRow(R.drawable.ic_insert, R.string.action_copy, MenuSelection.COPY_LINK))
+        container.addView(createMenuDivider())
+        container.addView(createMenuRow(R.drawable.ic_action_settings, R.string.settings, MenuSelection.SETTINGS))
+
+        return container
+    }
+
+    private fun createQuickActionButton(action: OverflowAction): ImageButton =
+        ImageButton(this).apply {
+            layoutParams = LinearLayout.LayoutParams(38.dp, 38.dp)
+            background = drawable(R.drawable.browser_overflow_quick_button_background)
+            contentDescription = getString(action.title)
+            setPadding(8.dp, 8.dp, 8.dp, 8.dp)
+            setImageResource(action.icon)
+            setColorFilter(themeProvider.color(R.attr.colorOnSurface))
+            scaleType = ImageView.ScaleType.CENTER
+            setOnClickListener { runOverflowAction(action) }
+        }
+
+    private fun createMenuRow(
+        icon: Int,
+        title: Int,
+        selection: MenuSelection
+    ): View = LinearLayout(this).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+        background = drawable(R.drawable.browser_overflow_menu_item_background)
+        isClickable = true
+        isFocusable = true
+        setPadding(4.dp, 3.dp, 6.dp, 3.dp)
+        minimumHeight = 38.dp
+        addView(ImageView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(30.dp, 30.dp)
+            setPadding(6.dp, 6.dp, 6.dp, 6.dp)
+            setImageResource(icon)
+            setColorFilter(themeProvider.color(R.attr.colorOnSurfaceVariant))
+        })
+        addView(TextView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                .apply { marginStart = 7.dp }
+            text = getString(title)
+            setTextColor(themeProvider.color(R.attr.colorOnSurface))
+            textSize = 15f
+            maxLines = 1
+            includeFontPadding = true
+        })
+        setOnClickListener {
+            browserMenuPopup?.dismiss()
+            presenter.onMenuClick(selection)
+        }
+    }
+
+    private fun createMenuDivider(): View =
+        View(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+                1.dp
+            ).apply {
+                setMargins(4.dp, 5.dp, 4.dp, 5.dp)
+            }
+            setBackgroundColor(themeProvider.color(R.attr.colorOutlineVariant))
+            alpha = 0.7f
+        }
+
+    private fun runOverflowAction(action: OverflowAction) {
+        browserMenuPopup?.dismiss()
+        action.customAction?.invoke() ?: action.selection?.let(presenter::onMenuClick)
     }
 
     /**
@@ -629,17 +857,16 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.uiLayout.isVisible = false
         binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         view.requestLayout()
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            customViewHidSystemUi = true
-            previousSystemUiVisibility = window.decorView.systemUiVisibility
-            window.decorView.systemUiVisibility = previousSystemUiVisibility or
-                View.SYSTEM_UI_FLAG_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-        }
+        customViewHidSystemUi = true
+        previousSystemUiVisibility = window.decorView.systemUiVisibility
+        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.decorView.systemUiVisibility = previousSystemUiVisibility or
+            View.SYSTEM_UI_FLAG_FULLSCREEN or
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
     }
 
     /**
@@ -652,6 +879,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         requestedOrientation = customViewOriginalOrientation
         if (customViewHidSystemUi) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             window.decorView.systemUiVisibility = previousSystemUiVisibility
             customViewHidSystemUi = false
         }
@@ -666,6 +894,90 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     override fun launchQrScanner() {
         qrScannerLauncher.launch(Intent(this, QrScannerActivity::class.java))
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun installUrlRailGestures() {
+        val rail = binding.verticalUrlText?.parent as? View ?: return
+        var downY = 0f
+        var downX = 0f
+        val listener = View.OnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    downY = event.rawY
+                    downX = event.rawX
+                    view.animate().cancel()
+                    view.animate()
+                        .scaleX(0.96f)
+                        .scaleY(0.96f)
+                        .setDuration(120L)
+                        .setInterpolator(expressiveEffectsInterpolator)
+                        .start()
+                    true
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    val dy = event.rawY - downY
+                    val dx = event.rawX - downX
+                    view.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(180L)
+                        .setInterpolator(expressiveSpatialInterpolator)
+                        .start()
+                    if (kotlin.math.abs(dy) > URL_RAIL_SWIPE_THRESHOLD_DP.dp &&
+                        kotlin.math.abs(dy) > kotlin.math.abs(dx) * 1.2f
+                    ) {
+                        val direction = if (dy < 0f) 1 else -1
+                        if (presenter.onUrlBarSwipeTab(direction)) {
+                            animateUrlRailTabSwitch(view, direction)
+                            vibratePixelMini(view)
+                        }
+                    } else {
+                        view.performClick()
+                        showAddressOverlay()
+                    }
+                    true
+                }
+
+                MotionEvent.ACTION_CANCEL -> {
+                    view.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150L)
+                        .setInterpolator(expressiveSpatialInterpolator)
+                        .start()
+                    true
+                }
+
+                else -> true
+            }
+        }
+        rail.setOnTouchListener(listener)
+        binding.verticalUrlText?.setOnTouchListener(listener)
+    }
+
+    private fun animateUrlRailTabSwitch(view: View, direction: Int) {
+        val distance = 10.dp.toFloat() * direction
+        view.animate().cancel()
+        view.translationY = -distance
+        view.alpha = 0.72f
+        view.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(240L)
+            .setInterpolator(expressiveSpatialInterpolator)
+            .start()
+    }
+
+    private fun vibratePixelMini(view: View) {
+        if (Build.MANUFACTURER.equals("Google", ignoreCase = true) &&
+            Build.MODEL.contains("Pixel", ignoreCase = true)
+        ) {
+            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        }
     }
 
     override fun renderState(viewState: BrowserViewState) {
@@ -705,6 +1017,17 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             binding.searchSslStatus.updateVisibilityForDrawable()
         }
         viewState.bookmarks?.let(bookmarksAdapter::submitList)
+        viewState.findInPage?.let { query ->
+            val shouldShowFind = query.isNotEmpty() || binding.findBar.isVisible && binding.findQuery.hasFocus()
+            binding.findBar.isVisible = shouldShowFind
+            if (binding.findQuery.text.toString() != query) {
+                binding.findQuery.setText(query)
+            }
+            if (!shouldShowFind) {
+                binding.findQuery.clearFocus()
+                inputMethodManager.hideSoftInputFromWindow(binding.findQuery.windowToken, 0)
+            }
+        }
         val suggestionsAdapter = binding.search.adapter as? SuggestionsAdapter
         suggestionsAdapter?.refreshBookmarks()
     }
@@ -833,6 +1156,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun showFindInPageDialog() {
         binding.findBar.isVisible = true
         binding.findQuery.requestFocus()
+        binding.findQuery.setSelection(binding.findQuery.text.length)
         inputMethodManager.showSoftInput(binding.findQuery, InputMethodManager.SHOW_IMPLICIT)
     }
 
@@ -941,6 +1265,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private fun showAddressOverlay() {
         val overlay = binding.addressOverlay ?: return
         val searchContainer = binding.searchContainer
+        val editUrl = presenter.currentUrlForEditing()
         overlay.animate().cancel()
         searchContainer.animate().cancel()
         if (!overlay.isVisible) {
@@ -951,6 +1276,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             searchContainer.elevation = 0f
             searchContainer.translationZ = 0f
             overlay.isVisible = true
+        }
+        if (editUrl.isNotBlank() && binding.search.text.toString() != editUrl) {
+            binding.search.setText(editUrl)
+            binding.search.setSelection(editUrl.length)
         }
         overlay.animate()
             .alpha(1f)
@@ -1045,11 +1374,21 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 }
 
+private data class OverflowAction(
+    @DrawableRes val icon: Int,
+    val title: Int,
+    val selection: MenuSelection?,
+    val customAction: (() -> Unit)? = null
+)
+
 private const val SUPER_COMPACT_RAIL_WIDTH_DP = 30
 private const val MIN_SOLIPSISM_RAIL_WIDTH_DP = SUPER_COMPACT_RAIL_WIDTH_DP
 private const val MAX_SOLIPSISM_RAIL_WIDTH_DP = 96
 private const val ADDRESS_OVERLAY_RAIL_GAP_DP = 14
 private const val FIND_BAR_RAIL_GAP_DP = 14
+private const val URL_RAIL_SWIPE_THRESHOLD_DP = 34
+private const val BROWSER_MENU_MAX_WIDTH_DP = 258
+private const val BROWSER_MENU_SCREEN_MARGIN_DP = 14
 private const val DONATION_PREFERENCES = "solipsism_donation"
 private const val DONATION_PROMPT_SHOWN = "donationPromptShown"
 private const val KO_FI_URL = "https://ko-fi.com/kennethchoinfosec"

@@ -19,36 +19,47 @@
 
     <item
         android:id="@+id/action_new_tab"
+        android:icon="@drawable/ic_action_plus"
         android:title="@string/action_new_tab"/>
     <item
         android:id="@+id/action_incognito"
+        android:icon="@drawable/incognito_mode"
         android:title="@string/action_incognito"/>
     <item
         android:id="@+id/action_share"
+        android:icon="@drawable/ic_insert"
         android:title="@string/action_share"/>
     <item
         android:id="@+id/action_history"
+        android:icon="@drawable/ic_history"
         android:title="@string/action_history"/>
     <item
         android:id="@+id/action_downloads"
+        android:icon="@drawable/ic_settings_download"
         android:title="@string/action_downloads"/>
     <item
         android:id="@+id/action_find"
+        android:icon="@drawable/ic_search"
         android:title="@string/action_find"/>
     <item
         android:id="@+id/action_copy"
+        android:icon="@drawable/ic_insert"
         android:title="@string/action_copy"/>
     <item
         android:id="@+id/action_add_to_homescreen"
+        android:icon="@drawable/ic_webpage"
         android:title="@string/action_add_to_homescreen"/>
     <item
         android:id="@+id/action_bookmarks"
+        android:icon="@drawable/ic_bookmark"
         android:title="@string/action_bookmarks"/>
     <item
         android:id="@+id/action_add_bookmark"
+        android:icon="@drawable/ic_action_star"
         android:title="@string/action_add_bookmark"/>
     <item
         android:id="@+id/action_settings"
+        android:icon="@drawable/ic_action_settings"
         android:title="@string/settings"/>
 
 </menu>

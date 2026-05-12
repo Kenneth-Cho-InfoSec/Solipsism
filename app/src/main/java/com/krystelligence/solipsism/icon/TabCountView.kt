@@ -48,6 +48,7 @@ class TabCountView @JvmOverloads constructor(
     private val cornerPathEffect: CornerPathEffect
 
     private var count: Int = 0
+    private var showCount: Boolean = true
 
     init {
         setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -65,12 +66,18 @@ class TabCountView @JvmOverloads constructor(
      */
     fun updateCount(count: Int) {
         this.count = count
-        contentDescription = count.toString()
+        contentDescription = if (showCount) count.toString() else context.getString(R.string.tabs)
         invalidate()
     }
 
     fun updateTabCount(count: Int) {
         updateCount(count)
+    }
+
+    fun setShowCount(showCount: Boolean) {
+        this.showCount = showCount
+        contentDescription = if (showCount) count.toString() else context.getString(R.string.tabs)
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -105,10 +112,11 @@ class TabCountView @JvmOverloads constructor(
 
         paint.style = Paint.Style.FILL
 
-        val xPos = width / 2F
-        val yPos = height / 2 - (paint.descent() + paint.ascent()) / 2
-
-        canvas.drawText(text, xPos, yPos, paint)
+        if (showCount) {
+            val xPos = width / 2F
+            val yPos = height / 2 - (paint.descent() + paint.ascent()) / 2
+            canvas.drawText(text, xPos, yPos, paint)
+        }
 
         super.onDraw(canvas)
     }

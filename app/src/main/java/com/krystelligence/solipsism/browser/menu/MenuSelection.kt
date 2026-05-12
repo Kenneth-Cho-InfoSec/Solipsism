@@ -6,6 +6,7 @@ package com.krystelligence.solipsism.browser.menu
 enum class MenuSelection {
     NEW_TAB,
     NEW_INCOGNITO_TAB,
+    FEELING_LUCKY,
     SHARE,
     HISTORY,
     DOWNLOADS,

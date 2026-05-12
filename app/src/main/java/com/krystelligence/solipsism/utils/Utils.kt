@@ -2,22 +2,24 @@ package com.krystelligence.solipsism.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ShortcutInfo
-import android.content.pm.ShortcutManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import android.webkit.URLUtil
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.IconCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.krystelligence.solipsism.DefaultBrowserActivity
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.constant.HTTPS
 import com.krystelligence.solipsism.database.HistoryEntry
@@ -209,6 +211,9 @@ object Utils {
     ) {
         val shortcutIntent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(url)
+            setClass(activity, DefaultBrowserActivity::class.java)
+            addCategory(Intent.CATEGORY_BROWSABLE)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
 
         val title = if (unsafeTitle.isEmpty()) activity.getString(R.string.untitled) else unsafeTitle
@@ -219,18 +224,34 @@ object Utils {
             null
         )
 
-        val favicon = unsafeFavicon ?: webPageBitmap
+        val favicon = (unsafeFavicon ?: webPageBitmap).let { bitmap ->
+            val iconSize = activity.resources.getDimensionPixelSize(android.R.dimen.app_icon_size)
+            if (bitmap.width > iconSize || bitmap.height > iconSize) {
+                Bitmap.createScaledBitmap(bitmap, iconSize, iconSize, true)
+            } else {
+                bitmap
+            }
+        }
 
-        val shortcutManager = activity.getSystemService(ShortcutManager::class.java)
-        if (shortcutManager.isRequestPinShortcutSupported) {
-            val pinShortcutInfo = ShortcutInfo.Builder(activity, "browser-shortcut-${url.hashCode()}")
+        if (ShortcutManagerCompat.isRequestPinShortcutSupported(activity)) {
+            val pinShortcutInfo = ShortcutInfoCompat.Builder(
+                activity,
+                "browser-shortcut-${url.hashCode()}"
+            )
+                .setActivity(ComponentName(activity, DefaultBrowserActivity::class.java))
                 .setIntent(shortcutIntent)
-                .setIcon(Icon.createWithBitmap(favicon))
-                .setShortLabel(title)
+                .setIcon(IconCompat.createWithBitmap(favicon))
+                .setShortLabel(title.take(MAX_SHORTCUT_LABEL_LENGTH).ifBlank {
+                    activity.getString(R.string.untitled)
+                })
+                .setLongLabel(title)
                 .build()
 
-            shortcutManager.requestPinShortcut(pinShortcutInfo, null)
-            activity.snackbar(R.string.message_added_to_homescreen)
+            if (ShortcutManagerCompat.requestPinShortcut(activity, pinShortcutInfo, null)) {
+                activity.snackbar(R.string.message_added_to_homescreen)
+            } else {
+                activity.snackbar(R.string.shortcut_message_failed_to_add)
+            }
         } else {
             activity.snackbar(R.string.shortcut_message_failed_to_add)
         }
@@ -266,3 +287,5 @@ object Utils {
         }
     }
 }
+
+private const val MAX_SHORTCUT_LABEL_LENGTH = 12

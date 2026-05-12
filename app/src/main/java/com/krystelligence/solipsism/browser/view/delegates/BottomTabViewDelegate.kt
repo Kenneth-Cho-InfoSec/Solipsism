@@ -4,6 +4,7 @@ import com.krystelligence.solipsism.browser.view.ViewDelegate
 import com.krystelligence.solipsism.databinding.BrowserActivityBottomBinding
 import com.krystelligence.solipsism.icon.TabCountView
 import com.krystelligence.solipsism.search.SearchView
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -34,7 +35,7 @@ class BottomTabViewDelegate(binding: BrowserActivityBottomBinding) : ViewDelegat
     override val searchContainer: ConstraintLayout = binding.searchContainer
     override val search: SearchView = binding.search
     override val findBar: LinearLayout = binding.findBar
-    override val findQuery: TextView = binding.findQuery
+    override val findQuery: EditText = binding.findQuery
     override val findPrevious: ImageButton = binding.findPrevious
     override val findNext: ImageButton = binding.findNext
     override val findQuit: ImageButton = binding.findQuit

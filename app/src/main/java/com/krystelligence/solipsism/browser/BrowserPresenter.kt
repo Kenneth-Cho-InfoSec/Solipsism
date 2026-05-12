@@ -7,6 +7,7 @@ import com.krystelligence.solipsism.browser.di.DatabaseScheduler
 import com.krystelligence.solipsism.browser.di.DiskScheduler
 import com.krystelligence.solipsism.browser.di.IncognitoMode
 import com.krystelligence.solipsism.browser.di.MainScheduler
+import com.krystelligence.solipsism.browser.di.SuggestionsClient
 import com.krystelligence.solipsism.browser.download.PendingDownload
 import com.krystelligence.solipsism.browser.history.HistoryRecord
 import com.krystelligence.solipsism.browser.keys.KeyCombo
@@ -56,6 +57,10 @@ import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.kotlin.plusAssign
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.kotlin.toObservable
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.jsoup.Jsoup
+import java.net.URLDecoder
 import java.net.URLEncoder
 import javax.inject.Inject
 import kotlin.random.Random
@@ -89,6 +94,7 @@ class BrowserPresenter @Inject constructor(
     private val allowListModel: AllowListModel,
     private val cookieAdministrator: CookieAdministrator,
     private val tabCountNotifier: TabCountNotifier,
+    @SuggestionsClient private val okHttpClient: Single<OkHttpClient>,
     @IncognitoMode private val incognitoMode: Boolean
 ) {
 
@@ -398,6 +404,7 @@ class BrowserPresenter @Inject constructor(
         when (menuSelection) {
             MenuSelection.NEW_TAB -> onNewTabClick()
             MenuSelection.NEW_INCOGNITO_TAB -> navigator.launchIncognito(url = null)
+            MenuSelection.FEELING_LUCKY -> onFeelingLuckyClick()
             MenuSelection.SHARE -> currentTab?.url?.takeIf { !it.isSpecialUrl() }?.let {
                 navigator.sharePage(url = it, title = currentTab?.title)
             }
@@ -433,6 +440,39 @@ class BrowserPresenter @Inject constructor(
         currentTab?.let {
             navigator.addToHomeScreen(it.url, it.title, it.favicon)
         }
+    }
+
+    private fun onFeelingLuckyClick() {
+        val query = currentTab?.title
+            ?.takeIf { it.isNotBlank() && it != currentTab?.url }
+            ?: currentTab?.url?.takeIf { !it.isSpecialUrl() && it.isNotBlank() }
+            ?: DEFAULT_LUCKY_QUERY
+        compositeDisposable += okHttpClient
+            .flatMap { client ->
+                Single.fromCallable {
+                    val searchUrl = "$DUCKDUCKGO_HTML_SEARCH${URLEncoder.encode(query, "UTF-8")}"
+                    val request = Request.Builder()
+                        .url(searchUrl)
+                        .header("User-Agent", LUCKY_USER_AGENT)
+                        .build()
+                    client.newCall(request).execute().use { response ->
+                        response.body?.string()?.let(::parseDuckDuckGoResultUrls).orEmpty()
+                    }
+                }
+            }
+            .subscribeOn(diskScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy(
+                onSuccess = { results ->
+                    currentTab?.loadUrl(
+                        results.take(MAX_LUCKY_RESULTS).randomOrNull()
+                            ?: duckDuckGoLuckySearchUrl(query)
+                    )
+                },
+                onError = {
+                    currentTab?.loadUrl(duckDuckGoLuckySearchUrl(query))
+                }
+            )
     }
 
     private fun createNewTabAndSelect(
@@ -485,6 +525,22 @@ class BrowserPresenter @Inject constructor(
      */
     fun onTabClick(index: Int) {
         selectTab(model.selectTab(tabListState[index].id))
+    }
+
+    fun currentUrlForEditing(): String =
+        currentTab?.url?.takeIf { !it.isSpecialUrl() }.orEmpty()
+
+    fun onUrlBarSwipeTab(direction: Int): Boolean {
+        if (tabListState.size < 2) {
+            return false
+        }
+        val currentIndex = tabListState.indexOfCurrentTab()
+        if (currentIndex !in tabListState.indices) {
+            return false
+        }
+        val nextIndex = (currentIndex + direction).floorMod(tabListState.size)
+        selectTab(model.selectTab(tabListState[nextIndex].id))
+        return true
     }
 
     /**
@@ -653,6 +709,8 @@ class BrowserPresenter @Inject constructor(
         }
     }
 
+    private fun Int.floorMod(other: Int): Int = ((this % other) + other) % other
+
     fun onReloadClick() {
         reload()
     }
@@ -739,7 +797,11 @@ class BrowserPresenter @Inject constructor(
      * Call when the user enters a [query] to look for in the current web page.
      */
     fun onFindInPage(query: String) {
-        currentTab?.find(query)
+        if (query.isBlank()) {
+            currentTab?.clearFindMatches()
+        } else {
+            currentTab?.find(query)
+        }
         view?.updateState(viewState.copy(findInPage = query))
     }
 
@@ -926,15 +988,22 @@ class BrowserPresenter @Inject constructor(
         compositeDisposable += bookmarkRepository.addBookmarkIfNotExists(
             Bookmark.Entry(
                 url = url,
-                title = title,
+                title = title.ifBlank { url },
                 position = 0,
                 folder = folder.asFolder()
             )
-        ).flatMap { bookmarkRepository.bookmarksAndFolders(folder = currentFolder) }
+        ).flatMap {
+            bookmarkPageFactory.buildPage()
+                .onErrorReturnItem("")
+                .flatMap { bookmarkRepository.bookmarksAndFolders(folder = currentFolder) }
+        }
             .subscribeOn(databaseScheduler)
             .observeOn(mainScheduler)
             .subscribeBy { list ->
-                this.view?.updateState(viewState.copy(bookmarks = list))
+                this.view?.updateState(viewState.copy(bookmarks = list, isBookmarked = true))
+                if (currentTab?.url?.isBookmarkUrl() == true) {
+                    reload()
+                }
             }
     }
 
@@ -1367,21 +1436,62 @@ class BrowserPresenter @Inject constructor(
 
     private fun createDecoyHistoryEntries(startTime: Long, endTime: Long): List<HistoryEntry> {
         val random = Random(System.currentTimeMillis())
-        val selectedQueries = DECOY_QUERIES.shuffled(random)
         var visitedAt = startTime + random.nextLong(4 * 60 * 1000L, 14 * 60 * 1000L)
-        var index = 0
         val entries = mutableListOf<HistoryEntry>()
-        while (visitedAt < endTime && index < selectedQueries.size) {
-            val query = selectedQueries[index++]
-            val encodedQuery = URLEncoder.encode(query, "UTF-8")
-            entries += HistoryEntry(
-                url = DECOY_GOOGLE_SEARCH + encodedQuery,
-                title = query.replaceFirstChar { it.uppercase() },
-                lastTimeVisited = visitedAt
-            )
-            visitedAt += random.nextLong(7 * 60 * 1000L, 28 * 60 * 1000L)
+        val journeys = DECOY_JOURNEYS.shuffled(random).take(random.nextInt(2, 4))
+
+        for (journey in journeys) {
+            for (step in journey.steps) {
+                if (visitedAt >= endTime) {
+                    return entries
+                }
+                entries += HistoryEntry(
+                    url = step.url,
+                    title = step.title,
+                    lastTimeVisited = visitedAt
+                )
+                visitedAt += random.nextLong(step.minDelayMinutes, step.maxDelayMinutes + 1) * 60 * 1000L
+            }
+            visitedAt += random.nextLong(12, 35) * 60 * 1000L
         }
         return entries
+    }
+
+    private data class DecoyStep(
+        val title: String,
+        val url: String,
+        val minDelayMinutes: Long = 4,
+        val maxDelayMinutes: Long = 18
+    )
+
+    private data class DecoyJourney(
+        val steps: List<DecoyStep>
+    )
+
+    private fun parseDuckDuckGoResultUrls(html: String): List<String> =
+        Jsoup.parse(html)
+            .select("a.result__a[href], a.result-link[href], a[data-testid=result-title-a][href]")
+            .mapNotNull { element -> normalizeDuckDuckGoResultUrl(element.attr("href")) }
+            .distinct()
+            .take(MAX_LUCKY_RESULTS)
+
+    private fun duckDuckGoLuckySearchUrl(query: String): String =
+        "$DUCKDUCKGO_SEARCH${URLEncoder.encode("\\$query", "UTF-8")}"
+
+    private fun normalizeDuckDuckGoResultUrl(rawHref: String): String? {
+        val href = when {
+            rawHref.startsWith("//") -> "https:$rawHref"
+            rawHref.startsWith("/") -> "https://duckduckgo.com$rawHref"
+            else -> rawHref
+        }
+        val uri = href.toUri()
+        val redirectedUrl = uri.getQueryParameter("uddg")
+        val decodedUrl = redirectedUrl?.let { URLDecoder.decode(it, "UTF-8") } ?: href
+        return decodedUrl.takeIf {
+            (it.startsWith("http://") || it.startsWith("https://")) &&
+                !it.contains("duckduckgo.com/y.js") &&
+                !it.contains("duckduckgo.com/html")
+        }
     }
 
     private fun BrowserContract.View?.updateState(state: BrowserViewState) {
@@ -1395,27 +1505,62 @@ class BrowserPresenter @Inject constructor(
     }
 
     companion object {
+        private const val DUCKDUCKGO_HTML_SEARCH = "https://html.duckduckgo.com/html/?q="
+        private const val DUCKDUCKGO_SEARCH = "https://duckduckgo.com/?q="
+        private const val DEFAULT_LUCKY_QUERY = "interesting websites"
+        private const val LUCKY_USER_AGENT =
+            "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36"
+        private const val MAX_LUCKY_RESULTS = 20
         private const val DECOY_WINDOW_MILLIS = 4 * 60 * 60 * 1000L
-        private const val DECOY_GOOGLE_SEARCH = "https://www.google.com/search?q="
-        private val DECOY_QUERIES = listOf(
-            "best budget headphones 2026",
-            "how to clean phone screen safely",
-            "weather tomorrow",
-            "easy pasta dinner ideas",
-            "android privacy settings",
-            "local coffee shops near me",
-            "train times this weekend",
-            "movie releases 2026",
-            "healthy breakfast recipes",
-            "usb c cable differences",
-            "how to back up photos",
-            "weekend city walks",
-            "simple home workout",
-            "news headlines today",
-            "battery saving tips android",
-            "how to remove sticker residue",
-            "cheap flights in summer",
-            "best note taking apps"
+        private fun searchUrl(engine: String, query: String): String =
+            when (engine) {
+                "amazon" -> "https://www.amazon.com/s?k=${URLEncoder.encode(query, "UTF-8")}"
+                "reddit" -> "https://www.reddit.com/search/?q=${URLEncoder.encode(query, "UTF-8")}"
+                "youtube" -> "https://www.youtube.com/results?search_query=${URLEncoder.encode(query, "UTF-8")}"
+                else -> "https://www.google.com/search?q=${URLEncoder.encode(query, "UTF-8")}"
+            }
+
+        private val DECOY_JOURNEYS = listOf(
+            DecoyJourney(
+                listOf(
+                    DecoyStep("best compact desk lamp 2026 - Google Search", searchUrl("google", "best compact desk lamp 2026"), 5, 11),
+                    DecoyStep("compact desk lamp dimmable - Amazon.com", searchUrl("amazon", "compact desk lamp dimmable"), 7, 16),
+                    DecoyStep("Reddit - compact desk lamp recommendations", searchUrl("reddit", "compact desk lamp recommendations"), 6, 14),
+                    DecoyStep("compact desk lamp review - YouTube", searchUrl("youtube", "compact desk lamp review"), 9, 22)
+                )
+            ),
+            DecoyJourney(
+                listOf(
+                    DecoyStep("easy weeknight rice bowl ideas - Google Search", searchUrl("google", "easy weeknight rice bowl ideas"), 4, 12),
+                    DecoyStep("rice cooker recipes - YouTube", searchUrl("youtube", "rice cooker recipes"), 8, 18),
+                    DecoyStep("Reddit - meal prep rice bowl ideas", searchUrl("reddit", "meal prep rice bowl ideas"), 5, 13),
+                    DecoyStep("bento lunch containers - Amazon.com", searchUrl("amazon", "bento lunch containers"), 10, 24)
+                )
+            ),
+            DecoyJourney(
+                listOf(
+                    DecoyStep("android privacy settings checklist - Google Search", searchUrl("google", "android privacy settings checklist"), 6, 14),
+                    DecoyStep("Reddit - android privacy settings", searchUrl("reddit", "android privacy settings"), 8, 16),
+                    DecoyStep("android privacy settings explained - YouTube", searchUrl("youtube", "android privacy settings explained"), 7, 18),
+                    DecoyStep("privacy screen protector phone - Amazon.com", searchUrl("amazon", "privacy screen protector phone"), 9, 20)
+                )
+            ),
+            DecoyJourney(
+                listOf(
+                    DecoyStep("best walking shoes for city travel - Google Search", searchUrl("google", "best walking shoes for city travel"), 5, 12),
+                    DecoyStep("Reddit - comfortable walking shoes travel", searchUrl("reddit", "comfortable walking shoes travel"), 7, 17),
+                    DecoyStep("walking shoes comparison - YouTube", searchUrl("youtube", "walking shoes comparison"), 8, 19),
+                    DecoyStep("walking shoes men women - Amazon.com", searchUrl("amazon", "walking shoes"), 10, 23)
+                )
+            ),
+            DecoyJourney(
+                listOf(
+                    DecoyStep("usb c hub for laptop reviews - Google Search", searchUrl("google", "usb c hub for laptop reviews"), 4, 11),
+                    DecoyStep("usb c hub 4k hdmi - Amazon.com", searchUrl("amazon", "usb c hub 4k hdmi"), 6, 15),
+                    DecoyStep("Reddit - usb c hub recommendations", searchUrl("reddit", "usb c hub recommendations"), 7, 18),
+                    DecoyStep("usb c hub review 2026 - YouTube", searchUrl("youtube", "usb c hub review 2026"), 8, 21)
+                )
+            )
         )
     }
 }

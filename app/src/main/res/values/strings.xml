@@ -74,6 +74,7 @@
     <string name="hint_url">URL</string>
     <string name="title_file_chooser">Choose file</string>
     <string name="action_incognito">New incognito tab</string>
+    <string name="action_feeling_lucky">I am feeling lucky</string>
     <string name="action_homepage">Default</string>
     <string name="action_back">Back</string>
     <string name="action_find">Find in page</string>
@@ -250,8 +251,8 @@
     <string name="save_data">Request \'Save-Data\'</string>
     <string name="remove_identifying_headers">Remove identifying headers</string>
     <string name="webrtc_support">WebRTC Support</string>
-    <string name="action_add_to_homescreen">Add to home screen</string>
-    <string name="message_added_to_homescreen">Shortcut added to home screen</string>
+    <string name="action_add_to_homescreen">Install Website as App</string>
+    <string name="message_added_to_homescreen">Website app install requested</string>
     <string name="shortcut_message_failed_to_add">Sorry, your launcher does not support shortcuts.</string>
     <string name="action_delete_all_bookmarks">Delete all bookmarks</string>
     <string name="message_open_download_fail">This file doesn\'t exist anymore</string>

@@ -179,7 +179,8 @@
             android:exported="false"
             android:label="@string/qr_scanner_title"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.LightTheme" />
+            android:theme="@style/Theme.LightTheme"
+            android:windowSoftInputMode="stateHidden" />
 
         <activity
             android:name=".qr.QrShowActivity"

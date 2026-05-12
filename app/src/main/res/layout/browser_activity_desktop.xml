@@ -228,17 +228,22 @@
                 android:visibility="gone"
                 android:weightSum="1">
 
-                <TextView
+                <EditText
                     android:id="@+id/find_query"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="@android:color/transparent"
                     android:ellipsize="end"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
+                    android:hint="@string/action_find"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
                     android:paddingLeft="@dimen/material_grid_margin"
+                    android:singleLine="true"
                     android:textAppearance="?android:attr/textAppearanceListItem"
-                        android:textSize="18sp" />
+                    android:textSize="18sp" />
 
                 <ImageButton
                     android:id="@+id/find_previous"
