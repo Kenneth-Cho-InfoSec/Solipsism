@@ -14,7 +14,7 @@ Repo: https://github.com/Kenneth-Cho-InfoSec/Solipsism.git
 Builds:
   - versionName: 5.1.6
     versionCode: 113
-    commit: v5.1.6
+    commit: 49149fba0340f4b719a8be37858d4035a8616140
     subdir: app
     gradle:
       - solipsismPlus
