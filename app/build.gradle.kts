@@ -171,6 +171,40 @@ mezzanine {
     )
 }
 
+val mezzanineGeneratedDir = layout.buildDirectory
+    .dir("mezzanineGenerated/com/anthonycr/mezzanine")
+    .map { it.asFile }
+val mezzanineReaderAliases = mapOf(
+    "511272597" to "1433655294",
+    "1621098914" to "1591862187",
+    "669645893" to "11812658",
+    "591841962" to "1678998121",
+    "1744299999" to "279827214",
+    "90424053" to "2114551266"
+)
+
+tasks.named("generateMezzanine") {
+    doLast {
+        val generatedDir = mezzanineGeneratedDir.get()
+        mezzanineReaderAliases.forEach { (generatedId, processorId) ->
+            val generatedFile = generatedDir.resolve("_MezzanineReader_$generatedId.kt")
+            val processorFile = generatedDir.resolve("_MezzanineReader_$processorId.kt")
+            if (generatedFile.isFile && !processorFile.exists()) {
+                processorFile.writeText(
+                    """
+                    package com.anthonycr.mezzanine
+
+                    public object _MezzanineReader_$processorId {
+                      public fun readFromMezzanine(): kotlin.String =
+                        _MezzanineReader_$generatedId.readFromMezzanine()
+                    }
+                    """.trimIndent()
+                )
+            }
+        }
+    }
+}
+
 kotlin {
     jvmToolchain(21)
 }
