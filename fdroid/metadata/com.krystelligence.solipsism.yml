@@ -6,7 +6,7 @@ SourceCode: https://github.com/Kenneth-Cho-InfoSec/Solipsism
 IssueTracker: https://github.com/Kenneth-Cho-InfoSec/Solipsism/issues
 Donate: https://ko-fi.com/kennethchoinfosec
 
-AutoName: Solipsism Browser
+AutoName: Solipsism
 
 RepoType: git
 Repo: https://github.com/Kenneth-Cho-InfoSec/Solipsism.git
@@ -16,6 +16,10 @@ Builds:
     versionCode: 113
     commit: 49149fba0340f4b719a8be37858d4035a8616140
     subdir: app
+    sudo:
+      - apt-get update
+      - apt-get install -y openjdk-17-jdk-headless
+      - update-alternatives --auto java
     gradle:
       - solipsismPlus
 
