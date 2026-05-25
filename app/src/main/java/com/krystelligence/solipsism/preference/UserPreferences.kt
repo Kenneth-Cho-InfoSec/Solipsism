@@ -164,6 +164,11 @@ class UserPreferences @Inject constructor(
     var userAgentString by preferences.stringPreference(USER_AGENT_STRING, "")
 
     /**
+     * True if the browser should identify as a recent Chrome build for website compatibility.
+     */
+    var chrompatibilityModeEnabled by preferences.booleanPreference(CHROMPATIBILITY_MODE, true)
+
+    /**
      * True if the browser should clear the navigation history on app exit, false otherwise.
      */
     var clearHistoryExitEnabled by preferences.booleanPreference(CLEAR_HISTORY_EXIT, false)
@@ -354,6 +359,7 @@ private const val TEXT_SIZE = "textsize"
 private const val USE_WIDE_VIEWPORT = "wideviewport"
 private const val USER_AGENT = "agentchoose"
 private const val USER_AGENT_STRING = "userAgentString"
+private const val CHROMPATIBILITY_MODE = "chrompatibilityMode"
 private const val CLEAR_HISTORY_EXIT = "clearHistoryExit"
 private const val CLEAR_COOKIES_EXIT = "clearCookiesExit"
 private const val SAVE_URL = "saveUrl"

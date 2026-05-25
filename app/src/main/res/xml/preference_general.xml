@@ -30,6 +30,12 @@
             android:icon="@drawable/ic_settings_text"
             android:key="agent"
             android:title="@string/agent"/>
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_settings_globe"
+            android:key="chrompatibility_mode"
+            android:summary="@string/chrompatibility_mode_summary"
+            android:title="@string/chrompatibility_mode" />
         <Preference
             android:icon="@drawable/ic_settings_download"
             android:key="download"

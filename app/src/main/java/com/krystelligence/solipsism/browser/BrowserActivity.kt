@@ -65,11 +65,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
-import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
@@ -101,6 +102,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
@@ -118,6 +120,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private var customViewHidSystemUi = false
     private var previousSystemUiVisibility = 0
     private var browserMenuPopup: PopupWindow? = null
+    private var urlRailTransition: BrowserPresenter.UrlBarTabTransition? = null
+    private var urlRailHapticLastPulse = 0L
 
     private var menuItemShare: MenuItem? = null
     private var menuItemCopyLink: MenuItem? = null
@@ -134,6 +138,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     private val inputMethodManager: InputMethodManager by lazy {
         getSystemService(InputMethodManager::class.java)
+    }
+
+    private val vibrator: Vibrator? by lazy {
+        getSystemService(Vibrator::class.java)
     }
 
     private val expressiveSpatialInterpolator by lazy {
@@ -836,6 +844,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
      */
     override fun showFileChooser(intent: Intent) {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         fileChooserLauncher.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
     }
 
@@ -901,11 +911,15 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         val rail = binding.verticalUrlText?.parent as? View ?: return
         var downY = 0f
         var downX = 0f
+        var dragProgress = 0f
         val listener = View.OnTouchListener { view, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     downY = event.rawY
                     downX = event.rawX
+                    dragProgress = 0f
+                    urlRailTransition = null
+                    tabPager.cancelVerticalTabSwitch()
                     view.animate().cancel()
                     view.animate()
                         .scaleX(0.96f)
@@ -913,6 +927,32 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                         .setDuration(120L)
                         .setInterpolator(expressiveEffectsInterpolator)
                         .start()
+                    true
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    val dy = event.rawY - downY
+                    val dx = event.rawX - downX
+                    if (abs(dy) > URL_RAIL_DRAG_START_DP.dp &&
+                        abs(dy) > abs(dx) * 1.15f
+                    ) {
+                        val direction = if (dy < 0f) 1 else -1
+                        val transition = urlRailTransition
+                            ?.takeIf { it.direction == direction }
+                            ?: presenter.previewUrlBarSwipeTab(direction)
+                        if (transition != null) {
+                            urlRailTransition = transition
+                            dragProgress = (abs(dy) / URL_RAIL_SWIPE_THRESHOLD_DP.dp.toFloat())
+                                .coerceIn(0f, 0.98f)
+                            tabPager.previewVerticalTabSwitch(
+                                currentId = transition.currentId,
+                                targetId = transition.targetId,
+                                direction = direction,
+                                progress = dragProgress
+                            )
+                            pulsePixelHaptic(dragProgress)
+                        }
+                    }
                     true
                 }
 
@@ -925,22 +965,49 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                         .setDuration(180L)
                         .setInterpolator(expressiveSpatialInterpolator)
                         .start()
-                    if (kotlin.math.abs(dy) > URL_RAIL_SWIPE_THRESHOLD_DP.dp &&
-                        kotlin.math.abs(dy) > kotlin.math.abs(dx) * 1.2f
+                    val transition = urlRailTransition
+                    if (transition != null && dragProgress >= URL_RAIL_COMMIT_PROGRESS) {
+                        animateUrlRailTabSwitch(view, transition.direction)
+                        fadePixelHaptic()
+                        tabPager.commitVerticalTabSwitch(
+                            targetId = transition.targetId,
+                            direction = transition.direction
+                        ) {
+                            presenter.commitUrlBarSwipeTab(transition.targetId)
+                        }
+                    } else if (abs(dy) > URL_RAIL_SWIPE_THRESHOLD_DP.dp &&
+                        abs(dy) > abs(dx) * 1.2f
                     ) {
                         val direction = if (dy < 0f) 1 else -1
-                        if (presenter.onUrlBarSwipeTab(direction)) {
+                        val quickTransition = presenter.previewUrlBarSwipeTab(direction)
+                        if (quickTransition != null) {
                             animateUrlRailTabSwitch(view, direction)
-                            vibratePixelMini(view)
+                            fadePixelHaptic()
+                            tabPager.previewVerticalTabSwitch(
+                                currentId = quickTransition.currentId,
+                                targetId = quickTransition.targetId,
+                                direction = direction,
+                                progress = 0.2f
+                            )
+                            tabPager.commitVerticalTabSwitch(
+                                targetId = quickTransition.targetId,
+                                direction = direction
+                            ) {
+                                presenter.commitUrlBarSwipeTab(quickTransition.targetId)
+                            }
                         }
                     } else {
+                        tabPager.cancelVerticalTabSwitch()
                         view.performClick()
                         showAddressOverlay()
                     }
+                    urlRailTransition = null
                     true
                 }
 
                 MotionEvent.ACTION_CANCEL -> {
+                    tabPager.cancelVerticalTabSwitch()
+                    urlRailTransition = null
                     view.animate()
                         .scaleX(1f)
                         .scaleY(1f)
@@ -972,12 +1039,35 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             .start()
     }
 
-    private fun vibratePixelMini(view: View) {
-        if (Build.MANUFACTURER.equals("Google", ignoreCase = true) &&
+    private fun pulsePixelHaptic(progress: Float) {
+        if (!isGooglePixel()) return
+        val now = System.currentTimeMillis()
+        if (now - urlRailHapticLastPulse < URL_RAIL_HAPTIC_INTERVAL_MS) return
+        urlRailHapticLastPulse = now
+        val amplitude = (32 + (progress.coerceIn(0f, 1f) * 112f)).roundToInt()
+            .coerceIn(1, 180)
+        vibrator?.vibrate(
+            VibrationEffect.createOneShot(
+                URL_RAIL_HAPTIC_PULSE_MS,
+                amplitude
+            )
+        )
+    }
+
+    private fun fadePixelHaptic() {
+        if (!isGooglePixel()) return
+        vibrator?.vibrate(
+            VibrationEffect.createWaveform(
+                longArrayOf(0L, 18L, 32L, 14L, 38L, 8L),
+                intArrayOf(145, 0, 88, 0, 34, 0),
+                -1
+            )
+        )
+    }
+
+    private fun isGooglePixel(): Boolean {
+        return Build.MANUFACTURER.equals("Google", ignoreCase = true) &&
             Build.MODEL.contains("Pixel", ignoreCase = true)
-        ) {
-            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-        }
     }
 
     override fun renderState(viewState: BrowserViewState) {
@@ -1386,7 +1476,11 @@ private const val MIN_SOLIPSISM_RAIL_WIDTH_DP = SUPER_COMPACT_RAIL_WIDTH_DP
 private const val MAX_SOLIPSISM_RAIL_WIDTH_DP = 96
 private const val ADDRESS_OVERLAY_RAIL_GAP_DP = 14
 private const val FIND_BAR_RAIL_GAP_DP = 14
+private const val URL_RAIL_DRAG_START_DP = 8
 private const val URL_RAIL_SWIPE_THRESHOLD_DP = 34
+private const val URL_RAIL_COMMIT_PROGRESS = 0.42f
+private const val URL_RAIL_HAPTIC_INTERVAL_MS = 46L
+private const val URL_RAIL_HAPTIC_PULSE_MS = 9L
 private const val BROWSER_MENU_MAX_WIDTH_DP = 258
 private const val BROWSER_MENU_SCREEN_MARGIN_DP = 14
 private const val DONATION_PREFERENCES = "solipsism_donation"

@@ -1,5 +1,6 @@
 package com.krystelligence.solipsism.preference
 
+import com.krystelligence.solipsism.constant.CHROMPATIBILITY_USER_AGENT
 import com.krystelligence.solipsism.constant.DESKTOP_USER_AGENT
 import com.krystelligence.solipsism.constant.MOBILE_USER_AGENT
 import android.app.Application
@@ -10,7 +11,11 @@ import android.webkit.WebSettings
  */
 fun UserPreferences.userAgent(application: Application): String =
     when (val choice = userAgentChoice) {
-        1 -> WebSettings.getDefaultUserAgent(application)
+        1 -> if (chrompatibilityModeEnabled) {
+            CHROMPATIBILITY_USER_AGENT
+        } else {
+            WebSettings.getDefaultUserAgent(application)
+        }
         2 -> DESKTOP_USER_AGENT
         3 -> MOBILE_USER_AGENT
         4 -> userAgentString.takeIf(String::isNotEmpty) ?: " "
@@ -19,7 +24,7 @@ fun UserPreferences.userAgent(application: Application): String =
 
 fun UserPreferences.userAgent(defaultUserAgent: String): String =
     when (val choice = userAgentChoice) {
-        1 -> defaultUserAgent
+        1 -> if (chrompatibilityModeEnabled) CHROMPATIBILITY_USER_AGENT else defaultUserAgent
         2 -> DESKTOP_USER_AGENT
         3 -> MOBILE_USER_AGENT
         4 -> userAgentString.takeIf(String::isNotEmpty) ?: " "

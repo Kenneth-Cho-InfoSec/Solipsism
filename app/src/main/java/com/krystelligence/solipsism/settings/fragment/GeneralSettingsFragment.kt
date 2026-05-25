@@ -59,6 +59,13 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
             onClick = ::showUserAgentChooserDialog
         )
 
+        togglePreference(
+            preference = SETTINGS_CHROMPATIBILITY,
+            isChecked = userPreferences.chrompatibilityModeEnabled,
+            summary = getString(R.string.chrompatibility_mode_summary),
+            onCheckChange = { userPreferences.chrompatibilityModeEnabled = it }
+        )
+
         clickableDynamicPreference(
             preference = SETTINGS_DOWNLOAD,
             summary = userPreferences.downloadDirectory,
@@ -472,6 +479,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_JAVASCRIPT = "cb_javascript"
         private const val SETTINGS_COLOR_MODE = "cb_colormode"
         private const val SETTINGS_USER_AGENT = "agent"
+        private const val SETTINGS_CHROMPATIBILITY = "chrompatibility_mode"
         private const val SETTINGS_DOWNLOAD = "download"
         private const val SETTINGS_HOME = "home"
         private const val SETTINGS_SEARCH_ENGINE = "search"

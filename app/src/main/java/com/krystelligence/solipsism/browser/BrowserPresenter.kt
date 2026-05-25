@@ -531,16 +531,26 @@ class BrowserPresenter @Inject constructor(
         currentTab?.url?.takeIf { !it.isSpecialUrl() }.orEmpty()
 
     fun onUrlBarSwipeTab(direction: Int): Boolean {
-        if (tabListState.size < 2) {
-            return false
-        }
+        return previewUrlBarSwipeTab(direction)?.let {
+            commitUrlBarSwipeTab(it.targetId)
+            true
+        } ?: false
+    }
+
+    fun previewUrlBarSwipeTab(direction: Int): UrlBarTabTransition? {
+        if (tabListState.size < 2) return null
         val currentIndex = tabListState.indexOfCurrentTab()
-        if (currentIndex !in tabListState.indices) {
-            return false
-        }
+        if (currentIndex !in tabListState.indices) return null
         val nextIndex = (currentIndex + direction).floorMod(tabListState.size)
-        selectTab(model.selectTab(tabListState[nextIndex].id))
-        return true
+        return UrlBarTabTransition(
+            currentId = tabListState[currentIndex].id,
+            targetId = tabListState[nextIndex].id,
+            direction = direction
+        )
+    }
+
+    fun commitUrlBarSwipeTab(targetId: Int) {
+        selectTab(model.selectTab(targetId))
     }
 
     /**
@@ -710,6 +720,12 @@ class BrowserPresenter @Inject constructor(
     }
 
     private fun Int.floorMod(other: Int): Int = ((this % other) + other) % other
+
+    data class UrlBarTabTransition(
+        val currentId: Int,
+        val targetId: Int,
+        val direction: Int
+    )
 
     fun onReloadClick() {
         reload()

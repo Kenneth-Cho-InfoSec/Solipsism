@@ -13,6 +13,7 @@ import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.utils.Option
 import com.krystelligence.solipsism.utils.Utils
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -102,12 +103,26 @@ class TabWebChromeClient @Inject constructor(
      * Handle the [activityResult] that was returned by the file chooser.
      */
     fun onResult(activityResult: ActivityResult) {
-        val resultCode = activityResult.resultCode
-        val intent = activityResult.data
-        val result = FileChooserParams.parseResult(resultCode, intent)
-
+        val result = parseFileChooserResult(activityResult)
         filePathCallback?.onReceiveValue(result)
         filePathCallback = null
+    }
+
+    private fun parseFileChooserResult(activityResult: ActivityResult): Array<Uri>? {
+        if (activityResult.resultCode != Activity.RESULT_OK) {
+            return null
+        }
+        val intent = activityResult.data ?: return null
+        val clipData = intent.clipData
+        if (clipData != null && clipData.itemCount > 0) {
+            return (0 until clipData.itemCount)
+                .mapNotNull { index -> clipData.getItemAt(index).uri }
+                .distinct()
+                .takeIf { it.isNotEmpty() }
+                ?.toTypedArray()
+        }
+        return intent.data?.let { arrayOf(it) }
+            ?: FileChooserParams.parseResult(activityResult.resultCode, intent)
     }
 
     /**
@@ -179,7 +194,11 @@ class TabWebChromeClient @Inject constructor(
         this.filePathCallback = null
 
         this.filePathCallback = filePathCallback
-        fileChooserParams.createIntent().let(fileChooserObservable::onNext)
+        fileChooserParams.createIntent().apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        }.let(fileChooserObservable::onNext)
         return true
     }
 
