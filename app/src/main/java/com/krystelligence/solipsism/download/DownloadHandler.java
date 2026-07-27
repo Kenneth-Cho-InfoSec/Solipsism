@@ -6,10 +6,6 @@ package com.krystelligence.solipsism.download;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DownloadManager;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -24,9 +20,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.krystelligence.solipsism.BuildConfig;
 import com.krystelligence.solipsism.R;
-import com.krystelligence.solipsism.DefaultBrowserActivity;
 import com.krystelligence.solipsism.browser.di.MainScheduler;
 import com.krystelligence.solipsism.browser.di.NetworkScheduler;
 import com.krystelligence.solipsism.constant.Constants;
@@ -78,24 +72,10 @@ public class DownloadHandler {
 
         logger.log(TAG, "DOWNLOAD: Trying to download from URL: " + url);
 
-        if (contentDisposition == null
-            || !contentDisposition.regionMatches(true, 0, "attachment", 0, 10)) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.parse(url), mimeType);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.addCategory(Intent.CATEGORY_BROWSABLE);
-            ResolveInfo info = context.getPackageManager().resolveActivity(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
-            if (info != null) {
-                if (BuildConfig.APPLICATION_ID.equals(info.activityInfo.packageName)
-                    || DefaultBrowserActivity.class.getName().equals(info.activityInfo.name)) {
-                    try {
-                        context.startActivity(intent);
-                        return;
-                    } catch (ActivityNotFoundException ignored) {}
-                }
-            }
-        }
+        // A download request must always be sent to DownloadManager. Opening
+        // inline responses with ACTION_VIEW makes images/videos appear to
+        // work, but sends other MIME types back to a viewer or to this browser
+        // instead of saving them.
         onDownloadStartNoStream(context, manager, url, userAgent, contentDisposition, mimeType, contentSize);
     }
 
@@ -176,6 +156,12 @@ public class DownloadHandler {
         }
 
         String newMimeType = mimetype;
+        if (!TextUtils.isEmpty(newMimeType)) {
+            int semicolonIndex = newMimeType.indexOf(';');
+            if (semicolonIndex != -1) {
+                newMimeType = newMimeType.substring(0, semicolonIndex).trim();
+            }
+        }
         if (TextUtils.isEmpty(newMimeType)) {
             newMimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(Utils.guessFileExtension(filename));
         }

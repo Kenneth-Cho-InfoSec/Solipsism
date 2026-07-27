@@ -10,6 +10,7 @@ import com.krystelligence.solipsism.browser.di.MainScheduler
 import com.krystelligence.solipsism.browser.di.SuggestionsClient
 import com.krystelligence.solipsism.browser.download.PendingDownload
 import com.krystelligence.solipsism.browser.history.HistoryRecord
+import com.krystelligence.solipsism.browser.history.DecoyTimeframe
 import com.krystelligence.solipsism.browser.keys.KeyCombo
 import com.krystelligence.solipsism.browser.menu.MenuSelection
 import com.krystelligence.solipsism.browser.notification.TabCountNotifier
@@ -1218,10 +1219,15 @@ class BrowserPresenter @Inject constructor(
             }
     }
 
-    fun onHistoryDecoyModeConfirmed() {
-        val fourHoursAgo = System.currentTimeMillis() - DECOY_WINDOW_MILLIS
-        val entries = createDecoyHistoryEntries(fourHoursAgo, System.currentTimeMillis())
-        compositeDisposable += historyRepository.replaceRecentHistory(fourHoursAgo, entries)
+    fun onHistoryDecoyModeConfirmed(timeframe: DecoyTimeframe) {
+        val now = System.currentTimeMillis()
+        val startTime = when (timeframe) {
+            DecoyTimeframe.FOUR_HOURS -> now - 4 * 60 * 60 * 1000L
+            DecoyTimeframe.FORTY_EIGHT_HOURS -> now - 48 * 60 * 60 * 1000L
+            DecoyTimeframe.ALL_TIME -> 0L
+        }
+        val entries = createDecoyHistoryEntries(startTime, now)
+        compositeDisposable += historyRepository.replaceRecentHistory(startTime, entries)
             .andThen(historyPageFactory.deleteHistoryPage())
             .subscribeOn(databaseScheduler)
             .observeOn(mainScheduler)
@@ -1454,9 +1460,18 @@ class BrowserPresenter @Inject constructor(
         val random = Random(System.currentTimeMillis())
         var visitedAt = startTime + random.nextLong(4 * 60 * 1000L, 14 * 60 * 1000L)
         val entries = mutableListOf<HistoryEntry>()
-        val journeys = DECOY_JOURNEYS.shuffled(random).take(random.nextInt(2, 4))
+        val windowHours = (endTime - startTime) / (60 * 60 * 1000L)
+        val maxJourneys = when {
+            windowHours <= 4 -> DECOY_JOURNEYS.shuffled(random).take(random.nextInt(2, 4))
+            windowHours <= 48 -> DECOY_JOURNEYS.shuffled(random) + DECOY_JOURNEYS.shuffled(random)
+            else -> {
+                // All time: cycle through journeys enough to fill the window
+                val repeats = 6
+                (1..repeats).flatMap { DECOY_JOURNEYS.shuffled(random) }
+            }
+        }
 
-        for (journey in journeys) {
+        for (journey in maxJourneys) {
             for (step in journey.steps) {
                 if (visitedAt >= endTime) {
                     return entries

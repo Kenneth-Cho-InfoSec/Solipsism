@@ -13,7 +13,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "5.1.7"
+        versionName = "5.1.8"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -67,7 +67,7 @@ android {
             dimension = "capabilities"
             buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"true\")")
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 115
+            versionCode = 116
         }
 
         if (!isCi) {
@@ -75,7 +75,7 @@ android {
                 dimension = "capabilities"
                 buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"false\")")
                 applicationId = "com.krystelligence.solipsism"
-                versionCode = 116
+            versionCode = 117
             }
         }
     }
@@ -207,4 +207,7 @@ tasks.named("generateMezzanine") {
 
 kotlin {
     jvmToolchain(21)
+    compilerOptions {
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
+    }
 }

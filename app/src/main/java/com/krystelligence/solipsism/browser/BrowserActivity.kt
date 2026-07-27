@@ -32,6 +32,7 @@ import com.krystelligence.solipsism.browser.view.delegates.DrawerTabViewDelegate
 import com.krystelligence.solipsism.browser.download.DownloadPermissionsHelper
 import com.krystelligence.solipsism.browser.view.delegates.SolipsismRailViewDelegate
 import com.krystelligence.solipsism.browser.view.targetUrl.LongPress
+import com.krystelligence.solipsism.browser.history.DecoyTimeframe
 import com.krystelligence.solipsism.constant.HTTP
 import com.krystelligence.solipsism.database.Bookmark
 import com.krystelligence.solipsism.database.HistoryEntry
@@ -1342,11 +1343,27 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     fun showHistoryDecoyModePrompt() {
+        val options = arrayOf(
+            getString(R.string.history_decoy_mode_4_hours),
+            getString(R.string.history_decoy_mode_48_hours),
+            getString(R.string.history_decoy_mode_all_time)
+        )
+        var selectedIndex = 0
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.history_decoy_mode_title)
-            .setMessage(R.string.history_decoy_mode_message)
+            // AlertDialog uses the single-choice list as its content. Do not
+            // also set a message here, otherwise the message panel can take
+            // precedence over the list on some Material dialog themes.
+            .setSingleChoiceItems(options, selectedIndex) { _, which ->
+                selectedIndex = which
+            }
             .setPositiveButton(R.string.history_decoy_mode_start) { _, _ ->
-                presenter.onHistoryDecoyModeConfirmed()
+                val timeframe = when (selectedIndex) {
+                    1 -> DecoyTimeframe.FORTY_EIGHT_HOURS
+                    2 -> DecoyTimeframe.ALL_TIME
+                    else -> DecoyTimeframe.FOUR_HOURS
+                }
+                presenter.onHistoryDecoyModeConfirmed(timeframe)
             }
             .setNegativeButton(R.string.action_cancel, null)
             .show()

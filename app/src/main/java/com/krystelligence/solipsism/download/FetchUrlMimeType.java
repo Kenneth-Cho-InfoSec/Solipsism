@@ -4,16 +4,13 @@
 package com.krystelligence.solipsism.download;
 
 import android.app.DownloadManager;
-import android.os.Environment;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
-import android.webkit.URLUtil;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import com.krystelligence.solipsism.utils.FileUtils;
 import com.krystelligence.solipsism.utils.Utils;
 import androidx.annotation.NonNull;
 import io.reactivex.rxjava3.core.Single;
@@ -53,7 +50,6 @@ class FetchUrlMimeType {
             // User agent is likely to be null, though the AndroidHttpClient
             // seems ok with that.
             String mimeType = null;
-            String contentDisposition = null;
             HttpURLConnection connection = null;
             try {
                 URL url = new URL(mUri);
@@ -77,10 +73,6 @@ class FetchUrlMimeType {
                             mimeType = mimeType.substring(0, semicolonIndex);
                         }
                     }
-                    String contentDispositionHeader = connection.getHeaderField("Content-Disposition");
-                    if (contentDispositionHeader != null) {
-                        contentDisposition = contentDispositionHeader;
-                    }
                 }
             } catch (@NonNull IllegalArgumentException | IOException ex) {
                 if (connection != null)
@@ -99,11 +91,10 @@ class FetchUrlMimeType {
                         mRequest.setMimeType(newMimeType);
                     }
                 }
-                final String filename = FileUtils.sanitizeFileName(
-                    URLUtil.guessFileName(mUri, contentDisposition, mimeType)
-                );
-                mRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-                mRequest.setTitle(filename);
+                // DownloadHandler has already selected the destination and
+                // filename, including custom download locations. Do not
+                // overwrite that destination here when probing an unknown
+                // MIME type.
             }
 
             // Start the download
