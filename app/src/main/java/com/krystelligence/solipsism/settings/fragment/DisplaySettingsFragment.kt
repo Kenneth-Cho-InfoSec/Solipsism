@@ -145,12 +145,12 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             }
             setPositiveButton(resources.getString(R.string.action_ok)) { _, _ ->
                 if (currentTheme != userPreferences.useTheme) {
-                    requireActivity().onBackPressed()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                 }
             }
             setOnCancelListener {
                 if (currentTheme != userPreferences.useTheme) {
-                    requireActivity().onBackPressed()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                 }
             }
         }.resizeAndShow()

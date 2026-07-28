@@ -88,7 +88,12 @@ class TabsRepository @Inject constructor(
             }
             .map { (_, tabModel) -> tabModel }
             .doOnSuccess {
-                tabsList = tabsList + it
+                val selectedIndex = selectedTab?.let(tabsList::indexOf)
+                tabsList = if (selectedIndex == null || selectedIndex < 0) {
+                    tabsList + it
+                } else {
+                    tabsList.toMutableList().apply { add(selectedIndex + 1, it) }
+                }
                 tabsListObservable.onNext(tabsList)
             }
             .subscribeOn(mainScheduler)

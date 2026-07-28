@@ -21,6 +21,7 @@ class NetworkConnectivityModel @Inject constructor(
      * An infinite observable that emits a boolean value whenever the network condition changes.
      * Emitted value is true when the network is in the connected state, and it is false otherwise.
      */
+    @Suppress("DEPRECATION")
     fun connectivity(): Observable<Boolean> = BroadcastReceiverObservable(
         NETWORK_BROADCAST_ACTION,
         application

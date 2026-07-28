@@ -23,6 +23,9 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.webkit.WebView
+import android.webkit.JavascriptInterface
+import android.util.Log
+import org.json.JSONObject
 import androidx.activity.result.ActivityResult
 import androidx.core.graphics.createBitmap
 import dagger.assisted.Assisted
@@ -92,15 +95,25 @@ class TabAdapter @AssistedInject constructor(
             webViewClient = tabWebViewClient
             webChromeClient = tabWebChromeClient
             setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
-                downloadsSubject.onNext(
-                    PendingDownload(
+                if (url.startsWith(BLOB_SCHEME)) {
+                    extractBlobDownload(
+                        webView = this,
                         url = url,
                         userAgent = userAgent,
                         contentDisposition = contentDisposition,
-                        mimeType = mimetype,
-                        contentLength = contentLength
+                        mimeType = mimetype
                     )
-                )
+                } else {
+                    downloadsSubject.onNext(
+                        PendingDownload(
+                            url = url,
+                            userAgent = userAgent,
+                            contentDisposition = contentDisposition,
+                            mimeType = mimetype,
+                            contentLength = contentLength
+                        )
+                    )
+                }
             }
             id = this@TabAdapter.id
 
@@ -118,6 +131,100 @@ class TabAdapter @AssistedInject constructor(
                 false
             }
         }
+
+    private fun extractBlobDownload(
+        webView: WebView,
+        url: String,
+        userAgent: String?,
+        contentDisposition: String?,
+        mimeType: String?
+    ) {
+        val bridgeName = "solipsismBlob_${id}_${System.nanoTime()}"
+        val bridge = BlobDownloadBridge(
+            onComplete = { data, extractedMimeType, contentLength ->
+                webView.post {
+                    webView.removeJavascriptInterface(bridgeName)
+                    downloadsSubject.onNext(
+                        PendingDownload(
+                            url = url,
+                            userAgent = userAgent,
+                            contentDisposition = contentDisposition,
+                            mimeType = extractedMimeType ?: mimeType,
+                            contentLength = contentLength,
+                            blobData = data
+                        )
+                    )
+                }
+            },
+            onError = {
+                webView.post { webView.removeJavascriptInterface(bridgeName) }
+                Log.e(TAG, "Unable to extract blob download: $it")
+            }
+        )
+        webView.addJavascriptInterface(bridge, bridgeName)
+        webView.evaluateJavascript(
+            """
+            (function() {
+                fetch(${JSONObject.quote(url)})
+                    .then(function(response) { return response.blob(); })
+                    .then(function(blob) {
+                        var reader = new FileReader();
+                        reader.onloadend = function() {
+                            var result = String(reader.result);
+                            var comma = result.indexOf(',');
+                            ${bridgeName}.onMetadata(
+                                result.substring(5, comma).split(';')[0],
+                                blob.size
+                            );
+                            var data = result.substring(comma + 1);
+                            for (var offset = 0; offset < data.length; offset += ${BLOB_CHUNK_SIZE}) {
+                                ${bridgeName}.onChunk(data.substring(offset, offset + ${BLOB_CHUNK_SIZE}));
+                            }
+                            ${bridgeName}.onComplete();
+                        };
+                        reader.readAsDataURL(blob);
+                    })
+                    .catch(function(error) { ${bridgeName}.onError(String(error)); });
+            })();
+            """.trimIndent(),
+            null
+        )
+    }
+
+    private class BlobDownloadBridge(
+        private val onComplete: (String, String?, Long) -> Unit,
+        private val onError: (String) -> Unit
+    ) {
+        private val data = StringBuilder()
+        private var mimeType: String? = null
+        private var contentLength = 0L
+        private var finished = false
+
+        @JavascriptInterface
+        fun onMetadata(mimeType: String?, contentLength: Long) {
+            this.mimeType = mimeType?.takeIf(String::isNotBlank)
+            this.contentLength = contentLength
+        }
+
+        @JavascriptInterface
+        fun onChunk(chunk: String) {
+            if (!finished) data.append(chunk)
+        }
+
+        @JavascriptInterface
+        fun onComplete() {
+            if (finished) return
+            finished = true
+            onComplete(data.toString(), mimeType, contentLength)
+        }
+
+        @JavascriptInterface
+        fun onError(message: String) {
+            if (finished) return
+            finished = true
+            onError(message)
+        }
+    }
 
     init {
         if (tabInitializer !is FreezableBundleInitializer) {
@@ -345,5 +452,11 @@ class TabAdapter @AssistedInject constructor(
         view.draw(canvas)
 
         return bitmap
+    }
+
+    companion object {
+        private const val TAG = "TabAdapter"
+        private const val BLOB_SCHEME = "blob:"
+        private const val BLOB_CHUNK_SIZE = 32 * 1024
     }
 }

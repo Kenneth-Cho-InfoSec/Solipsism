@@ -95,6 +95,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -335,6 +337,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         }
 
         setContentView(binding.root)
+        applyStatusBarPreferences()
         setSupportActionBar(binding.toolbar)
         applySolipsismRailPreferences()
 
@@ -558,7 +561,21 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     override fun onResume() {
         super.onResume()
+        applyStatusBarPreferences()
         intentExtractor.extractUrlFromIntent(intent)?.let(presenter::onNewAction)
+    }
+
+    private fun applyStatusBarPreferences() {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        controller.systemBarsBehavior =
+            androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        if (userPreferences.hideStatusBarEnabled) {
+            controller.hide(WindowInsetsCompat.Type.statusBars())
+        } else {
+            controller.show(WindowInsetsCompat.Type.statusBars())
+        }
+        controller.isAppearanceLightStatusBars =
+            !userPreferences.useBlackStatusBar && userPreferences.useTheme == AppTheme.LIGHT
     }
 
     @SuppressLint("DiscouragedPrivateApi")

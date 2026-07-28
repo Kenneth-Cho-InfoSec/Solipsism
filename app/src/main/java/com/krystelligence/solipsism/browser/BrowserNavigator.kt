@@ -69,7 +69,8 @@ class BrowserNavigator @Inject constructor(
             userAgent = pendingDownload.userAgent,
             contentDisposition = pendingDownload.contentDisposition,
             mimeType = pendingDownload.mimeType,
-            contentLength = pendingDownload.contentLength
+            contentLength = pendingDownload.contentLength,
+            blobData = pendingDownload.blobData
         )
     }
 

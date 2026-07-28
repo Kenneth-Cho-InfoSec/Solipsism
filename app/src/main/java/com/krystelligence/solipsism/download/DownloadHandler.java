@@ -6,16 +6,22 @@ package com.krystelligence.solipsism.download;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DownloadManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.webkit.CookieManager;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,6 +40,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
@@ -77,6 +84,65 @@ public class DownloadHandler {
         // work, but sends other MIME types back to a viewer or to this browser
         // instead of saving them.
         onDownloadStartNoStream(context, manager, url, userAgent, contentDisposition, mimeType, contentSize);
+    }
+
+    /**
+     * Save bytes extracted from a WebView-owned blob URL. DownloadManager only
+     * accepts network URLs, so blob data must be persisted by the app itself.
+     */
+    public Single<String> downloadBlob(@NonNull Activity context,
+                                       @NonNull UserPreferences preferences,
+                                       @NonNull String sourceUrl,
+                                       @Nullable String contentDisposition,
+                                       @Nullable String mimeType,
+                                       @NonNull String base64Data) {
+        return Single.fromCallable(() -> {
+            String filename = FileUtils.sanitizeFileName(
+                URLUtil.guessFileName(sourceUrl, contentDisposition, mimeType)
+            );
+            String contentType = TextUtils.isEmpty(mimeType)
+                ? "application/octet-stream"
+                : mimeType;
+            byte[] bytes = Base64.decode(base64Data, Base64.DEFAULT);
+            String location = FileUtils.addNecessarySlashes(preferences.getDownloadDirectory());
+            String defaultPath = FileUtils.addNecessarySlashes(FileUtils.DEFAULT_DOWNLOAD_PATH);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                && location.equalsIgnoreCase(defaultPath)) {
+                ContentResolver resolver = context.getContentResolver();
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
+                values.put(MediaStore.Downloads.MIME_TYPE, contentType);
+                values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                values.put(MediaStore.Downloads.IS_PENDING, 1);
+                Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                if (uri == null) throw new IOException("Unable to create download entry");
+                try {
+                    OutputStream output = resolver.openOutputStream(uri);
+                    if (output == null) throw new IOException("Unable to open download entry");
+                    try (OutputStream stream = output) {
+                        stream.write(bytes);
+                    }
+                    ContentValues completed = new ContentValues();
+                    completed.put(MediaStore.Downloads.IS_PENDING, 0);
+                    resolver.update(uri, completed, null, null);
+                    return uri.toString();
+                } catch (Exception exception) {
+                    resolver.delete(uri, null, null);
+                    throw exception;
+                }
+            }
+
+            File directory = new File(location);
+            if (!directory.isDirectory() && !directory.mkdirs()) {
+                throw new IOException("Unable to create download directory");
+            }
+            File outputFile = new File(directory, filename);
+            try (FileOutputStream output = new FileOutputStream(outputFile)) {
+                output.write(bytes);
+            }
+            return outputFile.toURI().toString();
+        });
     }
 
     @NonNull

@@ -655,7 +655,7 @@ class BrowserPresenter @Inject constructor(
             ) {
                 onTabClose(tabListState.indexOfCurrentTab())
             } else {
-                navigator.backgroundBrowser()
+                onTabClose(tabListState.indexOfCurrentTab())
             }
         }
     }

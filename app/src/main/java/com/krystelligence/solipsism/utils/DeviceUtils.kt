@@ -16,11 +16,7 @@ object DeviceUtils {
      */
     @JvmStatic
     fun getScreenWidth(context: Context): Int {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
-        return Point().apply {
-            windowManager.defaultDisplay.getSize(this)
-        }.x
+        return context.resources.displayMetrics.widthPixels
     }
 
 }

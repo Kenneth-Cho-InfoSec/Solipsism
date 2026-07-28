@@ -22,6 +22,7 @@ object WebUtils {
     }
 
     @JvmStatic
+    @Suppress("DEPRECATION")
     fun clearHistory(
         context: Context,
         historyRepository: HistoryRepository,

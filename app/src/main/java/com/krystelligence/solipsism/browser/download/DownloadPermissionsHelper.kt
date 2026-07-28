@@ -16,6 +16,7 @@ import com.krystelligence.solipsism.database.downloads.DownloadEntry
 import com.krystelligence.solipsism.database.downloads.DownloadsRepository
 import com.krystelligence.solipsism.dialog.BrowserDialog.setDialogSize
 import com.krystelligence.solipsism.download.DownloadHandler
+import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.utils.FileUtils
@@ -38,10 +39,11 @@ class DownloadPermissionsHelper @Inject constructor(
         userAgent: String?,
         contentDisposition: String?,
         mimeType: String?,
-        contentLength: Long
+        contentLength: Long,
+        blobData: String? = null
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength)
+            showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, blobData)
             return
         }
 
@@ -55,7 +57,7 @@ class DownloadPermissionsHelper @Inject constructor(
             }
             .request { allGranted, _, _ ->
                 if (allGranted) {
-                    showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength)
+                    showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, blobData)
                 } else {
                     logger.log(TAG, "Download permission denied")
                 }
@@ -75,7 +77,8 @@ class DownloadPermissionsHelper @Inject constructor(
         userAgent: String?,
         contentDisposition: String?,
         mimeType: String?,
-        contentLength: Long
+        contentLength: Long,
+        blobData: String?
     ) {
         val guessedFileName = if (mimeType != null && MimeTypeMap.getSingleton().hasMimeType(mimeType)) {
             URLUtil.guessFileName(url, contentDisposition, mimeType)
@@ -92,27 +95,50 @@ class DownloadPermissionsHelper @Inject constructor(
         val dialogClickListener = android.content.DialogInterface.OnClickListener { _, which ->
             when (which) {
                 android.content.DialogInterface.BUTTON_POSITIVE -> {
-                    downloadHandler.onDownloadStart(
-                        activity,
-                        userPreferences,
-                        url,
-                        userAgent,
-                        contentDisposition,
-                        mimeType,
-                        downloadSize
-                    )
-                    downloadsRepository.addDownloadIfNotExists(
-                        DownloadEntry(
-                            url = url,
-                            title = fileName,
-                            contentSize = downloadSize
-                        )
-                    ).subscribeOn(databaseScheduler)
-                        .subscribeBy {
-                            if (!it) {
-                                logger.log(TAG, "error saving download to database")
+                    val saveDownload = { storedUrl: String ->
+                        downloadsRepository.addDownloadIfNotExists(
+                            DownloadEntry(
+                                url = storedUrl,
+                                title = fileName,
+                                contentSize = downloadSize
+                            )
+                        ).subscribeOn(databaseScheduler)
+                            .subscribeBy {
+                                if (!it) logger.log(TAG, "error saving download to database")
                             }
-                        }
+                    }
+                    if (blobData != null) {
+                        downloadHandler.downloadBlob(
+                            activity,
+                            userPreferences,
+                            url,
+                            contentDisposition,
+                            mimeType,
+                            blobData
+                        ).subscribeOn(databaseScheduler)
+                            .observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
+                            .subscribeBy(
+                                onSuccess = { storedUrl ->
+                                    saveDownload(storedUrl)
+                                    activity.snackbar(R.string.download_pending)
+                                },
+                                onError = {
+                                    logger.log(TAG, "error saving blob download", it)
+                                    activity.snackbar(R.string.cannot_download)
+                                }
+                            )
+                    } else {
+                        downloadHandler.onDownloadStart(
+                            activity,
+                            userPreferences,
+                            url,
+                            userAgent,
+                            contentDisposition,
+                            mimeType,
+                            downloadSize
+                        )
+                        saveDownload(url)
+                    }
                 }
                 android.content.DialogInterface.BUTTON_NEGATIVE -> {}
             }

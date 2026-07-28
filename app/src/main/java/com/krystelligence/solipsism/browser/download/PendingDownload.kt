@@ -14,5 +14,7 @@ data class PendingDownload(
     val userAgent: String?,
     val contentDisposition: String?,
     val mimeType: String?,
-    val contentLength: Long
+    val contentLength: Long,
+    /** Base64 payload extracted from a WebView-owned blob URL, when present. */
+    val blobData: String? = null
 )
