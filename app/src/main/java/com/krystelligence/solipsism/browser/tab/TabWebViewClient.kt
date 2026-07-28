@@ -3,6 +3,8 @@ package com.krystelligence.solipsism.browser.tab
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.adblock.AdBlocker
 import com.krystelligence.solipsism.adblock.allowlist.AllowListModel
+import com.krystelligence.solipsism.adblock.custom.CosmeticFilterRuntime
+import com.krystelligence.solipsism.adblock.custom.CustomFilterRepository
 import com.krystelligence.solipsism.databinding.DialogAuthRequestBinding
 import com.krystelligence.solipsism.databinding.DialogSslWarningBinding
 import com.krystelligence.solipsism.extensions.resizeAndShow
@@ -11,6 +13,7 @@ import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.ssl.SslState
 import com.krystelligence.solipsism.ssl.SslWarningPreferences
+import com.krystelligence.solipsism.userscript.UserScriptRuntime
 import android.annotation.SuppressLint
 import android.app.Application
 import android.graphics.Bitmap
@@ -42,12 +45,15 @@ import kotlin.math.abs
 class TabWebViewClient @AssistedInject constructor(
     private val application: Application,
     private val adBlocker: AdBlocker,
+    private val customFilterRepository: CustomFilterRepository,
+    private val cosmeticFilterRuntime: CosmeticFilterRuntime,
     private val allowListModel: AllowListModel,
     private val urlHandler: UrlHandler,
     @Assisted private val headers: Map<String, String>,
     private val userPreferences: UserPreferences,
     private val sslWarningPreferences: SslWarningPreferences,
     private val textReflow: TextReflow,
+    private val userScriptRuntime: UserScriptRuntime,
     private val logger: Logger,
     @Assisted("cache") private val cacheStoragePathHandler: InternalStoragePathHandler,
     @Assisted("files") private val filesStoragePathHandler: InternalStoragePathHandler,
@@ -99,7 +105,9 @@ class TabWebViewClient @AssistedInject constructor(
 
     private fun shouldBlockRequest(pageUrl: String, requestUrl: String) =
         !allowListModel.isUrlAllowedAds(pageUrl) &&
-            adBlocker.isAd(requestUrl, pageUrl)
+            (adBlocker.isAd(requestUrl, pageUrl) ||
+                customFilterRepository.shouldBlockNetwork(requestUrl) ||
+                (userPreferences.blockGifImagesEnabled && requestUrl.isGifResource()))
 
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
@@ -118,6 +126,8 @@ class TabWebViewClient @AssistedInject constructor(
 
     override fun onPageFinished(view: WebView, url: String) {
         super.onPageFinished(view, url)
+        userScriptRuntime.injectAfterPageFinished(view, url)
+        cosmeticFilterRuntime.injectAfterPageFinished(view, url)
         urlObservable.onNext(url)
         goBackObservable.onNext(view.canGoBack())
         goForwardObservable.onNext(view.canGoForward())
@@ -316,6 +326,10 @@ class TabWebViewClient @AssistedInject constructor(
 
         private const val BLOCKED_RESPONSE_MIME_TYPE = "text/plain"
         private const val BLOCKED_RESPONSE_ENCODING = "utf-8"
+
+        private fun String.isGifResource(): Boolean = runCatching {
+            URI(this).path?.lowercase()?.endsWith(".gif") == true
+        }.getOrDefault(false)
 
         private fun String.isYouTubeUrl(): Boolean = try {
             val host = URI(this).host?.lowercase().orEmpty()

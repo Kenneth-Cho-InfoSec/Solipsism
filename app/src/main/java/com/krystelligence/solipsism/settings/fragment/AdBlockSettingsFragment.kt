@@ -3,6 +3,7 @@ package com.krystelligence.solipsism.settings.fragment
 import com.krystelligence.solipsism.BuildConfig
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.adblock.BloomFilterAdBlocker
+import com.krystelligence.solipsism.adblock.custom.CustomFilterRepository
 import com.krystelligence.solipsism.adblock.source.HostsSourceType
 import com.krystelligence.solipsism.adblock.source.selectedHostsSource
 import com.krystelligence.solipsism.adblock.source.toPreferenceIndex
@@ -17,7 +18,13 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.InputType
+import android.view.Gravity
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import androidx.preference.Preference
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -40,6 +47,7 @@ class AdBlockSettingsFragment : AbstractSettingsFragment() {
     @Inject @MainScheduler internal lateinit var mainScheduler: Scheduler
     @Inject @DiskScheduler internal lateinit var diskScheduler: Scheduler
     @Inject internal lateinit var bloomFilterAdBlocker: BloomFilterAdBlocker
+    @Inject internal lateinit var customFilterRepository: CustomFilterRepository
 
     private var recentSummaryUpdater: SummaryUpdater? = null
     private val compositeDisposable = CompositeDisposable()
@@ -62,6 +70,22 @@ class AdBlockSettingsFragment : AbstractSettingsFragment() {
             isChecked = userPreferences.uBlockOriginEnabled,
             onCheckChange = { userPreferences.uBlockOriginEnabled = it }
         )
+
+        togglePreference(
+            preference = "cb_cosmetic_filters",
+            isChecked = userPreferences.cosmeticFiltersEnabled,
+            onCheckChange = { userPreferences.cosmeticFiltersEnabled = it }
+        )
+
+        togglePreference(
+            preference = "cb_block_gif",
+            isChecked = userPreferences.blockGifImagesEnabled,
+            onCheckChange = { userPreferences.blockGifImagesEnabled = it }
+        )
+
+        clickablePreference("custom_filters", summary = customFilterSummary()) {
+            showCustomFilterEditor()
+        }
 
         clickableDynamicPreference(
             preference = "preference_hosts_source",
@@ -192,6 +216,62 @@ class AdBlockSettingsFragment : AbstractSettingsFragment() {
         bloomFilterAdBlocker.populateAdBlockerFromDataSource(forceRefresh = true)
         updateRefreshHostsEnabledStatus()
     }
+
+    private fun customFilterSummary(): String = getString(
+        R.string.custom_filters_count,
+        customFilterRepository.all().count { it.enabled }
+    )
+
+    private fun showCustomFilterEditor() {
+        val context = requireContext()
+        val input = EditText(context).apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE or
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            minLines = 8
+            setText(customFilterRepository.all().joinToString("\n") { it.line })
+            hint = getString(R.string.custom_filters_hint)
+        }
+        val help = ImageButton(context).apply {
+            setImageResource(android.R.drawable.ic_menu_info_details)
+            contentDescription = getString(R.string.custom_filters_help)
+            setOnClickListener { showFilterLanguageHelp() }
+        }
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.TOP
+            addView(input, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+            addView(help, LinearLayout.LayoutParams(48.dp, 48.dp))
+        }
+        MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.custom_filters)
+            .setView(container)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.action_ok) { _, _ ->
+                customFilterRepository.clear()
+                val errors = customFilterRepository.addAll(input.text.toString().lineSequence().toList())
+                if (errors.isEmpty()) {
+                    activity?.toast(R.string.custom_filters_saved)
+                } else {
+                    android.widget.Toast.makeText(
+                        context,
+                        getString(R.string.custom_filters_invalid, errors.size),
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            .show()
+    }
+
+    private fun showFilterLanguageHelp() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.custom_filters_help)
+            .setMessage(R.string.custom_filters_help_message)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+    }
+
+    private val Int.dp: Int
+        get() = (this * resources.displayMetrics.density).toInt()
 
     private fun readTextFromUri(uri: Uri): Maybe<File> = Maybe.create {
         val externalFilesDir = activity?.getExternalFilesDir("")

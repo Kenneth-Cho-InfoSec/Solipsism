@@ -74,8 +74,9 @@ abstract class AbstractSettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun updateVisiblePreferenceRowBackgrounds() {
-        for (index in 0 until listView.childCount) {
-            updatePreferenceRowBackground(listView.getChildAt(index))
+        val recyclerView = listView ?: return
+        for (index in 0 until recyclerView.childCount) {
+            updatePreferenceRowBackground(recyclerView.getChildAt(index))
         }
     }
 

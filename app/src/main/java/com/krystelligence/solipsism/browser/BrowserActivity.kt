@@ -30,6 +30,8 @@ import com.krystelligence.solipsism.browser.view.delegates.BottomTabViewDelegate
 import com.krystelligence.solipsism.browser.view.delegates.DesktopTabViewDelegate
 import com.krystelligence.solipsism.browser.view.delegates.DrawerTabViewDelegate
 import com.krystelligence.solipsism.browser.download.DownloadPermissionsHelper
+import com.krystelligence.solipsism.browser.data.CookieManagerDialog
+import com.krystelligence.solipsism.browser.data.CookieManagerRepository
 import com.krystelligence.solipsism.browser.view.delegates.SolipsismRailViewDelegate
 import com.krystelligence.solipsism.browser.view.targetUrl.LongPress
 import com.krystelligence.solipsism.browser.history.DecoyTimeframe
@@ -135,6 +137,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     @Inject internal lateinit var uiConfiguration: UiConfiguration
     @Inject internal lateinit var intentExtractor: IntentExtractor
     @Inject internal lateinit var downloadPermissionsHelper: DownloadPermissionsHelper
+    @Inject internal lateinit var cookieManagerRepository: CookieManagerRepository
     @Inject internal lateinit var solipsismDialogBuilder: SolipsismDialogBuilder
     @Inject internal lateinit var tabPager: TabPager
     @Inject @MainHandler internal lateinit var mainHandler: Handler
@@ -718,6 +721,14 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         container.addView(createMenuRow(R.drawable.ic_bookmark, R.string.action_bookmarks, MenuSelection.BOOKMARKS))
         container.addView(createMenuRow(R.drawable.ic_search, R.string.action_find, MenuSelection.FIND))
         container.addView(createMenuRow(R.drawable.ic_insert, R.string.action_copy, MenuSelection.COPY_LINK))
+        if (presenter.viewState.displayUrl.startsWith("http://") || presenter.viewState.displayUrl.startsWith("https://")) {
+            container.addView(createActionMenuRow(R.drawable.ic_settings_text, R.string.block_element) {
+                presenter.onPickElement()
+            })
+            container.addView(createActionMenuRow(R.drawable.ic_settings_privacy, R.string.cookie_manager) {
+                presenter.onCookieManager()
+            })
+        }
         container.addView(createMenuDivider())
         container.addView(createMenuRow(R.drawable.ic_action_settings, R.string.settings, MenuSelection.SETTINGS))
 
@@ -768,6 +779,35 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             presenter.onMenuClick(selection)
         }
     }
+
+    private fun createActionMenuRow(icon: Int, title: Int, action: () -> Unit): View =
+        LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            background = drawable(R.drawable.browser_overflow_menu_item_background)
+            isClickable = true
+            isFocusable = true
+            setPadding(4.dp, 3.dp, 6.dp, 3.dp)
+            minimumHeight = 38.dp
+            addView(ImageView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(30.dp, 30.dp)
+                setPadding(6.dp, 6.dp, 6.dp, 6.dp)
+                setImageResource(icon)
+                setColorFilter(themeProvider.color(R.attr.colorOnSurfaceVariant))
+            })
+            addView(TextView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                    .apply { marginStart = 7.dp }
+                text = getString(title)
+                setTextColor(themeProvider.color(R.attr.colorOnSurface))
+                textSize = 15f
+                maxLines = 1
+            })
+            setOnClickListener {
+                browserMenuPopup?.dismiss()
+                action()
+            }
+        }
 
     private fun createMenuDivider(): View =
         View(this).apply {
@@ -826,7 +866,11 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     /**
      * @see BrowserContract.View.showToolsDialog
      */
-    override fun showToolsDialog(areAdsAllowed: Boolean, shouldShowAdBlockOption: Boolean) {
+    override fun showToolsDialog(
+        areAdsAllowed: Boolean,
+        shouldShowAdBlockOption: Boolean,
+        shouldShowElementPicker: Boolean
+    ) {
         BrowserDialog.showWithIcons(
             this, getString(R.string.dialog_tools_title),
             DialogItem(
@@ -839,8 +883,24 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                 icon = R.drawable.ic_block,
                 isConditionMet = shouldShowAdBlockOption,
                 onClick = presenter::onToggleAdBlocking
+            ),
+            DialogItem(
+                title = R.string.block_element,
+                icon = R.drawable.ic_settings_text,
+                isConditionMet = shouldShowElementPicker,
+                onClick = presenter::onPickElement
+            ),
+            DialogItem(
+                title = R.string.cookie_manager,
+                icon = R.drawable.ic_settings_privacy,
+                isConditionMet = shouldShowElementPicker,
+                onClick = presenter::onCookieManager
             )
         )
+    }
+
+    override fun showCookieManager(url: String) {
+        CookieManagerDialog.show(this, url, cookieManagerRepository)
     }
 
     /**

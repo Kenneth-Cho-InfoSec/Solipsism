@@ -47,6 +47,12 @@ class UserPreferences @Inject constructor(
      */
     var uBlockOriginEnabled by preferences.booleanPreference(UBLOCK_ORIGIN, true)
 
+    /** True when user-defined cosmetic filters should be applied. */
+    var cosmeticFiltersEnabled by preferences.booleanPreference(COSMETIC_FILTERS, true)
+
+    /** True when GIF image resources should be blocked. */
+    var blockGifImagesEnabled by preferences.booleanPreference(BLOCK_GIF_IMAGES, false)
+
     /**
      * True if the browser should block images from being loaded, false otherwise.
      */
@@ -98,6 +104,9 @@ class UserPreferences @Inject constructor(
      * True if the browser should allow execution of javascript, false otherwise.
      */
     var javaScriptEnabled by preferences.booleanPreference(JAVASCRIPT, true)
+
+    /** True when the experimental, unprivileged userscript runtime is enabled. */
+    var userscriptsEnabled by preferences.booleanPreference(USER_SCRIPTS, false)
 
     /**
      * True if the device location should be accessible by websites, false otherwise.
@@ -338,6 +347,8 @@ class UserPreferences @Inject constructor(
 private const val WEB_RTC = "webRtc"
 private const val BLOCK_ADS = "AdBlock"
 private const val UBLOCK_ORIGIN = "uBlockOrigin"
+private const val COSMETIC_FILTERS = "cosmeticFilters"
+private const val BLOCK_GIF_IMAGES = "blockGifImages"
 private const val BLOCK_IMAGES = "blockimages"
 private const val CLEAR_CACHE_EXIT = "cache"
 private const val COOKIES = "cookies"
@@ -347,6 +358,7 @@ private const val HIDE_STATUS_BAR = "hidestatus"
 private const val HOMEPAGE = "home"
 private const val INCOGNITO_COOKIES = "incognitocookies"
 private const val JAVASCRIPT = "java"
+private const val USER_SCRIPTS = "userscripts"
 private const val LOCATION = "location"
 private const val OVERVIEW_MODE = "overviewmode"
 private const val POPUPS = "newwindows"

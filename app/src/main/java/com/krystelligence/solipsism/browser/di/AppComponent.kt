@@ -18,6 +18,7 @@ import com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment
 import com.krystelligence.solipsism.settings.fragment.GeneralSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.PrivacySettingsFragment
 import com.krystelligence.solipsism.settings.fragment.RootSettingsFragment
+import com.krystelligence.solipsism.settings.fragment.UserScriptsSettingsFragment
 import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
@@ -69,6 +70,8 @@ interface AppComponent {
     fun inject(adBlockSettingsFragment: AdBlockSettingsFragment)
 
     fun inject(accessibilitySettingsFragment: AccessibilitySettingsFragment)
+
+    fun inject(userScriptsSettingsFragment: UserScriptsSettingsFragment)
 
     fun provideBloomFilterAdBlocker(): BloomFilterAdBlocker
 

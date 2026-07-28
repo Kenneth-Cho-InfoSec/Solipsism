@@ -4,6 +4,8 @@ import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.DatabaseScheduler
 import com.krystelligence.solipsism.browser.di.MainScheduler
 import com.krystelligence.solipsism.browser.di.injector
+import com.krystelligence.solipsism.browser.data.CookieManagerDialog
+import com.krystelligence.solipsism.browser.data.CookieManagerRepository
 import com.krystelligence.solipsism.browser.tab.WebViewFactory
 import com.krystelligence.solipsism.database.history.HistoryRepository
 import com.krystelligence.solipsism.dialog.BrowserDialog
@@ -23,12 +25,17 @@ class PrivacySettingsFragment : AbstractSettingsFragment() {
     @Inject internal lateinit var userPreferences: UserPreferences
     @Inject @DatabaseScheduler internal lateinit var databaseScheduler: Scheduler
     @Inject @MainScheduler internal lateinit var mainScheduler: Scheduler
+    @Inject internal lateinit var cookieManagerRepository: CookieManagerRepository
 
     override fun providePreferencesXmlResource() = R.xml.preference_privacy
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
         injector.inject(this)
+
+        clickablePreference("cookie_manager") {
+            CookieManagerDialog.promptForUrl(requireContext(), cookieManagerRepository)
+        }
 
         clickablePreference(preference = SETTINGS_CLEARCACHE, onClick = this::clearCache)
         clickablePreference(preference = SETTINGS_CLEARHISTORY, onClick = this::clearHistoryDialog)

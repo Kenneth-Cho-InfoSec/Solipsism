@@ -135,25 +135,29 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
     }
 
     private fun showThemePicker(summaryUpdater: SummaryUpdater) {
-        val currentTheme = userPreferences.useTheme
-        MaterialAlertDialogBuilder(requireActivity()).apply {
-            setTitle(resources.getString(R.string.theme))
-            val values = AppTheme.entries.map { Pair(it, it.toDisplayString()) }
-            withSingleChoiceItems(values, userPreferences.useTheme) {
-                userPreferences.useTheme = it
-                summaryUpdater.updateSummary(it.toDisplayString())
-            }
-            setPositiveButton(resources.getString(R.string.action_ok)) { _, _ ->
-                if (currentTheme != userPreferences.useTheme) {
-                    requireActivity().onBackPressedDispatcher.onBackPressed()
+        val values = AppTheme.entries.map { Pair(it, it.toDisplayString()) }
+        lateinit var themeDialog: androidx.appcompat.app.AlertDialog
+        themeDialog = MaterialAlertDialogBuilder(requireActivity())
+            .setTitle(resources.getString(R.string.theme))
+            .setSingleChoiceItems(
+                values.map { it.second }.toTypedArray(),
+                values.indexOfFirst { it.first == userPreferences.useTheme }
+            ) { _, which ->
+                val selectedTheme = values[which].first
+                if (selectedTheme != userPreferences.useTheme) {
+                    userPreferences.useTheme = selectedTheme
+                    summaryUpdater.updateSummary(selectedTheme.toDisplayString())
+                    themeDialog.dismiss()
+                    requireActivity().recreate()
                 }
             }
-            setOnCancelListener {
-                if (currentTheme != userPreferences.useTheme) {
-                    requireActivity().onBackPressedDispatcher.onBackPressed()
-                }
-            }
-        }.resizeAndShow()
+            .setPositiveButton(resources.getString(R.string.action_ok), null)
+            .create()
+        themeDialog.show()
+        com.krystelligence.solipsism.dialog.BrowserDialog.setDialogSize(
+            requireActivity(),
+            themeDialog
+        )
     }
 
     private fun showRailSizePicker(summaryUpdater: SummaryUpdater) {

@@ -12,6 +12,23 @@
             android:key="cb_ublock_origin"
             android:summary="@string/ublock_origin_summary"
             android:title="@string/ublock_origin"/>
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_settings_text"
+            android:key="cb_cosmetic_filters"
+            android:summary="@string/cosmetic_filters_summary"
+            android:title="@string/cosmetic_filters"/>
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_text"
+            android:key="cb_block_gif"
+            android:summary="@string/block_gif_summary"
+            android:title="@string/block_gif"/>
+        <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="custom_filters"
+            android:summary="@string/custom_filters_summary"
+            android:title="@string/custom_filters"/>
         <Preference
             android:icon="@drawable/ic_settings_globe"
             android:key="preference_hosts_source"

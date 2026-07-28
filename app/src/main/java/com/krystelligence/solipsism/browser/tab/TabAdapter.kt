@@ -1,6 +1,7 @@
 package com.krystelligence.solipsism.browser.tab
 
 import com.krystelligence.solipsism.browser.di.DiskScheduler
+import com.krystelligence.solipsism.adblock.custom.ElementPickerController
 import com.krystelligence.solipsism.browser.di.MainScheduler
 import com.krystelligence.solipsism.browser.download.PendingDownload
 import com.krystelligence.solipsism.browser.image.IconFreeze
@@ -58,6 +59,7 @@ class TabAdapter @AssistedInject constructor(
     private val previewModel: PreviewModel,
     @DiskScheduler private val diskScheduler: Scheduler,
     @MainScheduler private val mainScheduler: Scheduler,
+    private val elementPickerController: ElementPickerController,
 ) : TabModel {
 
     @AssistedFactory
@@ -92,6 +94,7 @@ class TabAdapter @AssistedInject constructor(
 
     private val webView: WebView
         get() = webViewLazy.value.apply {
+            elementPickerController.attach(this)
             webViewClient = tabWebViewClient
             webChromeClient = tabWebChromeClient
             setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
@@ -273,6 +276,10 @@ class TabAdapter @AssistedInject constructor(
 
     override fun reload() {
         webView.reload()
+    }
+
+    override fun pickElement() {
+        elementPickerController.start(webView, url)
     }
 
     override fun stopLoading() {

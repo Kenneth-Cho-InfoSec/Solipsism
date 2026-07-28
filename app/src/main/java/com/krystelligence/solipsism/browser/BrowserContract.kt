@@ -143,7 +143,16 @@ interface BrowserContract {
          * @param shouldShowAdBlockOption True if ad block toggling is available for the current
          * page.
          */
-        fun showToolsDialog(areAdsAllowed: Boolean, shouldShowAdBlockOption: Boolean)
+        fun showToolsDialog(
+            areAdsAllowed: Boolean,
+            shouldShowAdBlockOption: Boolean,
+            shouldShowElementPicker: Boolean
+        )
+
+        /**
+         * Show the cookie manager for the current HTTP(S) page.
+         */
+        fun showCookieManager(url: String)
 
         /**
          * Show a warning to the user that they are about to open a local file in the browser that

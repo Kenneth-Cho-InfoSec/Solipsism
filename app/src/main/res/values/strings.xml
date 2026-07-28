@@ -37,6 +37,26 @@
     <string name="wideViewPort">Use wide viewport</string>
     <string name="overViewMode">Load pages in overview mode</string>
     <string name="restore">Restore lost tabs on start</string>
+    <string name="userscripts">Userscripts</string>
+    <string name="userscripts_explain">Install and control safe, unprivileged browser userscripts</string>
+    <string name="userscripts_options">Userscript options</string>
+    <string name="userscripts_installed">Installed scripts</string>
+    <string name="userscripts_enable">Enable userscripts</string>
+    <string name="userscripts_enabled_summary">Scripts run only when they are enabled and matched to the current page</string>
+    <string name="userscripts_import_file">Import from file</string>
+    <string name="userscripts_import_file_summary">Choose a .user.js or JavaScript file from storage</string>
+    <string name="userscripts_import_url">Install from HTTPS URL</string>
+    <string name="userscripts_import_url_summary">Download a userscript and its HTTPS @require dependencies</string>
+    <string name="userscripts_no_scripts">No userscripts installed</string>
+    <string name="userscripts_script_summary">Version %1$s · %2$s</string>
+    <string name="userscripts_edit">Edit source</string>
+    <string name="userscripts_delete">Delete script</string>
+    <string name="userscripts_edit_title">Edit %1$s</string>
+    <string name="userscripts_delete_title">Delete %1$s?</string>
+    <string name="userscripts_delete_message">The script and downloaded dependencies will be removed.</string>
+    <string name="userscripts_install_success">Installed %1$s</string>
+    <string name="userscripts_saved">Saved %1$s</string>
+    <string name="userscripts_deleted">Deleted %1$s</string>
     <string name="fullScreenOption">Hide status bar while browsing</string>
     <string name="clear_cookies">Clear browser cookies</string>
     <string name="clear_history">Clear browser history</string>
@@ -191,6 +211,24 @@
     <string name="settings_display">Appearance</string>
     <string name="settings_privacy">Privacy</string>
     <string name="settings_privacy_explain">Cookies, location, WebRTC, history, and stored site data controls.</string>
+    <string name="cookie_manager">Cookie Manager</string>
+    <string name="cookie_manager_summary">View and manage cookies visible to a specific site.</string>
+    <string name="cookie_manager_explanation">Only cookies visible to this URL are shown. Android WebView does not expose every cookie domain and path, so site cleanup may be best effort.</string>
+    <string name="cookie_manager_site">Site: %1$s</string>
+    <string name="cookie_manager_empty">No cookies are visible to this URL.</string>
+    <string name="cookie_manager_add">Add cookie</string>
+    <string name="cookie_manager_add_short">Add</string>
+    <string name="cookie_manager_edit">Edit</string>
+    <string name="cookie_manager_delete">Delete</string>
+    <string name="cookie_manager_refresh">Refresh</string>
+    <string name="cookie_manager_delete_visible">Delete visible cookies</string>
+    <string name="cookie_manager_delete_visible_short">Clear site</string>
+    <string name="cookie_manager_delete_visible_warning">This removes cookies visible to the current URL. Cookies with unknown domain or path attributes may require separate cleanup.</string>
+    <string name="cookie_manager_delete_warning">Delete this cookie from the current URL?</string>
+    <string name="cookie_manager_editor_warning">Cookie values can contain login sessions. Values are masked in the list and are never logged.</string>
+    <string name="cookie_manager_cookie_format">%1$s\n%2$s</string>
+    <string name="cookie_manager_url_prompt">Enter an HTTP or HTTPS URL whose visible cookies you want to manage.</string>
+    <string name="cookie_manager_invalid_url">Enter a valid HTTP or HTTPS URL.</string>
     <string name="settings_about">About</string>
     <string name="settings_about_explain">Details about version, author and license.</string>
     <string name="close_tab">Close current tab</string>
@@ -293,6 +331,9 @@
     <string name="dialog_toggle_desktop">Toggle desktop user agent</string>
     <string name="dialog_adblock_enable_for_site">Enable ad block for site</string>
     <string name="dialog_adblock_disable_for_site">Disable ad block for site</string>
+    <string name="block_element">Block element</string>
+    <string name="block_element_host">Choose a page element to hide on %1$s</string>
+    <string name="block_element_saved">Element filter saved</string>
 
     <!-- Search Engines -->
     <string name="search_engine_custom">Custom URL</string>
@@ -320,6 +361,18 @@
     <string name="ad_block_load_failure">Failed to load hosts from ad blocking source.</string>
     <string name="ublock_origin">Built-in uBlock Origin filters</string>
     <string name="ublock_origin_summary">Layer uBlock Origin compatible network filters on top of hosts blocking.</string>
+    <string name="cosmetic_filters">Custom cosmetic filters</string>
+    <string name="cosmetic_filters_summary">Hide matching page elements using safe CSS rules</string>
+    <string name="block_gif">Block GIF images</string>
+    <string name="block_gif_summary">Blocks GIF resources, including animated GIFs; static GIFs may also be blocked</string>
+    <string name="custom_filters">Custom filters</string>
+    <string name="custom_filters_summary">Write or edit uBlock-compatible network and element rules</string>
+    <string name="custom_filters_count">%1$d enabled custom filters</string>
+    <string name="custom_filters_hint">example.com##.advertisement</string>
+    <string name="custom_filters_help">Filter language help</string>
+    <string name="custom_filters_help_message">Supported examples:\n\nexample.com##.advertisement\nexample.com#@#.keep-this\n##.global-banner\n||ads.example.com^\n@@||trusted.example.com^\n\nUse ## to hide elements and #@# to create an exception. CSS selectors must be valid. JavaScript, +js, #?#, and snippet filters are not supported. Keep selectors specific to avoid breaking pages.</string>
+    <string name="custom_filters_saved">Custom filters saved</string>
+    <string name="custom_filters_invalid">Saved with %1$d invalid line(s) skipped</string>
 
     <string name="infinity">∞</string>
 

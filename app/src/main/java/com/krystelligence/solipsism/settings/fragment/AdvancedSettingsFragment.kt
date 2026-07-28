@@ -83,6 +83,7 @@ class AdvancedSettingsFragment : AbstractSettingsFragment() {
             isChecked = userPreferences.restoreLostTabsEnabled,
             onCheckChange = { userPreferences.restoreLostTabsEnabled = it }
         )
+
     }
 
     /**

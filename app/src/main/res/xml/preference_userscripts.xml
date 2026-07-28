@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/userscripts_options">
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_action_plus"
+            android:key="userscripts_enabled"
+            android:summary="@string/userscripts_enabled_summary"
+            android:title="@string/userscripts_enable" />
+        <Preference
+            android:icon="@drawable/ic_action_plus"
+            android:key="userscripts_import_file"
+            android:summary="@string/userscripts_import_file_summary"
+            android:title="@string/userscripts_import_file" />
+        <Preference
+            android:icon="@drawable/ic_settings_globe"
+            android:key="userscripts_import_url"
+            android:summary="@string/userscripts_import_url_summary"
+            android:title="@string/userscripts_import_url" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="userscripts_list"
+        android:title="@string/userscripts_installed" />
+</PreferenceScreen>

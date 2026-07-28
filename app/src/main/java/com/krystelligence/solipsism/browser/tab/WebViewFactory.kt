@@ -7,6 +7,7 @@ import com.krystelligence.solipsism.isSupported
 import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.preference.userAgent
+import com.krystelligence.solipsism.userscript.UserScriptRuntime
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Color
@@ -26,6 +27,7 @@ class WebViewFactory @Inject constructor(
     private val activity: Activity,
     private val logger: Logger,
     private val userPreferences: UserPreferences,
+    private val userScriptRuntime: UserScriptRuntime,
     @IncognitoMode private val incognitoMode: Boolean
 ) {
 
@@ -104,6 +106,7 @@ class WebViewFactory @Inject constructor(
             }
 
             updateForPreferences(userPreferences, incognitoMode)
+            userScriptRuntime.attach(this)
         }
     }
 

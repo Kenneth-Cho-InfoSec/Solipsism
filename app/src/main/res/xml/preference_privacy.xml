@@ -2,6 +2,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="@string/settings_privacy">
+        <Preference
+            android:icon="@drawable/ic_settings_privacy"
+            android:key="cookie_manager"
+            android:summary="@string/cookie_manager_summary"
+            android:title="@string/cookie_manager"/>
         <SwitchPreferenceCompat
             android:defaultValue="true"
             android:icon="@drawable/ic_settings_privacy"

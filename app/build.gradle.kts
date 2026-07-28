@@ -13,7 +13,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "5.1.9"
+        versionName = "5.2.0"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -67,7 +67,7 @@ android {
             dimension = "capabilities"
             buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"true\")")
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 117
+            versionCode = 118
         }
 
         if (!isCi) {
@@ -75,7 +75,7 @@ android {
                 dimension = "capabilities"
                 buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"false\")")
                 applicationId = "com.krystelligence.solipsism"
-                versionCode = 118
+                versionCode = 119
             }
         }
     }
@@ -120,7 +120,7 @@ dependencies {
     implementation("androidx.palette:palette:1.0.0")
     implementation("androidx.preference:preference:1.2.1")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("androidx.webkit:webkit:1.15.0")
+    implementation("androidx.webkit:webkit:1.16.0")
     implementation("com.anthonycr.mezzanine:core:$mezzanineVersion")
     implementation("com.google.android.material:material:1.14.0-beta01")
     implementation("com.google.dagger:dagger:$daggerVersion")

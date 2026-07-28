@@ -922,8 +922,13 @@ class BrowserPresenter @Inject constructor(
         val currentUrl = currentTab?.url ?: return
         view?.showToolsDialog(
             areAdsAllowed = allowListModel.isUrlAllowedAds(currentUrl),
-            shouldShowAdBlockOption = !currentUrl.isSpecialUrl()
+            shouldShowAdBlockOption = !currentUrl.isSpecialUrl(),
+            shouldShowElementPicker = currentUrl.startsWith("http://") || currentUrl.startsWith("https://")
         )
+    }
+
+    fun onPickElement() {
+        currentTab?.pickElement()
     }
 
     /**
@@ -1121,6 +1126,12 @@ class BrowserPresenter @Inject constructor(
                         )
                     }
         }
+    }
+
+    fun onCookieManager() {
+        currentTab?.url
+            ?.takeIf { it.startsWith("http://") || it.startsWith("https://") }
+            ?.let { view?.showCookieManager(it) }
     }
 
     /**

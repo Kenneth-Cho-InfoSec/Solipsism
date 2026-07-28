@@ -79,6 +79,8 @@ interface TabModel {
      */
     fun reload()
 
+    fun pickElement()
+
     /**
      * Stop loading the current page if it is loading. If the page is not loading, has no effect.
      */
