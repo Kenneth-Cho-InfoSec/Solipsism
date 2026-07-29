@@ -35,7 +35,7 @@ Builds:
 
   - versionName: 5.2.2
     versionCode: 122
-    commit: PLACEHOLDER_RELEASE_COMMIT
+    commit: 0360f866c9
     subdir: app
     gradle:
       - solipsismBrowser
