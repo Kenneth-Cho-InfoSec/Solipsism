@@ -149,6 +149,14 @@ class BrowserStateAdapter(private val browserActivity: BrowserActivity) : Browse
         browserActivity.showCookieManager(url)
     }
 
+    override fun showScreenshot(bitmap: android.graphics.Bitmap) {
+        browserActivity.showScreenshot(bitmap)
+    }
+
+    override fun showScreenshotCaptureFailed() {
+        browserActivity.showScreenshotCaptureFailed()
+    }
+
     override fun showLocalFileBlockedDialog() {
         browserActivity.showLocalFileBlockedDialog()
     }

@@ -84,6 +84,9 @@ interface TabModel {
      */
     fun reloadWithJavaScriptDisabled()
 
+    /** Capture the visible webpage viewport, excluding browser chrome and rails. */
+    fun captureVisiblePage(): Bitmap?
+
     fun pickElement()
 
     /**

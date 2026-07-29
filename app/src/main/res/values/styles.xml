@@ -222,6 +222,124 @@
         <item name="materialAlertDialogTheme">@style/MaterialDialogStyle.Black</item>
     </style>
 
+    <!-- User-selectable accent overlays. The surface and text roles remain theme-specific. -->
+    <style name="ThemeOverlay" />
+    <style name="ThemeOverlay.Solipsism" />
+    <style name="ThemeOverlay.Solipsism.Accent" />
+    <style name="ThemeOverlay.Solipsism.Accent.Base" />
+    <style name="ThemeOverlay.Solipsism.Accent.Base.Light">
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Base.Dark">
+        <item name="colorOnPrimary">#101010</item>
+        <item name="colorOnSecondary">#101010</item>
+        <item name="colorOnTertiary">#101010</item>
+    </style>
+
+    <style name="ThemeOverlay.Solipsism.Accent.Teal_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
+        <item name="colorAccent">#006A6A</item><item name="colorPrimaryContainer">#9CF1EE</item>
+        <item name="colorSecondary">#4A6361</item><item name="colorSecondaryContainer">#CCE8E5</item>
+        <item name="colorTertiary">#6B5D7B</item><item name="colorTertiaryContainer">#F2DAFF</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Blue_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
+        <item name="colorAccent">#2563EB</item><item name="colorPrimaryContainer">#D8E2FF</item>
+        <item name="colorSecondary">#585E71</item><item name="colorSecondaryContainer">#DCE2F9</item>
+        <item name="colorTertiary">#725572</item><item name="colorTertiaryContainer">#FFD7F3</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Indigo_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
+        <item name="colorAccent">#4F46E5</item><item name="colorPrimaryContainer">#E0E0FF</item>
+        <item name="colorSecondary">#5C5D72</item><item name="colorSecondaryContainer">#E1E0F9</item>
+        <item name="colorTertiary">#76586A</item><item name="colorTertiaryContainer">#FFD9E5</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Purple_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
+        <item name="colorAccent">#7C3AED</item><item name="colorPrimaryContainer">#EADDFF</item>
+        <item name="colorSecondary">#655A6F</item><item name="colorSecondaryContainer">#ECDDF4</item>
+        <item name="colorTertiary">#805248</item><item name="colorTertiaryContainer">#FFDBD1</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Pink_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
+        <item name="colorAccent">#DB2777</item><item name="colorPrimaryContainer">#FFD9E5</item>
+        <item name="colorSecondary">#745663</item><item name="colorSecondaryContainer">#FFD9E5</item>
+        <item name="colorTertiary">#765C2E</item><item name="colorTertiaryContainer">#FFDEA6</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Red_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
+        <item name="colorAccent">#DC2626</item><item name="colorPrimaryContainer">#FFDAD6</item>
+        <item name="colorSecondary">#765654</item><item name="colorSecondaryContainer">#FFDBD7</item>
+        <item name="colorTertiary">#715B2E</item><item name="colorTertiaryContainer">#FFDEA6</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Orange_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
+        <item name="colorAccent">#EA580C</item><item name="colorPrimaryContainer">#FFDBCA</item>
+        <item name="colorSecondary">#765A4E</item><item name="colorSecondaryContainer">#FFDBC9</item>
+        <item name="colorTertiary">#655F31</item><item name="colorTertiaryContainer">#E9E7AA</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Green_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
+        <item name="colorAccent">#16A34A</item><item name="colorPrimaryContainer">#A4F4AF</item>
+        <item name="colorSecondary">#526553</item><item name="colorSecondaryContainer">#D4E8D3</item>
+        <item name="colorTertiary">#376477</item><item name="colorTertiaryContainer">#BDEAF8</item>
+    </style>
+
+    <style name="ThemeOverlay.Solipsism.Accent.Teal_Dark" parent="ThemeOverlay.Solipsism.Accent.Base.Dark">
+        <item name="colorAccent">#80D5D1</item><item name="colorPrimary">#00504F</item><item name="colorPrimaryContainer">#00504F</item>
+        <item name="colorSurface">#101918</item><item name="colorSurfaceContainerLow">#141D1C</item><item name="colorSurfaceContainer">#172120</item><item name="colorSurfaceContainerHigh">#222B2A</item><item name="colorSurfaceContainerHighest">#2D3635</item>
+        <item name="colorSecondary">#B0CCCA</item><item name="colorSecondaryContainer">#324B49</item>
+        <item name="colorTertiary">#D6BEE6</item><item name="colorTertiaryContainer">#534160</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Blue_Dark" parent="ThemeOverlay.Solipsism.Accent.Base.Dark">
+        <item name="colorAccent">#B1C5FF</item><item name="colorPrimary">#084399</item><item name="colorPrimaryContainer">#084399</item>
+        <item name="colorSurface">#10141F</item><item name="colorSurfaceContainerLow">#151A27</item><item name="colorSurfaceContainer">#1B2232</item><item name="colorSurfaceContainerHigh">#252E42</item><item name="colorSurfaceContainerHighest">#303B53</item>
+        <item name="colorSecondary">#C0C6DD</item><item name="colorSecondaryContainer">#414659</item>
+        <item name="colorTertiary">#E2BBDD</item><item name="colorTertiaryContainer">#5A3F58</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Indigo_Dark" parent="ThemeOverlay.Solipsism.Accent.Base.Dark">
+        <item name="colorAccent">#BEC2FF</item><item name="colorPrimary">#37349A</item><item name="colorPrimaryContainer">#37349A</item>
+        <item name="colorSurface">#11111F</item><item name="colorSurfaceContainerLow">#17172A</item><item name="colorSurfaceContainer">#1F1F38</item><item name="colorSurfaceContainerHigh">#29294A</item><item name="colorSurfaceContainerHighest">#34345C</item>
+        <item name="colorSecondary">#C5C5E0</item><item name="colorSecondaryContainer">#45455B</item>
+        <item name="colorTertiary">#E8B9C9</item><item name="colorTertiaryContainer">#5B414A</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Purple_Dark" parent="ThemeOverlay.Solipsism.Accent.Base.Dark">
+        <item name="colorAccent">#D0BCFF</item><item name="colorPrimary">#4F378B</item><item name="colorPrimaryContainer">#4F378B</item>
+        <item name="colorSurface">#15101F</item><item name="colorSurfaceContainerLow">#1C1628</item><item name="colorSurfaceContainer">#261E36</item><item name="colorSurfaceContainerHigh">#32284A</item><item name="colorSurfaceContainerHighest">#3E325D</item>
+        <item name="colorSecondary">#D0C2D8</item><item name="colorSecondaryContainer">#4A4458</item>
+        <item name="colorTertiary">#F5B9A8</item><item name="colorTertiaryContainer">#603D35</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Pink_Dark" parent="ThemeOverlay.Solipsism.Accent.Base.Dark">
+        <item name="colorAccent">#FFB0CA</item><item name="colorPrimary">#8F0F4C</item><item name="colorPrimaryContainer">#8F0F4C</item>
+        <item name="colorSurface">#1E1018</item><item name="colorSurfaceContainerLow">#28151F</item><item name="colorSurfaceContainer">#351C29</item><item name="colorSurfaceContainerHigh">#452436</item><item name="colorSurfaceContainerHighest">#552B42</item>
+        <item name="colorSecondary">#E4BDC8</item><item name="colorSecondaryContainer">#5A3F48</item>
+        <item name="colorTertiary">#E5C58D</item><item name="colorTertiaryContainer">#59441F</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Red_Dark" parent="ThemeOverlay.Solipsism.Accent.Base.Dark">
+        <item name="colorAccent">#FFB4AB</item><item name="colorPrimary">#930006</item><item name="colorPrimaryContainer">#930006</item>
+        <item name="colorSurface">#1D1010</item><item name="colorSurfaceContainerLow">#271515</item><item name="colorSurfaceContainer">#351C1C</item><item name="colorSurfaceContainerHigh">#452424</item><item name="colorSurfaceContainerHighest">#572C2C</item>
+        <item name="colorSecondary">#E7BDB8</item><item name="colorSecondaryContainer">#5D3F3C</item>
+        <item name="colorTertiary">#DFC58A</item><item name="colorTertiaryContainer">#55451B</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Orange_Dark" parent="ThemeOverlay.Solipsism.Accent.Base.Dark">
+        <item name="colorAccent">#FFB695</item><item name="colorPrimary">#8B2F00</item><item name="colorPrimaryContainer">#8B2F00</item>
+        <item name="colorSurface">#1D140E</item><item name="colorSurfaceContainerLow">#281B12</item><item name="colorSurfaceContainer">#352319</item><item name="colorSurfaceContainerHigh">#452E21</item><item name="colorSurfaceContainerHighest">#573A28</item>
+        <item name="colorSecondary">#E6BFAE</item><item name="colorSecondaryContainer">#5C4035</item>
+        <item name="colorTertiary">#D2CC8D</item><item name="colorTertiaryContainer">#4D4D1F</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Green_Dark" parent="ThemeOverlay.Solipsism.Accent.Base.Dark">
+        <item name="colorAccent">#88D992</item><item name="colorPrimary">#00531F</item><item name="colorPrimaryContainer">#00531F</item>
+        <item name="colorSurface">#101B14</item><item name="colorSurfaceContainerLow">#14261A</item><item name="colorSurfaceContainer">#1B3221</item><item name="colorSurfaceContainerHigh">#26442D</item><item name="colorSurfaceContainerHighest">#31573A</item>
+        <item name="colorSecondary">#B8CCB5</item><item name="colorSecondaryContainer">#394B39</item>
+        <item name="colorTertiary">#A7CFDF</item><item name="colorTertiaryContainer">#1E4D5F</item>
+    </style>
+
+    <style name="ThemeOverlay.Solipsism.Accent.Teal_Black" parent="ThemeOverlay.Solipsism.Accent.Teal_Dark" />
+    <style name="ThemeOverlay.Solipsism.Accent.Blue_Black" parent="ThemeOverlay.Solipsism.Accent.Blue_Dark" />
+    <style name="ThemeOverlay.Solipsism.Accent.Indigo_Black" parent="ThemeOverlay.Solipsism.Accent.Indigo_Dark" />
+    <style name="ThemeOverlay.Solipsism.Accent.Purple_Black" parent="ThemeOverlay.Solipsism.Accent.Purple_Dark" />
+    <style name="ThemeOverlay.Solipsism.Accent.Pink_Black" parent="ThemeOverlay.Solipsism.Accent.Pink_Dark" />
+    <style name="ThemeOverlay.Solipsism.Accent.Red_Black" parent="ThemeOverlay.Solipsism.Accent.Red_Dark" />
+    <style name="ThemeOverlay.Solipsism.Accent.Orange_Black" parent="ThemeOverlay.Solipsism.Accent.Orange_Dark" />
+    <style name="ThemeOverlay.Solipsism.Accent.Green_Black" parent="ThemeOverlay.Solipsism.Accent.Green_Dark" />
+    <style name="ThemeOverlay.Solipsism.Accent.System_Light" parent="ThemeOverlay.Solipsism.Accent.Teal_Light" />
+    <style name="ThemeOverlay.Solipsism.Accent.System_Dark" parent="ThemeOverlay.Solipsism.Accent.Teal_Dark" />
+    <style name="ThemeOverlay.Solipsism.Accent.System_Black" parent="ThemeOverlay.Solipsism.Accent.Teal_Black" />
+
     <!-- AlertDialog Theming -->
     <style name="MaterialDialogStyle.Light" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="colorPrimary">@color/black</item>

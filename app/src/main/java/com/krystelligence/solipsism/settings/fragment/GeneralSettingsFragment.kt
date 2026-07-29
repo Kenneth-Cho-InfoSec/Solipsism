@@ -9,6 +9,7 @@ import com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
 import com.krystelligence.solipsism.dialog.BrowserDialog
 import com.krystelligence.solipsism.extensions.withSingleChoiceItems
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.search.SearchEngineProvider
 import com.krystelligence.solipsism.search.Suggestions
 import com.krystelligence.solipsism.search.engine.BaseSearchEngine
@@ -17,6 +18,7 @@ import com.krystelligence.solipsism.utils.FileUtils
 import com.krystelligence.solipsism.utils.ProxyUtils
 import com.krystelligence.solipsism.utils.ThemeUtils
 import android.app.Activity
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
@@ -335,16 +337,19 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
                 when (which) {
                     0 -> {
                         userPreferences.homepage = SCHEME_HOMEPAGE
+                        userPreferences.homepageSource = HomepageSource.BUILT_IN.value
                         summaryUpdater.updateSummary(resources.getString(R.string.action_homepage))
                     }
 
                     1 -> {
                         userPreferences.homepage = SCHEME_BLANK
+                        userPreferences.homepageSource = HomepageSource.BUILT_IN.value
                         summaryUpdater.updateSummary(resources.getString(R.string.action_blank))
                     }
 
                     2 -> {
                         userPreferences.homepage = SCHEME_BOOKMARKS
+                        userPreferences.homepageSource = HomepageSource.BUILT_IN.value
                         summaryUpdater.updateSummary(resources.getString(R.string.action_bookmarks))
                     }
 
@@ -372,8 +377,12 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
                 currentHomepage,
                 R.string.action_ok
             ) { url ->
-                userPreferences.homepage = url
-                summaryUpdater.updateSummary(url)
+                val uri = Uri.parse(url.trim())
+                if ((uri.scheme == "http" || uri.scheme == "https") && !uri.host.isNullOrBlank()) {
+                    userPreferences.homepage = uri.toString()
+                    userPreferences.homepageSource = HomepageSource.DOMAIN.value
+                    summaryUpdater.updateSummary(uri.toString())
+                }
             }
         }
     }

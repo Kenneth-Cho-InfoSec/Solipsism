@@ -1,6 +1,7 @@
 package com.krystelligence.solipsism.settings.activity
 
 import com.krystelligence.solipsism.AppTheme
+import com.krystelligence.solipsism.AccentPalette
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.preference.UserPreferences
@@ -14,6 +15,7 @@ import javax.inject.Inject
 abstract class ThemableSettingsActivity : AppCompatActivity() {
 
     private var themeId: AppTheme = AppTheme.LIGHT
+    private var appliedSystemAccent: Int? = null
 
     @Inject internal lateinit var userPreferences: UserPreferences
 
@@ -38,6 +40,15 @@ abstract class ThemableSettingsActivity : AppCompatActivity() {
                 window.setBackgroundDrawable(ThemeUtils.getPrimaryColorDark(this).toDrawable())
             }
         }
+        theme.applyStyle(
+            AccentPalette.overlayFor(
+                themeId,
+                userPreferences.accentPalette,
+                userPreferences.matchSystemAccent
+            ),
+            true
+        )
+        appliedSystemAccent = AccentPalette.systemAccentFingerprint(this)
         super.onCreate(savedInstanceState)
 
         resetPreferences()
@@ -53,6 +64,11 @@ abstract class ThemableSettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val systemAccent = AccentPalette.systemAccentFingerprint(this)
+        if (userPreferences.matchSystemAccent && systemAccent != appliedSystemAccent) {
+            recreate()
+            return
+        }
         resetPreferences()
         if (userPreferences.useTheme != themeId) {
             recreate()

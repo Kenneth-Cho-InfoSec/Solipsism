@@ -48,11 +48,49 @@
             android:title="@string/settings_homepage_wallpaper" />
         <Preference
             android:icon="@drawable/ic_action_desktop"
+            android:key="homepage_source"
+            android:title="@string/settings_homepage_source" />
+        <Preference
+            android:icon="@drawable/ic_action_invert"
+            android:key="accent_palette"
+            android:title="@string/settings_accent_palette" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_action_invert"
+            android:key="match_system_accent"
+            android:title="@string/settings_match_system_accent"
+            android:summary="@string/settings_match_system_accent_summary" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_history"
+            android:key="homepage_datetime_enabled"
+            android:title="@string/settings_homepage_datetime"
+            android:summary="@string/settings_homepage_datetime_summary" />
+        <Preference
+            android:icon="@drawable/ic_history"
+            android:key="homepage_time_format"
+            android:title="@string/settings_homepage_time_format" />
+        <Preference
+            android:icon="@drawable/ic_history"
+            android:key="homepage_date_format"
+            android:title="@string/settings_homepage_date_format" />
+        <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="homepage_datetime_opacity"
+            android:title="@string/settings_homepage_datetime_opacity" />
+        <Preference
+            android:icon="@drawable/ic_action_desktop"
             android:key="rail_size"
             android:title="@string/settings_rail_size" />
         <Preference
             android:icon="@drawable/ic_action_forward"
             android:key="rail_position"
             android:title="@string/settings_rail_position" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_action_tabs"
+            android:key="swap_qr_and_tabs_buttons"
+            android:title="@string/settings_swap_qr_tabs"
+            android:summary="@string/settings_swap_qr_tabs_summary" />
     </PreferenceCategory>
 </PreferenceScreen>

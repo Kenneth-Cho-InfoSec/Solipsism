@@ -52,6 +52,7 @@ import com.krystelligence.solipsism.dialog.SolipsismDialogBuilder
 import com.krystelligence.solipsism.extensions.color
 import com.krystelligence.solipsism.extensions.drawable
 import com.krystelligence.solipsism.extensions.resizeAndShow
+import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.extensions.takeIfInstance
 import com.krystelligence.solipsism.extensions.tint
 import com.krystelligence.solipsism.qr.QrScannerActivity
@@ -63,13 +64,18 @@ import com.krystelligence.solipsism.utils.ProxyUtils
 import com.krystelligence.solipsism.utils.value
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Outline
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.provider.MediaStore
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
@@ -81,6 +87,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.view.animation.PathInterpolator
@@ -106,7 +113,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.lifecycle.lifecycleScope
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -247,6 +258,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             ).forEach { it.setTopMargin(3.dp) }
         }
 
+        applyQrAndTabsButtonPositions()
+
         binding.contentFrame.applyRailMargin(railWidth, railOnLeft)
         binding.progressView.applyRailMargin(railWidth, railOnLeft)
         binding.addressOverlay?.applyRailMargin(
@@ -280,6 +293,69 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         updateLayoutParams<ViewGroup.LayoutParams> {
             width = size
             height = size
+        }
+    }
+
+    /** Reparents the two rail controls while leaving their click listeners and accessibility intact. */
+    private fun applyQrAndTabsButtonPositions() {
+        val tabsButton = binding.homeButton
+        val qrButton = binding.searchRefresh
+        val tabsParent = tabsButton.parent as? ViewGroup ?: return
+        val qrParent = qrButton.parent as? ViewGroup ?: return
+        val shouldSwap = userPreferences.swapQrAndTabsButtons
+        val alreadySwapped = (tabsButton.parent as? View)?.id == R.id.address_rail
+        val addressRail = listOf(tabsParent, qrParent).firstOrNull { it.id == R.id.address_rail } ?: return
+
+        addressRail.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
+            if (shouldSwap) {
+                topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                topToBottom = -1
+                topMargin = tabsButton.layoutParams.height +
+                    resources.getDimensionPixelSize(R.dimen.solipsism_address_rail_top_gap)
+            } else {
+                topToTop = -1
+                topToBottom = R.id.home_button
+                topMargin = resources.getDimensionPixelSize(R.dimen.solipsism_address_rail_top_gap)
+            }
+        }
+
+        if (shouldSwap == alreadySwapped) return
+
+        val tabsWidth = tabsButton.layoutParams.width
+        val tabsHeight = tabsButton.layoutParams.height
+        val qrWidth = qrButton.layoutParams.width
+        val qrHeight = qrButton.layoutParams.height
+        tabsParent.removeView(tabsButton)
+        qrParent.removeView(qrButton)
+
+        if (shouldSwap) {
+            val swappedTabsParams = LinearLayout.LayoutParams(
+                tabsWidth,
+                tabsHeight
+            ).apply { gravity = Gravity.CENTER }
+            val swappedQrParams = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(
+                qrWidth,
+                qrHeight
+            ).apply {
+                startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+            }
+            qrParent.addView(tabsButton, swappedTabsParams)
+            tabsParent.addView(qrButton, swappedQrParams)
+        } else {
+            val restoredTabsParams = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(
+                tabsWidth,
+                tabsHeight
+            ).apply {
+                startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+            }
+            val restoredQrParams = LinearLayout.LayoutParams(qrWidth, qrHeight)
+                .apply { gravity = Gravity.CENTER }
+            qrParent.addView(tabsButton, restoredTabsParams)
+            tabsParent.addView(qrButton, restoredQrParams)
         }
     }
 
@@ -569,6 +645,11 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun onResume() {
         super.onResume()
         applyStatusBarPreferences()
+        if (::binding.isInitialized && ::uiConfiguration.isInitialized &&
+            uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM
+        ) {
+            applySolipsismRailPreferences()
+        }
         intentExtractor.extractUrlFromIntent(intent)?.let(presenter::onNewAction)
     }
 
@@ -725,6 +806,9 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         container.addView(createMenuRow(R.drawable.ic_bookmark, R.string.action_bookmarks, MenuSelection.BOOKMARKS))
         container.addView(createMenuRow(R.drawable.ic_search, R.string.action_find, MenuSelection.FIND))
         container.addView(createMenuRow(R.drawable.ic_insert, R.string.action_copy, MenuSelection.COPY_LINK))
+        container.addView(createActionMenuRow(R.drawable.ic_action_screenshot, R.string.action_screenshot) {
+            presenter.onScreenshotClick()
+        })
         if (presenter.viewState.displayUrl.startsWith("http://") || presenter.viewState.displayUrl.startsWith("https://")) {
             container.addView(createActionMenuRow(R.drawable.ic_settings_text, R.string.block_element) {
                 presenter.onPickElement()
@@ -905,6 +989,113 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     override fun showCookieManager(url: String) {
         CookieManagerDialog.show(this, url, cookieManagerRepository)
+    }
+
+    override fun showScreenshot(bitmap: Bitmap) {
+        showScreenshotAnimation(bitmap)
+        lifecycleScope.launch {
+            runCatching { withContext(Dispatchers.IO) { saveScreenshot(bitmap) } }
+                .onSuccess { snackbar(R.string.screenshot_saved) }
+                .onFailure { snackbar(R.string.screenshot_failed) }
+        }
+    }
+
+    override fun showScreenshotCaptureFailed() {
+        snackbar(R.string.screenshot_failed)
+    }
+
+    private fun showScreenshotAnimation(bitmap: Bitmap) {
+        val contentFrame = binding.contentFrame
+        if (contentFrame.width <= 0 || contentFrame.height <= 0) return
+
+        val radius = 24.dp.toFloat()
+        val outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setRoundRect(0, 0, view.width, view.height, radius)
+            }
+        }
+        fun View.applyScreenshotShape() {
+            this.outlineProvider = outlineProvider
+            this.clipToOutline = true
+            this.pivotX = contentFrame.width / 2f
+            this.pivotY = contentFrame.height / 2f
+        }
+
+        val snapshot = ImageView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            setImageBitmap(bitmap)
+            scaleType = ImageView.ScaleType.FIT_XY
+            applyScreenshotShape()
+        }
+        val whiteFilter = View(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            setBackgroundColor(Color.WHITE)
+            alpha = 0.5f
+            applyScreenshotShape()
+        }
+
+        contentFrame.addView(snapshot)
+        contentFrame.addView(whiteFilter)
+        vibrator?.takeIf { it.hasVibrator() }?.vibrate(
+            VibrationEffect.createOneShot(SCREENSHOT_ANIMATION_DURATION_MS, VibrationEffect.DEFAULT_AMPLITUDE)
+        )
+
+        snapshot.animate()
+            .scaleX(SCREENSHOT_SHRINK_SCALE)
+            .scaleY(SCREENSHOT_SHRINK_SCALE)
+            .setDuration(SCREENSHOT_ANIMATION_DURATION_MS / 2)
+            .setInterpolator(expressiveEffectsInterpolator)
+            .withEndAction {
+                snapshot.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(SCREENSHOT_ANIMATION_DURATION_MS / 2)
+                    .setInterpolator(expressiveSpatialInterpolator)
+                    .withEndAction {
+                        contentFrame.removeView(whiteFilter)
+                        contentFrame.removeView(snapshot)
+                    }
+                    .start()
+            }
+            .start()
+        whiteFilter.animate()
+            .alpha(0f)
+            .setDuration(SCREENSHOT_ANIMATION_DURATION_MS)
+            .setInterpolator(expressiveEffectsInterpolator)
+            .start()
+    }
+
+    private fun saveScreenshot(bitmap: Bitmap) {
+        val fileName = "Solipsism_${System.currentTimeMillis()}.png"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val values = android.content.ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/Solipsism")
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
+            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+                ?: error("Unable to create screenshot media entry")
+            try {
+                contentResolver.openOutputStream(uri)?.use { output ->
+                    check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output))
+                } ?: error("Unable to open screenshot output")
+                values.clear()
+                values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                contentResolver.update(uri, values, null, null)
+            } catch (error: Throwable) {
+                contentResolver.delete(uri, null, null)
+                throw error
+            }
+        } else {
+            check(MediaStore.Images.Media.insertImage(contentResolver, bitmap, fileName, null) != null)
+        }
     }
 
     /**
@@ -1579,6 +1770,8 @@ private const val URL_RAIL_SWIPE_THRESHOLD_DP = 34
 private const val URL_RAIL_COMMIT_PROGRESS = 0.42f
 private const val URL_RAIL_HAPTIC_INTERVAL_MS = 46L
 private const val URL_RAIL_HAPTIC_PULSE_MS = 9L
+private const val SCREENSHOT_ANIMATION_DURATION_MS = 650L
+private const val SCREENSHOT_SHRINK_SCALE = 0.70f
 private const val BROWSER_MENU_MAX_WIDTH_DP = 258
 private const val BROWSER_MENU_SCREEN_MARGIN_DP = 14
 private const val DONATION_PREFERENCES = "solipsism_donation"

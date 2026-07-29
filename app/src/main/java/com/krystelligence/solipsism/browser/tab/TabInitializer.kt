@@ -11,11 +11,14 @@ import com.krystelligence.solipsism.html.bookmark.BookmarkPageFactory
 import com.krystelligence.solipsism.html.download.DownloadPageFactory
 import com.krystelligence.solipsism.html.history.HistoryPageFactory
 import com.krystelligence.solipsism.html.homepage.HomePageFactory
+import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.preference.UserPreferences
 import android.app.Activity
 import android.os.Bundle
 import android.os.Message
 import android.webkit.WebView
+import android.webkit.URLUtil
+import java.io.File
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Reusable
@@ -57,10 +60,21 @@ class UrlInitializer(private val url: String) : TabInitializer {
 class HomePageInitializer @Inject constructor(
     private val userPreferences: UserPreferences,
     private val startPageInitializer: StartPageInitializer,
-    private val bookmarkPageInitializer: BookmarkPageInitializer
+    private val bookmarkPageInitializer: BookmarkPageInitializer,
+    private val staticHomepageInitializer: StaticHomepageInitializer,
+    private val restrictedDomainHomepageInitializer: RestrictedDomainHomepageInitializer
 ) : TabInitializer {
 
     override fun initialize(webView: WebView, headers: Map<String, String>) {
+        if (HomepageSource.fromValue(userPreferences.homepageSource) == HomepageSource.STATIC_HTML) {
+            staticHomepageInitializer.initialize(webView, headers)
+            return
+        }
+        if (HomepageSource.fromValue(userPreferences.homepageSource) == HomepageSource.DOMAIN) {
+            restrictedDomainHomepageInitializer.initialize(webView, headers)
+            return
+        }
+
         val homepage = userPreferences.homepage
 
         when (homepage) {
@@ -70,6 +84,68 @@ class HomePageInitializer @Inject constructor(
         }.initialize(webView, headers)
     }
 
+}
+
+/** Loads sanitized HTML with a deliberately restricted WebView configuration. */
+@Reusable
+class StaticHomepageInitializer @Inject constructor(
+    private val userPreferences: UserPreferences,
+    private val startPageInitializer: StartPageInitializer
+) : TabInitializer {
+
+    override fun initialize(webView: WebView, headers: Map<String, String>) {
+        val path = userPreferences.homepageHtmlPath?.let(::File)
+        val html = path?.takeIf(File::isFile)?.readText()
+        if (html.isNullOrBlank()) {
+            startPageInitializer.initialize(webView, headers)
+            return
+        }
+
+        webView.settings.apply {
+            javaScriptEnabled = false
+            domStorageEnabled = false
+            databaseEnabled = false
+            allowFileAccess = false
+            allowContentAccess = false
+            javaScriptCanOpenWindowsAutomatically = false
+            setSupportMultipleWindows(false)
+            setGeolocationEnabled(false)
+        }
+        webView.loadDataWithBaseURL(
+            "https://appassets.androidplatform.net/custom-homepage/",
+            html,
+            "text/html",
+            "UTF-8",
+            null
+        )
+    }
+}
+
+/** Loads a user-selected website with JavaScript, storage, permissions, and popups disabled. */
+@Reusable
+class RestrictedDomainHomepageInitializer @Inject constructor(
+    private val userPreferences: UserPreferences,
+    private val startPageInitializer: StartPageInitializer
+) : TabInitializer {
+
+    override fun initialize(webView: WebView, headers: Map<String, String>) {
+        val homepage = userPreferences.homepage
+        if (!URLUtil.isHttpUrl(homepage) && !URLUtil.isHttpsUrl(homepage)) {
+            startPageInitializer.initialize(webView, headers)
+            return
+        }
+        webView.settings.apply {
+            javaScriptEnabled = false
+            domStorageEnabled = false
+            databaseEnabled = false
+            allowFileAccess = false
+            allowContentAccess = false
+            javaScriptCanOpenWindowsAutomatically = false
+            setSupportMultipleWindows(false)
+            setGeolocationEnabled(false)
+        }
+        webView.loadUrl(homepage, headers)
+    }
 }
 
 /**

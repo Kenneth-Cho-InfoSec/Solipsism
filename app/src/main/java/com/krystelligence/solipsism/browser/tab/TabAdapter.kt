@@ -10,6 +10,7 @@ import com.krystelligence.solipsism.browser.view.setCompositeTouchListener
 import com.krystelligence.solipsism.constant.DESKTOP_USER_AGENT
 import com.krystelligence.solipsism.ids.ViewIdGenerator
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.preference.userAgent
 import com.krystelligence.solipsism.preview.PreviewModel
 import com.krystelligence.solipsism.ssl.SslCertificateInfo
@@ -99,6 +100,10 @@ class TabAdapter @AssistedInject constructor(
             webViewClient = tabWebViewClient
             webChromeClient = tabWebChromeClient
             setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+                if (isRestrictedHomepageDownload()) {
+                    Log.w(TAG, "Blocked homepage download: $url")
+                    return@setDownloadListener
+                }
                 if (url.startsWith(BLOB_SCHEME)) {
                     extractBlobDownload(
                         webView = this,
@@ -193,6 +198,13 @@ class TabAdapter @AssistedInject constructor(
             """.trimIndent(),
             null
         )
+    }
+
+    private fun isRestrictedHomepageDownload(): Boolean {
+        val currentUrl = webView.url.orEmpty()
+        return currentUrl.startsWith("https://appassets.androidplatform.net/custom-homepage/") ||
+            (userPreferences.homepageSource == HomepageSource.DOMAIN.value &&
+                currentUrl == userPreferences.homepage)
     }
 
     private class BlobDownloadBridge(
@@ -296,6 +308,17 @@ class TabAdapter @AssistedInject constructor(
                 }
             }
         })
+    }
+
+    override fun captureVisiblePage(): Bitmap? {
+        val view = webView
+        if (view.width <= 0 || view.height <= 0) return null
+
+        return runCatching {
+            Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888).also { bitmap ->
+                view.draw(Canvas(bitmap))
+            }
+        }.getOrNull()
     }
 
     override fun pickElement() {

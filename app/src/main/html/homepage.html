@@ -14,6 +14,14 @@
         --box-bg: {COLOR}
         --box-txt: {COLOR}
         --home-wallpaper: {WALLPAPER}
+        --home-overlay: {HOME_OVERLAY}
+        --home-text: {HOME_TEXT}
+        --home-text-secondary: {HOME_TEXT_SECONDARY}
+        --shortcut-text: {SHORTCUT_TEXT}
+        --shortcut-border: {SHORTCUT_BORDER}
+        --shortcut-bg: {SHORTCUT_BG}
+        --shortcut-icon-bg: {SHORTCUT_ICON_BG}
+        --homepage-datetime-opacity: {DATETIME_OPACITY}
     }
 
     @font-face {
@@ -31,15 +39,31 @@
     body {
         min-height: 100vh;
         margin: 0;
-        color: #ffffff;
-        background:
-            linear-gradient(180deg, rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.76)),
-            var(--home-wallpaper),
-            var(--body-bg);
+        color: var(--home-text);
+        background: var(--body-bg);
         font-family: "Google Sans", "Google Sans Medium", Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
+    .homepage_wallpaper {
+        position: fixed;
+        z-index: 0;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .homepage_wallpaper_overlay {
+        position: fixed;
+        z-index: 1;
+        inset: 0;
+        background: var(--home-overlay);
+        pointer-events: none;
+    }
+
     .page {
+        position: relative;
+        z-index: 2;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
@@ -60,10 +84,10 @@
         min-width: 0;
         min-height: 84px;
         padding: 12px 10px;
-        border: 1px solid rgba(255, 255, 255, 0.16);
+        border: 1px solid var(--shortcut-border);
         border-radius: 22px;
-        background: rgba(18, 24, 24, 0.46);
-        color: #ffffff;
+        background: var(--shortcut-bg);
+        color: var(--shortcut-text);
         text-align: center;
         text-decoration: none;
         -webkit-backdrop-filter: blur(18px);
@@ -77,8 +101,8 @@
         align-items: center;
         justify-content: center;
         border-radius: 17px;
-        background: rgba(255, 255, 255, 0.20);
-        color: #ffffff;
+        background: var(--shortcut-icon-bg);
+        color: var(--shortcut-text);
         font-size: 15px;
         font-weight: 500;
     }
@@ -87,7 +111,7 @@
         display: block;
         margin-top: 8px;
         overflow: hidden;
-        color: rgba(255, 255, 255, 0.92);
+        color: var(--shortcut-text);
         font-size: 12px;
         font-weight: 500;
         line-height: 1.18;
@@ -104,16 +128,26 @@
 
     .browser_title {
         margin: 0;
-        color: rgba(255, 255, 255, 0.94);
+        color: var(--home-text);
         font-family: "Google Sans Flex Offline", "Google Sans", "Google Sans Medium", Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         font-size: 34px;
         font-weight: 500;
         line-height: 1.12;
     }
 
+    .homepage_datetime {
+        margin: 0 0 6px;
+        color: var(--home-text);
+        font-family: "Google Sans Flex Offline", "Google Sans", "Google Sans Medium", Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.2;
+        opacity: var(--homepage-datetime-opacity);
+    }
+
     .motto {
         margin: 8px 0 0;
-        color: rgba(255, 255, 255, 0.72);
+        color: var(--home-text-secondary);
         font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         font-size: 13px;
         font-weight: 400;
@@ -134,6 +168,10 @@
             font-size: 28px;
         }
 
+        .homepage_datetime {
+            font-size: 14px;
+        }
+
         .home {
             padding-bottom: 8vh;
         }
@@ -141,6 +179,8 @@
 </style>
 
 <body>
+<img class="homepage_wallpaper" src="{HOME_WALLPAPER_IMAGE}" alt="" aria-hidden="true">
+<div class="homepage_wallpaper_overlay" aria-hidden="true"></div>
 <main class="page">
     <nav id="bookmark_shortcuts" class="shortcuts">
         <a id="shortcut_template" class="shortcut" href="${URL}">
@@ -149,10 +189,53 @@
         </a>
     </nav>
     <section class="home">
+        <p id="homepage_datetime" class="homepage_datetime">{DATETIME_INITIAL}</p>
         <p class="browser_title">Solipsism Browser</p>
         <p class="motto">Ex se sola veritas fluit</p>
     </section>
 </main>
+<script>
+    (function () {
+        const timePattern = {TIME_FORMAT};
+        const datePattern = {DATE_FORMAT};
+        const dateTime = document.getElementById("homepage_datetime");
+        if (!dateTime || !timePattern || !datePattern) return;
+
+        const pad = value => String(value).padStart(2, "0");
+        const format = (date, pattern) => pattern.replace(
+            /yyyy|yy|EEEE|EEE|MMMM|MMM|dd|d|HH|H|hh|h|mm|ss|a|MM|M/g,
+            token => {
+                switch (token) {
+                    case "yyyy": return String(date.getFullYear());
+                    case "yy": return String(date.getFullYear()).slice(-2);
+                    case "MMMM": return new Intl.DateTimeFormat(undefined, { month: "long" }).format(date);
+                    case "MMM": return new Intl.DateTimeFormat(undefined, { month: "short" }).format(date);
+                    case "MM": return pad(date.getMonth() + 1);
+                    case "M": return String(date.getMonth() + 1);
+                    case "dd": return pad(date.getDate());
+                    case "d": return String(date.getDate());
+                    case "EEEE": return new Intl.DateTimeFormat(undefined, { weekday: "long" }).format(date);
+                    case "EEE": return new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date);
+                    case "HH": return pad(date.getHours());
+                    case "H": return String(date.getHours());
+                    case "hh": return pad((date.getHours() % 12) || 12);
+                    case "h": return String((date.getHours() % 12) || 12);
+                    case "mm": return pad(date.getMinutes());
+                    case "ss": return pad(date.getSeconds());
+                    case "a": return date.getHours() < 12 ? "AM" : "PM";
+                    default: return token;
+                }
+            }
+        );
+
+        const update = () => {
+            const now = new Date();
+            dateTime.textContent = format(now, timePattern) + "  •  " + format(now, datePattern);
+        };
+        update();
+        window.setInterval(update, 60000);
+    })();
+</script>
 </body>
 
 </html>

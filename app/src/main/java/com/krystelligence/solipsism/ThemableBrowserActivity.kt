@@ -28,6 +28,7 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
     private var solipsismRailSize: Int = 72
     private var solipsismRailOnLeft: Boolean = false
     private var shouldRunOnResumeActions = false
+    private var appliedSystemAccent: Int? = null
 
     /**
      * Override this to provide an alternate theme that should be set for every instance of this
@@ -51,6 +52,15 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
                 AppTheme.BLACK -> R.style.Theme_BlackTheme
             }
         )
+        theme.applyStyle(
+            AccentPalette.overlayFor(
+                userPreferences.useTheme,
+                userPreferences.accentPalette,
+                userPreferences.matchSystemAccent
+            ),
+            true
+        )
+        appliedSystemAccent = AccentPalette.systemAccentFingerprint(this)
         super.onCreate(savedInstanceState)
 
         resetPreferences()
@@ -98,6 +108,11 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val systemAccent = AccentPalette.systemAccentFingerprint(this)
+        if (userPreferences.matchSystemAccent && systemAccent != appliedSystemAccent) {
+            recreate()
+            return
+        }
         resetPreferences()
         shouldRunOnResumeActions = true
         val nextTabConfiguration = userPreferences.tabConfiguration

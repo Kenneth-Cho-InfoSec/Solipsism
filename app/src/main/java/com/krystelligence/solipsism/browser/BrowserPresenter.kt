@@ -1141,6 +1141,12 @@ class BrowserPresenter @Inject constructor(
             ?.let { view?.showCookieManager(it) }
     }
 
+    fun onScreenshotClick() {
+        currentTab?.captureVisiblePage()
+            ?.let { view?.showScreenshot(it) }
+            ?: view?.showScreenshotCaptureFailed()
+    }
+
     /**
      * Call when the user clicks on a menu [option] for the provided [folder].
      */

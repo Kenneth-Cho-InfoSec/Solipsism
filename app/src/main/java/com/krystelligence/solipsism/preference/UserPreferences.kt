@@ -11,6 +11,7 @@ import com.krystelligence.solipsism.constant.DEFAULT_ENCODING
 import com.krystelligence.solipsism.constant.SCHEME_BOOKMARKS
 import com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
 import com.krystelligence.solipsism.device.ScreenSize
+import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.preference.delegates.booleanPreference
 import com.krystelligence.solipsism.preference.delegates.enumPreference
 import com.krystelligence.solipsism.preference.delegates.intPreference
@@ -92,6 +93,12 @@ class UserPreferences @Inject constructor(
      * The URL of the selected homepage.
      */
     var homepage by preferences.stringPreference(HOMEPAGE, SCHEME_HOMEPAGE)
+
+    /** The secured homepage source selected by the user. */
+    var homepageSource by preferences.intPreference(HOMEPAGE_SOURCE, HomepageSource.BUILT_IN.value)
+
+    /** Path to the sanitized static homepage HTML file. */
+    var homepageHtmlPath by preferences.nullableStringPreference(HOMEPAGE_HTML_PATH)
 
     /**
      * True if cookies should be enabled in incognito mode, false otherwise.
@@ -260,6 +267,9 @@ class UserPreferences @Inject constructor(
      */
     var solipsismRailOnLeft by preferences.booleanPreference(SOLIPSISM_RAIL_ON_LEFT, false)
 
+    /** True when the QR scanner and Tabs controls should exchange their rail positions. */
+    var swapQrAndTabsButtons by preferences.booleanPreference(SWAP_QR_AND_TABS_BUTTONS, false)
+
     /**
      * The homepage wallpaper mode: bundled default image, custom user image, or black background.
      */
@@ -269,6 +279,27 @@ class UserPreferences @Inject constructor(
      * The copied local file path of the user's custom homepage wallpaper, when selected.
      */
     var homepageWallpaperPath by preferences.nullableStringPreference(HOMEPAGE_WALLPAPER_PATH)
+
+    /** True when the date and time should be shown above the homepage title. */
+    var homepageDateTimeEnabled by preferences.booleanPreference(HOMEPAGE_DATE_TIME_ENABLED, true)
+
+    /** SimpleDateFormat pattern used for the homepage time. */
+    var homepageTimeFormat by preferences.stringPreference(HOMEPAGE_TIME_FORMAT, "HH:mm")
+
+    /** SimpleDateFormat pattern used for the homepage date. */
+    var homepageDateFormat by preferences.stringPreference(
+        HOMEPAGE_DATE_FORMAT,
+        "EEEE, d MMMM yyyy"
+    )
+
+    /** Opacity percentage for the homepage date and time. */
+    var homepageDateTimeOpacity by preferences.intPreference(HOMEPAGE_DATE_TIME_OPACITY, 80)
+
+    /** The selected fixed accent palette. */
+    var accentPalette by preferences.intPreference(ACCENT_PALETTE, 0)
+
+    /** True when the app should use Android's dynamic system accent on API 31+. */
+    var matchSystemAccent by preferences.booleanPreference(MATCH_SYSTEM_ACCENT, false)
 
     /**
      * True if the browser should send a do not track (DNT) header with every GET request, false
@@ -341,6 +372,11 @@ class UserPreferences @Inject constructor(
         if (homepage == SCHEME_BOOKMARKS) {
             homepage = SCHEME_HOMEPAGE
         }
+        if (HomepageSource.fromValue(homepageSource) == HomepageSource.BUILT_IN &&
+            (homepage.startsWith("http://") || homepage.startsWith("https://"))
+        ) {
+            homepageSource = HomepageSource.DOMAIN.value
+        }
     }
 }
 
@@ -388,8 +424,17 @@ private const val SHOW_TABS_IN_DRAWER = "showTabsInDrawer"
 private const val TAB_CONFIGURATION = "tabConfiguration"
 private const val SOLIPSISM_RAIL_SIZE = "solipsismRailSize"
 private const val SOLIPSISM_RAIL_ON_LEFT = "solipsismRailOnLeft"
+private const val SWAP_QR_AND_TABS_BUTTONS = "swapQrAndTabsButtons"
 private const val HOMEPAGE_WALLPAPER_MODE = "homepageWallpaperMode"
 private const val HOMEPAGE_WALLPAPER_PATH = "homepageWallpaperPath"
+private const val HOMEPAGE_SOURCE = "homepageSource"
+private const val HOMEPAGE_HTML_PATH = "homepageHtmlPath"
+private const val HOMEPAGE_DATE_TIME_ENABLED = "homepageDateTimeEnabled"
+private const val HOMEPAGE_TIME_FORMAT = "homepageTimeFormat"
+private const val HOMEPAGE_DATE_FORMAT = "homepageDateFormat"
+private const val HOMEPAGE_DATE_TIME_OPACITY = "homepageDateTimeOpacity"
+private const val ACCENT_PALETTE = "accentPalette"
+private const val MATCH_SYSTEM_ACCENT = "matchSystemAccent"
 private const val DO_NOT_TRACK = "doNotTrack"
 private const val SAVE_DATA = "saveData"
 private const val IDENTIFYING_HEADERS = "removeIdentifyingHeaders"

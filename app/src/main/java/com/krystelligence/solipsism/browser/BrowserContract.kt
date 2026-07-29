@@ -154,6 +154,10 @@ interface BrowserContract {
          */
         fun showCookieManager(url: String)
 
+        fun showScreenshot(bitmap: Bitmap)
+
+        fun showScreenshotCaptureFailed()
+
         /**
          * Show a warning to the user that they are about to open a local file in the browser that
          * could be potentially dangerous.

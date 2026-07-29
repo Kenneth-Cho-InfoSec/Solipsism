@@ -5,7 +5,7 @@
         android:color="?attr/colorOnSurface"
         android:state_enabled="false" />
     <item
-        android:color="?attr/colorPrimary"
+        android:color="?attr/colorAccent"
         android:state_checked="true" />
     <item android:color="?attr/colorOutline" />
 </selector>
