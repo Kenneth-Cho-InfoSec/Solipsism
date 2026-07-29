@@ -732,6 +732,13 @@ class BrowserPresenter @Inject constructor(
         reload()
     }
 
+    /**
+     * Reload the current page once without JavaScript, without changing the saved preference.
+     */
+    fun onJavaScriptDisabledReload() {
+        currentTab?.reloadWithJavaScriptDisabled()
+    }
+
     private fun reload() {
         val currentUrl = currentTab?.url
         if (currentUrl?.isSpecialUrl() == true) {

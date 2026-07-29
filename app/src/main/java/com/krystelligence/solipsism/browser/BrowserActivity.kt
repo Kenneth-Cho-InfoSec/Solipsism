@@ -533,6 +533,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.settingsButton?.setOnClickListener {
             presenter.onReloadClick()
         }
+        binding.settingsButton?.setOnLongClickListener {
+            presenter.onJavaScriptDisabledReload()
+            true
+        }
 
         binding.searchQr?.setOnClickListener { presenter.onQrButtonClick() }
         binding.searchQr?.setOnLongClickListener {

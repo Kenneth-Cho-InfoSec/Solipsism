@@ -78,6 +78,7 @@ class TabAdapter @AssistedInject constructor(
 
     private var findInPageQuery: String? = null
     private var toggleDesktop: Boolean = false
+    private var javaScriptStateToRestore: Boolean? = null
     private val downloadsSubject = PublishSubject.create<PendingDownload>()
     private val focusObservable = BehaviorSubject.createDefault(false)
 
@@ -276,6 +277,25 @@ class TabAdapter @AssistedInject constructor(
 
     override fun reload() {
         webView.reload()
+    }
+
+    override fun reloadWithJavaScriptDisabled() {
+        val view = webView
+        if (javaScriptStateToRestore != null) return
+
+        javaScriptStateToRestore = view.settings.javaScriptEnabled
+        view.settings.javaScriptEnabled = false
+        view.reload()
+        view.postVisualStateCallback(System.nanoTime(), object : WebView.VisualStateCallback() {
+            override fun onComplete(requestId: Long) {
+                view.post {
+                    javaScriptStateToRestore?.let { enabled ->
+                        view.settings.javaScriptEnabled = enabled
+                        javaScriptStateToRestore = null
+                    }
+                }
+            }
+        })
     }
 
     override fun pickElement() {

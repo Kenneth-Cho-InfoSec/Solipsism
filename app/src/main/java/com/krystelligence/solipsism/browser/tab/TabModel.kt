@@ -79,6 +79,11 @@ interface TabModel {
      */
     fun reload()
 
+    /**
+     * Reload the current page once with JavaScript disabled, then restore the previous state.
+     */
+    fun reloadWithJavaScriptDisabled()
+
     fun pickElement()
 
     /**

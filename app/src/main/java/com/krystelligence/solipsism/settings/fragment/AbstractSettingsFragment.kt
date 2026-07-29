@@ -5,11 +5,9 @@ import android.view.View
 import androidx.annotation.XmlRes
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroup
 import androidx.preference.SwitchPreferenceCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.krystelligence.solipsism.R
 
 /**
@@ -36,21 +34,12 @@ abstract class AbstractSettingsFragment : PreferenceFragmentCompat() {
         listView.apply {
             clipToPadding = false
             setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
-            addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener {
-                override fun onChildViewAttachedToWindow(view: View) {
-                    updatePreferenceRowBackground(view)
-                }
-
-                override fun onChildViewDetachedFromWindow(view: View) = Unit
-            })
-            post { updateVisiblePreferenceRowBackgrounds() }
         }
     }
 
     open fun applySettingsSearch(query: String) {
         val normalizedQuery = query.trim().lowercase()
         preferenceScreen?.filterChildren(normalizedQuery)
-        listView?.post { updateVisiblePreferenceRowBackgrounds() }
     }
 
     private fun Preference.matches(query: String): Boolean =
@@ -71,53 +60,6 @@ abstract class AbstractSettingsFragment : PreferenceFragmentCompat() {
             hasVisibleChild = hasVisibleChild || isVisible
         }
         return hasVisibleChild
-    }
-
-    private fun updateVisiblePreferenceRowBackgrounds() {
-        val recyclerView = listView ?: return
-        for (index in 0 until recyclerView.childCount) {
-            updatePreferenceRowBackground(recyclerView.getChildAt(index))
-        }
-    }
-
-    private fun updatePreferenceRowBackground(view: View) {
-        val adapterPosition = listView.getChildAdapterPosition(view)
-        val preference = visiblePreferences().getOrNull(adapterPosition) ?: return
-        if (preference is PreferenceCategory) {
-            view.background = null
-            return
-        }
-
-        val previous = visiblePreferences().getOrNull(adapterPosition - 1)
-        val next = visiblePreferences().getOrNull(adapterPosition + 1)
-        val startsCluster = previous == null || previous is PreferenceCategory
-        val endsCluster = next == null || next is PreferenceCategory
-        val background = when {
-            startsCluster && endsCluster -> R.drawable.preference_group_item_background_single
-            startsCluster -> R.drawable.preference_group_item_background_top
-            endsCluster -> R.drawable.preference_group_item_background_bottom
-            else -> R.drawable.preference_group_item_background_middle
-        }
-        view.setBackgroundResource(background)
-    }
-
-    private fun visiblePreferences(): List<Preference> {
-        val preferences = mutableListOf<Preference>()
-        preferenceScreen?.collectVisiblePreferences(preferences)
-        return preferences
-    }
-
-    private fun PreferenceGroup.collectVisiblePreferences(output: MutableList<Preference>) {
-        for (index in 0 until preferenceCount) {
-            val preference = getPreference(index)
-            if (!preference.isVisible) {
-                continue
-            }
-            output += preference
-            if (preference is PreferenceGroup) {
-                preference.collectVisiblePreferences(output)
-            }
-        }
     }
 
     /**

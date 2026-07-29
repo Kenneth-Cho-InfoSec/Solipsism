@@ -2,19 +2,21 @@ package com.krystelligence.solipsism.browser.data
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Color
+import android.content.res.ColorStateList
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.setPadding
+import androidx.core.content.ContextCompat
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.krystelligence.solipsism.R
 import java.net.URI
 
@@ -68,18 +70,24 @@ object CookieManagerDialog {
             }
         }
 
-        val add = Button(activity).apply {
-            text = activity.getString(R.string.cookie_manager_add_short)
+        val add = MaterialButton(activity).apply {
+            icon = ContextCompat.getDrawable(activity, R.drawable.ic_action_plus)
+            contentDescription = activity.getString(R.string.cookie_manager_add_short)
+            compactActionStyle()
             setOnClickListener {
                 showEditor(activity, url, repository, null) { refresh() }
             }
         }
-        val refreshButton = Button(activity).apply {
-            text = activity.getString(R.string.cookie_manager_refresh)
+        val refreshButton = MaterialButton(activity).apply {
+            icon = ContextCompat.getDrawable(activity, R.drawable.ic_action_refresh)
+            contentDescription = activity.getString(R.string.cookie_manager_refresh)
+            compactActionStyle()
             setOnClickListener { refresh() }
         }
-        val deleteAll = Button(activity).apply {
-            text = activity.getString(R.string.cookie_manager_delete_visible_short)
+        val deleteAll = MaterialButton(activity).apply {
+            icon = ContextCompat.getDrawable(activity, R.drawable.ic_action_delete)
+            contentDescription = activity.getString(R.string.cookie_manager_delete_visible_short)
+            compactActionStyle()
             setOnClickListener {
                 MaterialAlertDialogBuilder(activity)
                     .setTitle(R.string.cookie_manager_delete_visible)
@@ -117,15 +125,18 @@ object CookieManagerDialog {
     }
 
     fun promptForUrl(context: Context, repository: CookieManagerRepository) {
-        val input = EditText(context).apply {
-            hint = "https://example.com"
+        val input = TextInputEditText(context).apply {
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
             setSingleLine(true)
+        }
+        val inputLayout = TextInputLayout(context).apply {
+            hint = "https://example.com"
+            addView(input)
         }
         MaterialAlertDialogBuilder(context)
             .setTitle(R.string.cookie_manager)
             .setMessage(R.string.cookie_manager_url_prompt)
-            .setView(input)
+            .setView(inputLayout)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 val url = input.text.toString().trim()
@@ -156,14 +167,18 @@ object CookieManagerDialog {
             setTextColor(context.themeTextColor())
         }
         val buttons = LinearLayout(context).apply {
-            addView(Button(context).apply {
-                text = context.getString(R.string.cookie_manager_edit)
+            addView(MaterialButton(context).apply {
+                icon = ContextCompat.getDrawable(context, R.drawable.ic_action_edit)
+                contentDescription = context.getString(R.string.cookie_manager_edit)
+                compactActionStyle()
                 setOnClickListener {
                     showEditor(context, url, repository, cookie, onChanged)
                 }
             }, buttonParams(context))
-            addView(Button(context).apply {
-                text = context.getString(R.string.cookie_manager_delete)
+            addView(MaterialButton(context).apply {
+                icon = ContextCompat.getDrawable(context, R.drawable.ic_action_delete)
+                contentDescription = context.getString(R.string.cookie_manager_delete)
+                compactActionStyle()
                 setOnClickListener {
                     MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.cookie_manager_delete)
@@ -202,20 +217,21 @@ object CookieManagerDialog {
         val value = editor(context, existing?.value.orEmpty(), "Value", password = true)
         val domain = editor(context, "", "Domain (optional)")
         val path = editor(context, "/", "Path")
-        val secure = CheckBox(context).apply { text = "Secure" }
-        val httpOnly = CheckBox(context).apply { text = "HttpOnly" }
+        val secure = MaterialCheckBox(context).apply { text = "Secure" }
+        val httpOnly = MaterialCheckBox(context).apply { text = "HttpOnly" }
         val sameSite = editor(context, "", "SameSite (Strict, Lax, or None)")
-        listOf(name, value, domain, path, secure, httpOnly, sameSite).forEach(form::addView)
+        listOf(name.layout, value.layout, domain.layout, path.layout, secure, httpOnly, sameSite.layout)
+            .forEach(form::addView)
         lateinit var editorDialog: androidx.appcompat.app.AlertDialog
         val submit: () -> Unit = {
             val draft = CookieDraft(
-                name = name.text.toString().trim(),
-                value = value.text.toString(),
-                domain = domain.text.toString().trim().ifEmpty { null },
-                path = path.text.toString().trim(),
+                name = name.input.text?.toString()?.trim().orEmpty(),
+                value = value.input.text?.toString().orEmpty(),
+                domain = domain.input.text?.toString()?.trim()?.ifEmpty { null },
+                path = path.input.text?.toString()?.trim().orEmpty(),
                 secure = secure.isChecked,
                 httpOnly = httpOnly.isChecked,
-                sameSite = sameSite.text.toString().trim().ifEmpty { null }
+                sameSite = sameSite.input.text?.toString()?.trim()?.ifEmpty { null }
             )
             repository.set(url, draft) { result ->
                 (context as? Activity)?.runOnUiThread {
@@ -228,8 +244,9 @@ object CookieManagerDialog {
                 }
             }
         }
-        form.addView(Button(context).apply {
+        form.addView(MaterialButton(context).apply {
             text = context.getString(android.R.string.ok)
+            isAllCaps = false
             setOnClickListener { submit() }
         }, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -245,9 +262,13 @@ object CookieManagerDialog {
         editorDialog.show()
     }
 
-    private fun editor(context: Context, value: String, hint: String, password: Boolean = false) =
-        EditText(context).apply {
-            this.hint = hint
+    private fun editor(
+        context: Context,
+        value: String,
+        hint: String,
+        password: Boolean = false
+    ): EditorField {
+        val input = TextInputEditText(context).apply {
             setText(value)
             setSingleLine(true)
             inputType = if (password) {
@@ -256,6 +277,19 @@ object CookieManagerDialog {
                 InputType.TYPE_CLASS_TEXT
             }
         }
+        return EditorField(
+            layout = TextInputLayout(context).apply {
+                this.hint = hint
+                addView(input)
+            },
+            input = input
+        )
+    }
+
+    private data class EditorField(
+        val layout: TextInputLayout,
+        val input: TextInputEditText
+    )
 
     private fun showMessage(context: Context, message: String) {
         android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
@@ -273,14 +307,45 @@ object CookieManagerDialog {
             marginEnd = context.dp(4)
         }
 
+    private fun MaterialButton.compactActionStyle() {
+        isAllCaps = false
+        minWidth = 0
+        minimumWidth = 0
+        insetTop = 0
+        insetBottom = 0
+        setPadding(context.dp(4), 0, context.dp(4), 0)
+        maxLines = 1
+        textSize = 12f
+        val containerColor = com.google.android.material.color.MaterialColors.getColor(
+            context,
+            com.google.android.material.R.attr.colorSecondaryContainer,
+            com.google.android.material.color.MaterialColors.getColor(
+                context,
+                com.google.android.material.R.attr.colorSecondary,
+                0
+            )
+        )
+        val contentColor = com.google.android.material.color.MaterialColors.getColor(
+            context,
+            com.krystelligence.solipsism.R.attr.iconColor,
+            com.google.android.material.color.MaterialColors.getColor(
+                context,
+                com.google.android.material.R.attr.colorOnSecondary,
+                0
+            )
+        )
+        backgroundTintList = ColorStateList.valueOf(containerColor)
+        iconTint = ColorStateList.valueOf(contentColor)
+        setTextColor(contentColor)
+    }
+
     private fun Context.dp(value: Int): Int =
         (value * resources.displayMetrics.density).toInt()
 
     private fun Context.themeTextColor(): Int =
-        runCatching {
-            val attrs = obtainStyledAttributes(intArrayOf(android.R.attr.textColorPrimary))
-            val color = attrs.getColor(0, Color.WHITE)
-            attrs.recycle()
-            color
-        }.getOrDefault(Color.WHITE)
+        com.google.android.material.color.MaterialColors.getColor(
+            this,
+            com.google.android.material.R.attr.colorOnSurface,
+            android.graphics.Color.WHITE
+        )
 }
