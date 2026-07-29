@@ -77,6 +77,24 @@ class UserPreferences @Inject constructor(
         FileUtils.DEFAULT_DOWNLOAD_PATH
     )
 
+    /** True when eligible downloads should be checked locally before being saved. */
+    var virusTotalScanningEnabled by preferences.booleanPreference(VIRUS_TOTAL_SCANNING, true)
+
+    /** Images are excluded by default because they are commonly large and lower risk. */
+    var virusTotalScanImages by preferences.booleanPreference(VIRUS_TOTAL_SCAN_IMAGES, false)
+
+    /** Videos are excluded by default because they are commonly very large. */
+    var virusTotalScanVideos by preferences.booleanPreference(VIRUS_TOTAL_SCAN_VIDEOS, false)
+
+    /** Periodically refresh the compact on-device malware definitions. */
+    var malwareDefinitionsAutoUpdate by preferences.booleanPreference(
+        MALWARE_DEFINITIONS_AUTO_UPDATE,
+        true
+    )
+
+    /** Use VirusTotal as an optional cloud-based second opinion after the local scan. */
+    var virusTotalCloudEnabled by preferences.booleanPreference(VIRUS_TOTAL_CLOUD_ENABLED, false)
+
     /**
      * True if the browser should hide the navigation bar when scrolling, false if it should be
      * immobile.
@@ -389,6 +407,11 @@ private const val BLOCK_IMAGES = "blockimages"
 private const val CLEAR_CACHE_EXIT = "cache"
 private const val COOKIES = "cookies"
 private const val DOWNLOAD_DIRECTORY = "downloadLocation"
+private const val VIRUS_TOTAL_SCANNING = "virusTotalScanning"
+private const val VIRUS_TOTAL_SCAN_IMAGES = "virusTotalScanImages"
+private const val VIRUS_TOTAL_SCAN_VIDEOS = "virusTotalScanVideos"
+private const val MALWARE_DEFINITIONS_AUTO_UPDATE = "malwareDefinitionsAutoUpdate"
+private const val VIRUS_TOTAL_CLOUD_ENABLED = "virusTotalCloudEnabled"
 private const val FULL_SCREEN = "fullscreen"
 private const val HIDE_STATUS_BAR = "hidestatus"
 private const val HOMEPAGE = "home"

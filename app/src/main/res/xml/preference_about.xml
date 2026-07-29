@@ -19,6 +19,11 @@
             android:icon="@drawable/ic_settings_info"
             android:key="pref_version"
             android:title="@string/version" />
+        <Preference
+            android:icon="@drawable/ic_settings_info"
+            android:selectable="false"
+            android:summary="@string/developer_name"
+            android:title="@string/developer" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/licenses">
         <Preference

@@ -13,7 +13,7 @@
         <item name="toolbarSettingsBackground">@drawable/toolbar_expressive</item>
 
         <!-- Dark settings has a special primary dark -->
-        <item name="colorPrimaryDark">@color/secondary_color_settings_dark</item>
+        <item name="colorPrimaryDark">?attr/colorSurfaceContainer</item>
     </style>
 
     <style name="Theme.SettingsTheme.Black" parent="Theme.BlackTheme">
@@ -231,11 +231,29 @@
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorOnSecondary">#FFFFFF</item>
         <item name="colorOnTertiary">#FFFFFF</item>
+        <item name="selectedBackground">?attr/colorPrimaryContainer</item>
+        <item name="progressBackgroundColor">?attr/colorPrimaryContainer</item>
+        <item name="sheetBackground">?attr/colorSurfaceContainer</item>
+        <item name="sheetHeaderBackground">?attr/colorSurfaceContainerHigh</item>
+        <item name="sheetFooterBackground">?attr/colorSurfaceContainerHigh</item>
+        <item name="sheetHandleColor">?attr/colorOutline</item>
+        <item name="drawerBackground">?attr/colorSurfaceContainer</item>
+        <item name="dividerColor">?attr/colorOutlineVariant</item>
+        <item name="autoCompleteBackgroundColor">?attr/colorSurfaceContainerHigh</item>
     </style>
     <style name="ThemeOverlay.Solipsism.Accent.Base.Dark">
         <item name="colorOnPrimary">#101010</item>
         <item name="colorOnSecondary">#101010</item>
         <item name="colorOnTertiary">#101010</item>
+        <item name="selectedBackground">?attr/colorPrimaryContainer</item>
+        <item name="progressBackgroundColor">?attr/colorPrimaryContainer</item>
+        <item name="sheetBackground">?attr/colorSurfaceContainer</item>
+        <item name="sheetHeaderBackground">?attr/colorSurfaceContainerHigh</item>
+        <item name="sheetFooterBackground">?attr/colorSurfaceContainerHigh</item>
+        <item name="sheetHandleColor">?attr/colorOutline</item>
+        <item name="drawerBackground">?attr/colorSurfaceContainer</item>
+        <item name="dividerColor">?attr/colorOutlineVariant</item>
+        <item name="autoCompleteBackgroundColor">?attr/colorSurfaceContainerHigh</item>
     </style>
 
     <style name="ThemeOverlay.Solipsism.Accent.Teal_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
@@ -342,27 +360,17 @@
 
     <!-- AlertDialog Theming -->
     <style name="MaterialDialogStyle.Light" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="colorPrimary">@color/black</item>
-        <item name="colorAccent">@color/md3_primary</item>
-        <item name="colorSurface">@color/md3_surface_container_highest</item>
-        <item name="colorOnSurface">@color/md3_on_surface</item>
-        <item name="colorOnSurfaceVariant">@color/md3_on_surface_variant</item>
+        <!-- Material buttons use colorPrimary for their enabled label color. Resolve it from
+             the already-applied activity accent instead of the neutral light surface. -->
+        <item name="colorPrimary">?attr/colorAccent</item>
     </style>
 
     <style name="MaterialDialogStyle.Dark" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="colorPrimary">@color/white</item>
-        <item name="colorAccent">@color/md3_dark_primary</item>
-        <item name="colorSurface">@color/md3_dark_surface_container_high</item>
-        <item name="colorOnSurface">@color/md3_dark_on_surface</item>
-        <item name="colorOnSurfaceVariant">@color/md3_dark_on_surface_variant</item>
+        <item name="colorPrimary">?attr/colorAccent</item>
     </style>
 
     <style name="MaterialDialogStyle.Black" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="colorPrimary">@color/white</item>
-        <item name="colorAccent">@color/md3_dark_primary</item>
-        <item name="colorSurface">@color/gray_dark</item>
-        <item name="colorOnSurface">@color/md3_dark_on_surface</item>
-        <item name="colorOnSurfaceVariant">@color/md3_dark_on_surface_variant</item>
+        <item name="colorPrimary">?attr/colorAccent</item>
     </style>
 
     <style name="Widget.Solipsism.Toolbar" parent="Widget.Material3Expressive.Toolbar.AppBarWithSearch">

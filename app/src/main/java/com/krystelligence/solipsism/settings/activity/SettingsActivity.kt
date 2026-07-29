@@ -37,10 +37,15 @@ class SettingsActivity : ThemableSettingsActivity(),
         })
         supportFragmentManager.addOnBackStackChangedListener(::applySettingsSearch)
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.root, RootSettingsFragment())
-            .commit()
+        // Let FragmentManager restore the current nested settings page after a configuration
+        // or theme recreation. Replacing it unconditionally would always send the user back to
+        // the root settings screen.
+        if (savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.root, RootSettingsFragment())
+                .commit()
+        }
     }
 
     override fun onPreferenceStartFragment(

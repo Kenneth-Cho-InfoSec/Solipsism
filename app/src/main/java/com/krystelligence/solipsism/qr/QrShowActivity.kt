@@ -7,6 +7,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import com.krystelligence.solipsism.ThemeApplication
 import com.krystelligence.solipsism.databinding.ActivityQrShowBinding
 
 class QrShowActivity : AppCompatActivity() {
@@ -14,6 +15,7 @@ class QrShowActivity : AppCompatActivity() {
     private lateinit var binding: ActivityQrShowBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeApplication.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         binding = ActivityQrShowBinding.inflate(layoutInflater)
         setContentView(binding.root)

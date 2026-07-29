@@ -19,6 +19,7 @@ import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -143,6 +144,84 @@ public class DownloadHandler {
             }
             return outputFile.toURI().toString();
         });
+    }
+
+    /**
+     * Publishes bytes that have already passed a security scan. The source is app-private and the
+     * MediaStore entry remains pending until the copy has completed.
+     */
+    public String publishScannedFile(@NonNull Activity context,
+                                     @NonNull UserPreferences preferences,
+                                     @NonNull File source,
+                                     @NonNull String filename,
+                                     @Nullable String mimeType) throws IOException {
+        String contentType = TextUtils.isEmpty(mimeType)
+            ? "application/octet-stream"
+            : mimeType;
+        String location = FileUtils.addNecessarySlashes(preferences.getDownloadDirectory());
+        String defaultPath = FileUtils.addNecessarySlashes(FileUtils.DEFAULT_DOWNLOAD_PATH);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+            && location.equalsIgnoreCase(defaultPath)) {
+            ContentResolver resolver = context.getContentResolver();
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
+            values.put(MediaStore.Downloads.MIME_TYPE, contentType);
+            values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+            values.put(MediaStore.Downloads.IS_PENDING, 1);
+            Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            if (uri == null) throw new IOException("Unable to create download entry");
+            try {
+                OutputStream output = resolver.openOutputStream(uri);
+                if (output == null) throw new IOException("Unable to open download entry");
+                try (FileInputStream input = new FileInputStream(source);
+                     OutputStream stream = output) {
+                    byte[] buffer = new byte[64 * 1024];
+                    int count;
+                    while ((count = input.read(buffer)) != -1) {
+                        stream.write(buffer, 0, count);
+                    }
+                }
+                ContentValues completed = new ContentValues();
+                completed.put(MediaStore.Downloads.IS_PENDING, 0);
+                resolver.update(uri, completed, null, null);
+                return uri.toString();
+            } catch (Exception exception) {
+                resolver.delete(uri, null, null);
+                if (exception instanceof IOException) throw (IOException) exception;
+                throw new IOException(exception);
+            }
+        }
+
+        File directory = new File(location);
+        if (!directory.isDirectory() && !directory.mkdirs()) {
+            throw new IOException("Unable to create download directory");
+        }
+        File outputFile = availableFile(directory, filename);
+        try (FileInputStream input = new FileInputStream(source);
+             FileOutputStream output = new FileOutputStream(outputFile)) {
+            byte[] buffer = new byte[64 * 1024];
+            int count;
+            while ((count = input.read(buffer)) != -1) {
+                output.write(buffer, 0, count);
+            }
+        }
+        return outputFile.toURI().toString();
+    }
+
+    @NonNull
+    private static File availableFile(@NonNull File directory, @NonNull String filename) {
+        File requested = new File(directory, filename);
+        if (!requested.exists()) return requested;
+        int dot = filename.lastIndexOf('.');
+        String stem = dot > 0 ? filename.substring(0, dot) : filename;
+        String extension = dot > 0 ? filename.substring(dot) : "";
+        int suffix = 1;
+        File candidate;
+        do {
+            candidate = new File(directory, stem + " (" + suffix++ + ")" + extension);
+        } while (candidate.exists());
+        return candidate;
     }
 
     @NonNull

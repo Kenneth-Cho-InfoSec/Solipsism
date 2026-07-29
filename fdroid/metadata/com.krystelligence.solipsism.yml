@@ -6,7 +6,7 @@ SourceCode: https://github.com/Kenneth-Cho-InfoSec/Solipsism
 IssueTracker: https://github.com/Kenneth-Cho-InfoSec/Solipsism/issues
 Donate: https://ko-fi.com/kennethchoinfosec
 
-AutoName: Solipsism
+AutoName: Solipsism Browser
 
 RepoType: git
 Repo: https://github.com/Kenneth-Cho-InfoSec/Solipsism.git
@@ -17,23 +17,30 @@ Builds:
     commit: 97ea187e41d974e69ae38ed43d81526629b58bc3
     subdir: app
     gradle:
-      - solipsismPlus
+      - solipsismBrowser
 
   - versionName: 5.2.0
     versionCode: 118
     commit: 8cadb69
     subdir: app
     gradle:
-      - solipsismPlus
+      - solipsismBrowser
 
   - versionName: 5.2.1
     versionCode: 120
     commit: ecdeb8f
     subdir: app
     gradle:
-      - solipsismPlus
+      - solipsismBrowser
+
+  - versionName: 5.2.2
+    versionCode: 122
+    commit: PLACEHOLDER_RELEASE_COMMIT
+    subdir: app
+    gradle:
+      - solipsismBrowser
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 5.2.1
-CurrentVersionCode: 120
+CurrentVersion: 5.2.2
+CurrentVersionCode: 122

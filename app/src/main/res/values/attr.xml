@@ -7,7 +7,7 @@
     <attr name="autoCompleteUrlColor" format="reference|color" />
     <attr name="autoCompleteBackgroundColor" format="reference|color" />
     <attr name="listBackground" format="reference|color" />
-    <attr name="progressBackgroundColor" format="color" />
+    <attr name="progressBackgroundColor" format="reference|color" />
     <attr name="searchBackground" format="reference|color" />
     <attr name="toolbarSettingsBackground" format="reference|color" />
     <attr name="drawerBackground" format="reference|color" />

@@ -12,7 +12,7 @@
         <item name="toolbarSettingsBackground">@drawable/toolbar_expressive</item>
 
         <!-- Dark settings has a special primary dark color-->
-        <item name="colorPrimaryDark">@color/secondary_color_settings_dark</item>
+        <item name="colorPrimaryDark">?attr/colorSurfaceContainer</item>
     </style>
 
     <style name="Theme.SettingsTheme.Black" parent="Theme.BlackTheme">

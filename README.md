@@ -56,19 +56,19 @@ Requirements:
 Debug build:
 
 ```powershell
-.\gradlew.bat assembleSolipsismPlusDebug
+.\gradlew.bat assembleSolipsismBrowserDebug
 ```
 
 Release build:
 
 ```powershell
-.\gradlew.bat assembleSolipsismPlusRelease
+.\gradlew.bat assembleSolipsismBrowserRelease
 ```
 
 Lint:
 
 ```powershell
-.\gradlew.bat lintSolipsismPlusDebug
+.\gradlew.bat lintSolipsismBrowserDebug
 ```
 
 Generated APKs are written under:

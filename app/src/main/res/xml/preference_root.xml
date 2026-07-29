@@ -28,18 +28,27 @@
         <Preference
             app:icon="@drawable/ic_settings_shield"
             app:fragment="com.krystelligence.solipsism.settings.fragment.AdBlockSettingsFragment"
+            app:summary="@string/settings_adblock_summary"
             app:title="@string/settings_adblock" />
+        <Preference
+            app:icon="@drawable/ic_settings_shield"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.VirusTotalSettingsFragment"
+            app:summary="@string/malware_scanner_settings_summary"
+            app:title="@string/malware_scanner" />
         <Preference
             app:icon="@drawable/ic_action_star"
             app:fragment="com.krystelligence.solipsism.settings.fragment.BookmarkSettingsFragment"
+            app:summary="@string/bookmark_settings_summary"
             app:title="@string/bookmark_settings" />
         <Preference
             app:icon="@drawable/ic_action_desktop"
             app:fragment="com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment"
+            app:summary="@string/settings_graphics_summary"
             app:title="@string/settings_display" />
         <Preference
             app:icon="@drawable/ic_settings_text"
             app:fragment="com.krystelligence.solipsism.settings.fragment.AccessibilitySettingsFragment"
+            app:summary="@string/settings_accessibility_summary"
             app:title="@string/settings_accessibility" />
         <Preference
             app:icon="@drawable/ic_settings_info"

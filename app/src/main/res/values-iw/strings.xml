@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Solipsism</string>
+    <string name="app_name">Solipsism Browser</string>
     <string name="settings">הגדרות דפדפן</string>
     <string name="location">מאפשר לאתרים לגשת למיקומך</string>
     <string name="agent">סוכן משתמש</string>

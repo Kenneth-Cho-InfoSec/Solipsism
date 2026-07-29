@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Solipsism</string>
+    <string name="app_name">Solipsism Browser</string>
     <string name="action_new_tab">Nueva pestaña</string>
     <string name="action_share">Compartir</string>
     <string name="action_history">Historial</string>

@@ -1,7 +1,7 @@
 package com.krystelligence.solipsism.qr
 
-import com.krystelligence.solipsism.AppTheme
 import com.krystelligence.solipsism.R
+import com.krystelligence.solipsism.ThemeApplication
 import com.krystelligence.solipsism.databinding.ActivityQrScannerBinding
 import android.Manifest
 import android.content.Intent
@@ -56,7 +56,7 @@ class QrScannerActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        applySavedTheme()
+        ThemeApplication.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         binding = ActivityQrScannerBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -150,18 +150,6 @@ class QrScannerActivity : AppCompatActivity() {
         cameraExecutor.shutdown()
     }
 
-    private fun applySavedTheme() {
-        val themeValue = getSharedPreferences(USER_PREFERENCES, MODE_PRIVATE)
-            .getInt(THEME_PREFERENCE, AppTheme.LIGHT.value)
-        setTheme(
-            when (AppTheme.entries.firstOrNull { it.value == themeValue } ?: AppTheme.LIGHT) {
-                AppTheme.LIGHT -> R.style.Theme_LightTheme
-                AppTheme.DARK -> R.style.Theme_DarkTheme
-                AppTheme.BLACK -> R.style.Theme_BlackTheme
-            }
-        )
-    }
-
     private fun applySystemBarInsets() {
         val topBaseMargin = resources.getDimensionPixelSize(R.dimen.chrome_outer_margin)
         val bottomBaseMargin = (48 * resources.displayMetrics.density).toInt()
@@ -184,7 +172,5 @@ class QrScannerActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_SCAN_RESULT = "com.krystelligence.solipsism.extra.QR_SCAN_RESULT"
-        private const val USER_PREFERENCES = "settings"
-        private const val THEME_PREFERENCE = "Theme"
     }
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/malware_scanner">
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_settings_shield"
+            android:key="virus_total_enabled"
+            android:summary="@string/malware_scanner_enabled_summary"
+            android:title="@string/malware_scanner_enabled" />
+        <Preference
+            android:icon="@drawable/ic_action_refresh"
+            android:key="malware_definitions"
+            android:summary="@string/malware_definitions_missing"
+            android:title="@string/malware_definitions" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_refresh"
+            android:key="malware_definitions_auto_update"
+            android:summary="@string/malware_definitions_auto_update_summary"
+            android:title="@string/malware_definitions_auto_update" />
+        <Preference
+            android:icon="@drawable/ic_settings_info"
+            android:key="malware_definitions_source"
+            android:summary="@string/malware_definitions_source_summary"
+            android:title="@string/malware_definitions_source" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_shield"
+            android:key="virus_total_scan_images"
+            android:summary="@string/virus_total_scan_images_summary"
+            android:title="@string/virus_total_scan_images" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_shield"
+            android:key="virus_total_scan_videos"
+            android:summary="@string/virus_total_scan_videos_summary"
+            android:title="@string/virus_total_scan_videos" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/virus_total_optional">
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_shield"
+            android:key="virus_total_cloud_enabled"
+            android:summary="@string/virus_total_cloud_enabled_summary"
+            android:title="@string/virus_total_cloud_enabled" />
+        <Preference
+            android:icon="@drawable/ic_settings_privacy"
+            android:key="virus_total_api_key"
+            android:summary="@string/virus_total_api_key_missing"
+            android:title="@string/virus_total_api_key" />
+        <Preference
+            android:icon="@drawable/ic_settings_info"
+            android:key="virus_total_privacy"
+            android:summary="@string/virus_total_privacy_summary"
+            android:title="@string/virus_total_privacy" />
+    </PreferenceCategory>
+</PreferenceScreen>

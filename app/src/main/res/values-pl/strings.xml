@@ -203,7 +203,7 @@
 	<string name="action_history">Historia</string>
 	<string name="action_share">Udostępnij</string>
 	<string name="action_new_tab">Nowa karta</string>
-	<string name="app_name">Solipsism</string>
+	<string name="app_name">Solipsism Browser</string>
 	<string-array name="proxy_choices_array">
 		<item>Bez proxy</item>
 		<item>Orbot</item>

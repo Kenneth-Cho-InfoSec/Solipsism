@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="ThemeOverlay.Solipsism.Accent.System_Light">
+    <style name="ThemeOverlay.Solipsism.Accent.System_Light" parent="ThemeOverlay.Solipsism.Accent.Base.Light">
         <item name="colorAccent">@android:color/system_accent1_600</item>
         <item name="colorPrimaryContainer">@android:color/system_accent1_100</item>
         <item name="colorSecondary">@android:color/system_accent2_600</item>
@@ -11,7 +11,7 @@
         <item name="colorOnSecondary">@android:color/system_accent2_0</item>
         <item name="colorOnTertiary">@android:color/system_accent3_0</item>
     </style>
-    <style name="ThemeOverlay.Solipsism.Accent.System_Dark">
+    <style name="ThemeOverlay.Solipsism.Accent.System_Dark" parent="ThemeOverlay.Solipsism.Accent.Base.Dark">
         <item name="colorAccent">@android:color/system_accent1_200</item>
         <item name="colorPrimaryContainer">@android:color/system_accent1_800</item>
         <item name="colorSecondary">@android:color/system_accent2_200</item>

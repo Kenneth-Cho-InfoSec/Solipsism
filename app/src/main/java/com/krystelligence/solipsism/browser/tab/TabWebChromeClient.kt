@@ -6,11 +6,11 @@ import com.krystelligence.solipsism.browser.webrtc.WebRtcPermissionsModel
 import com.krystelligence.solipsism.browser.webrtc.WebRtcPermissionsView
 import com.krystelligence.solipsism.dialog.BrowserDialog
 import com.krystelligence.solipsism.dialog.DialogItem
-import com.krystelligence.solipsism.extensions.color
 import com.krystelligence.solipsism.extensions.resizeAndShow
 import com.krystelligence.solipsism.favicon.FaviconModel
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.utils.Option
+import com.krystelligence.solipsism.utils.ThemeUtils
 import com.krystelligence.solipsism.utils.Utils
 import android.Manifest
 import android.app.Activity
@@ -47,7 +47,7 @@ class TabWebChromeClient @Inject constructor(
     private val webRtcPermissionsModel: WebRtcPermissionsModel
 ) : WebChromeClient(), WebRtcPermissionsView {
 
-    private val defaultColor = activity.color(R.color.primary_color)
+    private val defaultColor = ThemeUtils.getPrimaryColor(activity)
     private val geoLocationPermissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
     /**

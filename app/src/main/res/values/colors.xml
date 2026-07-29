@@ -5,15 +5,15 @@
     <color name="gray_dark">#222222</color>
     <color name="white">#ffffff</color>
 
-    <color name="primary_color">#F7FBF9</color>
+    <color name="primary_color">#FFFBFE</color>
     <color name="accent_color">#006A6A</color>
 
-    <color name="secondary_color_settings_dark">#354B49</color>
+    <color name="secondary_color_settings_dark">#302D33</color>
 
     <color name="transparent">#00000000</color>
 
-    <color name="icon_light_theme">#173332</color>
-    <color name="icon_dark_theme">#DDEDEA</color>
+    <color name="icon_light_theme">#1A1B20</color>
+    <color name="icon_dark_theme">#F1EEF3</color>
     <color name="icon_light_theme_disabled">#40000000</color>
     <color name="icon_dark_theme_disabled">#8AFFFFFF</color>
 
@@ -36,15 +36,16 @@
     <color name="md3_tertiary">#6B5D7B</color>
     <color name="md3_on_tertiary">#FFFFFF</color>
     <color name="md3_tertiary_container">#F2DAFF</color>
-    <color name="md3_surface">#F7FBF9</color>
-    <color name="md3_surface_container">#EAF0EE</color>
-    <color name="md3_surface_container_high">#E1E8E6</color>
-    <color name="md3_surface_container_highest">#D7E0DD</color>
-    <color name="md3_surface_container_low">#EFF5F3</color>
-    <color name="md3_on_surface">#172120</color>
-    <color name="md3_on_surface_variant">#405755</color>
-    <color name="md3_outline">#708785</color>
-    <color name="md3_outline_variant">#C0C9C7</color>
+    <!-- Neutral light surfaces keep non-teal accent palettes from inheriting teal chrome. -->
+    <color name="md3_surface">#FFFBFE</color>
+    <color name="md3_surface_container">#F3F0F4</color>
+    <color name="md3_surface_container_high">#ECE9EE</color>
+    <color name="md3_surface_container_highest">#E6E2E8</color>
+    <color name="md3_surface_container_low">#F9F6FA</color>
+    <color name="md3_on_surface">#1A1B20</color>
+    <color name="md3_on_surface_variant">#45464F</color>
+    <color name="md3_outline">#757780</color>
+    <color name="md3_outline_variant">#C5C6D0</color>
     <color name="md3_error">#BA1A1A</color>
 
     <color name="md3_dark_primary">#80D5D1</color>
@@ -56,15 +57,15 @@
     <color name="md3_dark_tertiary">#D6BEE6</color>
     <color name="md3_dark_on_tertiary">#3B2949</color>
     <color name="md3_dark_tertiary_container">#534160</color>
-    <color name="md3_dark_surface">#101918</color>
-    <color name="md3_dark_surface_container">#172120</color>
-    <color name="md3_dark_surface_container_high">#222B2A</color>
-    <color name="md3_dark_surface_container_highest">#2D3635</color>
-    <color name="md3_dark_surface_container_low">#141D1C</color>
-    <color name="md3_dark_on_surface">#DDEDEA</color>
-    <color name="md3_dark_on_surface_variant">#C0C9C7</color>
-    <color name="md3_dark_outline">#8A9A97</color>
-    <color name="md3_dark_outline_variant">#405755</color>
+    <color name="md3_dark_surface">#121014</color>
+    <color name="md3_dark_surface_container">#1D1A20</color>
+    <color name="md3_dark_surface_container_high">#28242B</color>
+    <color name="md3_dark_surface_container_highest">#332F36</color>
+    <color name="md3_dark_surface_container_low">#17141A</color>
+    <color name="md3_dark_on_surface">#F1EEF3</color>
+    <color name="md3_dark_on_surface_variant">#C8C3CC</color>
+    <color name="md3_dark_outline">#938E99</color>
+    <color name="md3_dark_outline_variant">#47434B</color>
     <color name="md3_dark_error">#FFB4AB</color>
 
     <color name="md3_black_surface_container_low">#0F0F0F</color>

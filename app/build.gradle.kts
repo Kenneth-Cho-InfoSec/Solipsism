@@ -13,21 +13,8 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "5.2.1"
+        versionName = "5.2.2"
         vectorDrawables.useSupportLibrary = true
-    }
-
-    val isCi = System.getenv("CI") == "true"
-
-    sourceSets {
-        create("solipsismPlus").apply {
-            setRoot("src/SolipsismPlus")
-        }
-        if (!isCi) {
-            create("solipsismLite").apply {
-                setRoot("src/SolipsismLite")
-            }
-        }
     }
 
     buildFeatures {
@@ -63,20 +50,11 @@ android {
     flavorDimensions.add("capabilities")
 
     productFlavors {
-        create("solipsismPlus") {
+        create("solipsismBrowser") {
             dimension = "capabilities"
             buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"true\")")
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 120
-        }
-
-        if (!isCi) {
-            create("solipsismLite") {
-                dimension = "capabilities"
-                buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"false\")")
-                applicationId = "com.krystelligence.solipsism"
-                versionCode = 121
-            }
+            versionCode = 122
         }
     }
     packaging {
@@ -124,6 +102,7 @@ dependencies {
     implementation("com.anthonycr.mezzanine:core:$mezzanineVersion")
     implementation("com.google.android.material:material:1.14.0-beta01")
     implementation("com.google.dagger:dagger:$daggerVersion")
+    implementation("com.google.guava:guava:32.0.1-android")
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.guolindev.permissionx:permissionx:1.8.1")
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
