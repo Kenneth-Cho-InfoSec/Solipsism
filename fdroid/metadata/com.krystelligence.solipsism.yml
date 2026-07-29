@@ -18,12 +18,14 @@ Builds:
     subdir: app
     gradle:
       - solipsismPlus
+
   - versionName: 5.2.0
     versionCode: 118
     commit: 8cadb69
     subdir: app
     gradle:
       - solipsismPlus
+
   - versionName: 5.2.1
     versionCode: 120
     commit: ecdeb8f
