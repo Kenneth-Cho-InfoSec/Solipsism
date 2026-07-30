@@ -11,6 +11,7 @@ import com.krystelligence.solipsism.extensions.resizeAndShow
 import com.krystelligence.solipsism.js.TextReflow
 import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.audio.AudioEffectsRuntime
 import com.krystelligence.solipsism.ssl.SslState
 import com.krystelligence.solipsism.ssl.SslWarningPreferences
 import com.krystelligence.solipsism.userscript.UserScriptRuntime
@@ -130,6 +131,8 @@ class TabWebViewClient @AssistedInject constructor(
         userScriptRuntime.injectAfterPageFinished(view, url)
         cosmeticFilterRuntime.injectAfterPageFinished(view, url)
         sitePermissionRuntime.injectAfterPageFinished(view, url)
+        view.evaluateJavascript(AudioEffectsRuntime.SCRIPT, null)
+        AudioEffectsRuntime.injectAfterPageFinished(view, userPreferences)
         urlObservable.onNext(url)
         goBackObservable.onNext(view.canGoBack())
         goForwardObservable.onNext(view.canGoForward())

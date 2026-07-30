@@ -2,9 +2,12 @@ package com.krystelligence.solipsism
 
 import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.browser.ui.TabConfiguration
+import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
+import com.krystelligence.solipsism.preference.DeveloperPreferences
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.i18n.TranslationOverrides
 import com.krystelligence.solipsism.utils.ThemeUtils
+import com.krystelligence.solipsism.utils.CustomFontManager
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -28,10 +31,14 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
     @Inject
     internal lateinit var userPreferences: UserPreferences
 
+    @Inject
+    internal lateinit var developerPreferences: DeveloperPreferences
+
     private var themeId: AppTheme = AppTheme.LIGHT
     private var tabConfiguration: TabConfiguration = TabConfiguration.DRAWER_BOTTOM
     private var solipsismRailSize: Int = 72
     private var solipsismRailOnLeft: Boolean = false
+    private var solipsismRailPosition: SolipsismRailPosition = SolipsismRailPosition.RIGHT
     private var shouldRunOnResumeActions = false
     private var appliedSystemAccent: Int? = null
 
@@ -48,6 +55,7 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
         tabConfiguration = userPreferences.tabConfiguration
         solipsismRailSize = userPreferences.solipsismRailSize
         solipsismRailOnLeft = userPreferences.solipsismRailOnLeft
+        solipsismRailPosition = activeSolipsismRailPosition()
 
         // set the theme
         setTheme(
@@ -69,6 +77,7 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         resetPreferences()
+        CustomFontManager.applyToViewTree(window.decorView, userPreferences.customFontPath)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -119,17 +128,29 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
             return
         }
         resetPreferences()
+        CustomFontManager.applyToViewTree(window.decorView, userPreferences.customFontPath)
         shouldRunOnResumeActions = true
         val nextTabConfiguration = userPreferences.tabConfiguration
+        val nextRailPosition = activeSolipsismRailPosition()
         if (
             themeId != userPreferences.useTheme ||
             tabConfiguration != nextTabConfiguration ||
             solipsismRailSize != userPreferences.solipsismRailSize ||
-            solipsismRailOnLeft != userPreferences.solipsismRailOnLeft
+            solipsismRailOnLeft != userPreferences.solipsismRailOnLeft ||
+            solipsismRailPosition != nextRailPosition
         ) {
             restart()
         }
     }
+
+    protected fun activeSolipsismRailPosition(): SolipsismRailPosition =
+        userPreferences.solipsismRailPosition.takeUnless {
+            it.isExperimental && !developerPreferences.experimentalRailLayoutsEnabled
+        } ?: if (userPreferences.solipsismRailOnLeft) {
+            SolipsismRailPosition.LEFT
+        } else {
+            SolipsismRailPosition.RIGHT
+        }
 
     protected fun restart() {
         finish()

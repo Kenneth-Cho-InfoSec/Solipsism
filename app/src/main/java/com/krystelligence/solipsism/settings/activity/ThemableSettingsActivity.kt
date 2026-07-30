@@ -7,6 +7,7 @@ import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.i18n.TranslationOverrides
 import com.krystelligence.solipsism.utils.ThemeUtils
+import com.krystelligence.solipsism.utils.CustomFontManager
 import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -57,6 +58,7 @@ abstract class ThemableSettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         resetPreferences()
+        CustomFontManager.applyToViewTree(window.decorView, userPreferences.customFontPath)
     }
 
     private fun resetPreferences() {
@@ -75,6 +77,7 @@ abstract class ThemableSettingsActivity : AppCompatActivity() {
             return
         }
         resetPreferences()
+        CustomFontManager.applyToViewTree(window.decorView, userPreferences.customFontPath)
         if (userPreferences.useTheme != themeId) {
             recreate()
         }

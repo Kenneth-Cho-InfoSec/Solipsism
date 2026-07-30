@@ -4,6 +4,12 @@
         <SwitchPreferenceCompat
             android:defaultValue="false"
             android:icon="@drawable/ic_settings_debug"
+            android:key="experimental_rail_layouts"
+            android:summary="@string/debug_experimental_rail_layouts_summary"
+            android:title="@string/debug_experimental_rail_layouts" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_debug"
             android:key="leak_canary_enabled"
             android:title="@string/debug_leak_canary"/>
     </PreferenceCategory>

@@ -6,6 +6,8 @@ import com.krystelligence.solipsism.browser.proxy.ProxyChoice
 import com.krystelligence.solipsism.browser.search.SearchBoxDisplayChoice
 import com.krystelligence.solipsism.browser.search.SearchBoxModel
 import com.krystelligence.solipsism.browser.ui.TabConfiguration
+import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
+import com.krystelligence.solipsism.audio.AudioPreset
 import com.krystelligence.solipsism.browser.view.RenderingMode
 import com.krystelligence.solipsism.constant.DEFAULT_ENCODING
 import com.krystelligence.solipsism.constant.SCHEME_BOOKMARKS
@@ -207,6 +209,9 @@ class UserPreferences @Inject constructor(
      */
     var textSize by preferences.intPreference(TEXT_SIZE, 3)
 
+    /** Absolute path to the user-selected application font, or null for the system font. */
+    var customFontPath by preferences.nullableStringPreference(CUSTOM_FONT_PATH)
+
     /**
      * True if the browser should fit web pages to the view port, false otherwise.
      */
@@ -312,8 +317,31 @@ class UserPreferences @Inject constructor(
      */
     var solipsismRailOnLeft by preferences.booleanPreference(SOLIPSISM_RAIL_ON_LEFT, false)
 
+    /** Placement of the Solipsism rail; horizontal placements are experimental. */
+    var solipsismRailPosition by preferences.enumPreference(
+        SOLIPSISM_RAIL_POSITION,
+        if (solipsismRailOnLeft) SolipsismRailPosition.LEFT else SolipsismRailPosition.RIGHT
+    )
+
     /** True when the QR scanner and Tabs controls should exchange their rail positions. */
     var swapQrAndTabsButtons by preferences.booleanPreference(SWAP_QR_AND_TABS_BUTTONS, false)
+
+    /** When false, page audio is left untouched by Solipsism. */
+    var audioEffectsEnabled by preferences.booleanPreference(AUDIO_EFFECTS_ENABLED, false)
+
+    var audioCustomEqEnabled by preferences.booleanPreference(AUDIO_CUSTOM_EQ_ENABLED, false)
+
+    var audioPreset by preferences.enumPreference(AUDIO_PRESET, AudioPreset.FLAT)
+
+    var audioEq60 by preferences.intPreference(AUDIO_EQ_60, 0)
+    var audioEq250 by preferences.intPreference(AUDIO_EQ_250, 0)
+    var audioEq1000 by preferences.intPreference(AUDIO_EQ_1000, 0)
+    var audioEq4000 by preferences.intPreference(AUDIO_EQ_4000, 0)
+    var audioEq12000 by preferences.intPreference(AUDIO_EQ_12000, 0)
+    var audioPreampDb by preferences.intPreference(AUDIO_PREAMP_DB, 0)
+    var audioLimiterEnabled by preferences.booleanPreference(AUDIO_LIMITER_ENABLED, true)
+    var audioMonoEnabled by preferences.booleanPreference(AUDIO_MONO_ENABLED, false)
+    var audioBalance by preferences.intPreference(AUDIO_BALANCE, 0)
 
     /**
      * The homepage wallpaper mode: bundled default image, custom user image, or black background.
@@ -454,6 +482,7 @@ private const val SEARCH = "search"
 private const val SEARCH_URL = "searchurl"
 private const val TEXT_REFLOW = "textreflow"
 private const val TEXT_SIZE = "textsize"
+private const val CUSTOM_FONT_PATH = "customFontPath"
 private const val USE_WIDE_VIEWPORT = "wideviewport"
 private const val USER_AGENT = "agentchoose"
 private const val USER_AGENT_STRING = "userAgentString"
@@ -474,7 +503,20 @@ private const val SHOW_TABS_IN_DRAWER = "showTabsInDrawer"
 private const val TAB_CONFIGURATION = "tabConfiguration"
 private const val SOLIPSISM_RAIL_SIZE = "solipsismRailSize"
 private const val SOLIPSISM_RAIL_ON_LEFT = "solipsismRailOnLeft"
+private const val SOLIPSISM_RAIL_POSITION = "solipsismRailPosition"
 private const val SWAP_QR_AND_TABS_BUTTONS = "swapQrAndTabsButtons"
+private const val AUDIO_EFFECTS_ENABLED = "audioEffectsEnabled"
+private const val AUDIO_CUSTOM_EQ_ENABLED = "audioCustomEqEnabled"
+private const val AUDIO_PRESET = "audioPreset"
+private const val AUDIO_EQ_60 = "audioEq60"
+private const val AUDIO_EQ_250 = "audioEq250"
+private const val AUDIO_EQ_1000 = "audioEq1000"
+private const val AUDIO_EQ_4000 = "audioEq4000"
+private const val AUDIO_EQ_12000 = "audioEq12000"
+private const val AUDIO_PREAMP_DB = "audioPreampDb"
+private const val AUDIO_LIMITER_ENABLED = "audioLimiterEnabled"
+private const val AUDIO_MONO_ENABLED = "audioMonoEnabled"
+private const val AUDIO_BALANCE = "audioBalance"
 private const val HOMEPAGE_WALLPAPER_MODE = "homepageWallpaperMode"
 private const val HOMEPAGE_WALLPAPER_PATH = "homepageWallpaperPath"
 private const val HOMEPAGE_SOURCE = "homepageSource"

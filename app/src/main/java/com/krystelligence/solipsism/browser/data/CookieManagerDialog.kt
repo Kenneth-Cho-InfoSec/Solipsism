@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.krystelligence.solipsism.R
@@ -136,7 +137,7 @@ object CookieManagerDialog {
         MaterialAlertDialogBuilder(context)
             .setTitle(R.string.cookie_manager)
             .setMessage(R.string.cookie_manager_url_prompt)
-            .setView(inputLayout)
+            .setViewWithDialogMargins(inputLayout)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 val url = input.text.toString().trim()

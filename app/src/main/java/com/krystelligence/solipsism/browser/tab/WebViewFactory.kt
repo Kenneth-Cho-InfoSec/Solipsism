@@ -100,7 +100,9 @@ class WebViewFactory @Inject constructor(
                 builtInZoomControls = true
                 displayZoomControls = false
                 allowContentAccess = false
-                allowFileAccess = true
+                // Browser pages do not need local file access. Keeping this disabled prevents a
+                // compromised page from using file URLs as an additional local-data attack path.
+                allowFileAccess = false
                 allowFileAccessFromFileURLs = false
                 allowUniversalAccessFromFileURLs = false
             }

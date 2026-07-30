@@ -167,7 +167,7 @@ class TabAdapter @AssistedInject constructor(
                     )
                 }
             },
-            onError = {
+            onErrorCallback = {
                 webView.post { webView.removeJavascriptInterface(bridgeName) }
                 Log.e(TAG, "Unable to extract blob download: $it")
             }
@@ -179,6 +179,10 @@ class TabAdapter @AssistedInject constructor(
                 fetch(${JSONObject.quote(url)})
                     .then(function(response) { return response.blob(); })
                     .then(function(blob) {
+                        if (blob.size > ${MAX_BLOB_BYTES}) {
+                            ${bridgeName}.onError('Blob download exceeds the safety limit');
+                            return;
+                        }
                         var reader = new FileReader();
                         reader.onloadend = function() {
                             var result = String(reader.result);
@@ -211,7 +215,7 @@ class TabAdapter @AssistedInject constructor(
 
     private class BlobDownloadBridge(
         private val onComplete: (String, String?, Long) -> Unit,
-        private val onError: (String) -> Unit
+        private val onErrorCallback: (String) -> Unit
     ) {
         private val data = StringBuilder()
         private var mimeType: String? = null
@@ -226,7 +230,13 @@ class TabAdapter @AssistedInject constructor(
 
         @JavascriptInterface
         fun onChunk(chunk: String) {
-            if (!finished) data.append(chunk)
+            if (finished) return
+            if (chunk.length > MAX_BLOB_BASE64_CHARS - data.length) {
+                finished = true
+                onErrorCallback("Blob download exceeds the safety limit")
+                return
+            }
+            data.append(chunk)
         }
 
         @JavascriptInterface
@@ -240,7 +250,7 @@ class TabAdapter @AssistedInject constructor(
         fun onError(message: String) {
             if (finished) return
             finished = true
-            onError(message)
+            onErrorCallback(message)
         }
     }
 
@@ -510,5 +520,7 @@ class TabAdapter @AssistedInject constructor(
         private const val TAG = "TabAdapter"
         private const val BLOB_SCHEME = "blob:"
         private const val BLOB_CHUNK_SIZE = 32 * 1024
+        private const val MAX_BLOB_BYTES = 16L * 1024L * 1024L
+        private const val MAX_BLOB_BASE64_CHARS = ((MAX_BLOB_BYTES + 2L) / 3L * 4L).toInt()
     }
 }

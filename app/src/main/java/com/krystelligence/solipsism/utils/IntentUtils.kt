@@ -15,6 +15,7 @@ import java.util.regex.Pattern
 class IntentUtils(private val activity: Activity) {
 
     fun startActivityForUrl(tab: WebView?, url: String): Boolean {
+        if (!url.startsWith("intent://")) return false
         val parsedIntent = try {
             Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
         } catch (_: URISyntaxException) {
@@ -25,6 +26,11 @@ class IntentUtils(private val activity: Activity) {
             addCategory(Intent.CATEGORY_BROWSABLE)
             component = null
             selector = null
+        }
+
+        val dataScheme = intent.data?.scheme?.lowercase(java.util.Locale.ROOT)
+        if (dataScheme !in setOf("http", "https")) {
+            return false
         }
 
         if (activity.packageManager.resolveActivity(intent, 0) == null) {
@@ -50,7 +56,6 @@ class IntentUtils(private val activity: Activity) {
         return try {
             activity.startActivityIfNeeded(intent, -1)
         } catch (_: Exception) {
-            // TODO: fix case where this could throw a FileUriExposedException due to file:// urls
             false
         }
     }

@@ -14,6 +14,7 @@ import com.krystelligence.solipsism.html.homepage.HomePageFactory
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.preference.UserPreferences
 import android.app.Activity
+import android.app.Application
 import android.os.Bundle
 import android.os.Message
 import android.webkit.WebView
@@ -168,10 +169,25 @@ class VisualHomePageInitializer @Inject constructor(
  */
 @Reusable
 class StartPageInitializer @Inject constructor(
+    private val application: Application,
     homePageFactory: HomePageFactory,
     @DiskScheduler diskScheduler: Scheduler,
     @MainScheduler foregroundScheduler: Scheduler
-) : HtmlPageFactoryInitializer(homePageFactory, diskScheduler, foregroundScheduler)
+) : HtmlPageFactoryInitializer(homePageFactory, diskScheduler, foregroundScheduler) {
+
+    override fun initialize(webView: WebView, headers: Map<String, String>) {
+        webView.settings.apply {
+            // Built-in pages are generated inside app-private storage. Keep the exception narrow:
+            // file-to-file and universal access stay disabled, and UrlHandler resets this flag
+            // before any non-generated top-level navigation.
+            allowFileAccess = true
+            allowContentAccess = false
+            allowFileAccessFromFileURLs = false
+            allowUniversalAccessFromFileURLs = false
+        }
+        super.initialize(webView, headers)
+    }
+}
 
 /**
  * An initializer that displays the bookmark page.

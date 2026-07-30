@@ -8,8 +8,13 @@ import com.krystelligence.solipsism.AccentPalette
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.extensions.resizeAndShow
+import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import com.krystelligence.solipsism.extensions.withSingleChoiceItems
+import com.krystelligence.solipsism.utils.CustomFontManager
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.preference.DeveloperPreferences
+import com.krystelligence.solipsism.audio.AudioPreset
+import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.html.homepage.StaticHomepageSanitizer
 import android.net.Uri
@@ -28,7 +33,9 @@ import android.graphics.drawable.GradientDrawable
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.ScrollView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -41,6 +48,7 @@ import javax.inject.Inject
 class DisplaySettingsFragment : AbstractSettingsFragment() {
 
     @Inject internal lateinit var userPreferences: UserPreferences
+    @Inject internal lateinit var developerPreferences: DeveloperPreferences
     private var wallpaperSummaryUpdater: SummaryUpdater? = null
     private val wallpaperPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::copyHomepageWallpaper)
@@ -48,6 +56,9 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
     private var homepageSourceSummaryUpdater: SummaryUpdater? = null
     private val htmlHomepagePicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::importStaticHomepage)
+    }
+    private val customFontPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(::importCustomFont)
     }
 
     override fun providePreferencesXmlResource() = R.xml.preference_display
@@ -66,6 +77,12 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         clickablePreference(
             preference = SETTINGS_TEXTSIZE,
             onClick = ::showTextSizePicker
+        )
+
+        clickableDynamicPreference(
+            preference = SETTINGS_CUSTOM_FONT,
+            summary = customFontSummary(),
+            onClick = { customFontPicker.launch(arrayOf("font/ttf", "font/otf", "application/octet-stream")) }
         )
 
         clickableDynamicPreference(
@@ -147,7 +164,7 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
 
         clickableDynamicPreference(
             preference = SETTINGS_RAIL_POSITION,
-            summary = userPreferences.solipsismRailOnLeft.toRailPositionDisplayString(),
+            summary = currentRailPosition().toRailPositionDisplayString(),
             onClick = ::showRailPositionPicker
         )
 
@@ -225,6 +242,44 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         }.resizeAndShow()
     }
 
+    private fun customFontSummary(): String = userPreferences.customFontPath
+        ?.let(::File)
+        ?.takeIf(File::isFile)
+        ?.name
+        ?: getString(R.string.settings_custom_font_default)
+
+    private fun importCustomFont(uri: Uri) {
+        val context = requireContext()
+        val target = File(context.filesDir, "custom-font.ttf")
+        var temporary: File? = null
+        try {
+            temporary = File.createTempFile("custom-font-", ".tmp", context.cacheDir)
+            var copied = 0L
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                temporary!!.outputStream().use { output ->
+                    val buffer = ByteArray(DEFAULT_FONT_BUFFER_SIZE)
+                    while (true) {
+                        val count = input.read(buffer)
+                        if (count < 0) break
+                        copied += count
+                        if (copied > MAX_CUSTOM_FONT_BYTES) error("Font file is too large")
+                        output.write(buffer, 0, count)
+                    }
+                }
+            } ?: error("Unable to read font file")
+
+            check(CustomFontManager.load(temporary!!.absolutePath) != null) { "Unsupported font file" }
+            temporary!!.copyTo(target, overwrite = true)
+            temporary!!.delete()
+            userPreferences.customFontPath = target.absolutePath
+            findPreference<androidx.preference.Preference>(SETTINGS_CUSTOM_FONT)?.summary = customFontSummary()
+            CustomFontManager.applyToViewTree(requireActivity().window.decorView, userPreferences.customFontPath)
+        } catch (_: Exception) {
+            temporary?.delete()
+            Toast.makeText(context, R.string.settings_custom_font_invalid, Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun showThemePicker(summaryUpdater: SummaryUpdater) {
         val values = AppTheme.entries.map { Pair(it, it.toDisplayString()) }
         lateinit var themeDialog: androidx.appcompat.app.AlertDialog
@@ -251,6 +306,152 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         )
     }
 
+    private fun showAudioSettings(summaryUpdater: SummaryUpdater) {
+        val density = resources.displayMetrics.density
+        fun dp(value: Int) = (value * density).toInt()
+        val content = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(24), dp(8), dp(24), 0)
+        }
+        val compatibility = TextView(requireContext()).apply {
+            setText(R.string.settings_audio_compatibility)
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
+            setPadding(0, 0, 0, dp(12))
+        }
+        content.addView(compatibility)
+
+        val effects = SwitchMaterial(requireContext()).apply {
+            setText(R.string.settings_audio_effects)
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+            isChecked = userPreferences.audioEffectsEnabled
+        }
+        content.addView(effects)
+
+        val preset = TextView(requireContext()).apply {
+            setPadding(0, dp(16), 0, dp(12))
+            textSize = 16f
+        }
+        content.addView(preset)
+
+        val customEq = SwitchMaterial(requireContext()).apply {
+            setText(R.string.settings_audio_custom_eq)
+            isChecked = userPreferences.audioCustomEqEnabled
+        }
+        content.addView(customEq)
+
+        val sliders = mutableListOf<SeekBar>()
+        fun addSlider(label: String, value: Int, onChanged: (Int) -> Unit): SeekBar {
+            val labelView = TextView(requireContext()).apply {
+                text = label
+                setPadding(0, dp(8), 0, 0)
+            }
+            content.addView(labelView)
+            return SeekBar(requireContext()).apply {
+                max = 24
+                progress = (value + 12).coerceIn(0, 24)
+                setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                        onChanged(progress - 12)
+                    }
+                    override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
+                    override fun onStopTrackingTouch(seekBar: SeekBar) = Unit
+                })
+                content.addView(this)
+                sliders += this
+            }
+        }
+        addSlider("60 Hz", userPreferences.audioEq60) { userPreferences.audioEq60 = it }
+        addSlider("250 Hz", userPreferences.audioEq250) { userPreferences.audioEq250 = it }
+        addSlider("1 kHz", userPreferences.audioEq1000) { userPreferences.audioEq1000 = it }
+        addSlider("4 kHz", userPreferences.audioEq4000) { userPreferences.audioEq4000 = it }
+        addSlider("12 kHz", userPreferences.audioEq12000) { userPreferences.audioEq12000 = it }
+        addSlider(getString(R.string.settings_audio_preamp), userPreferences.audioPreampDb) {
+            userPreferences.audioPreampDb = it
+        }
+
+        val limiter = SwitchMaterial(requireContext()).apply {
+            setText(R.string.settings_audio_limiter)
+            isChecked = userPreferences.audioLimiterEnabled
+        }
+        content.addView(limiter)
+        val mono = SwitchMaterial(requireContext()).apply {
+            setText(R.string.settings_audio_mono)
+            isChecked = userPreferences.audioMonoEnabled
+        }
+        content.addView(mono)
+        val balanceSlider = addSlider(getString(R.string.settings_audio_balance), userPreferences.audioBalance) {
+            userPreferences.audioBalance = it
+        }.apply { max = 200; progress = (userPreferences.audioBalance + 100).coerceIn(0, 200) }
+        balanceSlider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                userPreferences.audioBalance = progress - 100
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
+            override fun onStopTrackingTouch(seekBar: SeekBar) = Unit
+        })
+
+        fun updateEnabled() {
+            val enabled = effects.isChecked
+            preset.isEnabled = enabled
+            customEq.isEnabled = enabled
+            sliders.forEach { it.isEnabled = enabled && customEq.isChecked }
+            balanceSlider.isEnabled = enabled
+            limiter.isEnabled = enabled
+            mono.isEnabled = enabled
+        }
+        fun updatePresetLabel() {
+            preset.text = getString(R.string.settings_audio_preset) + ": " + audioPresetName(userPreferences.audioPreset)
+            preset.setOnClickListener {
+                val presets = AudioPreset.entries
+                MaterialAlertDialogBuilder(requireActivity())
+                    .setTitle(R.string.settings_audio_preset)
+                    .setSingleChoiceItems(presets.map(::audioPresetName).toTypedArray(), presets.indexOf(userPreferences.audioPreset)) { dialog, which ->
+                        userPreferences.audioPreset = presets[which]
+                        updatePresetLabel()
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            }
+        }
+        effects.setOnCheckedChangeListener { _, checked ->
+            userPreferences.audioEffectsEnabled = checked
+            updateEnabled()
+            summaryUpdater.updateSummary(audioSettingsSummary())
+        }
+        customEq.setOnCheckedChangeListener { _, checked ->
+            userPreferences.audioCustomEqEnabled = checked
+            updateEnabled()
+        }
+        limiter.setOnCheckedChangeListener { _, checked -> userPreferences.audioLimiterEnabled = checked }
+        mono.setOnCheckedChangeListener { _, checked -> userPreferences.audioMonoEnabled = checked }
+        updatePresetLabel()
+        updateEnabled()
+        val scroll = ScrollView(requireContext()).apply { addView(content) }
+        MaterialAlertDialogBuilder(requireActivity())
+            .setTitle(R.string.settings_audio)
+            .setView(scroll)
+            .setPositiveButton(android.R.string.ok, null)
+            .resizeAndShow()
+    }
+
+    private fun audioSettingsSummary(): String = if (userPreferences.audioEffectsEnabled) {
+        getString(R.string.settings_audio_effects) + ": " + audioPresetName(userPreferences.audioPreset)
+    } else {
+        getString(R.string.settings_audio_effects) + ": Off"
+    }
+
+    private fun audioPresetName(preset: AudioPreset): String = when (preset) {
+        AudioPreset.FLAT -> getString(R.string.audio_preset_flat)
+        AudioPreset.BASS_BOOST -> getString(R.string.audio_preset_bass_boost)
+        AudioPreset.VOCAL_BOOST -> getString(R.string.audio_preset_vocal_boost)
+        AudioPreset.TREBLE_BOOST -> getString(R.string.audio_preset_treble_boost)
+        AudioPreset.ROCK -> getString(R.string.audio_preset_rock)
+        AudioPreset.CLASSICAL -> getString(R.string.audio_preset_classical)
+        AudioPreset.PODCAST -> getString(R.string.audio_preset_podcast)
+        AudioPreset.NIGHT -> getString(R.string.audio_preset_night)
+    }
+
     private fun showRailSizePicker(summaryUpdater: SummaryUpdater) {
         MaterialAlertDialogBuilder(requireActivity()).apply {
             setTitle(R.string.settings_rail_size)
@@ -269,18 +470,72 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
     }
 
     private fun showRailPositionPicker(summaryUpdater: SummaryUpdater) {
-        MaterialAlertDialogBuilder(requireActivity()).apply {
+        val values = buildList {
+            add(SolipsismRailPosition.RIGHT to getString(R.string.settings_rail_position_right))
+            add(SolipsismRailPosition.LEFT to getString(R.string.settings_rail_position_left))
+            if (experimentalRailLayoutsAvailable()) {
+                add(SolipsismRailPosition.TOP to getString(R.string.settings_rail_position_top_unoptimized))
+                add(SolipsismRailPosition.BOTTOM to getString(R.string.settings_rail_position_bottom_unoptimized))
+            }
+        }
+        lateinit var positionDialog: AlertDialog
+        positionDialog = MaterialAlertDialogBuilder(requireActivity()).apply {
             setTitle(R.string.settings_rail_position)
-            val values = listOf(
-                Pair(false, getString(R.string.settings_rail_position_right)),
-                Pair(true, getString(R.string.settings_rail_position_left))
-            )
-            withSingleChoiceItems(values, userPreferences.solipsismRailOnLeft) {
-                userPreferences.solipsismRailOnLeft = it
-                summaryUpdater.updateSummary(it.toRailPositionDisplayString())
+            setSingleChoiceItems(
+                values.map { it.second }.toTypedArray(),
+                values.indexOfFirst { it.first == currentRailPosition() }
+            ) { _, which ->
+                val selected = values[which].first
+                if (selected.isExperimental) {
+                    positionDialog.dismiss()
+                    showExperimentalRailWarning {
+                        saveRailPosition(selected, summaryUpdater)
+                    }
+                } else {
+                    saveRailPosition(selected, summaryUpdater)
+                }
             }
             setPositiveButton(resources.getString(R.string.action_ok), null)
-        }.resizeAndShow()
+        }.create()
+        positionDialog.show()
+    }
+
+    private fun showExperimentalRailWarning(onContinue: () -> Unit) {
+        MaterialAlertDialogBuilder(requireActivity())
+            .setTitle(R.string.settings_rail_experimental_title)
+            .setMessage(R.string.settings_rail_experimental_message)
+            .setNegativeButton(R.string.action_cancel, null)
+            .setPositiveButton(R.string.settings_rail_experimental_continue) { _, _ -> onContinue() }
+            .resizeAndShow()
+    }
+
+    private fun saveRailPosition(position: SolipsismRailPosition, summaryUpdater: SummaryUpdater) {
+        userPreferences.solipsismRailPosition = position
+        if (position == SolipsismRailPosition.LEFT || position == SolipsismRailPosition.RIGHT) {
+            userPreferences.solipsismRailOnLeft = position == SolipsismRailPosition.LEFT
+        }
+        summaryUpdater.updateSummary(position.toRailPositionDisplayString())
+        if (position.isExperimental) {
+            // The browser activity is paused behind Settings. Closing this activity lets its
+            // onResume() detect the new placement and recreate the browser immediately.
+            requireActivity().finish()
+        }
+    }
+
+    private fun experimentalRailLayoutsAvailable(): Boolean =
+        developerPreferences.experimentalRailLayoutsEnabled
+
+    private fun currentRailPosition(): SolipsismRailPosition {
+        val stored = userPreferences.solipsismRailPosition
+        return if (stored.isExperimental && !experimentalRailLayoutsAvailable()) {
+            if (userPreferences.solipsismRailOnLeft) {
+                SolipsismRailPosition.LEFT
+            } else {
+                SolipsismRailPosition.RIGHT
+            }
+        } else {
+            stored
+        }
     }
 
     private fun showHomepageWallpaperPicker(summaryUpdater: SummaryUpdater) {
@@ -346,7 +601,7 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         MaterialAlertDialogBuilder(requireActivity())
             .setTitle(R.string.settings_homepage_domain)
             .setMessage(R.string.settings_homepage_domain_safe_mode)
-            .setView(input)
+            .setViewWithDialogMargins(input)
             .setNegativeButton(R.string.action_cancel, null)
             .setPositiveButton(R.string.action_ok) { _, _ ->
                 val uri = Uri.parse(input.text.toString().trim())
@@ -797,8 +1052,13 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         else -> RAIL_SIZE_MEDIUM
     }
 
-    private fun Boolean.toRailPositionDisplayString(): String = getString(
-        if (this) R.string.settings_rail_position_left else R.string.settings_rail_position_right
+    private fun SolipsismRailPosition.toRailPositionDisplayString(): String = getString(
+        when (this) {
+            SolipsismRailPosition.LEFT -> R.string.settings_rail_position_left
+            SolipsismRailPosition.TOP -> R.string.settings_rail_position_top_unoptimized
+            SolipsismRailPosition.BOTTOM -> R.string.settings_rail_position_bottom_unoptimized
+            SolipsismRailPosition.RIGHT -> R.string.settings_rail_position_right
+        }
     )
 
     private fun Int.toWallpaperModeDisplayString(): String = getString(
@@ -836,7 +1096,11 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_OVERVIEWMODE = "overViewMode"
         private const val SETTINGS_REFLOW = "text_reflow"
         private const val SETTINGS_THEME = "app_theme"
+        private const val SETTINGS_AUDIO = "audio_settings"
         private const val SETTINGS_TEXTSIZE = "text_size"
+        private const val SETTINGS_CUSTOM_FONT = "custom_font"
+        private const val MAX_CUSTOM_FONT_BYTES = 20L * 1024L * 1024L
+        private const val DEFAULT_FONT_BUFFER_SIZE = 8 * 1024
         private const val SETTINGS_HOMEPAGE_WALLPAPER = "homepage_wallpaper"
         private const val SETTINGS_HOMEPAGE_SOURCE = "homepage_source"
         private const val SETTINGS_HOMEPAGE_LAYOUT = "homepage_layout"

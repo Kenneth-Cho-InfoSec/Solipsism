@@ -12,6 +12,7 @@ import com.krystelligence.solipsism.settings.activity.ThemableSettingsActivity
 import com.krystelligence.solipsism.settings.fragment.AccessibilitySettingsFragment
 import com.krystelligence.solipsism.settings.fragment.AdBlockSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.AdvancedSettingsFragment
+import com.krystelligence.solipsism.settings.fragment.AudioSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.BookmarkSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.DebugSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment
@@ -50,6 +51,8 @@ interface AppComponent {
     fun inject(activity: ThemableBrowserActivity)
 
     fun inject(advancedSettingsFragment: AdvancedSettingsFragment)
+
+    fun inject(audioSettingsFragment: AudioSettingsFragment)
 
     fun inject(app: BrowserApp)
 

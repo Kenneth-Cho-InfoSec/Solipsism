@@ -43,6 +43,11 @@
             android:key="text_size"
             android:title="@string/title_text_size" />
         <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="custom_font"
+            android:summary="@string/settings_custom_font_summary"
+            android:title="@string/settings_custom_font" />
+        <Preference
             android:icon="@drawable/ic_action_desktop"
             android:key="homepage_wallpaper"
             android:title="@string/settings_homepage_wallpaper" />

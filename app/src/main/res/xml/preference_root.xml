@@ -13,6 +13,16 @@
             app:summary="@string/settings_advanced_explain"
             app:title="@string/settings_advanced" />
         <Preference
+            app:icon="@drawable/ic_action_desktop"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment"
+            app:summary="@string/settings_graphics_summary"
+            app:title="@string/settings_display" />
+        <Preference
+            app:icon="@drawable/ic_settings_audio"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.AudioSettingsFragment"
+            app:summary="@string/settings_audio_summary"
+            app:title="@string/settings_audio" />
+        <Preference
             app:icon="@drawable/ic_settings_privacy"
             app:fragment="com.krystelligence.solipsism.settings.fragment.PrivacySettingsFragment"
             app:summary="@string/settings_privacy_explain"
@@ -45,11 +55,6 @@
             app:fragment="com.krystelligence.solipsism.settings.fragment.BookmarkSettingsFragment"
             app:summary="@string/bookmark_settings_summary"
             app:title="@string/bookmark_settings" />
-        <Preference
-            app:icon="@drawable/ic_action_desktop"
-            app:fragment="com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment"
-            app:summary="@string/settings_graphics_summary"
-            app:title="@string/settings_display" />
         <Preference
             app:icon="@drawable/ic_settings_text"
             app:fragment="com.krystelligence.solipsism.settings.fragment.AccessibilitySettingsFragment"

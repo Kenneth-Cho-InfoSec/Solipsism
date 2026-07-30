@@ -18,6 +18,13 @@ class DebugSettingsFragment : AbstractSettingsFragment() {
         injector.inject(this)
 
         togglePreference(
+            preference = EXPERIMENTAL_RAIL_LAYOUTS,
+            isChecked = developerPreferences.experimentalRailLayoutsEnabled,
+            onCheckChange = { change ->
+                developerPreferences.experimentalRailLayoutsEnabled = change
+            }
+        )
+        togglePreference(
             preference = LEAK_CANARY,
             isChecked = developerPreferences.useLeakCanary,
             onCheckChange = { change ->
@@ -28,6 +35,7 @@ class DebugSettingsFragment : AbstractSettingsFragment() {
     }
 
     companion object {
+        private const val EXPERIMENTAL_RAIL_LAYOUTS = "experimental_rail_layouts"
         private const val LEAK_CANARY = "leak_canary_enabled"
     }
 }

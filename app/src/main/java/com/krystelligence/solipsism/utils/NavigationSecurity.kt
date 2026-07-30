@@ -2,6 +2,7 @@ package com.krystelligence.solipsism.utils
 
 import android.net.Uri
 import android.webkit.URLUtil
+import java.io.File
 import java.util.Locale
 
 /**
@@ -25,7 +26,10 @@ object NavigationSecurity {
         return URLUtil.isNetworkUrl(sanitized)
     }
 
-    fun isAllowedTopLevelNavigation(url: String): Boolean {
+    fun isAllowedTopLevelNavigation(
+        url: String,
+        trustedInternalRoots: Collection<File> = emptyList()
+    ): Boolean {
         val sanitized = sanitizeUserInput(url)
         val scheme = Uri.parse(sanitized).scheme?.lowercase(Locale.ROOT)
 
@@ -35,6 +39,21 @@ object NavigationSecurity {
 
         return URLUtil.isNetworkUrl(sanitized)
             || URLUtil.isAboutUrl(sanitized)
-            || sanitized.isSpecialUrl()
+            || isTrustedInternalFileUrl(sanitized, trustedInternalRoots)
+    }
+
+    /**
+     * Allows only app-private generated pages. A filename such as homepage.html is not enough:
+     * public storage can be replaced by another app and must never become executable browser
+     * content.
+     */
+    fun isTrustedInternalFileUrl(url: String, trustedInternalRoots: Collection<File>): Boolean {
+        if (trustedInternalRoots.isEmpty() || !URLUtil.isFileUrl(url)) return false
+        val path = runCatching { Uri.parse(url).path }.getOrNull() ?: return false
+        val target = runCatching { File(path).canonicalFile }.getOrNull() ?: return false
+        return trustedInternalRoots.any { rootCandidate ->
+            val root = runCatching { rootCandidate.canonicalFile }.getOrNull() ?: return@any false
+            target == root || target.path.startsWith(root.path + File.separator)
+        }
     }
 }

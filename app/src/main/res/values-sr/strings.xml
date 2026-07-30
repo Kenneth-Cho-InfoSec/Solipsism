@@ -223,7 +223,7 @@
     <string name="bookmark_export_failure">Жао нам је, извоз обележивача није успео!</string>
     <string name="bookmark_settings_summary">Управљајте обележивачима, фасциклама и пречицама на почетној страници.</string>
     <string name="chrompatibility_mode">Режим хроматљивости</string>
-    <string name="chrompatibility_mode_summary">Пријавите као Цхроме 149.0.7827 ради боље компатибилности веб локација.</string>
+    <string name="chrompatibility_mode_summary">Пријавите као Цхроме 151.0.7922 ради боље компатибилности веб локација.</string>
     <string name="cookie_manager">Цоокие Манагер</string>
     <string name="cookie_manager_add">Додајте колачић</string>
     <string name="cookie_manager_add_short">Додај</string>
@@ -546,4 +546,35 @@
     <string name="settings_homepage_html_hint">&lt;h1&gt;My homepage&lt;/h1&gt;</string>
     <string name="settings_homepage_css_hint">body { color: white; }</string>
     <string name="settings_homepage_editor_help">Static HTML and CSS only. JavaScript, downloads, forms, frames, external resources, and executable content are removed. Built-in bookmarks and date/time remain available through the built-in homepage.</string>
-</resources>
+    <string name="debug_experimental_rail_layouts">Enable experimental top/bottom rail layouts</string>
+    <string name="debug_experimental_rail_layouts_summary">Expose unoptimized rail placements in Appearance settings</string>
+    <string name="settings_rail_position_top_unoptimized">Top (Unoptimized)</string>
+    <string name="settings_rail_position_bottom_unoptimized">Bottom (Unoptimized)</string>
+    <string name="settings_rail_experimental_title">Experimental rail layout</string>
+    <string name="settings_rail_experimental_message">The purpose of Solipsism Browser is its side rail interface. Top and bottom rail layouts are experimental and unoptimized. Some features may be missing, behave incorrectly, or contain bugs that are not currently priority support. Continue only if you understand and accept this limitation.</string>
+    <string name="settings_rail_experimental_continue">Continue</string>
+    <string name="settings_audio">Audio</string>
+    <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
+    <string name="settings_audio_effects">Custom audio effects</string>
+    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
+    <string name="settings_audio_preset">Preset</string>
+    <string name="settings_audio_custom_eq">Custom EQ</string>
+    <string name="settings_audio_preamp">Preamp</string>
+    <string name="settings_audio_limiter">Limiter</string>
+    <string name="settings_audio_mono">Mono audio</string>
+    <string name="settings_audio_balance">Balance</string>
+    <string name="settings_audio_compatibility">Audio effects depend on WebView support and may not work on every device. Audio continues normally when effects are off.</string>
+    <string name="settings_audio_channel_test">Test left/right channels</string>
+    <string name="settings_custom_font">Custom font</string>
+    <string name="settings_custom_font_summary">Use an imported font for Solipsism interface text.</string>
+    <string name="settings_custom_font_default">System default</string>
+    <string name="settings_custom_font_invalid">That file is not a supported or valid font.</string>
+    <string name="audio_preset_flat">Flat</string>
+    <string name="audio_preset_bass_boost">Bass boost</string>
+    <string name="audio_preset_vocal_boost">Vocal boost</string>
+    <string name="audio_preset_treble_boost">Treble boost</string>
+    <string name="audio_preset_rock">Rock</string>
+    <string name="audio_preset_classical">Classical</string>
+    <string name="audio_preset_podcast">Podcast</string>
+    <string name="audio_preset_night">Night listening</string>
+ </resources>

@@ -4,23 +4,20 @@ import com.krystelligence.solipsism.BuildConfig
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.BrowserActivity
 import com.krystelligence.solipsism.browser.di.IncognitoMode
-import com.krystelligence.solipsism.constant.FILE
 import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.utils.IntentUtils
 import com.krystelligence.solipsism.utils.NavigationSecurity
 import com.krystelligence.solipsism.utils.Utils
-import com.krystelligence.solipsism.utils.isSpecialUrl
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Environment
 import android.net.MailTo
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.webkit.WebView
 import androidx.core.content.FileProvider
 import java.io.File
-import java.net.URISyntaxException
 import javax.inject.Inject
 
 /**
@@ -43,6 +40,11 @@ class UrlHandler @Inject constructor(
         url: String,
         headers: Map<String, String>
     ): Boolean {
+        if (!NavigationSecurity.isTrustedInternalFileUrl(url, trustedInternalRoots())) {
+            // The generated Solipsism pages are the only pages that need file access. Reset this
+            // before every other top-level navigation so a local page cannot retain the exception.
+            view.settings.allowFileAccess = false
+        }
         if (url == HISTORY_CLEAR_URL) {
             (activity as? BrowserActivity)?.clearAllHistoryFromHistoryPage()
             return true
@@ -74,7 +76,7 @@ class UrlHandler @Inject constructor(
         url: String,
         headers: Map<String, String>
     ): Boolean {
-        if (!NavigationSecurity.isAllowedTopLevelNavigation(url)) {
+        if (!NavigationSecurity.isAllowedTopLevelNavigation(url, trustedInternalRoots())) {
             webView.stopLoading()
             return true
         }
@@ -95,41 +97,38 @@ class UrlHandler @Inject constructor(
             view.reload()
             return true
         } else if (url.startsWith("intent://")) {
-            val intent = try {
-                Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
-            } catch (ignored: URISyntaxException) {
-                null
+            // All intent:// URLs must go through IntentUtils, which rejects unsafe data schemes.
+            return intentUtils.startActivityForUrl(view, url)
+        } else if (URLUtil.isFileUrl(url)) {
+            if (NavigationSecurity.isTrustedInternalFileUrl(url, trustedInternalRoots())) {
+                return false
             }
+            val path = runCatching { android.net.Uri.parse(url).path }.getOrNull()
+            val file = path?.let(::File)
 
-            if (intent != null) {
-                intent.addCategory(Intent.CATEGORY_BROWSABLE)
-                intent.component = null
-                intent.selector = null
-                try {
-                    activity.startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
-                    logger.log(TAG, "ActivityNotFoundException")
-                }
-
-                return true
-            }
-        } else if (URLUtil.isFileUrl(url) && !url.isSpecialUrl()) {
-            val file = File(url.replace(FILE, ""))
-
-            if (file.exists()) {
-                val newMimeType = MimeTypeMap.getSingleton()
-                    .getMimeTypeFromExtension(Utils.guessFileExtension(file.toString()))
-
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                val contentUri = FileProvider.getUriForFile(
-                    activity,
-                    BuildConfig.APPLICATION_ID + ".fileprovider",
-                    file
-                )
-                intent.setDataAndType(contentUri, newMimeType)
+            if (file?.isFile == true) {
+                val downloadsRoot = runCatching {
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        .canonicalFile
+                }.getOrNull()
+                val canonicalFile = runCatching { file.canonicalFile }.getOrNull()
+                val isDownload = downloadsRoot != null && canonicalFile != null &&
+                    (canonicalFile == downloadsRoot ||
+                        canonicalFile.path.startsWith(downloadsRoot.path + File.separator))
+                if (!isDownload) return true
 
                 try {
+                    val newMimeType = MimeTypeMap.getSingleton()
+                        .getMimeTypeFromExtension(Utils.guessFileExtension(file.toString()))
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    val contentUri = FileProvider.getUriForFile(
+                        activity,
+                        BuildConfig.APPLICATION_ID + ".fileprovider",
+                        canonicalFile
+                    )
+                    intent.setDataAndType(contentUri, newMimeType)
+
                     activity.startActivity(intent)
                 } catch (e: Exception) {
                     logger.log(TAG, "Unable to open downloaded file", e)
@@ -142,6 +141,11 @@ class UrlHandler @Inject constructor(
         }
         return false
     }
+
+    private fun trustedInternalRoots(): List<File> = listOf(
+        File(activity.filesDir, "generated-html"),
+        File(activity.filesDir, "homepage")
+    )
 
     companion object {
         private const val TAG = "UrlHandler"

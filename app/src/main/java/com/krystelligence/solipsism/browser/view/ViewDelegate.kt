@@ -95,4 +95,10 @@ interface ViewDelegate {
     val settingsButton: ImageView?
         get() = null
 
+    val addressRail: LinearLayout?
+        get() = null
+
+    val railNav: LinearLayout?
+        get() = null
+
 }

@@ -2,6 +2,9 @@ package com.krystelligence.solipsism.extensions
 
 import com.krystelligence.solipsism.dialog.BrowserDialog
 import android.app.Dialog
+import android.widget.FrameLayout
+import android.view.View
+import kotlin.math.roundToInt
 import androidx.appcompat.app.AlertDialog
 
 /**
@@ -29,3 +32,15 @@ fun <T> AlertDialog.Builder.withSingleChoiceItems(
 @Suppress("NOTHING_TO_INLINE")
 inline fun AlertDialog.Builder.resizeAndShow(): Dialog =
     show().also { BrowserDialog.setDialogSize(context, it) }
+
+/** Adds the same 24dp horizontal inset used by Material dialog text content. */
+fun AlertDialog.Builder.setViewWithDialogMargins(view: View): AlertDialog.Builder {
+    val margin = (24f * context.resources.displayMetrics.density).roundToInt()
+    return setView(FrameLayout(context).apply {
+        setPadding(margin, 0, margin, 0)
+        addView(view, FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        ))
+    })
+}

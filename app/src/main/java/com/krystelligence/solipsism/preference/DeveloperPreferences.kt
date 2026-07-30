@@ -18,11 +18,17 @@ class DeveloperPreferences @Inject constructor(
 
     var useLeakCanary by preferences.booleanPreference(LEAK_CANARY, false)
 
+    var experimentalRailLayoutsEnabled by preferences.booleanPreference(
+        EXPERIMENTAL_RAIL_LAYOUTS,
+        false
+    )
+
     var checkedForTor by preferences.booleanPreference(INITIAL_CHECK_FOR_TOR, false)
 
     // var checkedForI2P by preferences.booleanPreference(INITIAL_CHECK_FOR_I2P, false)
 }
 
 private const val LEAK_CANARY = "leakCanary"
+private const val EXPERIMENTAL_RAIL_LAYOUTS = "experimentalRailLayouts"
 private const val INITIAL_CHECK_FOR_TOR = "checkForTor"
 // private const val INITIAL_CHECK_FOR_I2P = "checkForI2P"

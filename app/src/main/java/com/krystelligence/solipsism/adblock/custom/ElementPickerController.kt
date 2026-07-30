@@ -4,6 +4,7 @@ import android.app.Activity
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.extensions.toast
 import java.net.URI
@@ -34,7 +35,10 @@ class ElementPickerController @Inject constructor(
     }
 
     fun stop() {
-        webView?.evaluateJavascript("window.__solipsismStopPicker && window.__solipsismStopPicker();", null)
+        webView?.let { view ->
+            view.evaluateJavascript("window.__solipsismStopPicker && window.__solipsismStopPicker();", null)
+            view.removeJavascriptInterface(BRIDGE_NAME)
+        }
         active = false
         webView = null
     }
@@ -46,7 +50,7 @@ class ElementPickerController @Inject constructor(
         MaterialAlertDialogBuilder(activity)
             .setTitle(R.string.block_element)
             .setMessage(activity.getString(R.string.block_element_host, host))
-            .setView(input)
+            .setViewWithDialogMargins(input)
             .setNegativeButton(R.string.action_cancel) { _, _ -> stop() }
             .setPositiveButton(R.string.action_ok) { _, _ ->
                 runCatching { repository.add("$host##${input.text.toString().trim()}", CustomFilterSource.PICKER) }

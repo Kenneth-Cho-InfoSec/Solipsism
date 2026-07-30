@@ -51,6 +51,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 public class DownloadHandler {
 
     private static final String TAG = "DownloadHandler";
+    private static final int MAX_BLOB_BYTES = 16 * 1024 * 1024;
+    private static final int MAX_BLOB_BASE64_CHARS = ((MAX_BLOB_BYTES + 2) / 3) * 4;
 
     private static final String COOKIE_REQUEST_HEADER = "Cookie";
     private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
@@ -98,6 +100,9 @@ public class DownloadHandler {
                                        @Nullable String mimeType,
                                        @NonNull String base64Data) {
         return Single.fromCallable(() -> {
+            if (base64Data.length() > MAX_BLOB_BASE64_CHARS) {
+                throw new IOException("Blob download exceeds the safety limit");
+            }
             String filename = FileUtils.sanitizeFileName(
                 URLUtil.guessFileName(sourceUrl, contentDisposition, mimeType)
             );
@@ -105,6 +110,9 @@ public class DownloadHandler {
                 ? "application/octet-stream"
                 : mimeType;
             byte[] bytes = Base64.decode(base64Data, Base64.DEFAULT);
+            if (bytes.length > MAX_BLOB_BYTES) {
+                throw new IOException("Blob download exceeds the safety limit");
+            }
             String location = FileUtils.addNecessarySlashes(preferences.getDownloadDirectory());
             String defaultPath = FileUtils.addNecessarySlashes(FileUtils.DEFAULT_DOWNLOAD_PATH);
 

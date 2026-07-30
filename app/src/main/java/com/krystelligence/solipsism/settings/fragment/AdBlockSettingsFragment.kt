@@ -25,6 +25,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.preference.Preference
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -244,7 +245,7 @@ class AdBlockSettingsFragment : AbstractSettingsFragment() {
         }
         MaterialAlertDialogBuilder(context)
             .setTitle(R.string.custom_filters)
-            .setView(container)
+            .setViewWithDialogMargins(container)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(R.string.action_ok) { _, _ ->
                 customFilterRepository.clear()

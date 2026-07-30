@@ -32,6 +32,8 @@ class UserScriptManager @Inject constructor(application: Application) {
         dependencies: List<String> = emptyList(),
         enabled: Boolean = true
     ): UserScript {
+        validateSourceSize(source)
+        dependencies.forEach(::validateSourceSize)
         val metadata = UserScriptMetadataParser.parse(source)
             ?: throw IllegalArgumentException("No valid userscript metadata block")
         val id = UUID.randomUUID().toString()
@@ -55,6 +57,7 @@ class UserScriptManager @Inject constructor(application: Application) {
 
     @Synchronized
     fun updateSource(id: String, source: String) {
+        validateSourceSize(source)
         val old = scripts[id] ?: throw IllegalArgumentException("Unknown userscript")
         val metadata = UserScriptMetadataParser.parse(source)
             ?: throw IllegalArgumentException("No valid userscript metadata block")
@@ -106,6 +109,12 @@ class UserScriptManager @Inject constructor(application: Application) {
         }
         val disabled = File(directory, DISABLED_FILE)
         if (script.enabled) disabled.delete() else disabled.writeText("")
+    }
+
+    private fun validateSourceSize(source: String) {
+        require(source.toByteArray(Charsets.UTF_8).size <= MAX_SOURCE_BYTES) {
+            "Userscript is larger than 1 MiB"
+        }
     }
 
     private companion object {

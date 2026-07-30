@@ -9,6 +9,7 @@ import android.util.Log
 import android.widget.EditText
 import androidx.preference.Preference
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.MainScheduler
 import com.krystelligence.solipsism.browser.di.NetworkScheduler
@@ -176,7 +177,7 @@ class VirusTotalSettingsFragment : AbstractSettingsFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.virus_total_api_key)
             .setMessage(R.string.virus_total_api_key_explanation)
-            .setView(input)
+            .setViewWithDialogMargins(input)
             .setPositiveButton(R.string.action_save) { _, _ ->
                 apiKeyStore.set(input.text.toString())
                 findPreference<androidx.preference.Preference>(API_KEY)?.summary = keySummary()

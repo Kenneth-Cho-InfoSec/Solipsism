@@ -24,6 +24,7 @@ import com.krystelligence.solipsism.browser.tab.TabViewState
 import com.krystelligence.solipsism.browser.theme.ThemeProvider
 import com.krystelligence.solipsism.browser.ui.BookmarkConfiguration
 import com.krystelligence.solipsism.browser.ui.TabConfiguration
+import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
 import com.krystelligence.solipsism.browser.ui.UiConfiguration
 import com.krystelligence.solipsism.browser.view.ViewDelegate
 import com.krystelligence.solipsism.browser.view.delegates.BottomTabViewDelegate
@@ -189,8 +190,29 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             MIN_SOLIPSISM_RAIL_WIDTH_DP,
             MAX_SOLIPSISM_RAIL_WIDTH_DP
         ).dp
-        val railOnLeft = userPreferences.solipsismRailOnLeft
+        val railPosition = activeSolipsismRailPosition()
+        val railOnLeft = railPosition == SolipsismRailPosition.LEFT
         val superCompact = userPreferences.solipsismRailSize <= SUPER_COMPACT_RAIL_WIDTH_DP
+
+        if (railPosition.isExperimental) {
+            applyHorizontalSolipsismRailPreferences(railWidth, superCompact)
+            applyQrAndTabsButtonPositions()
+            configureHorizontalSolipsismRailConstraints(railWidth)
+            binding.contentFrame.applyHorizontalRailMargin(railWidth, railPosition == SolipsismRailPosition.TOP)
+            binding.progressView.applyHorizontalRailMargin(railWidth, railPosition == SolipsismRailPosition.TOP)
+            binding.addressOverlay?.applyHorizontalAddressMargin(
+                railWidth,
+                railPosition == SolipsismRailPosition.TOP
+            )
+            binding.findBar.applyHorizontalFindBarMargin(
+                railWidth,
+                railPosition == SolipsismRailPosition.TOP
+            )
+            return
+        }
+
+        binding.actionHome.visibility = View.VISIBLE
+        binding.actionAddBookmark.visibility = View.VISIBLE
 
         binding.toolbarLayout.updateLayoutParams<FrameLayout.LayoutParams> {
             width = railWidth
@@ -203,6 +225,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             if (superCompact) 16.dp else 28.dp
         )
         binding.tabCountView.setShowCount(!superCompact)
+        applySuperCompactTabsButton(superCompact)
 
         if (superCompact) {
             val railButtonSize = 28.dp
@@ -276,6 +299,168 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         )
     }
 
+    private fun applyHorizontalSolipsismRailPreferences(railHeight: Int, superCompact: Boolean) {
+        // Horizontal rails are intentionally compact so the full action set can coexist with
+        // the address controls on narrow phones.
+        val buttonSize = if (superCompact) 28.dp else 32.dp
+        val iconPadding = if (superCompact) 5.dp else 8.dp
+        binding.toolbarLayout.updateLayoutParams<FrameLayout.LayoutParams> {
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            height = railHeight
+            gravity = if (activeSolipsismRailPosition() == SolipsismRailPosition.TOP) {
+                Gravity.TOP
+            } else {
+                Gravity.BOTTOM
+            }
+        }
+        binding.toolbarLayout.setPaddingRelative(
+            if (superCompact) 1.dp else 10.dp,
+            if (superCompact) 1.dp else 8.dp,
+            if (superCompact) 1.dp else 10.dp,
+            if (superCompact) 1.dp else 8.dp
+        )
+        binding.tabCountView.setShowCount(!superCompact)
+        applySuperCompactTabsButton(superCompact)
+        binding.homeButton.setSquareSize(buttonSize)
+        binding.settingsButton?.setSquareSize(buttonSize)
+        binding.searchRefresh.setSquareSize(buttonSize)
+        binding.actionBack.setSquareSize(buttonSize)
+        binding.actionForward.setSquareSize(buttonSize)
+        binding.actionHome.setSquareSize(buttonSize)
+        binding.actionAddBookmark.setSquareSize(buttonSize)
+        binding.actionHome.visibility = View.GONE
+        binding.actionAddBookmark.visibility = View.GONE
+        binding.toolbar.setSquareSize(buttonSize)
+        binding.toolbar.minimumHeight = buttonSize
+        binding.verticalUrlText?.apply {
+            rotation = 0f
+            textSize = if (superCompact) 11.5f else 15f
+            updateLayoutParams<LinearLayout.LayoutParams> {
+                width = 0
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+                weight = 1f
+            }
+        }
+        binding.addressRail?.apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPaddingRelative(8.dp, 0, 8.dp, 0)
+        }
+        binding.railNav?.orientation = LinearLayout.HORIZONTAL
+        listOfNotNull(
+            binding.settingsButton,
+            binding.searchRefresh,
+            binding.actionBack,
+            binding.actionForward,
+            binding.actionHome,
+            binding.actionAddBookmark
+        ).forEach { it.setPadding(iconPadding, iconPadding, iconPadding, iconPadding) }
+        binding.toolbar.overflowIcon = drawable(R.drawable.ic_action_more_vertical)?.also {
+            it.tint(color(R.color.solipsism_rail_text))
+        }
+        binding.toolbar.contentInsetStartWithNavigation = 0
+        binding.toolbar.setContentInsetsRelative(0, 0)
+    }
+
+    private fun applySuperCompactTabsButton(superCompact: Boolean) {
+        if (superCompact) {
+            binding.homeImageView.apply {
+                setImageResource(R.drawable.ic_action_book)
+                contentDescription = getString(R.string.tabs)
+                visibility = View.VISIBLE
+            }
+            binding.tabCountView.visibility = View.GONE
+        } else {
+            binding.homeImageView.visibility = View.GONE
+            binding.tabCountView.visibility = View.VISIBLE
+        }
+    }
+
+    private fun configureHorizontalSolipsismRailConstraints(railHeight: Int) {
+        val parentId = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+        val addressRail = binding.addressRail ?: return
+        val railNav = binding.railNav ?: return
+        val tabsInAddress = binding.homeButton.parent === addressRail
+
+        addressRail.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
+            width = 0
+            height = (railHeight * 0.8f).roundToInt().coerceAtLeast(1)
+            startToStart = -1
+            startToEnd = if (tabsInAddress) R.id.search_refresh else R.id.home_button
+            endToEnd = -1
+            endToStart = R.id.rail_nav
+            topToTop = parentId
+            topToBottom = -1
+            bottomToBottom = parentId
+            bottomToTop = -1
+            topMargin = 0
+            bottomMargin = 0
+            marginStart = 8.dp
+            marginEnd = 8.dp
+        }
+        railNav.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
+            width = ViewGroup.LayoutParams.WRAP_CONTENT
+            height = ViewGroup.LayoutParams.MATCH_PARENT
+            startToStart = -1
+            startToEnd = -1
+            endToEnd = parentId
+            topToTop = parentId
+            bottomToBottom = parentId
+            topMargin = 0
+            bottomMargin = 0
+        }
+        binding.homeButton.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
+            if (!tabsInAddress) {
+                startToStart = parentId
+                startToEnd = -1
+                endToEnd = -1
+                endToStart = -1
+                topToTop = parentId
+                bottomToBottom = parentId
+            }
+        }
+        listOf(
+            binding.actionBack,
+            binding.actionForward,
+            binding.actionHome,
+            binding.actionAddBookmark,
+            binding.toolbar
+        ).forEach { view ->
+            view.updateLayoutParams<LinearLayout.LayoutParams> {
+                topMargin = 0
+                bottomMargin = 0
+                marginStart = 3.dp
+            }
+        }
+        addressRail.requestLayout()
+        railNav.requestLayout()
+    }
+
+    private fun View.applyHorizontalRailMargin(railHeight: Int, railAtTop: Boolean) {
+        updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginStart = 0
+            marginEnd = 0
+            topMargin = if (railAtTop) railHeight else 0
+            bottomMargin = if (railAtTop) 0 else railHeight
+        }
+    }
+
+    private fun View.applyHorizontalAddressMargin(railHeight: Int, railAtTop: Boolean) {
+        updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginStart = resources.getDimensionPixelSize(R.dimen.chrome_outer_margin)
+            marginEnd = resources.getDimensionPixelSize(R.dimen.chrome_outer_margin)
+            topMargin = if (railAtTop) railHeight + resources.getDimensionPixelSize(R.dimen.chrome_outer_margin) else resources.getDimensionPixelSize(R.dimen.chrome_outer_margin)
+        }
+    }
+
+    private fun View.applyHorizontalFindBarMargin(railHeight: Int, railAtTop: Boolean) {
+        updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginStart = resources.getDimensionPixelSize(R.dimen.chrome_outer_margin)
+            marginEnd = resources.getDimensionPixelSize(R.dimen.chrome_outer_margin)
+            topMargin = resources.getDimensionPixelSize(R.dimen.chrome_outer_margin)
+            bottomMargin = if (railAtTop) resources.getDimensionPixelSize(R.dimen.chrome_outer_margin) else railHeight + resources.getDimensionPixelSize(R.dimen.chrome_outer_margin)
+        }
+    }
+
     private fun View.applyRailMargin(
         railWidth: Int,
         railOnLeft: Boolean,
@@ -305,6 +490,24 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         val shouldSwap = userPreferences.swapQrAndTabsButtons
         val alreadySwapped = (tabsButton.parent as? View)?.id == R.id.address_rail
         val addressRail = listOf(tabsParent, qrParent).firstOrNull { it.id == R.id.address_rail } ?: return
+
+        if (activeSolipsismRailPosition().isExperimental) {
+            if (shouldSwap == alreadySwapped) return
+            val tabsWidth = tabsButton.layoutParams.width
+            val tabsHeight = tabsButton.layoutParams.height
+            val qrWidth = qrButton.layoutParams.width
+            val qrHeight = qrButton.layoutParams.height
+            tabsParent.removeView(tabsButton)
+            qrParent.removeView(qrButton)
+            if (shouldSwap) {
+                addressRail.addView(tabsButton, LinearLayout.LayoutParams(tabsWidth, tabsHeight))
+                toolbarLayoutForRail().addView(qrButton, horizontalRailButtonParams(qrWidth, qrHeight))
+            } else {
+                toolbarLayoutForRail().addView(tabsButton, horizontalRailButtonParams(tabsWidth, tabsHeight))
+                addressRail.addView(qrButton, LinearLayout.LayoutParams(qrWidth, qrHeight))
+            }
+            return
+        }
 
         addressRail.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
             if (shouldSwap) {
@@ -358,6 +561,15 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             tabsParent.addView(qrButton, restoredQrParams)
         }
     }
+
+    private fun toolbarLayoutForRail(): androidx.constraintlayout.widget.ConstraintLayout = binding.toolbarLayout
+
+    private fun horizontalRailButtonParams(width: Int, height: Int) =
+        androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(width, height).apply {
+            startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+            topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+            bottomToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+        }
 
     private fun View.setTopMargin(topMargin: Int) {
         updateLayoutParams<ViewGroup.MarginLayoutParams> {
@@ -744,12 +956,21 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
         val location = IntArray(2)
         binding.toolbar.getLocationOnScreen(location)
-        val x = if (userPreferences.solipsismRailOnLeft) {
+        val railPosition = activeSolipsismRailPosition()
+        val x = if (railPosition.isExperimental) {
+            ((resources.displayMetrics.widthPixels - popupWidth) / 2).coerceAtLeast(0)
+        } else if (railPosition == SolipsismRailPosition.LEFT) {
             BROWSER_MENU_SCREEN_MARGIN_DP.dp
         } else {
             resources.displayMetrics.widthPixels - popupWidth - BROWSER_MENU_SCREEN_MARGIN_DP.dp
         }
-        val y = (location[1] - 12.dp).coerceAtLeast(BROWSER_MENU_SCREEN_MARGIN_DP.dp)
+        val y = when (railPosition) {
+            SolipsismRailPosition.TOP -> (location[1] + binding.toolbarLayout.height + 12.dp)
+                .coerceAtMost(resources.displayMetrics.heightPixels - BROWSER_MENU_SCREEN_MARGIN_DP.dp)
+            SolipsismRailPosition.BOTTOM -> (location[1] - 12.dp - binding.toolbarLayout.height)
+                .coerceAtLeast(BROWSER_MENU_SCREEN_MARGIN_DP.dp)
+            else -> (location[1] - 12.dp).coerceAtLeast(BROWSER_MENU_SCREEN_MARGIN_DP.dp)
+        }
         browserMenuPopup?.showAtLocation(binding.root, Gravity.TOP or Gravity.START, x, y)
         menuView.alpha = 0f
         menuView.scaleX = 0.96f

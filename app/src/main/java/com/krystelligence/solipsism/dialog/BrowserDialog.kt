@@ -31,6 +31,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -184,7 +185,7 @@ object BrowserDialog {
 
         MaterialAlertDialogBuilder(activity)
             .setTitle(title)
-            .setView(dialogView)
+            .setViewWithDialogMargins(dialogView)
             .setPositiveButton(action) { _, _ -> textInputListener(editText.text.toString()) }
             .resizeAndShow()
     }

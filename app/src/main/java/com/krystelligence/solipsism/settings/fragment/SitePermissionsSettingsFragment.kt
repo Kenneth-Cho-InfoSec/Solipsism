@@ -3,6 +3,7 @@ package com.krystelligence.solipsism.settings.fragment
 import android.os.Bundle
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.injector
+import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.widget.EditText
 import com.krystelligence.solipsism.preference.SitePermissionDecision
@@ -67,7 +68,7 @@ class SitePermissionsSettingsFragment : AbstractSettingsFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.site_permission_add_site)
             .setMessage(R.string.site_permission_add_site_message)
-            .setView(input)
+            .setViewWithDialogMargins(input)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 if (sitePermissionStore.ensureOrigin(input.text.toString())) {

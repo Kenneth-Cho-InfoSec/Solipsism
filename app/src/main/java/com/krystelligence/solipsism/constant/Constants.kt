@@ -11,7 +11,7 @@ const val DESKTOP_USER_AGENT =
 const val MOBILE_USER_AGENT =
     "Mozilla/5.0 (Linux; Android 10; Pixel Build/QP1A.190711.019; wv) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Mobile Safari/537.36"
 const val CHROMPATIBILITY_USER_AGENT =
-    "Mozilla/5.0 (Linux; Android 15; Pixel 9 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.0 Mobile Safari/537.36"
+    "Mozilla/5.0 (Linux; Android 15; Pixel 9 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.7922.71 Mobile Safari/537.36"
 
 // URL Schemes
 const val HTTP = "http://"

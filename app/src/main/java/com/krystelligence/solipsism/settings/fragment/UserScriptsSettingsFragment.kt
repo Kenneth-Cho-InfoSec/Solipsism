@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.HostsClient
 import com.krystelligence.solipsism.browser.di.injector
@@ -115,7 +116,7 @@ class UserScriptsSettingsFragment : AbstractSettingsFragment() {
         }
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.userscripts_import_url)
-            .setView(input)
+            .setViewWithDialogMargins(input)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 val url = input.text.toString().trim()
@@ -144,7 +145,7 @@ class UserScriptsSettingsFragment : AbstractSettingsFragment() {
         }
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.userscripts_edit_title, script.metadata.name))
-            .setView(input)
+            .setViewWithDialogMargins(input)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(R.string.action_ok) { _, _ ->
                 lifecycleScope.launch {
