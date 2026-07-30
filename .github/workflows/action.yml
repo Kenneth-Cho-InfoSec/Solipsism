@@ -24,3 +24,5 @@ jobs:
         run: ./gradlew build
       - name: Check
         run: ./gradlew checkSortDependencies
+      - name: Check localization resources
+        run: python3 scripts/check_localized_resources.py

@@ -17,6 +17,7 @@ import com.krystelligence.solipsism.search.engine.CustomSearch
 import com.krystelligence.solipsism.utils.FileUtils
 import com.krystelligence.solipsism.utils.ProxyUtils
 import com.krystelligence.solipsism.utils.ThemeUtils
+import com.krystelligence.solipsism.i18n.TranslationOverrides
 import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
@@ -28,7 +29,11 @@ import android.view.LayoutInflater
 import android.webkit.URLUtil
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.os.LocaleListCompat
 import javax.inject.Inject
 
 /**
@@ -41,6 +46,13 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
 
     private lateinit var proxyChoices: Array<String>
 
+    private val customLanguagePicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri ?: return@registerForActivityResult
+        loadCustomLanguage(uri)
+    }
+
     override fun providePreferencesXmlResource() = R.xml.preference_general
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -48,6 +60,25 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         injector.inject(this)
 
         proxyChoices = resources.getStringArray(R.array.proxy_choices_array)
+
+        clickableDynamicPreference(
+            preference = SETTINGS_LANGUAGE,
+            summary = currentLanguageName(),
+            onClick = ::showLanguagePicker
+        )
+
+        clickablePreference(
+            preference = SETTINGS_CUSTOM_LANGUAGE,
+            summary = if (TranslationOverrides.count(requireContext()) == 0) {
+                getString(R.string.settings_custom_language_summary)
+            } else {
+                getString(
+                    R.string.settings_custom_language_loaded,
+                    TranslationOverrides.count(requireContext())
+                )
+            },
+            onClick = ::showCustomLanguageDialog
+        )
 
         clickableDynamicPreference(
             preference = SETTINGS_PROXY,
@@ -115,6 +146,83 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
             isChecked = userPreferences.colorModeEnabled,
             onCheckChange = { userPreferences.colorModeEnabled = it }
         )
+    }
+
+    private fun currentLanguageName(): String {
+        val selectedTag = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+            .takeIf { it.isNotBlank() } ?: "system"
+        val values = resources.getStringArray(R.array.language_values)
+        val entries = resources.getStringArray(R.array.language_entries)
+        return entries[values.indexOf(selectedTag).takeIf { it >= 0 } ?: 0]
+    }
+
+    private fun showLanguagePicker(summaryUpdater: SummaryUpdater) {
+        val entries = resources.getStringArray(R.array.language_entries)
+        val values = resources.getStringArray(R.array.language_values)
+        val selectedTag = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+            .takeIf { it.isNotBlank() } ?: "system"
+        val selectedIndex = values.indexOf(selectedTag).takeIf { it >= 0 } ?: 0
+
+        BrowserDialog.showCustomDialog(requireActivity()) {
+            setTitle(R.string.settings_language)
+            setSingleChoiceItems(entries, selectedIndex) { _, which ->
+                val languageTag = values[which]
+                summaryUpdater.updateSummary(entries[which])
+                AppCompatDelegate.setApplicationLocales(
+                    if (languageTag == "system") LocaleListCompat.getEmptyLocaleList()
+                    else LocaleListCompat.forLanguageTags(languageTag)
+                )
+            }
+            setPositiveButton(R.string.action_ok, null)
+        }
+    }
+
+    private fun showCustomLanguageDialog() {
+        BrowserDialog.showCustomDialog(requireActivity()) {
+            setTitle(R.string.settings_custom_language_format_title)
+            setMessage(R.string.settings_custom_language_format_message)
+            setPositiveButton(R.string.settings_custom_language_choose) { _, _ ->
+                customLanguagePicker.launch(arrayOf("text/xml", "application/xml", "text/plain"))
+            }
+            if (TranslationOverrides.count(requireContext()) > 0) {
+                setNeutralButton(R.string.settings_custom_language_clear) { _, _ ->
+                    TranslationOverrides.clear(requireContext())
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.settings_custom_language_cleared,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    requireActivity().recreate()
+                }
+            }
+            setNegativeButton(R.string.action_cancel, null)
+        }
+    }
+
+    private fun loadCustomLanguage(uri: Uri) {
+        runCatching {
+            requireContext().contentResolver.openInputStream(uri)
+                ?.let { TranslationOverrides.import(requireContext(), it) }
+                ?: error("could not open file")
+        }.onSuccess { count ->
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.settings_custom_language_loaded, count),
+                Toast.LENGTH_SHORT
+            ).show()
+            requireActivity().recreate()
+        }.onFailure { error ->
+            BrowserDialog.showCustomDialog(requireActivity()) {
+                setTitle(R.string.settings_custom_language)
+                setMessage(
+                    getString(
+                        R.string.settings_custom_language_invalid,
+                        error.message ?: "Unknown error"
+                    )
+                )
+                setPositiveButton(R.string.action_ok, null)
+            }
+        }
     }
 
     private fun ProxyChoice.toSummary(): String {
@@ -482,6 +590,8 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
     }
 
     companion object {
+        private const val SETTINGS_LANGUAGE = "app_language"
+        private const val SETTINGS_CUSTOM_LANGUAGE = "custom_language_xml"
         private const val SETTINGS_PROXY = "proxy"
         private const val SETTINGS_IMAGES = "cb_images"
         private const val SETTINGS_SAVEDATA = "savedata"

@@ -1,5 +1,7 @@
 package com.krystelligence.solipsism.qr
 
+import android.content.Context
+import com.krystelligence.solipsism.i18n.TranslationOverrides
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.ThemeApplication
 import com.krystelligence.solipsism.databinding.ActivityQrScannerBinding
@@ -33,6 +35,10 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class QrScannerActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(TranslationOverrides.wrap(newBase))
+    }
 
     private lateinit var binding: ActivityQrScannerBinding
     private lateinit var cameraExecutor: ExecutorService

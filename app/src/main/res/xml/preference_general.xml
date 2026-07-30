@@ -2,6 +2,16 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="@string/settings_general">
+        <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="app_language"
+            android:title="@string/settings_language"
+            android:summary="@string/settings_language_summary" />
+        <Preference
+            android:icon="@drawable/ic_settings_download"
+            android:key="custom_language_xml"
+            android:title="@string/settings_custom_language"
+            android:summary="@string/settings_custom_language_summary" />
         <SwitchPreferenceCompat
             android:defaultValue="false"
             android:icon="@drawable/ic_action_desktop"

@@ -1,0 +1,86 @@
+name: Bug report
+description: Report a reproducible problem in Solipsism Browser.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem. Please provide as much detail as possible.
+
+        Do not include passwords, private browsing data, personal files, or other sensitive information in screenshots, videos, logs, or descriptions.
+
+  - type: input
+    id: app-version
+    attributes:
+      label: Solipsism Browser version
+      description: Which app version is affected? Check Settings > About or the APK/F-Droid package details.
+      placeholder: 5.2.3
+    validations:
+      required: true
+
+  - type: input
+    id: android-version
+    attributes:
+      label: Android version
+      description: Include the Android version and, if known, the security patch level.
+      placeholder: Android 15, security patch 2026-06-05
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Phone brand and model
+      description: Please include the manufacturer and exact model, including the model variant when known.
+      placeholder: Google Pixel 8a
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation-source
+    attributes:
+      label: Installation source
+      description: Where did you install this version from?
+      options:
+        - F-Droid
+        - GitHub APK release
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem, what you expected, and the steps needed to reproduce it.
+      placeholder: |
+        Steps to reproduce:
+        1. ...
+        2. ...
+
+        Expected behavior:
+        ...
+
+        Actual behavior:
+        ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshot or video
+      description: If possible, attach a screenshot or screen recording that demonstrates the problem. Please redact private information first.
+      placeholder: Drag and drop an image or video here, or paste a link.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add relevant logs, website URLs, settings, or other details. Remove sensitive information.
+    validations:
+      required: false

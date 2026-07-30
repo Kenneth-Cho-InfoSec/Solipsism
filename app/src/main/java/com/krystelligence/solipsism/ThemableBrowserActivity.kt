@@ -3,6 +3,7 @@ package com.krystelligence.solipsism
 import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.browser.ui.TabConfiguration
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.i18n.TranslationOverrides
 import com.krystelligence.solipsism.utils.ThemeUtils
 import android.content.Intent
 import android.graphics.Color
@@ -19,6 +20,10 @@ import javax.inject.Inject
  * A theme aware activity that updates its theme based on the user preferences.
  */
 abstract class ThemableBrowserActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(TranslationOverrides.wrap(newBase))
+    }
 
     @Inject
     internal lateinit var userPreferences: UserPreferences

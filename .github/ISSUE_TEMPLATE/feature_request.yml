@@ -1,0 +1,62 @@
+name: Feature request
+description: Suggest an improvement for Solipsism Browser.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please describe the use case and proposed behavior clearly. Do not include passwords, private browsing data, or other sensitive information.
+
+  - type: input
+    id: app-version
+    attributes:
+      label: Solipsism Browser version
+      description: Which version are you currently using?
+      placeholder: 5.2.3
+    validations:
+      required: true
+
+  - type: input
+    id: android-version
+    attributes:
+      label: Android version
+      placeholder: Android 15
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Phone brand and model
+      placeholder: Google Pixel 8a
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation-source
+    attributes:
+      label: Installation source
+      options:
+        - F-Droid
+        - GitHub APK release
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: request
+    attributes:
+      label: What would you like to see?
+      description: Explain the proposed feature and the problem or use case it would solve.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshot, video, or example
+      description: If possible, attach a screenshot or video illustrating the idea. Please redact private information first.
+    validations:
+      required: false

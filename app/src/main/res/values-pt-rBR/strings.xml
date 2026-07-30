@@ -80,7 +80,7 @@
     <string name="action_homepage">Padrão</string>
     <string name="action_back">Voltar</string>
     <string name="action_find">Localizar na página</string>
-    <string name="download_pending">A iniciar transferência\u2026</string>
+    <string name="download_pending">A iniciar transferência…</string>
     <string name="cannot_download">Apenas possível para as URLs \"http\" ou \"https\".</string>
     <string name="download_no_sdcard_dlg_title">Cartão SD não encontrado</string>
     <string name="download_no_sdcard_dlg_msg">Necessita-se de um cartão SD para salvar o arquivo transferido.</string>
@@ -162,4 +162,18 @@
     </string-array>
     <string name="dark_theme">Tema escuro</string>
     <string name="tabs">Abas</string>
+    <string name="settings_custom_language_clear">Limpar idioma personalizado</string>
+    <string name="settings_custom_language_cleared">Substituições de idioma personalizado limpas.</string>
+    <string name="settings_custom_language_invalid">Could not load custom language XML: %1$s</string>
+    <string name="settings_custom_language_loaded">Custom language loaded (%1$d strings)</string>
+    <string name="settings_custom_language_choose">Escolher arquivo XML</string>
+    <string name="settings_custom_language_format_message">Use a UTF-8 XML file with this structure:\n\n&lt;resources&gt;\n  &lt;string name=&quot;settings_general&quot;&gt;My language&lt;/string&gt;\n&lt;/resources&gt;\n\nOnly &lt;string&gt; resources that already exist in Solipsism are accepted. Unknown names, duplicate names, external entities, scripts, and files larger than 512 KB are rejected. Unspecified strings continue using the selected built-in language.</string>
+    <string name="settings_custom_language_format_title">Formato XML de idioma personalizado</string>
+    <string name="settings_custom_language_summary">Importe substituições de texto validadas do dispositivo.</string>
+    <string name="settings_custom_language">Carregar XML de idioma personalizado</string>
+    <string name="settings_language_summary">Escolha o idioma usado pelo Solipsism.</string>
+    <string name="settings_language">Idioma do aplicativo</string>
+     <string name="malware_scanner_disclaimer">Aviso do Malware Scanner</string>
+    <string name="malware_scanner_disclaimer_summary">Limitações importantes e responsabilidade do usuário.</string>
+    <string name="malware_scanner_disclaimer_message">The Malware Scanner is provided solely as a supplementary security aid. No scanning method can identify every malicious file, and results may include false positives or false negatives. A clean result is not a guarantee that a file is safe.\n\nYou remain responsible for verifying downloads and maintaining appropriate protective measures. This feature does not replace antivirus controls, sandboxing, backups, access controls, security monitoring, incident response, or any security and regulatory compliance obligations. Use layered security techniques appropriate to your risk.\n\nTo the fullest extent permitted by applicable law, Kenneth-Cho-InfoSec and the project contributors provide this feature without a guarantee of complete accuracy and accept no responsibility for malware infection, data loss, service interruption, device damage, or other loss arising from reliance on scan results or from a download. This disclaimer does not exclude or limit rights or liability that cannot legally be excluded or limited.</string>
 </resources>

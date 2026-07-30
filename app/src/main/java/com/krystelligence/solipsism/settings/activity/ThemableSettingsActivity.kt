@@ -5,6 +5,7 @@ import com.krystelligence.solipsism.AccentPalette
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.i18n.TranslationOverrides
 import com.krystelligence.solipsism.utils.ThemeUtils
 import android.graphics.Color
 import android.os.Bundle
@@ -13,6 +14,10 @@ import androidx.core.graphics.drawable.toDrawable
 import javax.inject.Inject
 
 abstract class ThemableSettingsActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(TranslationOverrides.wrap(newBase))
+    }
 
     private var themeId: AppTheme = AppTheme.LIGHT
     private var appliedSystemAccent: Int? = null

@@ -44,6 +44,10 @@ class VirusTotalSettingsFragment : AbstractSettingsFragment() {
             isChecked = userPreferences.virusTotalScanningEnabled,
             onCheckChange = { userPreferences.virusTotalScanningEnabled = it }
         )
+        clickablePreference(
+            preference = DISCLAIMER,
+            onClick = ::showDisclaimer
+        )
         togglePreference(
             preference = SCAN_IMAGES,
             isChecked = userPreferences.virusTotalScanImages,
@@ -185,6 +189,14 @@ class VirusTotalSettingsFragment : AbstractSettingsFragment() {
             .show()
     }
 
+    private fun showDisclaimer() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.malware_scanner_disclaimer)
+            .setMessage(R.string.malware_scanner_disclaimer_message)
+            .setPositiveButton(R.string.action_ok, null)
+            .show()
+    }
+
     private fun keySummary(): String = if (apiKeyStore.hasKey()) {
         getString(R.string.virus_total_api_key_configured)
     } else {
@@ -193,6 +205,7 @@ class VirusTotalSettingsFragment : AbstractSettingsFragment() {
 
     private companion object {
         const val ENABLED = "virus_total_enabled"
+        const val DISCLAIMER = "malware_scanner_disclaimer"
         const val API_KEY = "virus_total_api_key"
         const val CLOUD_ENABLED = "virus_total_cloud_enabled"
         const val DEFINITIONS = "malware_definitions"

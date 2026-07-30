@@ -1,5 +1,7 @@
 package com.krystelligence.solipsism.qr
 
+import android.content.Context
+import com.krystelligence.solipsism.i18n.TranslationOverrides
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
@@ -11,6 +13,10 @@ import com.krystelligence.solipsism.ThemeApplication
 import com.krystelligence.solipsism.databinding.ActivityQrShowBinding
 
 class QrShowActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(TranslationOverrides.wrap(newBase))
+    }
 
     private lateinit var binding: ActivityQrShowBinding
 
