@@ -4,71 +4,210 @@
   <img src="docs/logo.png" alt="Solipsism Browser logo" width="220">
 </p>
 
-Solipsism Browser is an Android WebView browser built around a rail-first, one-handed interface. It turns the usual browser chrome sideways: navigation, tabs, search, QR scanning, refresh, and the overflow menu live in a compact left or right rail, leaving the page itself as the main surface.
+Solipsism Browser is a privacy-focused Android WebView browser built around a rail-first, one-handed interface. Navigation, tabs, search, QR scanning, refresh, bookmarks, and browser tools live in a compact rail on the left or right, leaving the webpage as the main surface.
 
-The current identity is privacy-aware, highly tactile, and mobile-native. Solipsism combines a Material Design 3 Expressive-inspired UI with compact rail modes, a customizable homepage, practical browsing tools, and privacy controls that are meant to feel close at hand instead of buried in menus.
+Current release: **5.3.0**<br>
+Application ID: `com.krystelligence.solipsism`<br>
+Developer: **Kenneth-Cho-InfoSec**
 
-## What Makes It Different
+## Why Solipsism?
 
-- **Rail-first browsing**: A left or right side rail keeps browser controls reachable without covering the web page.
-- **Compact by design**: Small, Medium, Large, and Super Compact rail sizes let the UI adapt to different hands, screens, and habits.
-- **Material 3 Expressive direction**: Rounded surfaces, motion, shadows, themed colors, and physical-feeling popup menus shape the app’s visual language.
-- **Custom homepage**: Wallpaper support, bookmark shortcuts, and a quiet Solipsism start page replace the generic blank tab feeling.
-- **Privacy tools**: Incognito browsing, ad blocking, cookie controls, WebRTC settings, clear-on-exit options, and Decoy Mode for history replacement.
-- **Fast daily actions**: QR scanning, find in page, add bookmark, downloads, install website as app, share, copy link, and history tools are designed for mobile use.
+- **Rail-first interaction** keeps frequent browser actions reachable with one hand.
+- **Privacy controls are visible and configurable**, instead of being hidden behind a single “private mode” switch.
+- **Power-user features are built in**: userscripts, cosmetic ad blocking, custom filters, site permissions, malware scanning, and homepage customization.
+- **The interface is adaptable** with themes, accent colors, AMOLED mode, wallpapers, compact layouts, custom fonts, and accessibility controls.
+- **The app is designed for Android WebView**, so unsupported platform capabilities are identified as experimental rather than presented as fully reliable browser permissions.
 
-## Core Features
+## Spotlight Features
 
-- WebView browsing with tabs, tab overview, and animated tab switching from the URL rail.
-- Vertical URL rail with a horizontal full-URL editor when needed.
-- Built-in QR scanner with light and dark mode support.
-- Bookmark list and homepage bookmark shortcuts.
-- History page with Clear All History and Decoy Mode.
-- Download handling with a donation prompt section.
-- Install Website as App using Android pinned shortcuts.
-- File upload support through Android’s file picker.
-- Fullscreen video support with system bars and rail hidden during landscape fullscreen playback.
-- Material-style settings with grouped sections, search, appearance controls, privacy controls, and accessibility options.
+### Tampermonkey-compatible userscripts
 
-## Privacy And Decoy Mode
+Solipsism includes an experimental userscript manager for scripts using the familiar Tampermonkey/Greasemonkey metadata format:
 
-Solipsism includes conventional browser privacy features such as incognito mode, ad blocking, cookie controls, stored data cleanup, and WebRTC toggles.
+- Import scripts from a local `.js` file.
+- Import scripts from an HTTPS URL.
+- Enable or disable the userscript runtime globally.
+- Review and manage installed scripts.
+- Respect common metadata such as `@match`, `@include`, `@exclude`, `@run-at`, `@name`, and `@description`.
+- Inject scripts at supported document lifecycle points.
 
-Decoy Mode is a more opinionated Solipsism feature: from the history page, long-pressing Clear All History can replace recent browsing history with randomized, realistic-looking browsing sessions. The generated activity follows coherent browsing paths across search, Amazon, Reddit, and YouTube-style destinations instead of creating a flat list of unrelated searches.
+This is a WebView-compatible userscript runtime, not the full Tampermonkey extension API. Unsupported privileged APIs are not silently emulated. Scripts should be treated as executable code: only install scripts from sources you trust.
 
-## Appearance
+### Screenshot capture
 
-The app is designed around the rail:
+The three-dot menu includes a screenshot action that captures the current webpage surface without the Solipsism rail. The capture provides visual feedback with a 70% shrink animation, rounded corners, a brief translucent white flash, and device vibration.
 
-- Put the rail on the left or right.
-- Choose rail size, including Super Compact mode.
-- Match rail colors to Android system theming.
-- Use dark or light mode-sensitive UI.
-- Customize the homepage wallpaper or keep it blacked out.
+### Site permissions
+
+The Site Permissions section provides per-site controls for browser capabilities, with separate global and site-specific decisions where Android WebView permits them:
+
+Standard controls include:
+
+- Location/GPS
+- Camera
+- Microphone
+- Notifications
+- Clipboard access
+- Motion sensors
+- Protected content
+- Embedded content
+- Local network access
+- Automatic downloads
+
+Additional controls are labelled **Experimental** because Android WebView does not reliably expose or enforce every browser permission independently:
+
+- NFC
+- USB
+- Serial devices
+- File editing
+- Virtual reality
+- Augmented reality
+- Device use
+- Apps on the device
+- JavaScript JIT
+
+Experimental controls are best-effort policy signals and should not be treated as equivalent to a desktop browser’s fully enforced permission sandbox.
+
+### Adblocker
+
+The Adblocker section combines network and cosmetic controls:
+
+- Host-based ad and tracker blocking.
+- uBlock-style cosmetic filtering where supported.
+- Custom filter rules.
+- An element picker for creating a rule from a page element.
+- Filter-language help beside the custom filter editor.
+- Optional blocking of animated GIF images.
+- Selectable host-list sources and manual refresh.
+
+The custom filter language supports common cosmetic-filter patterns such as `##` for hiding matching elements and `#@#` for exceptions. WebView limitations mean this is a focused, browser-safe subset rather than a complete uBlock Origin engine.
+
+### Malware Scanner
+
+Malware Scanner is a layered download-safety feature:
+
+- Local definitions-based scanning works without an API key.
+- Malware definitions can be refreshed and configured in settings.
+- Image and video scanning can be enabled separately.
+- Optional VirusTotal scanning can be configured with the user’s own API key.
+- Downloads can be scanned, downloaded while skipping scanning, or cancelled.
+- Suspicious files are blocked with a detection prompt.
+- Scanning state is shown in the download dialog and notification.
+- A disclaimer explains that no malware scanner is 100% accurate and that the feature is an aid, not a replacement for a complete cybersecurity program.
+
+Malware Scanner is a defence-in-depth feature. Users should still use trusted sources, keep Android updated, maintain endpoint protections, and follow applicable cybersecurity compliance procedures.
+
+## Browsing Features
+
+- WebView browsing with tabs and tab overview.
+- Vertical URL/search rail with an expanded URL editor.
+- Left or right side rail positioning.
+- Small, Medium, Large, and Super Compact rail sizes.
+- Experimental top and bottom rail layouts behind Debug settings.
+- QR code scanning with an optional downloadable module design.
+- Long-press refresh with JavaScript-disabled reload.
+- Find in page, copy link, share, add bookmark, history, and downloads.
+- Install Website as App through Android shortcuts.
+- File upload support through Android’s system picker.
+- Fullscreen video support with rail and system-bar handling.
+- Current-page screenshot capture without the browser rail.
+
+## Homepage Customization
+
+The homepage supports:
+
+- Built-in Solipsism homepage.
+- Wallpaper selection, including light, dark, non-AMOLED, and AMOLED-black presentation.
+- Custom wallpaper positioning and opacity.
+- Bookmark shortcut visibility and column count.
+- Custom motto text, size, and opacity.
+- Configurable date and time display, formats, and opacity.
+- Sanitized static HTML and CSS imported from the device.
+- Direct HTML/CSS editing in the app.
+- An HTTPS website homepage in restricted safe mode.
+
+Custom HTML is sanitized and stored in app-private storage. JavaScript, downloads, forms, frames, remote resources, executable content, and file access are disabled for static custom homepages. Homepage file navigation is restricted to Solipsism-generated private pages; arbitrary public-storage files are not accepted as browser pages.
+
+## Privacy and Security Controls
+
+- Incognito browsing.
+- Cookie Manager with per-site cookie viewing, editing, removal, and deletion.
+- Third-party cookie control.
+- Do Not Track and identifying-header controls.
+- WebRTC configuration.
+- Clear cache, history, cookies, and web storage individually or on exit.
+- Site-specific permission policies.
+- JavaScript and popup controls.
+- File and content access restrictions in WebView.
+- Safe Browsing enabled when supported by the installed WebView provider.
+- Hardened handling for `intent://`, `file://`, `content://`, `data:`, and `javascript:` navigation.
+- Canonical-path checks for app-generated internal HTML pages.
+
+### Decoy Mode
+
+From the history page, long-pressing Clear All History opens Decoy Mode. It can replace recent history with randomized, coherent-looking browsing sessions rather than a flat list of unrelated URLs.
+
+## Appearance, Accessibility, and Audio
+
+- Light, dark, and true AMOLED-black themes.
+- Multiple accent palettes and Android system accent matching.
+- Dynamic color updates when supported by Android.
+- Consistent Material Design 3 settings and dialogs.
+- Custom local font import with size validation.
+- Text size, text reflow, wide viewport, overview mode, and rendering controls.
+- Audio settings under Graphics.
+- Global Solipsism audio-effects toggle.
+- Custom equalizer controls and presets such as bass boost and vocal boost.
+- Left/right channel test playback.
+- Accent-aware rail, buttons, dialogs, and selected controls.
+
+## Download and Data Safety
+
+Downloads support common file types through Android’s DownloadManager and browser handling. Blob downloads have size limits, user-provided userscripts are size-checked, and dangerous navigation paths are rejected. Malware scanning is applied according to the configured policy, with an explicit skip-scanning option for users who understand the trade-off.
+
+## Permissions
+
+Declared permissions are limited to the browser’s core operation:
+
+- `INTERNET` for web access.
+- `ACCESS_NETWORK_STATE` for connectivity state.
+- `POST_NOTIFICATIONS` for download and scan notifications.
+
+Requested only when needed:
+
+- `CAMERA` for QR scanning and optional WebRTC video capture.
+- `RECORD_AUDIO` and `MODIFY_AUDIO_SETTINGS` for optional WebRTC audio capture.
+- `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` for website location requests when enabled.
+
+Android and WebView may still enforce additional system-level prompts or limitations. Denying a permission keeps the corresponding capability unavailable.
 
 ## Build
 
 Requirements:
 
-- Android Studio or Android SDK command line tools
-- JDK 17 or newer
+- Android SDK command-line tools or Android Studio.
+- JDK 17 or newer.
+- An Android SDK with the project’s compile SDK installed.
 
-Debug build:
+Linux/macOS:
 
-```powershell
-.\gradlew.bat assembleSolipsismBrowserDebug
+```bash
+./gradlew :app:assembleSolipsismBrowserDebug
+./gradlew :app:assembleSolipsismBrowserRelease
 ```
 
-Release build:
+Windows PowerShell:
 
 ```powershell
-.\gradlew.bat assembleSolipsismBrowserRelease
+.\gradlew.bat :app:assembleSolipsismBrowserDebug
+.\gradlew.bat :app:assembleSolipsismBrowserRelease
 ```
 
-Lint:
+Unit tests and resource validation:
 
-```powershell
-.\gradlew.bat lintSolipsismBrowserDebug
+```bash
+./gradlew :app:testSolipsismBrowserDebugUnitTest
+python3 scripts/check_localized_resources.py
 ```
 
 Generated APKs are written under:
@@ -77,20 +216,11 @@ Generated APKs are written under:
 app/build/outputs/apk/
 ```
 
-## Permissions
+The GitHub release page contains the current signed release APK. Release signing credentials are intentionally kept outside the repository.
 
-Declared permissions:
+## Translations
 
-- `INTERNET`: access the web.
-- `ACCESS_NETWORK_STATE`: respond to network availability.
-- `INSTALL_SHORTCUT`: support installed website shortcuts.
-- `POST_NOTIFICATIONS`: display browser notifications.
-
-Requested only when needed:
-
-- `CAMERA`: QR scanning and optional WebRTC video capture.
-- `RECORD_AUDIO` and `MODIFY_AUDIO_SETTINGS`: optional WebRTC audio capture.
-- `ACCESS_FINE_LOCATION` / `ACCESS_COARSE_LOCATION`: website location requests when enabled.
+The app includes translations for Arabic, Brazilian Portuguese, Chinese Simplified, Chinese Traditional, Dutch, French, German, Greek, Hebrew, Hungarian, Italian, Japanese, Korean, Lithuanian, Polish, Portuguese, Russian, Serbian, Spanish, and Turkish. Users can select a supported language or import a custom language XML file that follows the Android `strings.xml` resource format.
 
 ## Support
 
@@ -98,4 +228,4 @@ If Solipsism is useful to you, development can be supported on [Ko-fi](https://k
 
 ## License
 
-Solipsism Browser remains licensed under the Mozilla Public License 2.0. See [LICENSE](LICENSE).
+Solipsism Browser is licensed under the Mozilla Public License 2.0. See [LICENSE](LICENSE).
