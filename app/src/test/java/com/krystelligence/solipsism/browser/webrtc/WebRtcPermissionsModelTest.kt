@@ -3,6 +3,7 @@ package com.krystelligence.solipsism.browser.webrtc
 import android.net.Uri
 import android.webkit.PermissionRequest
 import com.nhaarman.mockito_kotlin.*
+import com.krystelligence.solipsism.preference.SitePermissionStore
 import org.junit.Test
 
 /**
@@ -22,7 +23,7 @@ class WebRtcPermissionsModelTest {
 
     @Test
     fun `requestPermission with resource denial denies request`() {
-        val model = WebRtcPermissionsModel()
+        val model = WebRtcPermissionsModel(mock<SitePermissionStore>())
         whenever(permissionsView.requestResources(any(), any(), any())).then {
             (it.arguments[2] as ((Boolean) -> Unit)).invoke(false)
         }
@@ -44,7 +45,7 @@ class WebRtcPermissionsModelTest {
 
     @Test
     fun `requestPermission with resource grant and permission denial denies request`() {
-        val model = WebRtcPermissionsModel()
+        val model = WebRtcPermissionsModel(mock<SitePermissionStore>())
         whenever(permissionsView.requestResources(any(), any(), any())).then {
             (it.arguments[2] as ((Boolean) -> Unit)).invoke(true)
         }
@@ -70,7 +71,7 @@ class WebRtcPermissionsModelTest {
 
     @Test
     fun `requestPermission with resource and permission grant grants request`() {
-        val model = WebRtcPermissionsModel()
+        val model = WebRtcPermissionsModel(mock<SitePermissionStore>())
         whenever(permissionsView.requestResources(any(), any(), any())).then {
             (it.arguments[2] as ((Boolean) -> Unit)).invoke(true)
         }
@@ -98,7 +99,7 @@ class WebRtcPermissionsModelTest {
 
     @Test
     fun `requestPermission with pre-granted resources and permission grant grants request`() {
-        val model = WebRtcPermissionsModel()
+        val model = WebRtcPermissionsModel(mock<SitePermissionStore>())
         whenever(permissionsView.requestResources(any(), any(), any())).then {
             (it.arguments[2] as ((Boolean) -> Unit)).invoke(true)
         }
@@ -139,7 +140,7 @@ class WebRtcPermissionsModelTest {
 
     @Test
     fun `requestPermission with pre-granted resources and permission denial denies request`() {
-        val model = WebRtcPermissionsModel()
+        val model = WebRtcPermissionsModel(mock<SitePermissionStore>())
         whenever(permissionsView.requestResources(any(), any(), any())).then {
             (it.arguments[2] as ((Boolean) -> Unit)).invoke(true)
         }
@@ -184,7 +185,7 @@ class WebRtcPermissionsModelTest {
 
     @Test
     fun `requestPermission with permission grant after multiple grants`() {
-        val model = WebRtcPermissionsModel()
+        val model = WebRtcPermissionsModel(mock<SitePermissionStore>())
         whenever(permissionsView.requestResources(any(), any(), any())).then {
             (it.arguments[2] as ((Boolean) -> Unit)).invoke(true)
         }

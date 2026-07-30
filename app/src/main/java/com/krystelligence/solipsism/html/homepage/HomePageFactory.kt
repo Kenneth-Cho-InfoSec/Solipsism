@@ -63,7 +63,7 @@ class HomePageFactory @Inject constructor(
                 ?.takeIf(File::exists)
                 ?.toURI()
                 ?.toString()
-                ?.let { "url(\"$it\") center center / cover no-repeat" }
+                ?.let { "url(\"$it\") $wallpaperPosition / cover no-repeat" }
                 ?: defaultWallpaperCss()
             HOMEPAGE_WALLPAPER_BLACK -> "none"
             else -> defaultWallpaperCss()
@@ -90,18 +90,34 @@ class HomePageFactory @Inject constructor(
                         .replace("--shortcut-border: {SHORTCUT_BORDER}", "--shortcut-border: $shortcutBorder;")
                         .replace("--shortcut-bg: {SHORTCUT_BG}", "--shortcut-bg: $shortcutBackground;")
                         .replace("--shortcut-icon-bg: {SHORTCUT_ICON_BG}", "--shortcut-icon-bg: $shortcutIconBackground;")
+                        .replace("--homepage-motto-size: {MOTTO_SIZE}", "--homepage-motto-size: ${mottoSize}px;")
+                        .replace("--homepage-motto-opacity: {MOTTO_OPACITY}", "--homepage-motto-opacity: $mottoOpacity;")
+                        .replace("--homepage-bookmark-columns: {BOOKMARK_COLUMNS}", "--homepage-bookmark-columns: ${bookmarkColumns};")
+                        .replace("--homepage-wallpaper-opacity: {WALLPAPER_OPACITY}", "--homepage-wallpaper-opacity: $wallpaperOpacity;")
+                        .replace("--homepage-wallpaper-position: {WALLPAPER_POSITION}", "--homepage-wallpaper-position: $wallpaperPosition;")
                         .replace("{GOOGLE_SANS_FONT}", googleSansFont)
                 }
                 charset { UTF8 }
                 body {
                     val shortcutTemplate = findId("shortcut_template").removeElement()
                     id("bookmark_shortcuts") {
-                        bookmarks.take(MAX_SHORTCUTS).forEach { bookmark ->
-                            appendChild(shortcutTemplate.clone {
-                                attr("href", bookmark.url)
-                                id("shortcut_icon") { text(bookmark.shortcutInitial()) }
-                                id("shortcut_title") { text(bookmark.title.ifBlank { bookmark.url }) }
-                            })
+                        if (userPreferences.homepageBookmarksEnabled) {
+                            bookmarks.take(MAX_SHORTCUTS).forEach { bookmark ->
+                                appendChild(shortcutTemplate.clone {
+                                    attr("href", bookmark.url)
+                                    id("shortcut_icon") { text(bookmark.shortcutInitial()) }
+                                    id("shortcut_title") { text(bookmark.title.ifBlank { bookmark.url }) }
+                                })
+                            }
+                        } else {
+                            remove()
+                        }
+                    }
+                    getElementsByClass("motto").first()?.let { motto ->
+                        if (userPreferences.homepageMottoEnabled) {
+                            motto.text(userPreferences.homepageMotto)
+                        } else {
+                            motto.remove()
                         }
                     }
                 }
@@ -166,7 +182,7 @@ class HomePageFactory @Inject constructor(
     }
 
     private fun defaultWallpaperCss(): String =
-        "url(\"data:image/jpeg;base64,${Base64.encodeToString(defaultWallpaperFile().readBytes(), Base64.NO_WRAP)}\") center center / cover no-repeat"
+        "url(\"data:image/jpeg;base64,${Base64.encodeToString(defaultWallpaperFile().readBytes(), Base64.NO_WRAP)}\") $wallpaperPosition / cover no-repeat"
 
     private val wallpaperImageDataUri: String
         get() = when (userPreferences.homepageWallpaperMode) {
@@ -227,6 +243,22 @@ class HomePageFactory @Inject constructor(
 
     private val shortcutIconBackground: String
         get() = if (isLightHomepage) "rgba(0, 0, 0, 0.10)" else "rgba(255, 255, 255, 0.20)"
+
+    private val mottoSize: Int
+        get() = userPreferences.homepageMottoSize.coerceIn(10, 32)
+
+    private val mottoOpacity: String
+        get() = (userPreferences.homepageMottoOpacity.coerceIn(0, 100) / 100.0).toString()
+
+    private val bookmarkColumns: Int
+        get() = userPreferences.homepageBookmarkColumns.coerceIn(1, 4)
+
+    private val wallpaperOpacity: String
+        get() = (userPreferences.homepageWallpaperOpacity.coerceIn(0, 100) / 100.0).toString()
+
+    private val wallpaperPosition: String
+        get() = "${userPreferences.homepageWallpaperPositionX.coerceIn(0, 100)}% " +
+            "${userPreferences.homepageWallpaperPositionY.coerceIn(0, 100)}%"
 
     private fun validDateFormat(value: String, fallback: String): String =
         value.takeIf { it.isNotBlank() }?.let { pattern ->

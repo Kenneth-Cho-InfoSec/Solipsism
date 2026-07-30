@@ -4,7 +4,7 @@
     <PreferenceCategory android:title="@string/malware_scanner">
         <SwitchPreferenceCompat
             android:defaultValue="true"
-            android:icon="@drawable/ic_settings_shield"
+            android:icon="@drawable/ic_settings_malware_horse"
             android:key="virus_total_enabled"
             android:summary="@string/malware_scanner_enabled_summary"
             android:title="@string/malware_scanner_enabled" />
@@ -31,13 +31,13 @@
             android:title="@string/malware_definitions_source" />
         <SwitchPreferenceCompat
             android:defaultValue="false"
-            android:icon="@drawable/ic_settings_shield"
+            android:icon="@drawable/ic_settings_malware_horse"
             android:key="virus_total_scan_images"
             android:summary="@string/virus_total_scan_images_summary"
             android:title="@string/virus_total_scan_images" />
         <SwitchPreferenceCompat
             android:defaultValue="false"
-            android:icon="@drawable/ic_settings_shield"
+            android:icon="@drawable/ic_settings_malware_horse"
             android:key="virus_total_scan_videos"
             android:summary="@string/virus_total_scan_videos_summary"
             android:title="@string/virus_total_scan_videos" />
@@ -46,7 +46,7 @@
     <PreferenceCategory android:title="@string/virus_total_optional">
         <SwitchPreferenceCompat
             android:defaultValue="false"
-            android:icon="@drawable/ic_settings_shield"
+            android:icon="@drawable/ic_settings_malware_horse"
             android:key="virus_total_cloud_enabled"
             android:summary="@string/virus_total_cloud_enabled_summary"
             android:title="@string/virus_total_cloud_enabled" />

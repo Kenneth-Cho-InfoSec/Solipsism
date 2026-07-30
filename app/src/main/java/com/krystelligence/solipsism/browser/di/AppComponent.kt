@@ -18,6 +18,7 @@ import com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment
 import com.krystelligence.solipsism.settings.fragment.GeneralSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.PrivacySettingsFragment
 import com.krystelligence.solipsism.settings.fragment.RootSettingsFragment
+import com.krystelligence.solipsism.settings.fragment.SitePermissionsSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.UserScriptsSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.VirusTotalSettingsFragment
 import android.app.Application
@@ -55,6 +56,8 @@ interface AppComponent {
     fun inject(activity: ThemableSettingsActivity)
 
     fun inject(fragment: PrivacySettingsFragment)
+
+    fun inject(fragment: SitePermissionsSettingsFragment)
 
     fun inject(fragment: DebugSettingsFragment)
 

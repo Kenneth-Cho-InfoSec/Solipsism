@@ -27,9 +27,11 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.ScrollView
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.switchmaterial.SwitchMaterial
 import java.io.File
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
@@ -76,6 +78,15 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             preference = SETTINGS_HOMEPAGE_SOURCE,
             summary = homepageSourceDisplayName(),
             onClick = ::showHomepageSourcePicker
+        )
+
+        clickablePreference(
+            preference = SETTINGS_HOMEPAGE_LAYOUT,
+            onClick = ::showHomepageLayoutEditor
+        )
+        clickablePreference(
+            preference = SETTINGS_HOMEPAGE_EDITOR,
+            onClick = ::showHomepageCodeEditor
         )
 
         clickableDynamicPreference(
@@ -349,6 +360,189 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             }
             .show()
     }
+
+    private fun showHomepageLayoutEditor() {
+        val container = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24.dp, 0, 24.dp, 0)
+        }
+        val mottoEnabled = SwitchMaterial(requireContext()).apply {
+            text = getString(R.string.settings_homepage_motto)
+            isChecked = userPreferences.homepageMottoEnabled
+        }
+        val motto = EditText(requireContext()).apply {
+            hint = getString(R.string.settings_homepage_motto_hint)
+            setText(userPreferences.homepageMotto)
+            setSingleLine(true)
+        }
+        val bookmarksEnabled = SwitchMaterial(requireContext()).apply {
+            text = getString(R.string.settings_homepage_bookmarks)
+            isChecked = userPreferences.homepageBookmarksEnabled
+        }
+        container.addView(mottoEnabled)
+        container.addView(motto)
+        container.addView(bookmarksEnabled)
+        val mottoSize = addHomepageSlider(
+            container,
+            R.string.settings_homepage_motto_size,
+            10,
+            32,
+            userPreferences.homepageMottoSize.coerceIn(10, 32)
+        ) { getString(R.string.settings_homepage_size_summary, it) }
+        val mottoOpacity = addHomepageSlider(
+            container,
+            R.string.settings_homepage_motto_opacity,
+            0,
+            100,
+            userPreferences.homepageMottoOpacity.coerceIn(0, 100)
+        ) { getString(R.string.settings_homepage_opacity_summary, it) }
+        val columns = addHomepageSlider(
+            container,
+            R.string.settings_homepage_bookmark_columns,
+            1,
+            4,
+            userPreferences.homepageBookmarkColumns.coerceIn(1, 4)
+        ) { getString(R.string.settings_homepage_columns_summary, it) }
+        val wallpaperOpacity = addHomepageSlider(
+            container,
+            R.string.settings_homepage_wallpaper_opacity,
+            0,
+            100,
+            userPreferences.homepageWallpaperOpacity.coerceIn(0, 100)
+        ) { getString(R.string.settings_homepage_opacity_summary, it) }
+        val wallpaperX = addHomepageSlider(
+            container,
+            R.string.settings_homepage_wallpaper_position_x,
+            0,
+            100,
+            userPreferences.homepageWallpaperPositionX.coerceIn(0, 100)
+        ) { getString(R.string.settings_homepage_percent_summary, it) }
+        val wallpaperY = addHomepageSlider(
+            container,
+            R.string.settings_homepage_wallpaper_position_y,
+            0,
+            100,
+            userPreferences.homepageWallpaperPositionY.coerceIn(0, 100)
+        ) { getString(R.string.settings_homepage_percent_summary, it) }
+        motto.isEnabled = mottoEnabled.isChecked
+        mottoEnabled.setOnCheckedChangeListener { _, checked -> motto.isEnabled = checked }
+        val scroll = ScrollView(requireContext()).apply { addView(container) }
+        MaterialAlertDialogBuilder(requireActivity())
+            .setTitle(R.string.settings_homepage_layout)
+            .setView(scroll)
+            .setNegativeButton(R.string.action_cancel, null)
+            .setPositiveButton(R.string.action_ok) { _, _ ->
+                userPreferences.homepageMottoEnabled = mottoEnabled.isChecked
+                userPreferences.homepageMotto = motto.text.toString().trim()
+                userPreferences.homepageBookmarksEnabled = bookmarksEnabled.isChecked
+                userPreferences.homepageMottoSize = mottoSize.progress
+                userPreferences.homepageMottoOpacity = mottoOpacity.progress
+                userPreferences.homepageBookmarkColumns = columns.progress
+                userPreferences.homepageWallpaperOpacity = wallpaperOpacity.progress
+                userPreferences.homepageWallpaperPositionX = wallpaperX.progress
+                userPreferences.homepageWallpaperPositionY = wallpaperY.progress
+            }
+            .show()
+    }
+
+    private fun addHomepageSlider(
+        container: LinearLayout,
+        label: Int,
+        min: Int,
+        max: Int,
+        value: Int,
+        summary: (Int) -> String
+    ): SeekBar {
+        val labelView = TextView(requireContext()).apply {
+            setPadding(0, 12.dp, 0, 0)
+            text = "${getString(label)}: ${summary(value)}"
+        }
+        val seekBar = SeekBar(requireContext()).apply {
+            this.max = max - min
+            progress = value - min
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    labelView.text = "${getString(label)}: ${summary(progress + min)}"
+                }
+                override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+                override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+            })
+        }
+        container.addView(labelView)
+        container.addView(seekBar)
+        return seekBar
+    }
+
+    private fun showHomepageCodeEditor() {
+        val existing = userPreferences.homepageHtmlPath?.let(::File)?.takeIf(File::isFile)?.readText()
+        val htmlInput = EditText(requireContext()).apply {
+            hint = getString(R.string.settings_homepage_html_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            minHeight = 220.dp
+            setText(existing?.let(::extractHomepageBody).orEmpty())
+            gravity = Gravity.TOP or Gravity.START
+        }
+        val cssInput = EditText(requireContext()).apply {
+            hint = getString(R.string.settings_homepage_css_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            minHeight = 220.dp
+            setText(existing?.let(::extractHomepageCss).orEmpty())
+            gravity = Gravity.TOP or Gravity.START
+        }
+        val container = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24.dp, 0, 24.dp, 0)
+            addView(TextView(requireContext()).apply { text = getString(R.string.settings_homepage_html_label) })
+            addView(htmlInput)
+            addView(TextView(requireContext()).apply {
+                text = getString(R.string.settings_homepage_css_label)
+                setPadding(0, 12.dp, 0, 0)
+            })
+            addView(cssInput)
+            addView(TextView(requireContext()).apply {
+                text = getString(R.string.settings_homepage_editor_help)
+                alpha = 0.75f
+                setPadding(0, 12.dp, 0, 0)
+            })
+        }
+        MaterialAlertDialogBuilder(requireActivity())
+            .setTitle(R.string.settings_homepage_editor)
+            .setView(ScrollView(requireContext()).apply { addView(container) })
+            .setNeutralButton(R.string.settings_homepage_source_builtin) { _, _ ->
+                userPreferences.homepageSource = HomepageSource.BUILT_IN.value
+                userPreferences.homepage = com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
+            }
+            .setNegativeButton(R.string.action_cancel, null)
+            .setPositiveButton(R.string.action_ok) { _, _ ->
+                saveInlineHomepage(htmlInput.text.toString(), cssInput.text.toString())
+            }
+            .show()
+    }
+
+    private fun saveInlineHomepage(html: String, css: String) {
+        runCatching {
+            val source = "<html><head><style>$css</style></head><body>$html</body></html>"
+            val sanitized = StaticHomepageSanitizer.sanitize(source)
+            val directory = File(requireContext().filesDir, "homepage").apply { mkdirs() }
+            val target = File(directory, "inline-homepage.html")
+            target.writeText(sanitized, Charsets.UTF_8)
+            userPreferences.homepageHtmlPath = target.absolutePath
+            userPreferences.homepageSource = HomepageSource.STATIC_HTML.value
+        }.onFailure {
+            android.widget.Toast.makeText(
+                requireContext(),
+                it.message ?: getString(R.string.settings_homepage_html_invalid),
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun extractHomepageBody(source: String): String =
+        runCatching { org.jsoup.Jsoup.parse(source).body().html() }.getOrDefault(source)
+
+    private fun extractHomepageCss(source: String): String =
+        runCatching { org.jsoup.Jsoup.parse(source).head().getElementsByTag("style").first()?.data().orEmpty() }
+            .getOrDefault("")
 
     private fun importStaticHomepage(uri: Uri) {
         runCatching {
@@ -645,6 +839,8 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_TEXTSIZE = "text_size"
         private const val SETTINGS_HOMEPAGE_WALLPAPER = "homepage_wallpaper"
         private const val SETTINGS_HOMEPAGE_SOURCE = "homepage_source"
+        private const val SETTINGS_HOMEPAGE_LAYOUT = "homepage_layout"
+        private const val SETTINGS_HOMEPAGE_EDITOR = "homepage_editor"
         private const val SETTINGS_ACCENT_PALETTE = "accent_palette"
         private const val SETTINGS_MATCH_SYSTEM_ACCENT = "match_system_accent"
         private const val SETTINGS_HOMEPAGE_DATETIME_ENABLED = "homepage_datetime_enabled"

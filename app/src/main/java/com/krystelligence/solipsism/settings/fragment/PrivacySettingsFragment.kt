@@ -43,12 +43,6 @@ class PrivacySettingsFragment : AbstractSettingsFragment() {
         clickablePreference(preference = SETTINGS_CLEARWEBSTORAGE, onClick = this::clearWebStorage)
 
         togglePreference(
-            preference = SETTINGS_LOCATION,
-            isChecked = userPreferences.locationEnabled,
-            onCheckChange = { userPreferences.locationEnabled = it }
-        )
-
-        togglePreference(
             preference = SETTINGS_THIRDPCOOKIES,
             isChecked = userPreferences.blockThirdPartyCookiesEnabled,
             onCheckChange = { userPreferences.blockThirdPartyCookiesEnabled = it }
@@ -163,7 +157,6 @@ class PrivacySettingsFragment : AbstractSettingsFragment() {
     }
 
     companion object {
-        private const val SETTINGS_LOCATION = "location"
         private const val SETTINGS_THIRDPCOOKIES = "third_party"
         private const val SETTINGS_CACHEEXIT = "clear_cache_exit"
         private const val SETTINGS_HISTORYEXIT = "clear_history_exit"

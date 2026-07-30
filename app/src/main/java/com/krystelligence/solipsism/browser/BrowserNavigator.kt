@@ -70,6 +70,7 @@ class BrowserNavigator @Inject constructor(
             contentDisposition = pendingDownload.contentDisposition,
             mimeType = pendingDownload.mimeType,
             contentLength = pendingDownload.contentLength,
+            origin = pendingDownload.origin,
             blobData = pendingDownload.blobData
         )
     }

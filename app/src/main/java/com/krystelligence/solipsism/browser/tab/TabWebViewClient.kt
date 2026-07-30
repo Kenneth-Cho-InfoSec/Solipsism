@@ -54,6 +54,7 @@ class TabWebViewClient @AssistedInject constructor(
     private val sslWarningPreferences: SslWarningPreferences,
     private val textReflow: TextReflow,
     private val userScriptRuntime: UserScriptRuntime,
+    private val sitePermissionRuntime: SitePermissionRuntime,
     private val logger: Logger,
     @Assisted("cache") private val cacheStoragePathHandler: InternalStoragePathHandler,
     @Assisted("files") private val filesStoragePathHandler: InternalStoragePathHandler,
@@ -128,6 +129,7 @@ class TabWebViewClient @AssistedInject constructor(
         super.onPageFinished(view, url)
         userScriptRuntime.injectAfterPageFinished(view, url)
         cosmeticFilterRuntime.injectAfterPageFinished(view, url)
+        sitePermissionRuntime.injectAfterPageFinished(view, url)
         urlObservable.onNext(url)
         goBackObservable.onNext(view.canGoBack())
         goForwardObservable.onNext(view.canGoForward())

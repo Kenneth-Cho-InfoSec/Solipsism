@@ -346,14 +346,39 @@
         <item name="colorTertiary">#A7CFDF</item><item name="colorTertiaryContainer">#1E4D5F</item>
     </style>
 
-    <style name="ThemeOverlay.Solipsism.Accent.Teal_Black" parent="ThemeOverlay.Solipsism.Accent.Teal_Dark" />
-    <style name="ThemeOverlay.Solipsism.Accent.Blue_Black" parent="ThemeOverlay.Solipsism.Accent.Blue_Dark" />
-    <style name="ThemeOverlay.Solipsism.Accent.Indigo_Black" parent="ThemeOverlay.Solipsism.Accent.Indigo_Dark" />
-    <style name="ThemeOverlay.Solipsism.Accent.Purple_Black" parent="ThemeOverlay.Solipsism.Accent.Purple_Dark" />
-    <style name="ThemeOverlay.Solipsism.Accent.Pink_Black" parent="ThemeOverlay.Solipsism.Accent.Pink_Dark" />
-    <style name="ThemeOverlay.Solipsism.Accent.Red_Black" parent="ThemeOverlay.Solipsism.Accent.Red_Dark" />
-    <style name="ThemeOverlay.Solipsism.Accent.Orange_Black" parent="ThemeOverlay.Solipsism.Accent.Orange_Dark" />
-    <style name="ThemeOverlay.Solipsism.Accent.Green_Black" parent="ThemeOverlay.Solipsism.Accent.Green_Dark" />
+    <!-- AMOLED keeps only the deepest surface pure black; elevated containers retain contrast. -->
+    <style name="ThemeOverlay.Solipsism.Accent.Teal_Black" parent="ThemeOverlay.Solipsism.Accent.Teal_Dark">
+        <item name="colorSurface">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Blue_Black" parent="ThemeOverlay.Solipsism.Accent.Blue_Dark">
+        <item name="colorSurface">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Indigo_Black" parent="ThemeOverlay.Solipsism.Accent.Indigo_Dark">
+        <item name="colorSurface">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Purple_Black" parent="ThemeOverlay.Solipsism.Accent.Purple_Dark">
+        <item name="colorSurface">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Pink_Black" parent="ThemeOverlay.Solipsism.Accent.Pink_Dark">
+        <item name="colorSurface">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Red_Black" parent="ThemeOverlay.Solipsism.Accent.Red_Dark">
+        <item name="colorSurface">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Orange_Black" parent="ThemeOverlay.Solipsism.Accent.Orange_Dark">
+        <item name="colorSurface">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
+    <style name="ThemeOverlay.Solipsism.Accent.Green_Black" parent="ThemeOverlay.Solipsism.Accent.Green_Dark">
+        <item name="colorSurface">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
     <style name="ThemeOverlay.Solipsism.Accent.System_Light" parent="ThemeOverlay.Solipsism.Accent.Teal_Light" />
     <style name="ThemeOverlay.Solipsism.Accent.System_Dark" parent="ThemeOverlay.Solipsism.Accent.Teal_Dark" />
     <style name="ThemeOverlay.Solipsism.Accent.System_Black" parent="ThemeOverlay.Solipsism.Accent.Teal_Black" />

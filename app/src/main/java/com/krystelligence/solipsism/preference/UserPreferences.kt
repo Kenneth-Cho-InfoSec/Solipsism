@@ -118,6 +118,33 @@ class UserPreferences @Inject constructor(
     /** Path to the sanitized static homepage HTML file. */
     var homepageHtmlPath by preferences.nullableStringPreference(HOMEPAGE_HTML_PATH)
 
+    /** Whether the built-in homepage motto is shown. */
+    var homepageMottoEnabled by preferences.booleanPreference(HOMEPAGE_MOTTO_ENABLED, true)
+
+    /** Text shown below the built-in homepage title. */
+    var homepageMotto by preferences.stringPreference(HOMEPAGE_MOTTO, "Ex se sola veritas fluit")
+
+    /** Built-in homepage motto size in sp. */
+    var homepageMottoSize by preferences.intPreference(HOMEPAGE_MOTTO_SIZE, 13)
+
+    /** Built-in homepage motto opacity as a percentage. */
+    var homepageMottoOpacity by preferences.intPreference(HOMEPAGE_MOTTO_OPACITY, 72)
+
+    /** Whether bookmark shortcuts are shown on the built-in homepage. */
+    var homepageBookmarksEnabled by preferences.booleanPreference(HOMEPAGE_BOOKMARKS_ENABLED, true)
+
+    /** Number of bookmark shortcut columns on the built-in homepage. */
+    var homepageBookmarkColumns by preferences.intPreference(HOMEPAGE_BOOKMARK_COLUMNS, 3)
+
+    /** Custom wallpaper opacity as a percentage. */
+    var homepageWallpaperOpacity by preferences.intPreference(HOMEPAGE_WALLPAPER_OPACITY, 100)
+
+    /** Custom wallpaper horizontal focal point as a percentage. */
+    var homepageWallpaperPositionX by preferences.intPreference(HOMEPAGE_WALLPAPER_POSITION_X, 50)
+
+    /** Custom wallpaper vertical focal point as a percentage. */
+    var homepageWallpaperPositionY by preferences.intPreference(HOMEPAGE_WALLPAPER_POSITION_Y, 50)
+
     /**
      * True if cookies should be enabled in incognito mode, false otherwise.
      *
@@ -452,6 +479,15 @@ private const val HOMEPAGE_WALLPAPER_MODE = "homepageWallpaperMode"
 private const val HOMEPAGE_WALLPAPER_PATH = "homepageWallpaperPath"
 private const val HOMEPAGE_SOURCE = "homepageSource"
 private const val HOMEPAGE_HTML_PATH = "homepageHtmlPath"
+private const val HOMEPAGE_MOTTO_ENABLED = "homepageMottoEnabled"
+private const val HOMEPAGE_MOTTO = "homepageMotto"
+private const val HOMEPAGE_MOTTO_SIZE = "homepageMottoSize"
+private const val HOMEPAGE_MOTTO_OPACITY = "homepageMottoOpacity"
+private const val HOMEPAGE_BOOKMARKS_ENABLED = "homepageBookmarksEnabled"
+private const val HOMEPAGE_BOOKMARK_COLUMNS = "homepageBookmarkColumns"
+private const val HOMEPAGE_WALLPAPER_OPACITY = "homepageWallpaperOpacity"
+private const val HOMEPAGE_WALLPAPER_POSITION_X = "homepageWallpaperPositionX"
+private const val HOMEPAGE_WALLPAPER_POSITION_Y = "homepageWallpaperPositionY"
 private const val HOMEPAGE_DATE_TIME_ENABLED = "homepageDateTimeEnabled"
 private const val HOMEPAGE_TIME_FORMAT = "homepageTimeFormat"
 private const val HOMEPAGE_DATE_FORMAT = "homepageDateFormat"

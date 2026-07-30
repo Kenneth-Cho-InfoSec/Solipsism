@@ -51,6 +51,14 @@
             android:key="homepage_source"
             android:title="@string/settings_homepage_source" />
         <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="homepage_layout"
+            android:title="@string/settings_homepage_layout" />
+        <Preference
+            android:icon="@drawable/ic_settings_text"
+            android:key="homepage_editor"
+            android:title="@string/settings_homepage_editor" />
+        <Preference
             android:icon="@drawable/ic_action_invert"
             android:key="accent_palette"
             android:title="@string/settings_accent_palette" />

@@ -22,6 +22,11 @@
         --shortcut-bg: {SHORTCUT_BG}
         --shortcut-icon-bg: {SHORTCUT_ICON_BG}
         --homepage-datetime-opacity: {DATETIME_OPACITY}
+        --homepage-motto-size: {MOTTO_SIZE}
+        --homepage-motto-opacity: {MOTTO_OPACITY}
+        --homepage-bookmark-columns: {BOOKMARK_COLUMNS}
+        --homepage-wallpaper-opacity: {WALLPAPER_OPACITY}
+        --homepage-wallpaper-position: {WALLPAPER_POSITION}
     }
 
     @font-face {
@@ -51,6 +56,8 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: var(--homepage-wallpaper-position);
+        opacity: var(--homepage-wallpaper-opacity);
     }
 
     .homepage_wallpaper_overlay {
@@ -73,7 +80,7 @@
 
     .shortcuts {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(var(--homepage-bookmark-columns), minmax(0, 1fr));
         gap: 14px;
         width: 100%;
         max-width: 720px;
@@ -149,9 +156,10 @@
         margin: 8px 0 0;
         color: var(--home-text-secondary);
         font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        font-size: 13px;
+        font-size: var(--homepage-motto-size);
         font-weight: 400;
         line-height: 1.35;
+        opacity: var(--homepage-motto-opacity);
     }
 
     @media (max-width: 480px) {
@@ -160,7 +168,7 @@
         }
 
         .shortcuts {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(var(--homepage-bookmark-columns), minmax(0, 1fr));
             gap: 9px;
         }
 

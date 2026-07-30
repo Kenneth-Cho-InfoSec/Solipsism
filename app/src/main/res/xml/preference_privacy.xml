@@ -8,11 +8,6 @@
             android:summary="@string/cookie_manager_summary"
             android:title="@string/cookie_manager"/>
         <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:icon="@drawable/ic_settings_privacy"
-            android:key="location"
-            android:title="@string/location"/>
-        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:icon="@drawable/ic_settings_privacy"
             android:key="third_party"

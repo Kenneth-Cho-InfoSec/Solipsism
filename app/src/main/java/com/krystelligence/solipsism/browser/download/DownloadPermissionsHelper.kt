@@ -24,6 +24,9 @@ import com.krystelligence.solipsism.download.DownloadHandler
 import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.preference.SitePermissionDecision
+import com.krystelligence.solipsism.preference.SitePermissionKey
+import com.krystelligence.solipsism.preference.SitePermissionStore
 import com.krystelligence.solipsism.utils.FileUtils
 import com.krystelligence.solipsism.virustotal.VirusTotalCancellationSignal
 import com.krystelligence.solipsism.virustotal.VirusTotalDownloadCoordinator
@@ -41,6 +44,7 @@ import javax.inject.Inject
 class DownloadPermissionsHelper @Inject constructor(
     private val downloadHandler: DownloadHandler,
     private val userPreferences: UserPreferences,
+    private val sitePermissionStore: SitePermissionStore,
     private val logger: Logger,
     private val downloadsRepository: DownloadsRepository,
     private val virusTotalCoordinator: VirusTotalDownloadCoordinator,
@@ -57,10 +61,11 @@ class DownloadPermissionsHelper @Inject constructor(
         contentDisposition: String?,
         mimeType: String?,
         contentLength: Long,
+        origin: String? = null,
         blobData: String? = null
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, blobData)
+            showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, origin, blobData)
             return
         }
 
@@ -74,7 +79,7 @@ class DownloadPermissionsHelper @Inject constructor(
             }
             .request { allGranted, _, _ ->
                 if (allGranted) {
-                    showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, blobData)
+                    showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, origin, blobData)
                 } else {
                     logger.log(TAG, "Download permission denied")
                 }
@@ -95,8 +100,16 @@ class DownloadPermissionsHelper @Inject constructor(
         contentDisposition: String?,
         mimeType: String?,
         contentLength: Long,
+        origin: String?,
         blobData: String?
     ) {
+        val siteDecision = origin?.let {
+            sitePermissionStore.decision(it, SitePermissionKey.AUTOMATIC_DOWNLOADS)
+        } ?: SitePermissionDecision.DEFAULT
+        if (siteDecision == SitePermissionDecision.DENY) {
+            activity.snackbar(R.string.site_permission_download_blocked)
+            return
+        }
         val guessedFileName = if (mimeType != null && MimeTypeMap.getSingleton().hasMimeType(mimeType)) {
             URLUtil.guessFileName(url, contentDisposition, mimeType)
         } else {
@@ -114,6 +127,10 @@ class DownloadPermissionsHelper @Inject constructor(
                 activity, url, userAgent, contentDisposition, mimeType, downloadSize,
                 blobData, fileName
             )
+        }
+        if (siteDecision == SitePermissionDecision.ALLOW) {
+            directDownload()
+            return
         }
         val scanEligible = shouldScan(mimeType, fileName)
 

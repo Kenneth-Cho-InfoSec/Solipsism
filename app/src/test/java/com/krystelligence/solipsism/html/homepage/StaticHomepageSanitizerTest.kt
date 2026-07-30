@@ -31,6 +31,15 @@ class StaticHomepageSanitizerTest {
         assertThat(result).doesNotContain("url(", "background-image", "style=")
     }
 
+    @Test
+    fun preservesSafeStyleBlockAndRemovesRemoteResources() {
+        val result = StaticHomepageSanitizer.sanitize(
+            "<style>body { color: red; background-image: url(https://evil.example/x); }</style><h1>Custom</h1>"
+        )
+        assertThat(result).contains("color: red", "Custom")
+        assertThat(result).doesNotContain("url(", "evil.example")
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun rejectsHtmlOverDoubledLimit() {
         StaticHomepageSanitizer.sanitize("x".repeat(StaticHomepageSanitizer.MAX_HTML_BYTES + 1))

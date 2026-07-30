@@ -9,6 +9,9 @@ import com.krystelligence.solipsism.dialog.DialogItem
 import com.krystelligence.solipsism.extensions.resizeAndShow
 import com.krystelligence.solipsism.favicon.FaviconModel
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.preference.SitePermissionDecision
+import com.krystelligence.solipsism.preference.SitePermissionKey
+import com.krystelligence.solipsism.preference.SitePermissionStore
 import com.krystelligence.solipsism.utils.Option
 import com.krystelligence.solipsism.utils.ThemeUtils
 import com.krystelligence.solipsism.utils.Utils
@@ -44,7 +47,8 @@ class TabWebChromeClient @Inject constructor(
     private val faviconModel: FaviconModel,
     @DiskScheduler private val diskScheduler: Scheduler,
     private val userPreferences: UserPreferences,
-    private val webRtcPermissionsModel: WebRtcPermissionsModel
+    private val webRtcPermissionsModel: WebRtcPermissionsModel,
+    private val sitePermissionStore: SitePermissionStore
 ) : WebChromeClient(), WebRtcPermissionsView {
 
     private val defaultColor = ThemeUtils.getPrimaryColor(activity)
@@ -261,10 +265,36 @@ class TabWebChromeClient @Inject constructor(
         origin: String,
         callback: GeolocationPermissions.Callback
     ) {
+        if (!userPreferences.locationEnabled) {
+            callback.invoke(origin, false, true)
+            return
+        }
+        when (sitePermissionStore.decision(origin, SitePermissionKey.LOCATION)) {
+            SitePermissionDecision.DENY -> {
+                callback.invoke(origin, false, true)
+                return
+            }
+            SitePermissionDecision.ALLOW -> {
+                requestAndroidLocationPermission(origin, callback, remember = true)
+                return
+            }
+            else -> Unit
+        }
+        requestAndroidLocationPermission(origin, callback, remember = false)
+    }
+
+    private fun requestAndroidLocationPermission(
+        origin: String,
+        callback: GeolocationPermissions.Callback,
+        remember: Boolean
+    ) {
         PermissionX.init(activity).permissions(geoLocationPermissions.toList())
             .request { allGranted, _, _ ->
                 if (allGranted) {
-                    val remember = false
+                    if (remember) {
+                        callback.invoke(origin, true, true)
+                        return@request
+                    }
                     MaterialAlertDialogBuilder(activity).apply {
                         setTitle(activity.getString(R.string.location))
                         val org = if (origin.length > 50) {
@@ -275,9 +305,19 @@ class TabWebChromeClient @Inject constructor(
                         setMessage(org + activity.getString(R.string.message_location))
                         setCancelable(true)
                         setPositiveButton(activity.getString(R.string.action_allow)) { _, _ ->
+                            sitePermissionStore.setDecision(
+                                origin,
+                                SitePermissionKey.LOCATION,
+                                SitePermissionDecision.ALLOW
+                            )
                             callback.invoke(origin, true, remember)
                         }
                         setNegativeButton(activity.getString(R.string.action_dont_allow)) { _, _ ->
+                            sitePermissionStore.setDecision(
+                                origin,
+                                SitePermissionKey.LOCATION,
+                                SitePermissionDecision.DENY
+                            )
                             callback.invoke(origin, false, remember)
                         }
                     }.resizeAndShow()

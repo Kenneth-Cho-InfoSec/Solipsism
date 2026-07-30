@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/settings_site_permissions">
+        <Preference
+            android:icon="@drawable/ic_settings_globe"
+            android:key="add_site"
+            android:title="@string/site_permission_add_site" />
+        <Preference
+            android:icon="@drawable/ic_settings_globe"
+            android:key="all_sites"
+            android:summary="@string/site_permission_no_saved_sites"
+            android:title="@string/site_permission_all_sites" />
+        <Preference
+            android:icon="@drawable/ic_action_delete"
+            android:key="clear_all"
+            android:summary="@string/site_permission_clear_all_summary"
+            android:title="@string/site_permission_clear_all" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/site_permission_standard">
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_permission_location"
+            android:key="location_master"
+            android:title="@string/site_permission_global_location"
+            android:summary="@string/site_permission_global_location_summary" />
+        <Preference
+            android:icon="@drawable/ic_permission_location"
+            android:key="location"
+            android:title="@string/location"
+            android:summary="@string/site_permission_default" />
+        <Preference
+            android:icon="@drawable/ic_permission_camera"
+            android:key="camera"
+            android:title="@string/site_permission_camera" />
+        <Preference
+            android:icon="@drawable/ic_permission_microphone"
+            android:key="microphone"
+            android:title="@string/site_permission_microphone" />
+        <Preference
+            android:icon="@drawable/ic_permission_notifications"
+            android:key="notifications"
+            android:title="@string/site_permission_notifications" />
+        <Preference
+            android:icon="@drawable/ic_permission_clipboard"
+            android:key="clipboard"
+            android:title="@string/site_permission_clipboard" />
+        <Preference
+            android:icon="@drawable/ic_permission_motion"
+            android:key="motion_sensors"
+            android:title="@string/site_permission_motion_sensors" />
+        <Preference
+            android:icon="@drawable/ic_permission_protected"
+            android:key="protected_content"
+            android:title="@string/site_permission_protected_content" />
+        <Preference
+            android:icon="@drawable/ic_permission_embedded"
+            android:key="embedded_content"
+            android:title="@string/site_permission_embedded_content" />
+        <Preference
+            android:icon="@drawable/ic_permission_network"
+            android:key="local_network"
+            android:title="@string/site_permission_local_network" />
+        <Preference
+            android:icon="@drawable/ic_permission_download"
+            android:key="automatic_downloads"
+            android:title="@string/site_permission_automatic_downloads" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/site_permission_experimental"
+        android:summary="@string/site_permission_experimental_summary">
+        <Preference android:icon="@drawable/ic_permission_nfc" android:key="nfc" android:title="@string/site_permission_nfc" />
+        <Preference android:icon="@drawable/ic_permission_usb" android:key="usb" android:title="@string/site_permission_usb" />
+        <Preference android:icon="@drawable/ic_permission_serial" android:key="serial" android:title="@string/site_permission_serial" />
+        <Preference android:icon="@drawable/ic_permission_file" android:key="file_editing" android:title="@string/site_permission_file_editing" />
+        <Preference android:icon="@drawable/ic_permission_vr" android:key="virtual_reality" android:title="@string/site_permission_virtual_reality" />
+        <Preference android:icon="@drawable/ic_permission_ar" android:key="augmented_reality" android:title="@string/site_permission_augmented_reality" />
+        <Preference android:icon="@drawable/ic_permission_device" android:key="device_use" android:title="@string/site_permission_device_use" />
+        <Preference android:icon="@drawable/ic_permission_apps" android:key="apps_on_device" android:title="@string/site_permission_apps_on_device" />
+        <Preference android:icon="@drawable/ic_permission_code" android:key="javascript_jit" android:title="@string/site_permission_javascript_jit" />
+    </PreferenceCategory>
+</PreferenceScreen>

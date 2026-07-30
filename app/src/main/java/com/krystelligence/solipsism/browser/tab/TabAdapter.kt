@@ -119,7 +119,8 @@ class TabAdapter @AssistedInject constructor(
                             userAgent = userAgent,
                             contentDisposition = contentDisposition,
                             mimeType = mimetype,
-                            contentLength = contentLength
+                            contentLength = contentLength,
+                            origin = this.url
                         )
                     )
                 }
@@ -160,6 +161,7 @@ class TabAdapter @AssistedInject constructor(
                             contentDisposition = contentDisposition,
                             mimeType = extractedMimeType ?: mimeType,
                             contentLength = contentLength,
+                            origin = webView.url,
                             blobData = data
                         )
                     )

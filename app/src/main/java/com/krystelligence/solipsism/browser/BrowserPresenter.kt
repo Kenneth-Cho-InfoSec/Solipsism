@@ -1453,7 +1453,8 @@ class BrowserPresenter @Inject constructor(
                     userAgent = null,
                     contentDisposition = "attachment",
                     mimeType = null,
-                    contentLength = 0
+                    contentLength = 0,
+                    origin = currentTab?.url
                 )
             )
         }

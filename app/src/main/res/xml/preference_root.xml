@@ -18,6 +18,11 @@
             app:summary="@string/settings_privacy_explain"
             app:title="@string/settings_privacy" />
         <Preference
+            app:icon="@drawable/ic_settings_globe"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.SitePermissionsSettingsFragment"
+            app:summary="@string/settings_site_permissions_summary"
+            app:title="@string/settings_site_permissions" />
+        <Preference
             app:icon="@drawable/ic_settings_text"
             app:fragment="com.krystelligence.solipsism.settings.fragment.UserScriptsSettingsFragment"
             app:summary="@string/userscripts_explain"
@@ -31,7 +36,7 @@
             app:summary="@string/settings_adblock_summary"
             app:title="@string/settings_adblock" />
         <Preference
-            app:icon="@drawable/ic_settings_shield"
+            app:icon="@drawable/ic_settings_malware_horse"
             app:fragment="com.krystelligence.solipsism.settings.fragment.VirusTotalSettingsFragment"
             app:summary="@string/malware_scanner_settings_summary"
             app:title="@string/malware_scanner" />

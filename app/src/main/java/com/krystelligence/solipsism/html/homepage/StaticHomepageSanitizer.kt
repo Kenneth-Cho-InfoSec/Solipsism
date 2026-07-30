@@ -25,11 +25,15 @@ object StaticHomepageSanitizer {
         "align-items", "background-color", "border", "border-radius", "color", "display",
         "font-size", "font-style", "font-weight", "gap", "justify-content", "letter-spacing",
         "line-height", "margin", "opacity", "padding", "text-align", "text-decoration",
-        "width", "height"
+        "width", "height", "max-width", "min-height", "position", "top", "right", "bottom",
+        "left", "inset", "z-index", "flex-direction", "flex-wrap", "grid-template-columns",
+        "grid-auto-flow", "overflow", "transform", "background", "background-size",
+        "background-position"
     )
 
     private val safeList = Safelist.none()
         .addTags(*allowedTags)
+        .addTags("style")
         .addAttributes("*", "class", "style", "data-solipsism-style-index")
         .addAttributes("a", "href", "title")
         .addProtocols("a", "href", "http", "https")
@@ -49,6 +53,11 @@ object StaticHomepageSanitizer {
             element.attr("data-solipsism-style-index", index.toString())
             cssBytes += safeStyle.toByteArray(StandardCharsets.UTF_8).size
         }
+        val safeStyleBlocks = parsed.select("style").map {
+            sanitizeCss(it.data().ifBlank { it.html() })
+        }
+        parsed.select("style").remove()
+        cssBytes += safeStyleBlocks.sumOf { it.toByteArray(StandardCharsets.UTF_8).size }
         require(cssBytes <= MAX_CSS_BYTES) {
             "Homepage CSS exceeds ${MAX_CSS_BYTES / 1024} KB"
         }
@@ -61,11 +70,31 @@ object StaticHomepageSanitizer {
             else element.removeAttr("style")
             element.removeAttr("data-solipsism-style-index")
         }
+        safeStyleBlocks.filter(String::isNotBlank).forEach { safeStyle ->
+            cleaned.head().appendElement("style").text(safeStyle)
+        }
         cleaned.outputSettings().prettyPrint(false)
         return cleaned.outerHtml()
     }
 
     private fun sanitizeStyle(style: String): String {
+        return sanitizeDeclarations(style)
+    }
+
+    private fun sanitizeCss(style: String): String {
+        val rulePattern = Regex("(?s)([^{}]+)\\{([^{}]*)\\}")
+        return rulePattern.findAll(style).mapNotNull { match ->
+            val selector = match.groupValues[1].trim()
+            val lowerSelector = selector.lowercase()
+            if (selector.isBlank() || listOf("@", "url(", "javascript", "<", ">").any(lowerSelector::contains)) {
+                return@mapNotNull null
+            }
+            val declarations = sanitizeDeclarations(match.groupValues[2])
+            if (declarations.isBlank()) null else "$selector { $declarations; }"
+        }.joinToString(" ")
+    }
+
+    private fun sanitizeDeclarations(style: String): String {
         return style.split(';').mapNotNull { declaration ->
             val separator = declaration.indexOf(':')
             if (separator <= 0) return@mapNotNull null
