@@ -138,7 +138,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private var previousSystemUiVisibility = 0
     private var browserMenuPopup: PopupWindow? = null
     private var urlRailTransition: BrowserPresenter.UrlBarTabTransition? = null
-    private var urlRailHapticLastPulse = 0L
+    private var railHapticActive = false
+    private var railHapticLastMovementAt = 0L
 
     private var menuItemShare: MenuItem? = null
     private var menuItemCopyLink: MenuItem? = null
@@ -160,6 +161,14 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     private val vibrator: Vibrator? by lazy {
         getSystemService(Vibrator::class.java)
+    }
+
+    private val railHapticStopRunnable: Runnable = Runnable {
+        if (System.currentTimeMillis() - railHapticLastMovementAt >= RAIL_HAPTIC_IDLE_TIMEOUT_MS) {
+            stopContinuousRailHaptic()
+        } else {
+            mainHandler.postDelayed(railHapticStopRunnable, RAIL_HAPTIC_IDLE_TIMEOUT_MS)
+        }
     }
 
     private val expressiveSpatialInterpolator by lazy {
@@ -845,11 +854,13 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     override fun onDestroy() {
+        stopContinuousRailHaptic()
         super.onDestroy()
         presenter.onViewDetached()
     }
 
     override fun onPause() {
+        stopContinuousRailHaptic()
         super.onPause()
         presenter.onViewHidden()
     }
@@ -1263,9 +1274,15 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
         contentFrame.addView(snapshot)
         contentFrame.addView(whiteFilter)
-        vibrator?.takeIf { it.hasVibrator() }?.vibrate(
-            VibrationEffect.createOneShot(SCREENSHOT_ANIMATION_DURATION_MS, VibrationEffect.DEFAULT_AMPLITUDE)
-        )
+        if (userPreferences.hapticsEnabled && userPreferences.screenshotHapticsEnabled) {
+            vibrator?.takeIf { it.hasVibrator() }?.vibrate(
+                    VibrationEffect.createOneShot(
+                        userPreferences.screenshotHapticDurationMs.coerceIn(50, 1000).toLong(),
+                        ((255 * userPreferences.screenshotHapticIntensity.coerceIn(0, 100)) / 100)
+                            .coerceIn(1, 255)
+                )
+            )
+        }
 
         snapshot.animate()
             .scaleX(SCREENSHOT_SHRINK_SCALE)
@@ -1444,7 +1461,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                                 direction = direction,
                                 progress = dragProgress
                             )
-                            pulsePixelHaptic(dragProgress)
+                            continueRailHaptic(dragProgress)
                         }
                     }
                     true
@@ -1461,6 +1478,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                         .start()
                     val transition = urlRailTransition
                     if (transition != null && dragProgress >= URL_RAIL_COMMIT_PROGRESS) {
+                        stopContinuousRailHaptic()
                         animateUrlRailTabSwitch(view, transition.direction)
                         fadePixelHaptic()
                         tabPager.commitVerticalTabSwitch(
@@ -1475,6 +1493,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                         val direction = if (dy < 0f) 1 else -1
                         val quickTransition = presenter.previewUrlBarSwipeTab(direction)
                         if (quickTransition != null) {
+                            stopContinuousRailHaptic()
                             animateUrlRailTabSwitch(view, direction)
                             fadePixelHaptic()
                             tabPager.previewVerticalTabSwitch(
@@ -1500,6 +1519,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                 }
 
                 MotionEvent.ACTION_CANCEL -> {
+                    stopContinuousRailHaptic()
                     tabPager.cancelVerticalTabSwitch()
                     urlRailTransition = null
                     view.animate()
@@ -1533,35 +1553,56 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             .start()
     }
 
-    private fun pulsePixelHaptic(progress: Float) {
-        if (!isGooglePixel()) return
-        val now = System.currentTimeMillis()
-        if (now - urlRailHapticLastPulse < URL_RAIL_HAPTIC_INTERVAL_MS) return
-        urlRailHapticLastPulse = now
-        val amplitude = (32 + (progress.coerceIn(0f, 1f) * 112f)).roundToInt()
-            .coerceIn(1, 180)
-        vibrator?.vibrate(
-            VibrationEffect.createOneShot(
-                URL_RAIL_HAPTIC_PULSE_MS,
-                amplitude
+    private fun continueRailHaptic(progress: Float) {
+        if (!userPreferences.hapticsEnabled || !userPreferences.railHapticsEnabled) return
+        railHapticLastMovementAt = System.currentTimeMillis()
+        if (!railHapticActive) {
+            val progressCurve = if (userPreferences.railHapticCurve == 1) {
+                val eased = progress.coerceIn(0f, 1f)
+                eased * eased * (3f - 2f * eased)
+            } else {
+                progress.coerceIn(0f, 1f)
+            }
+            val intensity = userPreferences.railHapticsIntensity.coerceIn(0, 100) / 100f
+            val amplitude = ((32 + (progressCurve * 112f)) * intensity)
+                .roundToInt().coerceIn(1, 180)
+            vibrator?.takeIf { it.hasVibrator() }?.vibrate(
+                VibrationEffect.createOneShot(RAIL_HAPTIC_MAX_DURATION_MS, amplitude)
             )
-        )
+            railHapticActive = true
+        }
+        mainHandler.removeCallbacks(railHapticStopRunnable)
+        mainHandler.postDelayed(railHapticStopRunnable, RAIL_HAPTIC_IDLE_TIMEOUT_MS)
+    }
+
+    private fun stopContinuousRailHaptic() {
+        mainHandler.removeCallbacks(railHapticStopRunnable)
+        if (railHapticActive) {
+            vibrator?.cancel()
+            railHapticActive = false
+        }
     }
 
     private fun fadePixelHaptic() {
-        if (!isGooglePixel()) return
+        if (!userPreferences.hapticsEnabled ||
+            !userPreferences.railHapticsEnabled ||
+            !userPreferences.railCompletionHapticsEnabled
+        ) return
+        val intensity = userPreferences.railCompletionHapticsIntensity.coerceIn(0, 100) / 100f
         vibrator?.vibrate(
             VibrationEffect.createWaveform(
                 longArrayOf(0L, 18L, 32L, 14L, 38L, 8L),
-                intArrayOf(145, 0, 88, 0, 34, 0),
+                intArrayOf(
+                    (145 * intensity).roundToInt(),
+                    0,
+                    (88 * intensity).roundToInt(),
+                    0,
+                    (34 * intensity).roundToInt(),
+                    0
+                ),
                 -1
             )
         )
-    }
-
-    private fun isGooglePixel(): Boolean {
-        return Build.MANUFACTURER.equals("Google", ignoreCase = true) &&
-            Build.MODEL.contains("Pixel", ignoreCase = true)
     }
 
     override fun renderState(viewState: BrowserViewState) {
@@ -1989,8 +2030,8 @@ private const val FIND_BAR_RAIL_GAP_DP = 14
 private const val URL_RAIL_DRAG_START_DP = 8
 private const val URL_RAIL_SWIPE_THRESHOLD_DP = 34
 private const val URL_RAIL_COMMIT_PROGRESS = 0.42f
-private const val URL_RAIL_HAPTIC_INTERVAL_MS = 46L
-private const val URL_RAIL_HAPTIC_PULSE_MS = 9L
+private const val RAIL_HAPTIC_MAX_DURATION_MS = 10_000L
+private const val RAIL_HAPTIC_IDLE_TIMEOUT_MS = 140L
 private const val SCREENSHOT_ANIMATION_DURATION_MS = 650L
 private const val SCREENSHOT_SHRINK_SCALE = 0.70f
 private const val BROWSER_MENU_MAX_WIDTH_DP = 258

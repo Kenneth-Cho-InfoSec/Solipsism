@@ -13,6 +13,7 @@ import com.krystelligence.solipsism.html.history.HistoryPageFactory
 import com.krystelligence.solipsism.html.homepage.HomePageFactory
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.utils.NavigationSecurity
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
@@ -233,7 +234,18 @@ abstract class HtmlPageFactoryInitializer(
             .buildPage()
             .subscribeOn(diskScheduler)
             .observeOn(foregroundScheduler)
-            .subscribeBy(onSuccess = { webView.loadUrl(it, headers) })
+            .subscribeBy(onSuccess = { pageUrl ->
+                // Generated Downloads/History/Bookmarks pages are app-private files. File access
+                // is disabled after normal web navigation, so grant it only for this trusted
+                // internal root before loading the generated page.
+                val trustedRoots = listOf(
+                    File(webView.context.filesDir, "generated-html"),
+                    File(webView.context.filesDir, "homepage")
+                )
+                webView.settings.allowFileAccess =
+                    NavigationSecurity.isTrustedInternalFileUrl(pageUrl, trustedRoots)
+                webView.loadUrl(pageUrl, headers)
+            })
     }
 
 }

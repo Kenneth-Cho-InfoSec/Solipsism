@@ -22,6 +22,9 @@ class UserScriptManager @Inject constructor(application: Application) {
     fun all(): List<UserScript> = scripts.values.toList()
 
     @Synchronized
+    fun find(id: String): UserScript? = scripts[id]
+
+    @Synchronized
     fun matching(url: String, runAt: UserScriptRunAt): List<UserScript> = scripts.values
         .filter { it.enabled && it.metadata.isUnprivileged && it.metadata.runAt == runAt }
         .filter { UserScriptUrlMatcher.matches(it.metadata, url) }

@@ -7,12 +7,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.extensions.toast
+import com.krystelligence.solipsism.haptics.HapticFeedbackController
 import java.net.URI
 import javax.inject.Inject
 
 class ElementPickerController @Inject constructor(
     private val activity: Activity,
-    private val repository: CustomFilterRepository
+    private val repository: CustomFilterRepository,
+    private val hapticFeedback: HapticFeedbackController
 ) {
     private var webView: WebView? = null
     private var pageUrl = ""
@@ -55,6 +57,7 @@ class ElementPickerController @Inject constructor(
             .setPositiveButton(R.string.action_ok) { _, _ ->
                 runCatching { repository.add("$host##${input.text.toString().trim()}", CustomFilterSource.PICKER) }
                     .onSuccess {
+                        hapticFeedback.success(HapticFeedbackController.Category.ADBLOCK)
                         val target = webView
                         stop()
                         activity.toast(R.string.block_element_saved)

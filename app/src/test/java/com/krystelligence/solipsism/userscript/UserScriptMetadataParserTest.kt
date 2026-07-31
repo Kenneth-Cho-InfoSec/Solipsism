@@ -8,6 +8,15 @@ import org.junit.Test
 
 class UserScriptMetadataParserTest {
     @Test
+    fun bundledEditorTemplateIsValidAndUnprivileged() {
+        val metadata = UserScriptMetadataParser.parse(UserScriptTemplate.SOURCE)
+
+        requireNotNull(metadata)
+        assertTrue(metadata.isUnprivileged)
+        assertEquals(listOf("https://example.com/*"), metadata.matches)
+    }
+
+    @Test
     fun parsesRepeatedMetadataAndDefaults() {
         val metadata = UserScriptMetadataParser.parse(
             """

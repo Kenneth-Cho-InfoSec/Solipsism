@@ -9,6 +9,8 @@ import com.krystelligence.solipsism.device.BuildInfo
 import com.krystelligence.solipsism.dialog.SolipsismDialogBuilder
 import com.krystelligence.solipsism.search.SuggestionsAdapter
 import com.krystelligence.solipsism.settings.activity.ThemableSettingsActivity
+import com.krystelligence.solipsism.settings.activity.UserScriptEditorActivity
+import com.krystelligence.solipsism.settings.fragment.HapticsSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.AccessibilitySettingsFragment
 import com.krystelligence.solipsism.settings.fragment.AdBlockSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.AdvancedSettingsFragment
@@ -22,6 +24,7 @@ import com.krystelligence.solipsism.settings.fragment.RootSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.SitePermissionsSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.UserScriptsSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.VirusTotalSettingsFragment
+import com.krystelligence.solipsism.qr.QrScannerActivity
 import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
@@ -57,6 +60,12 @@ interface AppComponent {
     fun inject(app: BrowserApp)
 
     fun inject(activity: ThemableSettingsActivity)
+
+    fun inject(activity: UserScriptEditorActivity)
+
+    fun inject(activity: QrScannerActivity)
+
+    fun inject(fragment: HapticsSettingsFragment)
 
     fun inject(fragment: PrivacySettingsFragment)
 

@@ -8,6 +8,7 @@ import com.krystelligence.solipsism.dialog.BrowserDialog
 import com.krystelligence.solipsism.dialog.DialogItem
 import com.krystelligence.solipsism.extensions.resizeAndShow
 import com.krystelligence.solipsism.favicon.FaviconModel
+import com.krystelligence.solipsism.haptics.HapticFeedbackController
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.preference.SitePermissionDecision
 import com.krystelligence.solipsism.preference.SitePermissionKey
@@ -48,7 +49,8 @@ class TabWebChromeClient @Inject constructor(
     @DiskScheduler private val diskScheduler: Scheduler,
     private val userPreferences: UserPreferences,
     private val webRtcPermissionsModel: WebRtcPermissionsModel,
-    private val sitePermissionStore: SitePermissionStore
+    private val sitePermissionStore: SitePermissionStore,
+    private val hapticFeedback: HapticFeedbackController
 ) : WebChromeClient(), WebRtcPermissionsView {
 
     private val defaultColor = ThemeUtils.getPrimaryColor(activity)
@@ -305,6 +307,7 @@ class TabWebChromeClient @Inject constructor(
                         setMessage(org + activity.getString(R.string.message_location))
                         setCancelable(true)
                         setPositiveButton(activity.getString(R.string.action_allow)) { _, _ ->
+                            hapticFeedback.success(HapticFeedbackController.Category.PERMISSIONS)
                             sitePermissionStore.setDecision(
                                 origin,
                                 SitePermissionKey.LOCATION,
@@ -313,6 +316,7 @@ class TabWebChromeClient @Inject constructor(
                             callback.invoke(origin, true, remember)
                         }
                         setNegativeButton(activity.getString(R.string.action_dont_allow)) { _, _ ->
+                            hapticFeedback.warning(HapticFeedbackController.Category.PERMISSIONS)
                             sitePermissionStore.setDecision(
                                 origin,
                                 SitePermissionKey.LOCATION,

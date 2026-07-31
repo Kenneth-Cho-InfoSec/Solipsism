@@ -291,6 +291,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/browser_sheet_section_background"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
@@ -310,6 +312,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/material_grid_margin"
+                    android:layout_marginEnd="@dimen/material_grid_margin"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
                     android:maxLines="1"

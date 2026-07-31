@@ -13,6 +13,11 @@
             android:summary="@string/userscripts_import_file_summary"
             android:title="@string/userscripts_import_file" />
         <Preference
+            android:icon="@drawable/ic_action_edit"
+            android:key="userscripts_write"
+            android:summary="@string/userscripts_write_summary"
+            android:title="@string/userscripts_write" />
+        <Preference
             android:icon="@drawable/ic_settings_globe"
             android:key="userscripts_import_url"
             android:summary="@string/userscripts_import_url_summary"

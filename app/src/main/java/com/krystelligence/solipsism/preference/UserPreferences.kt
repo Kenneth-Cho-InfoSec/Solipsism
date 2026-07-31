@@ -343,6 +343,64 @@ class UserPreferences @Inject constructor(
     var audioMonoEnabled by preferences.booleanPreference(AUDIO_MONO_ENABLED, false)
     var audioBalance by preferences.intPreference(AUDIO_BALANCE, 0)
 
+    /** Master switch for browser haptic feedback. */
+    var hapticsEnabled by preferences.booleanPreference(HAPTICS_ENABLED, true)
+
+    /** Whether the screenshot animation should provide haptic feedback. */
+    var screenshotHapticsEnabled by preferences.booleanPreference(SCREENSHOT_HAPTICS_ENABLED, true)
+
+    /** Duration of screenshot haptic feedback in milliseconds. */
+    var screenshotHapticDurationMs by preferences.intPreference(SCREENSHOT_HAPTIC_DURATION_MS, 650)
+
+    /** Screenshot vibration intensity as a percentage. */
+    var screenshotHapticIntensity by preferences.intPreference(SCREENSHOT_HAPTIC_INTENSITY, 70)
+
+    /** Whether rail swipe feedback is enabled. */
+    var railHapticsEnabled by preferences.booleanPreference(RAIL_HAPTICS_ENABLED, true)
+
+    /** Rail swipe vibration intensity as a percentage. */
+    var railHapticsIntensity by preferences.intPreference(RAIL_HAPTICS_INTENSITY, 100)
+
+    /** Rail vibration response curve: 0 is linear, 1 is nonlinear ease-in/ease-out. */
+    var railHapticCurve by preferences.intPreference(RAIL_HAPTIC_CURVE, 0)
+
+    /** Whether the completion feedback after a rail tab switch is enabled. */
+    var railCompletionHapticsEnabled by preferences.booleanPreference(
+        RAIL_COMPLETION_HAPTICS_ENABLED,
+        true
+    )
+
+    /** Completion feedback intensity as a percentage. */
+    var railCompletionHapticsIntensity by preferences.intPreference(
+        RAIL_COMPLETION_HAPTICS_INTENSITY,
+        100
+    )
+
+    /** Feedback for discrete actions such as tabs, bookmarks, and QR scans. */
+    var interactionHapticsEnabled by preferences.booleanPreference(INTERACTION_HAPTICS_ENABLED, true)
+
+    var tabsHapticsEnabled by preferences.booleanPreference(TABS_HAPTICS_ENABLED, true)
+    var tabsHapticsDurationMs by preferences.intPreference(TABS_HAPTICS_DURATION_MS, 18)
+    var tabsHapticsIntensity by preferences.intPreference(TABS_HAPTICS_INTENSITY, 70)
+    var bookmarksHapticsEnabled by preferences.booleanPreference(BOOKMARKS_HAPTICS_ENABLED, true)
+    var bookmarksHapticsDurationMs by preferences.intPreference(BOOKMARKS_HAPTICS_DURATION_MS, 28)
+    var bookmarksHapticsIntensity by preferences.intPreference(BOOKMARKS_HAPTICS_INTENSITY, 100)
+    var qrHapticsEnabled by preferences.booleanPreference(QR_HAPTICS_ENABLED, true)
+    var qrHapticsDurationMs by preferences.intPreference(QR_HAPTICS_DURATION_MS, 46)
+    var qrHapticsIntensity by preferences.intPreference(QR_HAPTICS_INTENSITY, 100)
+    var downloadHapticsEnabled by preferences.booleanPreference(DOWNLOAD_HAPTICS_ENABLED, true)
+    var downloadHapticsDurationMs by preferences.intPreference(DOWNLOAD_HAPTICS_DURATION_MS, 46)
+    var downloadHapticsIntensity by preferences.intPreference(DOWNLOAD_HAPTICS_INTENSITY, 100)
+    var adblockHapticsEnabled by preferences.booleanPreference(ADBLOCK_HAPTICS_ENABLED, true)
+    var adblockHapticsDurationMs by preferences.intPreference(ADBLOCK_HAPTICS_DURATION_MS, 28)
+    var adblockHapticsIntensity by preferences.intPreference(ADBLOCK_HAPTICS_INTENSITY, 90)
+    var permissionsHapticsEnabled by preferences.booleanPreference(PERMISSIONS_HAPTICS_ENABLED, true)
+    var permissionsHapticsDurationMs by preferences.intPreference(PERMISSIONS_HAPTICS_DURATION_MS, 46)
+    var permissionsHapticsIntensity by preferences.intPreference(PERMISSIONS_HAPTICS_INTENSITY, 100)
+    var refreshHapticsEnabled by preferences.booleanPreference(REFRESH_HAPTICS_ENABLED, true)
+    var refreshHapticsDurationMs by preferences.intPreference(REFRESH_HAPTICS_DURATION_MS, 24)
+    var refreshHapticsIntensity by preferences.intPreference(REFRESH_HAPTICS_INTENSITY, 70)
+
     /**
      * The homepage wallpaper mode: bundled default image, custom user image, or black background.
      */
@@ -517,6 +575,37 @@ private const val AUDIO_PREAMP_DB = "audioPreampDb"
 private const val AUDIO_LIMITER_ENABLED = "audioLimiterEnabled"
 private const val AUDIO_MONO_ENABLED = "audioMonoEnabled"
 private const val AUDIO_BALANCE = "audioBalance"
+private const val SCREENSHOT_HAPTICS_ENABLED = "screenshotHapticsEnabled"
+private const val SCREENSHOT_HAPTIC_DURATION_MS = "screenshotHapticDurationMs"
+private const val SCREENSHOT_HAPTIC_INTENSITY = "screenshotHapticIntensity"
+private const val HAPTICS_ENABLED = "hapticsEnabled"
+private const val RAIL_HAPTICS_ENABLED = "railHapticsEnabled"
+private const val RAIL_HAPTICS_INTENSITY = "railHapticsIntensity"
+private const val RAIL_HAPTIC_CURVE = "railHapticCurve"
+private const val RAIL_COMPLETION_HAPTICS_ENABLED = "railCompletionHapticsEnabled"
+private const val RAIL_COMPLETION_HAPTICS_INTENSITY = "railCompletionHapticsIntensity"
+private const val INTERACTION_HAPTICS_ENABLED = "interactionHapticsEnabled"
+private const val TABS_HAPTICS_ENABLED = "tabsHapticsEnabled"
+private const val TABS_HAPTICS_DURATION_MS = "tabsHapticsDurationMs"
+private const val TABS_HAPTICS_INTENSITY = "tabsHapticsIntensity"
+private const val BOOKMARKS_HAPTICS_ENABLED = "bookmarksHapticsEnabled"
+private const val BOOKMARKS_HAPTICS_DURATION_MS = "bookmarksHapticsDurationMs"
+private const val BOOKMARKS_HAPTICS_INTENSITY = "bookmarksHapticsIntensity"
+private const val QR_HAPTICS_ENABLED = "qrHapticsEnabled"
+private const val QR_HAPTICS_DURATION_MS = "qrHapticsDurationMs"
+private const val QR_HAPTICS_INTENSITY = "qrHapticsIntensity"
+private const val DOWNLOAD_HAPTICS_ENABLED = "downloadHapticsEnabled"
+private const val DOWNLOAD_HAPTICS_DURATION_MS = "downloadHapticsDurationMs"
+private const val DOWNLOAD_HAPTICS_INTENSITY = "downloadHapticsIntensity"
+private const val ADBLOCK_HAPTICS_ENABLED = "adblockHapticsEnabled"
+private const val ADBLOCK_HAPTICS_DURATION_MS = "adblockHapticsDurationMs"
+private const val ADBLOCK_HAPTICS_INTENSITY = "adblockHapticsIntensity"
+private const val PERMISSIONS_HAPTICS_ENABLED = "permissionsHapticsEnabled"
+private const val PERMISSIONS_HAPTICS_DURATION_MS = "permissionsHapticsDurationMs"
+private const val PERMISSIONS_HAPTICS_INTENSITY = "permissionsHapticsIntensity"
+private const val REFRESH_HAPTICS_ENABLED = "refreshHapticsEnabled"
+private const val REFRESH_HAPTICS_DURATION_MS = "refreshHapticsDurationMs"
+private const val REFRESH_HAPTICS_INTENSITY = "refreshHapticsIntensity"
 private const val HOMEPAGE_WALLPAPER_MODE = "homepageWallpaperMode"
 private const val HOMEPAGE_WALLPAPER_PATH = "homepageWallpaperPath"
 private const val HOMEPAGE_SOURCE = "homepageSource"

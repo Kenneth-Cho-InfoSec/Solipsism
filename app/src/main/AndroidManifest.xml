@@ -179,6 +179,15 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".settings.activity.UserScriptEditorActivity"
+            android:colorMode="wideColorGamut"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard"
+            android:exported="false"
+            android:label="@string/userscripts"
+            android:parentActivityName=".settings.activity.SettingsActivity"
+            android:theme="@style/Theme.SettingsTheme"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".qr.QrScannerActivity"
             android:colorMode="wideColorGamut"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard"

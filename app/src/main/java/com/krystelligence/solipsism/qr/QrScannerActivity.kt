@@ -33,6 +33,8 @@ import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.krystelligence.solipsism.haptics.HapticFeedbackController
+import javax.inject.Inject
 
 class QrScannerActivity : AppCompatActivity() {
 
@@ -42,6 +44,8 @@ class QrScannerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityQrScannerBinding
     private lateinit var cameraExecutor: ExecutorService
+
+    @Inject lateinit var hapticFeedback: HapticFeedbackController
 
     private val qrReader = MultiFormatReader().apply {
         setHints(mapOf(DecodeHintType.POSSIBLE_FORMATS to listOf(BarcodeFormat.QR_CODE)))
@@ -64,6 +68,7 @@ class QrScannerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeApplication.applySavedTheme(this)
         super.onCreate(savedInstanceState)
+        (application as com.krystelligence.solipsism.BrowserApp).applicationComponent.inject(this)
         binding = ActivityQrScannerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         applySystemBarInsets()
@@ -117,6 +122,7 @@ class QrScannerActivity : AppCompatActivity() {
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { scannedValue ->
                     resultReturned = true
+                    hapticFeedback.success(HapticFeedbackController.Category.QR)
                     setResult(
                         RESULT_OK,
                         Intent().putExtra(EXTRA_SCAN_RESULT, scannedValue)

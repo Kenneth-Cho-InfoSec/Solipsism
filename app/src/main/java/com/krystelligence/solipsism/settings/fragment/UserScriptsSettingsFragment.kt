@@ -15,6 +15,7 @@ import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.HostsClient
 import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.settings.activity.UserScriptEditorActivity
 import com.krystelligence.solipsism.userscript.UserScript
 import com.krystelligence.solipsism.userscript.UserScriptManager
 import io.reactivex.rxjava3.core.Single
@@ -52,6 +53,12 @@ class UserScriptsSettingsFragment : AbstractSettingsFragment() {
         }
     }
 
+    private val editorLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) refreshScripts()
+    }
+
     override fun providePreferencesXmlResource(): Int = R.xml.preference_userscripts
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -64,6 +71,7 @@ class UserScriptsSettingsFragment : AbstractSettingsFragment() {
             onCheckChange = { userPreferences.userscriptsEnabled = it }
         )
         clickablePreference(FILE_KEY, onClick = { filePicker.launch(arrayOf("text/*", "application/javascript")) })
+        clickablePreference(WRITE_KEY, onClick = { launchEditor(null) })
         clickablePreference(URL_KEY, onClick = ::showUrlInstallDialog)
         refreshScripts()
     }
@@ -99,7 +107,7 @@ class UserScriptsSettingsFragment : AbstractSettingsFragment() {
             category.addPreference(Preference(requireContext()).apply {
                 title = getString(R.string.userscripts_edit)
                 summary = script.metadata.description.takeIf(String::isNotBlank)
-                setOnPreferenceClickListener { showEditor(script); true }
+                setOnPreferenceClickListener { launchEditor(script.id); true }
             })
             category.addPreference(Preference(requireContext()).apply {
                 title = getString(R.string.userscripts_delete)
@@ -134,32 +142,10 @@ class UserScriptsSettingsFragment : AbstractSettingsFragment() {
             .show()
     }
 
-    private fun showEditor(script: UserScript) {
-        val input = EditText(requireContext()).apply {
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE or
-                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-            setText(script.source)
-            setSelection(length())
-            minLines = 12
-            maxLines = 24
-        }
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.userscripts_edit_title, script.metadata.name))
-            .setViewWithDialogMargins(input)
-            .setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton(R.string.action_ok) { _, _ ->
-                lifecycleScope.launch {
-                    runCatching {
-                        withContext(Dispatchers.IO) {
-                            userScriptManager.updateSource(script.id, input.text.toString())
-                        }
-                    }.onSuccess {
-                        refreshScripts()
-                        toast(getString(R.string.userscripts_saved, script.metadata.name))
-                    }.onFailure { error -> showError(error) }
-                }
-            }
-            .show()
+    private fun launchEditor(scriptId: String?) {
+        val intent = scriptId?.let { UserScriptEditorActivity.editIntent(requireContext(), it) }
+            ?: UserScriptEditorActivity.newIntent(requireContext())
+        editorLauncher.launch(intent)
     }
 
     private fun confirmDelete(script: UserScript) {
@@ -208,6 +194,7 @@ class UserScriptsSettingsFragment : AbstractSettingsFragment() {
     private companion object {
         const val ENABLED_KEY = "userscripts_enabled"
         const val FILE_KEY = "userscripts_import_file"
+        const val WRITE_KEY = "userscripts_write"
         const val URL_KEY = "userscripts_import_url"
         const val LIST_KEY = "userscripts_list"
         const val MAX_SOURCE_BYTES = 1024 * 1024

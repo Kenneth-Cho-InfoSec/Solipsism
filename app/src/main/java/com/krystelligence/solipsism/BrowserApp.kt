@@ -17,6 +17,7 @@ import android.app.Application
 import android.os.Build
 import android.os.StrictMode
 import android.webkit.WebView
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
@@ -116,6 +117,7 @@ class BrowserApp : Application() {
                 val assetsBookmarks = BookmarkExporter.importBookmarksFromAssets(this@BrowserApp)
                 bookmarkModel.addBookmarkList(assetsBookmarks)
             }
+            .andThen(migrateLegacyDefaultBookmarks())
             .subscribeOn(databaseScheduler)
             .subscribe()
 
@@ -136,7 +138,44 @@ class BrowserApp : Application() {
         }
     )
 
+    /**
+     * Replaces the two stale bookmarks inherited from the Lightning Browser defaults.
+     * Only exact legacy URLs are migrated, so user-created bookmarks are not affected.
+     */
+    private fun migrateLegacyDefaultBookmarks(): Completable =
+        bookmarkModel.getAllBookmarksSorted().flatMapCompletable { bookmarks ->
+            Completable.concat(
+                bookmarks.mapNotNull { bookmark ->
+                    legacyBookmarkReplacements[bookmark.url]?.let { replacement ->
+                        bookmarkModel.deleteBookmark(bookmark)
+                            .ignoreElement()
+                            .andThen(
+                                bookmarkModel.addBookmarkIfNotExists(
+                                    bookmark.copy(
+                                        url = replacement.url,
+                                        title = replacement.title
+                                    )
+                                ).ignoreElement()
+                            )
+                    }
+                }
+            )
+        }
+
+    private data class BookmarkReplacement(val url: String, val title: String)
+
     companion object {
         private const val TAG = "BrowserApp"
+
+        private val legacyBookmarkReplacements = mapOf(
+            "https://github.com/anthonycr/Lightning-Browser/releases" to BookmarkReplacement(
+                url = "https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases",
+                title = "Changelog"
+            ),
+            "https://twitter.com/RestainoAnthony" to BookmarkReplacement(
+                url = "https://github.com/Kenneth-Cho-InfoSec",
+                title = "Contact Me"
+            )
+        )
     }
 }

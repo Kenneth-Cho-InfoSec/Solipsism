@@ -2,6 +2,7 @@
 <resources>
     <string-array name="language_entries">
         <item>System default</item>
+        <item>English</item>
         <item>العربية</item>
         <item>Deutsch</item>
         <item>Ελληνικά</item>
@@ -25,6 +26,7 @@
     </string-array>
     <string-array name="language_values">
         <item>system</item>
+        <item>en</item>
         <item>ar</item>
         <item>de</item>
         <item>el</item>

@@ -35,6 +35,7 @@ import com.krystelligence.solipsism.virustotal.VirusTotalDownloadResult
 import com.krystelligence.solipsism.virustotal.VirusTotalException
 import com.krystelligence.solipsism.virustotal.VirusTotalFilePolicy
 import com.krystelligence.solipsism.virustotal.VirusTotalScanNotification
+import com.krystelligence.solipsism.haptics.HapticFeedbackController
 import com.permissionx.guolindev.PermissionX
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.SerialDisposable
@@ -49,6 +50,7 @@ class DownloadPermissionsHelper @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     private val virusTotalCoordinator: VirusTotalDownloadCoordinator,
     private val virusTotalNotification: VirusTotalScanNotification,
+    private val hapticFeedback: HapticFeedbackController,
     @DatabaseScheduler private val databaseScheduler: Scheduler,
     @NetworkScheduler private val networkScheduler: Scheduler,
     @MainScheduler private val mainScheduler: Scheduler
@@ -299,10 +301,12 @@ class DownloadPermissionsHelper @Inject constructor(
                         scanningDialog.dismiss()
                         when (result) {
                             is VirusTotalDownloadResult.Saved -> {
+                                hapticFeedback.success(HapticFeedbackController.Category.DOWNLOADS)
                                 saveDownload(result.storedUrl, fileName, downloadSize)
                                 activity.snackbar(R.string.virus_total_clean_downloaded)
                             }
                             is VirusTotalDownloadResult.Blocked -> {
+                                hapticFeedback.warning(HapticFeedbackController.Category.DOWNLOADS)
                                 showBlockedDialog(activity, fileName, result)
                             }
                         }

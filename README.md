@@ -6,7 +6,7 @@
 
 Solipsism Browser is a privacy-focused Android WebView browser built around a rail-first, one-handed interface. Navigation, tabs, search, QR scanning, refresh, bookmarks, and browser tools live in a compact rail on the left or right, leaving the webpage as the main surface.
 
-Current release: **5.3.0**<br>
+Current release: **5.3.1**<br>
 Application ID: `com.krystelligence.solipsism`<br>
 Developer: **Kenneth-Cho-InfoSec**
 

@@ -37,6 +37,7 @@ import com.krystelligence.solipsism.database.downloads.DownloadsRepository
 import com.krystelligence.solipsism.database.history.HistoryRepository
 import com.krystelligence.solipsism.html.bookmark.BookmarkPageFactory
 import com.krystelligence.solipsism.html.history.HistoryPageFactory
+import com.krystelligence.solipsism.haptics.HapticFeedbackController
 import com.krystelligence.solipsism.search.SearchEngineProvider
 import com.krystelligence.solipsism.ssl.SslState
 import com.krystelligence.solipsism.utils.Option
@@ -95,6 +96,7 @@ class BrowserPresenter @Inject constructor(
     private val allowListModel: AllowListModel,
     private val cookieAdministrator: CookieAdministrator,
     private val tabCountNotifier: TabCountNotifier,
+    private val hapticFeedback: HapticFeedbackController,
     @SuggestionsClient private val okHttpClient: Single<OkHttpClient>,
     @IncognitoMode private val incognitoMode: Boolean
 ) {
@@ -525,6 +527,7 @@ class BrowserPresenter @Inject constructor(
      * Call when the user selects a tab to switch to at the provided [index].
      */
     fun onTabClick(index: Int) {
+        hapticFeedback.tap(HapticFeedbackController.Category.TABS)
         selectTab(model.selectTab(tabListState[index].id))
     }
 
@@ -583,6 +586,7 @@ class BrowserPresenter @Inject constructor(
             // process of being removed.
             return
         }
+        hapticFeedback.tap(HapticFeedbackController.Category.TABS)
         val nextTab = tabListState.nextSelected(index)
 
         val currentTabId = currentTab?.id
@@ -689,6 +693,7 @@ class BrowserPresenter @Inject constructor(
      * Call when the user clicks on the open new tab button.
      */
     fun onNewTabClick() {
+        hapticFeedback.tap(HapticFeedbackController.Category.TABS)
         createNewTabAndSelect(homePageInitializer, shouldSelect = true)
     }
 
@@ -1029,6 +1034,7 @@ class BrowserPresenter @Inject constructor(
             .subscribeOn(databaseScheduler)
             .observeOn(mainScheduler)
             .subscribeBy { list ->
+                hapticFeedback.success(HapticFeedbackController.Category.BOOKMARKS)
                 this.view?.updateState(viewState.copy(bookmarks = list, isBookmarked = true))
                 if (currentTab?.url?.isBookmarkUrl() == true) {
                     reload()
@@ -1114,6 +1120,7 @@ class BrowserPresenter @Inject constructor(
                     .subscribeOn(databaseScheduler)
                     .observeOn(mainScheduler)
                     .subscribe { list ->
+                        hapticFeedback.success(HapticFeedbackController.Category.BOOKMARKS)
                         view?.updateState(viewState.copy(bookmarks = list))
                         if (currentTab?.url?.isBookmarkUrl() == true) {
                             reload()

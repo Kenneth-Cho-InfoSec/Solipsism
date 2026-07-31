@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/settings_haptics">
+        <androidx.preference.SwitchPreferenceCompat
+            android:icon="@drawable/ic_settings_haptics"
+            android:key="haptics_global"
+            android:title="@string/settings_haptics_global" />
+        <Preference
+            android:icon="@drawable/ic_settings_haptics"
+            android:key="haptics_screenshot"
+            android:title="@string/settings_haptics_screenshot" />
+        <Preference
+            android:icon="@drawable/ic_settings_haptics"
+            android:key="haptics_rail"
+            android:title="@string/settings_haptics_rail" />
+        <Preference
+            android:icon="@drawable/ic_settings_haptics"
+            android:key="haptics_presets"
+            android:title="@string/settings_haptics_presets"
+            android:summary="@string/settings_haptics_presets_summary" />
+        <androidx.preference.SwitchPreferenceCompat
+            android:icon="@drawable/ic_settings_haptics"
+            android:key="haptics_interactions"
+            android:title="@string/settings_haptics_interactions"
+            android:summary="@string/settings_haptics_interactions_summary" />
+        <Preference android:key="haptics_tabs" android:title="@string/settings_haptics_tabs" />
+        <Preference android:key="haptics_bookmarks" android:title="@string/settings_haptics_bookmarks" />
+        <Preference android:key="haptics_qr" android:title="@string/settings_haptics_qr" />
+        <Preference android:key="haptics_downloads" android:title="@string/settings_haptics_downloads" />
+        <Preference android:key="haptics_adblock" android:title="@string/settings_haptics_adblock" />
+        <Preference android:key="haptics_permissions" android:title="@string/settings_haptics_permissions" />
+        <Preference android:key="haptics_refresh" android:title="@string/settings_haptics_refresh" />
+    </PreferenceCategory>
+</PreferenceScreen>

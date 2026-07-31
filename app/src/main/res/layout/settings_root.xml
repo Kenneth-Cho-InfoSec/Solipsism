@@ -21,6 +21,18 @@
         app:contentInsetStart="0dp"
         app:popupTheme="@style/ThemeOverlay.Solipsism.Toolbar.Surface">
 
+        <ImageView
+            android:id="@+id/settings_search_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="12dp"
+            android:alpha="0.8"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_search"
+            app:tint="?attr/iconColor" />
+
         <EditText
             android:id="@+id/settings_search"
             android:layout_width="match_parent"
@@ -31,7 +43,7 @@
             android:importantForAutofill="no"
             android:inputType="text"
             android:maxLines="1"
-            android:paddingStart="52dp"
+            android:paddingStart="32dp"
             android:paddingEnd="20dp"
             android:singleLine="true"
             android:textColor="?attr/colorOnSurface"
