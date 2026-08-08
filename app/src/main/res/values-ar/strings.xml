@@ -456,8 +456,12 @@
     <string name="webrtc_support">دعم ويب آر تي سي</string>
     <string name="yes">نعم</string>
     <plurals name="notification_incognito_running_title">
-        <item quantity="one">%1$d incognito tab open</item>
-        <item quantity="other">%1$d incognito tabs open</item>
+        <item quantity="zero">لا توجد علامات تبويب للتصفح المتخفي مفتوحة</item>
+        <item quantity="one">علامة تبويب واحدة للتصفح المتخفي مفتوحة</item>
+        <item quantity="two">علامتا تبويب للتصفح المتخفي مفتوحتان</item>
+        <item quantity="few">%1$d علامات تبويب للتصفح المتخفي مفتوحة</item>
+        <item quantity="many">%1$d علامة تبويب للتصفح المتخفي مفتوحة</item>
+        <item quantity="other">%1$d علامة تبويب للتصفح المتخفي مفتوحة</item>
     </plurals>
     <string-array name="proxy_choices_array">
         <item>لا شيء</item><item>Orbot</item><item>يدوي</item>

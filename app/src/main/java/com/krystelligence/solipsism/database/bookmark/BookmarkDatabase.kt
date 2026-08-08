@@ -31,7 +31,9 @@ class BookmarkDatabase @Inject constructor(
     application: Application
 ) : SQLiteOpenHelper(application, DATABASE_NAME, null, DATABASE_VERSION), BookmarkRepository {
 
-    private val defaultBookmarkTitle: String = application.getString(R.string.untitled)
+    private val defaultBookmarkTitle: String = runCatching {
+        application.getString(R.string.untitled)
+    }.getOrDefault("Untitled")
     private val database: SQLiteDatabase by databaseDelegate()
 
     // Creating Tables
@@ -133,35 +135,32 @@ class BookmarkDatabase @Inject constructor(
     }
 
     override fun addBookmarkIfNotExists(entry: Bookmark.Entry): Single<Boolean> =
-        Single.fromCallable {
-            queryWithOptionalEndSlash(entry.url).use {
-                if (it.moveToFirst()) {
-                    return@fromCallable false
-                }
-            }
-
-            val id = database.insert(
-                TABLE_BOOKMARK,
-                null,
-                entry.bindBookmarkToContentValues()
-            )
-
-            return@fromCallable id != -1L
-        }
+        Single.fromCallable { insertBookmarkIfNotExists(entry) }
 
     override fun addBookmarkList(bookmarkItems: List<Bookmark.Entry>): Completable =
         Completable.fromAction {
             database.apply {
                 beginTransaction()
-
-                for (item in bookmarkItems) {
-                    addBookmarkIfNotExists(item).subscribe()
+                try {
+                    bookmarkItems.forEach(::insertBookmarkIfNotExists)
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
                 }
-
-                setTransactionSuccessful()
-                endTransaction()
             }
         }
+
+    private fun insertBookmarkIfNotExists(entry: Bookmark.Entry): Boolean {
+        queryWithOptionalEndSlash(entry.url).use {
+            if (it.moveToFirst()) return false
+        }
+
+        return database.insert(
+            TABLE_BOOKMARK,
+            null,
+            entry.bindBookmarkToContentValues()
+        ) != -1L
+    }
 
     override fun deleteBookmark(entry: Bookmark.Entry): Single<Boolean> = Single.fromCallable {
         return@fromCallable deleteWithOptionalEndSlash(entry.url) > 0

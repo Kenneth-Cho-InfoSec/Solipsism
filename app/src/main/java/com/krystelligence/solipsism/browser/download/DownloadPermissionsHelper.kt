@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.text.format.Formatter
 import android.webkit.CookieManager
-import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.widget.LinearLayout
 import androidx.fragment.app.FragmentActivity
@@ -21,13 +20,14 @@ import com.krystelligence.solipsism.database.downloads.DownloadEntry
 import com.krystelligence.solipsism.database.downloads.DownloadsRepository
 import com.krystelligence.solipsism.dialog.BrowserDialog.setDialogSize
 import com.krystelligence.solipsism.download.DownloadHandler
+import com.krystelligence.solipsism.download.DownloadFilenameResolver
+import com.krystelligence.solipsism.download.DownloadMetadataResolver
 import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.preference.SitePermissionDecision
 import com.krystelligence.solipsism.preference.SitePermissionKey
 import com.krystelligence.solipsism.preference.SitePermissionStore
-import com.krystelligence.solipsism.utils.FileUtils
 import com.krystelligence.solipsism.virustotal.VirusTotalCancellationSignal
 import com.krystelligence.solipsism.virustotal.VirusTotalDownloadCoordinator
 import com.krystelligence.solipsism.virustotal.VirusTotalDownloadRequest
@@ -44,6 +44,7 @@ import javax.inject.Inject
 
 class DownloadPermissionsHelper @Inject constructor(
     private val downloadHandler: DownloadHandler,
+    private val downloadMetadataResolver: DownloadMetadataResolver,
     private val userPreferences: UserPreferences,
     private val sitePermissionStore: SitePermissionStore,
     private val logger: Logger,
@@ -67,7 +68,7 @@ class DownloadPermissionsHelper @Inject constructor(
         blobData: String? = null
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, origin, blobData)
+            requestDownload(activity, url, userAgent, contentDisposition, mimeType, contentLength, origin, blobData)
             return
         }
 
@@ -81,11 +82,62 @@ class DownloadPermissionsHelper @Inject constructor(
             }
             .request { allGranted, _, _ ->
                 if (allGranted) {
-                    showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, origin, blobData)
+                    requestDownload(activity, url, userAgent, contentDisposition, mimeType, contentLength, origin, blobData)
                 } else {
                     logger.log(TAG, "Download permission denied")
                 }
             }
+    }
+
+    private fun requestDownload(
+        activity: FragmentActivity,
+        url: String,
+        userAgent: String?,
+        contentDisposition: String?,
+        mimeType: String?,
+        contentLength: Long,
+        origin: String?,
+        blobData: String?
+    ) {
+        if (!needsMetadataResolution(url, contentDisposition, mimeType, blobData)) {
+            showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, origin, blobData)
+            return
+        }
+
+        val cookie = runCatching { CookieManager.getInstance().getCookie(url) }.getOrNull()
+        downloadMetadataResolver.resolve(url, userAgent, cookie)
+            .subscribeOn(networkScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy(
+                onSuccess = { resolved ->
+                    logger.log(TAG, "Resolved download metadata: mime=${resolved.mimeType}, disposition=${resolved.contentDisposition}")
+                    showDownloadDialog(
+                        activity,
+                        url,
+                        userAgent,
+                        resolved.contentDisposition ?: contentDisposition,
+                        resolved.mimeType ?: mimeType,
+                        resolved.contentLength.takeIf { it > 0 } ?: contentLength,
+                        origin,
+                        blobData
+                    )
+                },
+                onError = {
+                    logger.log(TAG, "Unable to resolve download metadata", it)
+                    showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, origin, blobData)
+                }
+            )
+    }
+
+    private fun needsMetadataResolution(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String?,
+        blobData: String?
+    ): Boolean {
+        if (blobData != null || !mimeType.isNullOrBlank()) return false
+        val guessed = URLUtil.guessFileName(url, contentDisposition, null).lowercase()
+        return guessed.endsWith(".bin") || !guessed.contains('.')
     }
 
     /**
@@ -112,12 +164,9 @@ class DownloadPermissionsHelper @Inject constructor(
             activity.snackbar(R.string.site_permission_download_blocked)
             return
         }
-        val guessedFileName = if (mimeType != null && MimeTypeMap.getSingleton().hasMimeType(mimeType)) {
-            URLUtil.guessFileName(url, contentDisposition, mimeType)
-        } else {
-            URLUtil.guessFileName(url, contentDisposition, null)
-        }
-        val fileName = FileUtils.sanitizeFileName(guessedFileName)
+        val normalizedMimeType = mimeType?.substringBefore(';')?.trim()?.lowercase()
+        val convertImages = userPreferences.saveImagesAsJpeg && DownloadFilenameResolver.isRasterImage(normalizedMimeType)
+        val fileName = DownloadFilenameResolver.resolve(url, contentDisposition, normalizedMimeType, convertImages)
         val downloadSize: String = if (contentLength > 0) {
             Formatter.formatFileSize(activity, contentLength)
         } else {
@@ -126,15 +175,15 @@ class DownloadPermissionsHelper @Inject constructor(
 
         val directDownload = {
             downloadWithoutScanning(
-                activity, url, userAgent, contentDisposition, mimeType, downloadSize,
-                blobData, fileName
+                activity, url, userAgent, contentDisposition, normalizedMimeType, downloadSize,
+                blobData, fileName, convertImages
             )
         }
         if (siteDecision == SitePermissionDecision.ALLOW) {
             directDownload()
             return
         }
-        val scanEligible = shouldScan(mimeType, fileName)
+        val scanEligible = shouldScan(normalizedMimeType, fileName)
 
         val builder = MaterialAlertDialogBuilder(activity)
         val message = activity.getString(R.string.dialog_download, downloadSize) +
@@ -144,8 +193,8 @@ class DownloadPermissionsHelper @Inject constructor(
             .setPositiveButton(R.string.action_download) { _, _ ->
                 if (scanEligible) {
                     scanDownload(
-                        activity, url, userAgent, contentDisposition, mimeType,
-                        downloadSize, blobData, fileName
+                        activity, url, userAgent, contentDisposition, normalizedMimeType,
+                        downloadSize, blobData, fileName, convertImages
                     )
                 } else {
                     directDownload()
@@ -182,7 +231,8 @@ class DownloadPermissionsHelper @Inject constructor(
         mimeType: String?,
         downloadSize: String,
         blobData: String?,
-        fileName: String
+        fileName: String,
+        convertImages: Boolean
     ) {
         if (blobData != null) {
             downloadHandler.downloadBlob(
@@ -198,6 +248,13 @@ class DownloadPermissionsHelper @Inject constructor(
                         logger.log(TAG, "error saving blob download", it)
                         activity.snackbar(R.string.cannot_download)
                     }
+                )
+        } else if (convertImages) {
+            downloadHandler.downloadImageAsJpeg(activity, userPreferences, url, userAgent, fileName)
+                .subscribeOn(networkScheduler).observeOn(mainScheduler)
+                .subscribeBy(
+                    onSuccess = { storedUrl -> saveDownload(storedUrl, fileName, downloadSize); activity.snackbar(R.string.download_pending) },
+                    onError = { logger.log(TAG, "error converting image to JPEG", it); activity.snackbar(R.string.cannot_download) }
                 )
         } else {
             downloadHandler.onDownloadStart(
@@ -215,19 +272,20 @@ class DownloadPermissionsHelper @Inject constructor(
         mimeType: String?,
         downloadSize: String,
         blobData: String?,
-        fileName: String
+        fileName: String,
+        convertImages: Boolean
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             PermissionX.init(activity)
                 .permissions(Manifest.permission.POST_NOTIFICATIONS)
                 .request { _, _, _ ->
                     beginMalwareScan(
-                        activity, url, userAgent, mimeType, downloadSize, blobData, fileName
+                        activity, url, userAgent, mimeType, downloadSize, blobData, fileName, convertImages
                     )
                 }
             return
         }
-        beginMalwareScan(activity, url, userAgent, mimeType, downloadSize, blobData, fileName)
+        beginMalwareScan(activity, url, userAgent, mimeType, downloadSize, blobData, fileName, convertImages)
     }
 
     private fun beginMalwareScan(
@@ -237,7 +295,8 @@ class DownloadPermissionsHelper @Inject constructor(
         mimeType: String?,
         downloadSize: String,
         blobData: String?,
-        fileName: String
+        fileName: String,
+        convertImages: Boolean
     ) {
         val progress = LinearProgressIndicator(activity).apply {
             isIndeterminate = true
@@ -282,7 +341,8 @@ class DownloadPermissionsHelper @Inject constructor(
                     userAgent = userAgent,
                     cookie = cookie,
                     mimeType = mimeType,
-                    blobData = blobData
+                    blobData = blobData,
+                    convertToJpeg = convertImages
                 ),
                 cancellation
             )

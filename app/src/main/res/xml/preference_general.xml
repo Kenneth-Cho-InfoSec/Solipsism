@@ -50,6 +50,12 @@
             android:icon="@drawable/ic_settings_download"
             android:key="download"
             android:title="@string/download"/>
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_settings_download"
+            android:key="save_images_as_jpeg"
+            android:title="@string/save_images_as_jpeg"
+            android:summary="@string/save_images_as_jpeg_summary" />
         <Preference
             android:icon="@drawable/ic_action_home"
             android:key="home"

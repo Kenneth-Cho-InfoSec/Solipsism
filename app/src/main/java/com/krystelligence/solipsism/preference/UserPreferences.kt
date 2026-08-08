@@ -79,6 +79,9 @@ class UserPreferences @Inject constructor(
         FileUtils.DEFAULT_DOWNLOAD_PATH
     )
 
+    /** Convert downloaded raster images to JPEG before saving them. */
+    var saveImagesAsJpeg by preferences.booleanPreference(SAVE_IMAGES_AS_JPEG, true)
+
     /** True when eligible downloads should be checked locally before being saved. */
     var virusTotalScanningEnabled by preferences.booleanPreference(VIRUS_TOTAL_SCANNING, true)
 
@@ -520,6 +523,7 @@ private const val BLOCK_IMAGES = "blockimages"
 private const val CLEAR_CACHE_EXIT = "cache"
 private const val COOKIES = "cookies"
 private const val DOWNLOAD_DIRECTORY = "downloadLocation"
+private const val SAVE_IMAGES_AS_JPEG = "saveImagesAsJpeg"
 private const val VIRUS_TOTAL_SCANNING = "virusTotalScanning"
 private const val VIRUS_TOTAL_SCAN_IMAGES = "virusTotalScanImages"
 private const val VIRUS_TOTAL_SCAN_VIDEOS = "virusTotalScanVideos"

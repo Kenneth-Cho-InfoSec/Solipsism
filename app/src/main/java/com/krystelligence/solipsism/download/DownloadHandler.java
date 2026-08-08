@@ -14,6 +14,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.webkit.CookieManager;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
@@ -23,6 +25,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -113,6 +118,17 @@ public class DownloadHandler {
             if (bytes.length > MAX_BLOB_BYTES) {
                 throw new IOException("Blob download exceeds the safety limit");
             }
+            if (preferences.getSaveImagesAsJpeg() && DownloadFilenameResolver.isRasterImage(contentType)) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                if (bitmap != null) {
+                    filename = filename.replaceFirst("(?i)\\.[^.]+$", "") + ".jpg";
+                    java.io.ByteArrayOutputStream converted = new java.io.ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 95, converted);
+                    bitmap.recycle();
+                    bytes = converted.toByteArray();
+                    contentType = "image/jpeg";
+                }
+            }
             String location = FileUtils.addNecessarySlashes(preferences.getDownloadDirectory());
             String defaultPath = FileUtils.addNecessarySlashes(FileUtils.DEFAULT_DOWNLOAD_PATH);
 
@@ -151,6 +167,34 @@ public class DownloadHandler {
                 output.write(bytes);
             }
             return outputFile.toURI().toString();
+        });
+    }
+
+    /** Downloads and converts a raster image without routing it through DownloadManager. */
+    public Single<String> downloadImageAsJpeg(@NonNull Activity context,
+                                               @NonNull UserPreferences preferences,
+                                               @NonNull String url,
+                                               @Nullable String userAgent,
+                                               @NonNull String filename) {
+        return Single.fromCallable(() -> {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setInstanceFollowRedirects(true);
+            connection.setConnectTimeout(20000);
+            connection.setReadTimeout(120000);
+            String cookie = CookieManager.getInstance().getCookie(url);
+            if (!TextUtils.isEmpty(cookie)) connection.setRequestProperty(COOKIE_REQUEST_HEADER, cookie);
+            if (!TextUtils.isEmpty(userAgent)) connection.setRequestProperty(USER_AGENT_REQUEST_HEADER, userAgent);
+            try (InputStream input = connection.getInputStream()) {
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
+                if (bitmap == null) throw new IOException("Unable to decode image");
+                File temp = File.createTempFile("jpeg_", ".jpg", context.getCacheDir());
+                try (FileOutputStream output = new FileOutputStream(temp)) {
+                    if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 95, output)) throw new IOException("Unable to encode JPEG");
+                } finally { bitmap.recycle(); }
+                String jpgName = filename.replaceFirst("(?i)\\.[^.]+$", "") + ".jpg";
+                try { return publishScannedFile(context, preferences, temp, jpgName, "image/jpeg"); }
+                finally { temp.delete(); }
+            } finally { connection.disconnect(); }
         });
     }
 
@@ -262,8 +306,8 @@ public class DownloadHandler {
                                          @Nullable String contentDisposition,
                                          @Nullable String mimetype,
                                          @NonNull String contentSize) {
-        final String filename = FileUtils.sanitizeFileName(
-            URLUtil.guessFileName(url, contentDisposition, mimetype)
+        final String filename = DownloadFilenameResolver.resolve(
+            url, contentDisposition, mimetype, false
         );
 
         String status = Environment.getExternalStorageState();

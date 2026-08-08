@@ -105,6 +105,13 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
             onClick = ::showDownloadLocationDialog
         )
 
+        togglePreference(
+            preference = SETTINGS_SAVE_IMAGES_AS_JPEG,
+            isChecked = userPreferences.saveImagesAsJpeg,
+            summary = getString(R.string.save_images_as_jpeg_summary),
+            onCheckChange = { userPreferences.saveImagesAsJpeg = it }
+        )
+
         clickableDynamicPreference(
             preference = SETTINGS_HOME,
             summary = homePageUrlToDisplayTitle(userPreferences.homepage),
@@ -600,6 +607,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_USER_AGENT = "agent"
         private const val SETTINGS_CHROMPATIBILITY = "chrompatibility_mode"
         private const val SETTINGS_DOWNLOAD = "download"
+        private const val SETTINGS_SAVE_IMAGES_AS_JPEG = "save_images_as_jpeg"
         private const val SETTINGS_HOME = "home"
         private const val SETTINGS_SEARCH_ENGINE = "search"
         private const val SETTINGS_SUGGESTIONS = "suggestions_choice"

@@ -38,6 +38,7 @@ import com.krystelligence.solipsism.database.history.HistoryRepository
 import com.krystelligence.solipsism.html.bookmark.BookmarkPageFactory
 import com.krystelligence.solipsism.html.history.HistoryPageFactory
 import com.krystelligence.solipsism.haptics.HapticFeedbackController
+import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.search.SearchEngineProvider
 import com.krystelligence.solipsism.ssl.SslState
 import com.krystelligence.solipsism.utils.Option
@@ -45,6 +46,7 @@ import com.krystelligence.solipsism.utils.QUERY_PLACE_HOLDER
 import com.krystelligence.solipsism.utils.isBookmarkUrl
 import com.krystelligence.solipsism.utils.isDownloadsUrl
 import com.krystelligence.solipsism.utils.isHistoryUrl
+import com.krystelligence.solipsism.utils.isStartPageUrl
 import com.krystelligence.solipsism.utils.isSpecialUrl
 import com.krystelligence.solipsism.utils.smartUrlFilter
 import com.krystelligence.solipsism.utils.value
@@ -97,6 +99,7 @@ class BrowserPresenter @Inject constructor(
     private val cookieAdministrator: CookieAdministrator,
     private val tabCountNotifier: TabCountNotifier,
     private val hapticFeedback: HapticFeedbackController,
+    private val logger: Logger,
     @SuggestionsClient private val okHttpClient: Single<OkHttpClient>,
     @IncognitoMode private val incognitoMode: Boolean
 ) {
@@ -123,6 +126,7 @@ class BrowserPresenter @Inject constructor(
     private var isTabDrawerOpen = false
     private var isBookmarkDrawerOpen = false
     private var isSearchViewFocused = false
+    private var bookmarksNeedRefresh = false
     private var pendingAction: BrowserContract.Action.LoadUrl? = null
     private var isCustomViewShowing = false
 
@@ -180,8 +184,37 @@ class BrowserPresenter @Inject constructor(
      * Call when the view is hidden (i.e. the browser is sent to the background).
      */
     fun onViewHidden() {
+        bookmarksNeedRefresh = true
         model.markAllNonEphemeral()
         model.freeze()
+    }
+
+    /**
+     * Refreshes bookmark-backed UI after returning from another activity, such as Settings.
+     * Imported bookmarks are persisted by the settings activity while this activity is paused;
+     * the drawer and generated HTML must be queried/generated again before they are displayed.
+     */
+    fun onViewResumed() {
+        if (!bookmarksNeedRefresh) return
+        bookmarksNeedRefresh = false
+
+        compositeDisposable += bookmarkRepository
+            .bookmarksAndFolders(folder = currentFolder)
+            .subscribeOn(databaseScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy { list ->
+                view?.updateState(
+                    viewState.copy(
+                        bookmarks = list,
+                        isRootFolder = currentFolder == Bookmark.Folder.Root
+                    )
+                )
+            }
+
+        when {
+            currentTab?.url.isBookmarkUrl() -> rebuildBookmarkPageAndReload()
+            currentTab?.url.isStartPageUrl() -> currentTab?.loadFromInitializer(homePageInitializer)
+        }
     }
 
     private fun TabModel.asViewState(): TabViewState = TabViewState(
@@ -748,13 +781,7 @@ class BrowserPresenter @Inject constructor(
         val currentUrl = currentTab?.url
         if (currentUrl?.isSpecialUrl() == true) {
             when {
-                currentUrl.isBookmarkUrl() ->
-                    compositeDisposable += bookmarkPageFactory.buildPage()
-                        .subscribeOn(diskScheduler)
-                        .observeOn(mainScheduler)
-                        .subscribeBy {
-                            currentTab?.reload()
-                        }
+                currentUrl.isBookmarkUrl() -> rebuildBookmarkPageAndReload()
 
                 currentUrl.isDownloadsUrl() ->
                     currentTab?.loadFromInitializer(downloadPageInitializer)
@@ -767,6 +794,18 @@ class BrowserPresenter @Inject constructor(
         } else {
             currentTab?.reload()
         }
+    }
+
+    private fun rebuildBookmarkPageAndReload() {
+        compositeDisposable += bookmarkPageFactory.buildPage()
+            .subscribeOn(diskScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy(
+                onSuccess = { currentTab?.reload() },
+                onError = { throwable ->
+                    logger.log(TAG, "Unable to rebuild bookmark page", throwable)
+                }
+            )
     }
 
     /**
@@ -1568,6 +1607,7 @@ class BrowserPresenter @Inject constructor(
     }
 
     companion object {
+        private const val TAG = "BrowserPresenter"
         private const val DUCKDUCKGO_HTML_SEARCH = "https://html.duckduckgo.com/html/?q="
         private const val DUCKDUCKGO_SEARCH = "https://duckduckgo.com/?q="
         private const val DEFAULT_LUCKY_QUERY = "interesting websites"

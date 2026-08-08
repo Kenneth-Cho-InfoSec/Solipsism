@@ -456,8 +456,10 @@
     <string name="wideViewPort">Naudokite plačią peržiūros sritį</string>
     <string name="window">Leisti svetainėms atidaryti naujus langus</string>
     <plurals name="notification_incognito_running_title">
-        <item quantity="one">%1$d incognito tab open</item>
-        <item quantity="other">%1$d incognito tabs open</item>
+        <item quantity="one">Atidarytas %1$d inkognito skirtukas</item>
+        <item quantity="few">Atidaryti %1$d inkognito skirtukai</item>
+        <item quantity="many">Atidaryta %1$d inkognito skirtukų</item>
+        <item quantity="other">Atidaryta %1$d inkognito skirtukų</item>
     </plurals>
     <string-array name="proxy_choices_array">
         <item>Nėra</item><item>Orbot</item><item>Rankinis</item>

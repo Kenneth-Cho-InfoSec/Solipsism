@@ -181,7 +181,8 @@ class BookmarkSettingsFragment : AbstractSettingsFragment() {
 
         val inputStream = activity?.fileInputStream(uri) ?: return
 
-        inputStream
+        importSubscription?.dispose()
+        importSubscription = inputStream
             .map {
                 if (fileName?.endsWith(EXTENSION_HTML) == true) {
                     netscapeBookmarkFormatImporter.importBookmarks(it)

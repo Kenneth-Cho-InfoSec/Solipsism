@@ -867,6 +867,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     override fun onResume() {
         super.onResume()
+        presenter.onViewResumed()
         applyStatusBarPreferences()
         if (::binding.isInitialized && ::uiConfiguration.isInitialized &&
             uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM

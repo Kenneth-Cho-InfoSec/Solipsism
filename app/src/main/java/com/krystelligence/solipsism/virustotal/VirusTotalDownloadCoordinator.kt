@@ -3,6 +3,8 @@ package com.krystelligence.solipsism.virustotal
 import android.app.Activity
 import android.app.Application
 import android.util.Base64
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import com.krystelligence.solipsism.download.DownloadHandler
 import com.krystelligence.solipsism.malware.LocalMalwareDatabase
 import com.krystelligence.solipsism.preference.UserPreferences
@@ -24,7 +26,8 @@ data class VirusTotalDownloadRequest(
     val userAgent: String?,
     val cookie: String?,
     val mimeType: String?,
-    val blobData: String?
+    val blobData: String?,
+    val convertToJpeg: Boolean = false
 )
 
 sealed interface VirusTotalDownloadResult {
@@ -100,6 +103,7 @@ class VirusTotalDownloadCoordinator @Inject constructor(
                     )
                     else -> {
                         cancellation.throwIfCancelled()
+                        if (request.convertToJpeg) convertToJpeg(staged)
                         val storedUrl = downloadHandler.publishScannedFile(
                             activity,
                             preferences,
@@ -117,6 +121,22 @@ class VirusTotalDownloadCoordinator @Inject constructor(
             }
         } finally {
             staged.delete()
+        }
+    }
+
+    private fun convertToJpeg(file: File) {
+        val bitmap = BitmapFactory.decodeFile(file.absolutePath) ?: return
+        val converted = File.createTempFile("jpeg_", ".jpg", file.parentFile)
+        try {
+            converted.outputStream().use { output ->
+                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 95, output)) return
+            }
+            if (!converted.renameTo(file)) {
+                converted.copyTo(file, overwrite = true)
+            }
+        } finally {
+            bitmap.recycle()
+            converted.delete()
         }
     }
 

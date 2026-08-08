@@ -466,8 +466,10 @@
     <string name="virus_total_view_report">Zobacz raport</string>
     <string name="webrtc_support">Wsparcie WebRTC</string>
     <plurals name="notification_incognito_running_title">
-        <item quantity="one">%1$d incognito tab open</item>
-        <item quantity="other">%1$d incognito tabs open</item>
+        <item quantity="one">Otwarta %1$d karta incognito</item>
+        <item quantity="few">Otwarte %1$d karty incognito</item>
+        <item quantity="many">Otwartych %1$d kart incognito</item>
+        <item quantity="other">Otwartych %1$d kart incognito</item>
     </plurals>
     <string name="settings_custom_language_clear">Wyczyść niestandardowy język</string>
     <string name="settings_custom_language_cleared">Wyczyszczono zastąpienia niestandardowego języka.</string>

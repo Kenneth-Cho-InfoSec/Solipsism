@@ -459,6 +459,7 @@
     <string name="yes">כֵּן</string>
     <plurals name="notification_incognito_running_title">
         <item quantity="one">%1$d כרטיסיית גלישה בסתר פתוחה</item>
+        <item quantity="two">%1$d כרטיסיות גלישה בסתר פתוחות</item>
         <item quantity="other">%1$d כרטיסיות גלישה בסתר פתוחות</item>
     </plurals>
     <string-array name="proxy_choices_array">

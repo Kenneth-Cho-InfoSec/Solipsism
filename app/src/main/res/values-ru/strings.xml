@@ -469,8 +469,10 @@
     <string name="virus_total_view_report">Посмотреть отчет</string>
     <string name="webrtc_support">Поддержка WebRTC</string>
     <plurals name="notification_incognito_running_title">
-        <item quantity="one">%1$d incognito tab open</item>
-        <item quantity="other">%1$d incognito tabs open</item>
+        <item quantity="one">Открыта %1$d вкладка инкогнито</item>
+        <item quantity="few">Открыты %1$d вкладки инкогнито</item>
+        <item quantity="many">Открыто %1$d вкладок инкогнито</item>
+        <item quantity="other">Открыто %1$d вкладок инкогнито</item>
     </plurals>
     <string name="settings_custom_language_clear">Очистить пользовательский язык</string>
     <string name="settings_custom_language_cleared">Замены пользовательского языка очищены.</string>

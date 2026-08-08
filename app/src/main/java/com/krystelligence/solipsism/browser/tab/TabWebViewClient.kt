@@ -28,6 +28,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.RenderProcessGoneDetail
 import androidx.appcompat.app.AlertDialog
 import androidx.webkit.WebViewAssetLoader.InternalStoragePathHandler
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -124,6 +125,11 @@ class TabWebViewClient @AssistedInject constructor(
             }
         }
         sslStateObservable.onNext(sslState)
+    }
+
+    override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+        logger.log(TAG, "WebView renderer exited: didCrash=${detail.didCrash()}")
+        return true
     }
 
     override fun onPageFinished(view: WebView, url: String) {
