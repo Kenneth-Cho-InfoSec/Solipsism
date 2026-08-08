@@ -175,9 +175,12 @@ From the history page, long-pressing Clear All History opens Decoy Mode. It can 
 - Left/right channel test playback.
 - Accent-aware rail, buttons, dialogs, and selected controls.
 
-<img src="docs/screenshots/graphics-settings.png" alt="Solipsism Browser graphics settings showing fullscreen, viewport, reflow and theme controls" width="150">
-
-<img src="docs/screenshots/home-rail-amoled.png" alt="Solipsism Browser homepage with a true-black AMOLED surface and rail" width="150">
+<table>
+  <tr>
+    <td><img src="docs/screenshots/graphics-settings.png" alt="Solipsism Browser graphics settings showing fullscreen, viewport, reflow and theme controls" width="150"></td>
+    <td><img src="docs/screenshots/home-rail-amoled.png" alt="Solipsism Browser homepage with a true-black AMOLED surface and rail" width="150"></td>
+  </tr>
+</table>
 
 ## Download and Data Safety
 
