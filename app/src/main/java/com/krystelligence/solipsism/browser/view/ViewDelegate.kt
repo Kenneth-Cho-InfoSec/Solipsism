@@ -46,6 +46,8 @@ interface ViewDelegate {
 
     val bookmarkListView: RecyclerView
 
+    val bookmarkSearch: EditText
+
     val searchContainer: ConstraintLayout
 
     val search: SearchView

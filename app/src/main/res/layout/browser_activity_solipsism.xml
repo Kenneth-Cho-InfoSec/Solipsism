@@ -509,6 +509,17 @@
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
             </LinearLayout>
 
+            <EditText
+                android:id="@+id/bookmark_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:autofillHints=""
+                android:hint="@string/search_bookmarks"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/bookmark_list_view"
                 android:layout_width="match_parent"

@@ -198,6 +198,9 @@ class UserPreferences @Inject constructor(
      */
     var popupsEnabled by preferences.booleanPreference(POPUPS, true)
 
+    /** Block pop-up windows that were not initiated by a user gesture. */
+    var blockAutomaticPopups by preferences.booleanPreference(BLOCK_AUTOMATIC_POPUPS, false)
+
     /**
      * True if the app should remember which browser tabs were open and restore them if the browser
      * is automatically closed by the system.
@@ -560,6 +563,7 @@ private const val USER_SCRIPTS = "userscripts"
 private const val LOCATION = "location"
 private const val OVERVIEW_MODE = "overviewmode"
 private const val POPUPS = "newwindows"
+private const val BLOCK_AUTOMATIC_POPUPS = "blockAutomaticPopups"
 private const val RESTORE_LOST_TABS = "restoreclosed"
 private const val SAVE_PASSWORDS = "passwords"
 private const val SEARCH = "search"

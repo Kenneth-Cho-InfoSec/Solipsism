@@ -696,9 +696,11 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
                 userPreferences.homepageMottoEnabled = mottoEnabled.isChecked
                 userPreferences.homepageMotto = motto.text.toString().trim()
                 userPreferences.homepageBookmarksEnabled = bookmarksEnabled.isChecked
-                userPreferences.homepageMottoSize = mottoSize.progress
+                // SeekBar progress is offset by the slider's minimum value (ten sp).
+                userPreferences.homepageMottoSize = mottoSize.progress + 10
                 userPreferences.homepageMottoOpacity = mottoOpacity.progress
-                userPreferences.homepageBookmarkColumns = columns.progress
+                // SeekBar progress is offset by the slider's minimum value (one column).
+                userPreferences.homepageBookmarkColumns = columns.progress + 1
                 userPreferences.homepageWallpaperOpacity = wallpaperOpacity.progress
                 userPreferences.homepageWallpaperPositionX = wallpaperX.progress
                 userPreferences.homepageWallpaperPositionY = wallpaperY.progress

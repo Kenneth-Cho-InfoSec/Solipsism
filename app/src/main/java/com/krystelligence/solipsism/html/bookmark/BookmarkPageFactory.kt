@@ -129,6 +129,7 @@ class BookmarkPageFactory @Inject constructor(
                     list.forEach {
                         appendChild(repeatableElement.clone {
                             tag("a") { attr("href", it.url) }
+                            attr("data-search", "${it.title} ${it.url}")
                             tag("img") { attr("src", it.iconUrl) }
                             id("title") { appendText(it.title) }
                         })

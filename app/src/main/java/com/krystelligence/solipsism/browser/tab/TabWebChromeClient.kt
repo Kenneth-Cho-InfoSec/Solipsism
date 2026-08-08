@@ -145,6 +145,12 @@ class TabWebChromeClient @Inject constructor(
         isUserGesture: Boolean,
         resultMsg: Message
     ): Boolean {
+        // WebView reports whether the request came from a user gesture. Keep legitimate
+        // target="_blank" links working while stopping timer/script-driven pop-ups when the
+        // strict popup setting is enabled. Returning false prevents creation of the child window.
+        if (userPreferences.blockAutomaticPopups && !isUserGesture) {
+            return false
+        }
         createWindowObservable.onNext(ResultMessageInitializer(resultMsg))
         return true
     }

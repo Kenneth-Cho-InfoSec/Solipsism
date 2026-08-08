@@ -9,6 +9,12 @@
             android:summary="@string/recommended"
             android:title="@string/window" />
         <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_privacy"
+            android:key="block_automatic_popups"
+            android:summary="@string/block_automatic_popups_summary"
+            android:title="@string/block_automatic_popups" />
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:icon="@drawable/ic_settings_privacy"
             android:key="allow_cookies"

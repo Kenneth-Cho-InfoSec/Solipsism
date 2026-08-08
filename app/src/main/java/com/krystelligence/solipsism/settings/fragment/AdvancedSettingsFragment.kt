@@ -51,6 +51,13 @@ class AdvancedSettingsFragment : AbstractSettingsFragment() {
             onCheckChange = { userPreferences.popupsEnabled = it }
         )
 
+        togglePreference(
+            preference = SETTINGS_BLOCK_AUTOMATIC_POPUPS,
+            isChecked = userPreferences.blockAutomaticPopups,
+            isEnabled = userPreferences.popupsEnabled,
+            onCheckChange = { userPreferences.blockAutomaticPopups = it }
+        )
+
         val incognitoCheckboxPreference = togglePreference(
             preference = SETTINGS_COOKIES_INCOGNITO,
             isEnabled = !Capabilities.FULL_INCOGNITO.isSupported,
@@ -167,6 +174,7 @@ class AdvancedSettingsFragment : AbstractSettingsFragment() {
 
     companion object {
         private const val SETTINGS_NEW_WINDOW = "allow_new_window"
+        private const val SETTINGS_BLOCK_AUTOMATIC_POPUPS = "block_automatic_popups"
         private const val SETTINGS_ENABLE_COOKIES = "allow_cookies"
         private const val SETTINGS_COOKIES_INCOGNITO = "incognito_cookies"
         private const val SETTINGS_RESTORE_TABS = "restore_tabs"

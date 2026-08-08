@@ -48,6 +48,9 @@
     <string name="reflow">Enable text reflow</string>
     <string name="block">Block images</string>
     <string name="window">Allow sites to open new windows</string>
+    <string name="search_bookmarks">Search bookmarks</string>
+    <string name="block_automatic_popups">Block automatic pop-ups</string>
+    <string name="block_automatic_popups_summary">Allow new windows opened by a tap, but block unsolicited pop-ups</string>
     <string name="cookies">Enable cookies</string>
     <string name="recommended">Recommended</string>
     <string name="search">Search engine</string>

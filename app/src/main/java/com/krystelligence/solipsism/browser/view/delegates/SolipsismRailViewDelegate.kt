@@ -33,6 +33,7 @@ class SolipsismRailViewDelegate(binding: BrowserActivitySolipsismBinding) : View
     override val drawerTabsList: RecyclerView = binding.drawerTabsList
     override val desktopTabsList: RecyclerView = binding.desktopTabsList
     override val bookmarkListView: RecyclerView = binding.bookmarkListView
+    override val bookmarkSearch: EditText = binding.bookmarkSearch
     override val searchContainer: ConstraintLayout = binding.searchContainer
     override val search: SearchView = binding.search
     override val findBar: LinearLayout = binding.findBar

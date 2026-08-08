@@ -90,11 +90,34 @@
         margin: 10px
     }
 
+    #bookmark-search {
+        box-sizing: border-box;
+        display: block;
+        width: calc(100% - 24px);
+        max-width: 620px;
+        margin: 8px auto 12px;
+        padding: 10px 14px;
+        border: 1px solid var(--box-bg);
+        border-radius: 12px;
+        background: var(--box-bg);
+        color: var(--box-txt);
+        font: inherit;
+    }
+
+    #bookmark-empty {
+        display: none;
+        margin: 24px;
+        color: var(--box-txt);
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
 
 </style>
 
 <body>
 <div id=content>
+
+    <input id=bookmark-search type=search placeholder="Search bookmarks" aria-label="Search bookmarks" autocomplete=off />
 
     <div id=repeated class=box>
         <a href='${URL}'></a>
@@ -108,6 +131,25 @@
     </div>
 
 </div>
+<p id=bookmark-empty role=status>No bookmarks match your search.</p>
+<script>
+    (function () {
+        var input = document.getElementById('bookmark-search');
+        var empty = document.getElementById('bookmark-empty');
+        var cards = Array.prototype.slice.call(document.querySelectorAll('.box'));
+        input.addEventListener('input', function () {
+            var query = input.value.trim().toLowerCase();
+            var visible = 0;
+            cards.forEach(function (card) {
+                var haystack = (card.getAttribute('data-search') || card.textContent || '').toLowerCase();
+                var show = !query || haystack.indexOf(query) !== -1;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+            empty.style.display = visible ? 'none' : 'block';
+        });
+    }());
+</script>
 </body>
 
 </html>

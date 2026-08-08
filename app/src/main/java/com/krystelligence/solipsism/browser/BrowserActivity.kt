@@ -137,6 +137,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private var immersiveFullscreen = false
     private var previousSystemUiVisibility = 0
     private var browserMenuPopup: PopupWindow? = null
+    private var bookmarkQuery = ""
+    private var currentBookmarks: List<Bookmark> = emptyList()
     private var urlRailTransition: BrowserPresenter.UrlBarTabTransition? = null
     private var railHapticActive = false
     private var railHapticLastMovementAt = 0L
@@ -745,6 +747,14 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         )
         binding.bookmarkListView.adapter = bookmarksAdapter
         binding.bookmarkListView.layoutManager = LinearLayoutManager(this)
+        binding.bookmarkSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                bookmarkQuery = s?.toString().orEmpty()
+                updateBookmarkList(currentBookmarks)
+            }
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
 
         presenter.onViewAttached(BrowserStateAdapter(this))
         maybeShowFirstRunDonationDialog()
@@ -1693,7 +1703,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             binding.searchSslStatus.setImageDrawable(createSslDrawableForState(it))
             binding.searchSslStatus.updateVisibilityForDrawable()
         }
-        viewState.bookmarks?.let(bookmarksAdapter::submitList)
+        viewState.bookmarks?.let(::updateBookmarkList)
         viewState.findInPage?.let { query ->
             val shouldShowFind = query.isNotEmpty() || binding.findBar.isVisible && binding.findQuery.hasFocus()
             binding.findBar.isVisible = shouldShowFind
@@ -1707,6 +1717,16 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         }
         val suggestionsAdapter = binding.search.adapter as? SuggestionsAdapter
         suggestionsAdapter?.refreshBookmarks()
+    }
+
+    private fun updateBookmarkList(bookmarks: List<Bookmark>) {
+        currentBookmarks = bookmarks
+        val query = bookmarkQuery.trim().lowercase()
+        bookmarksAdapter.submitList(
+            if (query.isBlank()) bookmarks else bookmarks.filter {
+                it.title.lowercase().contains(query) || it.url.lowercase().contains(query)
+            }
+        )
     }
 
     override fun renderTabs(tabs: List<TabViewState>) {
