@@ -4,13 +4,13 @@
   <img src="docs/logo.png" alt="Solipsism Browser logo" width="220">
 </p>
 
-<p align="center">
-  <img src="docs/screenshots/home-rail-light.png" alt="Solipsism Browser homepage in light mode with the right-side navigation rail" width="360">
-  <br>
-  <img src="docs/screenshots/official-website.png" alt="Solipsism Browser official website loaded inside Solipsism Browser" width="360">
-  <br>
-  <img src="docs/screenshots/home-rail-amoled.png" alt="Solipsism Browser homepage with a true-black AMOLED surface and rail" width="360">
-</p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="docs/screenshots/home-rail-light.png" alt="Solipsism Browser homepage in light mode with the right-side navigation rail" width="150"></td>
+    <td align="center"><img src="docs/screenshots/official-website.png" alt="Solipsism Browser official website loaded inside Solipsism Browser" width="150"></td>
+    <td align="center"><img src="docs/screenshots/settings-light-blue.png" alt="Solipsism Browser settings menu in light mode with a blue accent" width="150"></td>
+  </tr>
+</table>
 
 Solipsism Browser is a privacy-focused Android WebView browser built around a rail-first, one-handed interface. Navigation, tabs, search, QR scanning, refresh, bookmarks, and browser tools live in a compact rail on the left or right, leaving the webpage as the main surface.
 
@@ -45,7 +45,7 @@ This is a WebView-compatible userscript runtime, not the full Tampermonkey exten
 
 The three-dot menu includes a screenshot action that captures the current webpage surface without the Solipsism rail. The capture provides visual feedback with a 70% shrink animation, rounded corners, a brief translucent white flash, and device vibration.
 
-![Solipsism Browser tools menu showing screenshot, downloads, history, bookmarks and user-agent actions](docs/screenshots/overflow-tools.png)
+<img src="docs/screenshots/overflow-tools.png" alt="Solipsism Browser tools menu showing screenshot, downloads, history, bookmarks and user-agent actions" width="150">
 
 ### Site permissions
 
@@ -78,7 +78,7 @@ Additional controls are labelled **Experimental** because Android WebView does n
 
 Experimental controls are best-effort policy signals and should not be treated as equivalent to a desktop browser’s fully enforced permission sandbox.
 
-![Solipsism Browser settings overview showing privacy, site permissions, bookmarks, graphics and audio sections](docs/screenshots/settings-main.png)
+<img src="docs/screenshots/settings-main.png" alt="Solipsism Browser settings overview showing privacy, site permissions, bookmarks, graphics and audio sections" width="150">
 
 ### Adblocker
 
@@ -124,7 +124,7 @@ Malware Scanner is a defence-in-depth feature. Users should still use trusted so
 - Fullscreen video support with rail and system-bar handling.
 - Current-page screenshot capture without the browser rail.
 
-![Solipsism Browser tab overview in AMOLED-black mode](docs/screenshots/tab-overview.png)
+<img src="docs/screenshots/tab-overview.png" alt="Solipsism Browser tab overview in AMOLED-black mode" width="150">
 
 ## Homepage Customization
 
@@ -175,9 +175,9 @@ From the history page, long-pressing Clear All History opens Decoy Mode. It can 
 - Left/right channel test playback.
 - Accent-aware rail, buttons, dialogs, and selected controls.
 
-![Solipsism Browser graphics settings showing fullscreen, viewport, reflow and theme controls](docs/screenshots/graphics-settings.png)
+<img src="docs/screenshots/graphics-settings.png" alt="Solipsism Browser graphics settings showing fullscreen, viewport, reflow and theme controls" width="150">
 
-![Solipsism Browser homepage with a true-black AMOLED surface and rail](docs/screenshots/home-rail-amoled.png)
+<img src="docs/screenshots/home-rail-amoled.png" alt="Solipsism Browser homepage with a true-black AMOLED surface and rail" width="150">
 
 ## Download and Data Safety
 
