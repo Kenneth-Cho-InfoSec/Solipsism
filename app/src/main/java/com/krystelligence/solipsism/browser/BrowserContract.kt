@@ -90,6 +90,9 @@ interface BrowserContract {
          */
         fun showFindInPageDialog()
 
+        /** Read the current page text using the Android system Text to Speech service. */
+        fun speakPageText(text: String)
+
         /**
          * Show the options menu for long pressing a link in the web page.
          */
@@ -161,6 +164,12 @@ interface BrowserContract {
         fun showScreenshot(bitmap: Bitmap)
 
         fun showScreenshotCaptureFailed()
+
+        fun openVault()
+
+        fun showVaultSaved()
+
+        fun showVaultSaveFailed()
 
         /**
          * Show a warning to the user that they are about to open a local file in the browser that

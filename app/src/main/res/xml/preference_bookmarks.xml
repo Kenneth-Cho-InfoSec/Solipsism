@@ -6,10 +6,33 @@
             android:icon="@drawable/ic_settings_download"
             android:key="export_bookmark"
             android:title="@string/export_bookmarks"/>
-        <Preference
+        <com.krystelligence.solipsism.settings.preference.LongPressPreference
             android:icon="@drawable/ic_action_plus"
             android:key="import_bookmark"
-            android:title="@string/import_backup"/>
+            android:title="@string/import_backup"
+            android:summary="@string/import_backup_summary" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_settings_globe"
+            android:key="bookmark_favicons_enabled"
+            android:title="@string/bookmark_favicons"
+            android:summary="@string/bookmark_favicons_summary" />
+        <ListPreference
+            android:defaultValue="merge"
+            android:entries="@array/bookmark_import_mode_labels"
+            android:entryValues="@array/bookmark_import_mode_values"
+            android:icon="@drawable/ic_settings_download"
+            android:key="bookmark_import_mode"
+            android:title="@string/bookmark_import_behaviour"
+            android:summary="@string/bookmark_import_behaviour_summary" />
+        <ListPreference
+            android:defaultValue="manual"
+            android:entries="@array/bookmark_sort_order_labels"
+            android:entryValues="@array/bookmark_sort_order_values"
+            android:icon="@drawable/ic_settings_text"
+            android:key="bookmark_sort_order"
+            android:title="@string/bookmark_sort_order"
+            android:summary="@string/bookmark_sort_order_summary" />
         <Preference
             android:icon="@drawable/ic_action_delete"
             android:key="delete_bookmarks"

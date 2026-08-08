@@ -24,6 +24,7 @@ import com.krystelligence.solipsism.browser.theme.ThemeProvider
 import com.krystelligence.solipsism.browser.ui.BookmarkConfiguration
 import com.krystelligence.solipsism.browser.ui.TabConfiguration
 import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
+import com.krystelligence.solipsism.browser.ui.RailUtilityAction
 import com.krystelligence.solipsism.browser.ui.UiConfiguration
 import com.krystelligence.solipsism.browser.view.ViewDelegate
 import com.krystelligence.solipsism.browser.view.delegates.BottomTabViewDelegate
@@ -57,6 +58,8 @@ import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.extensions.takeIfInstance
 import com.krystelligence.solipsism.extensions.tint
 import com.krystelligence.solipsism.qr.QrScannerActivity
+import com.krystelligence.solipsism.vault.VaultActivity
+import com.krystelligence.solipsism.screenshot.ScreenshotStudioActivity
 import com.krystelligence.solipsism.search.SuggestionsAdapter
 import com.krystelligence.solipsism.ssl.SslCertificateInfo
 import com.krystelligence.solipsism.ssl.createSslDrawableForState
@@ -77,6 +80,7 @@ import android.os.Handler
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.provider.MediaStore
+import android.speech.tts.TextToSpeech
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
@@ -114,7 +118,10 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.lifecycle.lifecycleScope
 import javax.inject.Inject
+import java.io.File
+import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
@@ -125,6 +132,10 @@ import kotlin.math.roundToInt
  * browsers.
  */
 abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View {
+
+    private var textToSpeech: TextToSpeech? = null
+    private var textToSpeechReady = false
+    private var pendingSpeechText: String? = null
 
     private lateinit var binding: ViewDelegate
     private lateinit var systemBarsController: SystemBarsController
@@ -197,13 +208,15 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     private fun applySolipsismRailPreferences() {
+        configureSearchRefreshOrUtilityButton()
         val railWidth = userPreferences.solipsismRailSize.coerceIn(
             MIN_SOLIPSISM_RAIL_WIDTH_DP,
             MAX_SOLIPSISM_RAIL_WIDTH_DP
         ).dp
         val railPosition = activeSolipsismRailPosition()
         val railOnLeft = railPosition == SolipsismRailPosition.LEFT
-        val superCompact = userPreferences.solipsismRailSize <= SUPER_COMPACT_RAIL_WIDTH_DP
+        val superCompact = userPreferences.solipsismRailSize <= SUPER_COMPACT_RAIL_WIDTH_DP &&
+            !userPreferences.largeAccessibilityTargetsEnabled
         val hideRail = !railPosition.isExperimental &&
             ((userPreferences.fullScreenEnabled && userPreferences.hideRailInFullscreen) ||
                 immersiveFullscreen)
@@ -316,6 +329,34 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         )
     }
 
+    private fun configureSearchRefreshOrUtilityButton() {
+        if (uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
+            val action = userPreferences.railUtilityAction
+            binding.searchRefresh.apply {
+                setImageResource(action.iconRes)
+                contentDescription = getString(action.labelRes)
+                setOnClickListener {
+                    when (action) {
+                        RailUtilityAction.QR -> presenter.onQrButtonClick()
+                        RailUtilityAction.VAULT -> presenter.onVaultButtonClick()
+                        RailUtilityAction.SCREENSHOT -> presenter.onScreenshotClick()
+                    }
+                }
+                setOnLongClickListener {
+                    when (action) {
+                        RailUtilityAction.QR -> presenter.onQrButtonLongClick()
+                        RailUtilityAction.VAULT -> presenter.onVaultButtonLongClick()
+                        RailUtilityAction.SCREENSHOT -> return@setOnLongClickListener false
+                    }
+                    true
+                }
+            }
+        } else {
+            binding.searchRefresh.setOnClickListener { presenter.onRefreshOrStopClick() }
+            binding.searchRefresh.setOnLongClickListener { false }
+        }
+    }
+
     private fun setImmersiveFullscreen(enabled: Boolean) {
         immersiveFullscreen = enabled
         if (::systemBarsController.isInitialized) {
@@ -332,7 +373,11 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private fun applyHorizontalSolipsismRailPreferences(railHeight: Int, superCompact: Boolean) {
         // Horizontal rails are intentionally compact so the full action set can coexist with
         // the address controls on narrow phones.
-        val buttonSize = if (superCompact) 28.dp else 32.dp
+        val buttonSize = when {
+            userPreferences.largeAccessibilityTargetsEnabled -> 48.dp
+            superCompact -> 28.dp
+            else -> 32.dp
+        }
         val iconPadding = if (superCompact) 5.dp else 8.dp
         binding.toolbarLayout.updateLayoutParams<FrameLayout.LayoutParams> {
             width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -665,7 +710,6 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         )
         systemBarsController.apply()
         setSupportActionBar(binding.toolbar)
-        applySolipsismRailPreferences()
 
         injector.browser2ComponentBuilder()
             .activity(this)
@@ -678,6 +722,9 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             .incognitoMode(isIncognito())
             .build()
             .inject(this)
+        // Rail configuration reads UiConfiguration, which is provided by the activity component.
+        // Apply it only after injection so cold starts do not access an uninitialised property.
+        applySolipsismRailPreferences()
         configureSolipsismOverflowMenu()
 
         if (uiConfiguration.tabConfiguration == TabConfiguration.DESKTOP) {
@@ -743,7 +790,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         bookmarksAdapter = BookmarkRecyclerViewAdapter(
             onClick = presenter::onBookmarkClick,
             onLongClick = presenter::onBookmarkLongClick,
-            imageLoader = imageLoader
+            imageLoader = imageLoader,
+            showFavicons = { userPreferences.bookmarkFaviconsEnabled }
         )
         binding.bookmarkListView.adapter = bookmarksAdapter
         binding.bookmarkListView.layoutManager = LinearLayoutManager(this)
@@ -842,21 +890,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             presenter.onNewTabLongClick()
             true
         }
-        binding.searchRefresh.setOnClickListener {
-            if (uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
-                presenter.onQrButtonClick()
-            } else {
-                presenter.onRefreshOrStopClick()
-            }
-        }
-        binding.searchRefresh.setOnLongClickListener {
-            if (uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
-                presenter.onQrButtonLongClick()
-                true
-            } else {
-                false
-            }
-        }
+        configureSearchRefreshOrUtilityButton()
         binding.actionAddBookmark.setOnClickListener { presenter.onStarClick() }
         binding.actionPageTools.setOnClickListener { presenter.onToolsClick() }
         binding.tabHeaderButton.setOnClickListener { presenter.onTabMenuClick() }
@@ -897,6 +931,9 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     override fun onDestroy() {
         stopContinuousRailHaptic()
+        textToSpeech?.stop()
+        textToSpeech?.shutdown()
+        textToSpeech = null
         super.onDestroy()
         presenter.onViewDetached()
     }
@@ -1074,6 +1111,9 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         container.addView(createMenuDivider())
         container.addView(createMenuRow(R.drawable.ic_bookmark, R.string.action_bookmarks, MenuSelection.BOOKMARKS))
         container.addView(createMenuRow(R.drawable.ic_search, R.string.action_find, MenuSelection.FIND))
+        container.addView(createActionMenuRow(R.drawable.ic_settings_audio, R.string.action_read_aloud) {
+            presenter.onReadPageAloud()
+        })
         container.addView(createMenuRow(R.drawable.ic_insert, R.string.action_copy, MenuSelection.COPY_LINK))
         container.addView(createActionMenuRow(R.drawable.ic_action_screenshot, R.string.action_screenshot) {
             presenter.onScreenshotClick()
@@ -1288,14 +1328,35 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun showScreenshot(bitmap: Bitmap) {
         showScreenshotAnimation(bitmap)
         lifecycleScope.launch {
-            runCatching { withContext(Dispatchers.IO) { saveScreenshot(bitmap) } }
-                .onSuccess { snackbar(R.string.screenshot_saved) }
+            runCatching {
+                val file = withContext(Dispatchers.IO) {
+                    File(cacheDir, "shared/screenshot-studio-source.png").also { it.parentFile?.mkdirs() }.apply {
+                        FileOutputStream(this).use { output -> check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)) }
+                    }
+                }
+                delay(SCREENSHOT_ANIMATION_DURATION_MS)
+                startActivity(Intent(this@BrowserActivity, ScreenshotStudioActivity::class.java).apply {
+                    putExtra(ScreenshotStudioActivity.EXTRA_PATH, file.absolutePath)
+                })
+            }
                 .onFailure { snackbar(R.string.screenshot_failed) }
         }
     }
 
     override fun showScreenshotCaptureFailed() {
         snackbar(R.string.screenshot_failed)
+    }
+
+    override fun openVault() {
+        startActivity(Intent(this, VaultActivity::class.java))
+    }
+
+    override fun showVaultSaved() {
+        snackbar(R.string.vault_saved)
+    }
+
+    override fun showVaultSaveFailed() {
+        snackbar(R.string.vault_save_failed)
     }
 
     private fun showScreenshotAnimation(bitmap: Bitmap) {
@@ -1687,7 +1748,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                 if (it) R.drawable.ic_action_refresh else R.drawable.ic_action_delete
             )
             if (uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
-                binding.searchRefresh.setImageResource(R.drawable.ic_action_qr_code)
+                configureSearchRefreshOrUtilityButton()
             } else {
                 binding.searchRefresh.setImageResource(
                     if (it) R.drawable.ic_action_refresh else R.drawable.ic_action_delete
@@ -1857,6 +1918,71 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         inputMethodManager.showSoftInput(binding.findQuery, InputMethodManager.SHOW_IMPLICIT)
     }
 
+    override fun speakPageText(text: String) {
+        if (text.isBlank()) {
+            snackbar(R.string.text_to_speech_no_text)
+            return
+        }
+        if (textToSpeech?.isSpeaking == true) {
+            textToSpeech?.stop()
+            pendingSpeechText = null
+            snackbar(R.string.text_to_speech_stopped)
+            return
+        }
+
+        pendingSpeechText = text
+        if (textToSpeech == null) {
+            textToSpeechReady = false
+            textToSpeech = TextToSpeech(this) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    textToSpeechReady = true
+                    pendingSpeechText?.also {
+                        pendingSpeechText = null
+                        enqueueSpeech(it)
+                    }
+                } else {
+                    pendingSpeechText = null
+                    snackbar(R.string.text_to_speech_unavailable)
+                }
+            }
+        } else if (textToSpeechReady) {
+            pendingSpeechText = null
+            enqueueSpeech(text)
+        }
+    }
+
+    private fun enqueueSpeech(text: String) {
+        val engine = textToSpeech ?: return
+        val chunks = text
+            .split(Regex("(?<=[.!?])\\s+"))
+            .fold(mutableListOf<String>()) { result, sentence ->
+                var remaining = sentence.trim()
+                while (remaining.length > TTS_CHUNK_LENGTH) {
+                    result += remaining.take(TTS_CHUNK_LENGTH)
+                    remaining = remaining.drop(TTS_CHUNK_LENGTH).trimStart()
+                }
+                if (remaining.isNotBlank()) {
+                    val current = result.lastOrNull().orEmpty()
+                    if (current.length + remaining.length + 1 <= TTS_CHUNK_LENGTH) {
+                        if (result.isEmpty()) result += remaining
+                        else result[result.lastIndex] = "$current $remaining"
+                    } else {
+                        result += remaining
+                    }
+                }
+                result
+            }
+        chunks.forEachIndexed { index, chunk ->
+            engine.speak(
+                chunk,
+                if (index == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD,
+                null,
+                "solipsism-read-aloud-$index"
+            )
+        }
+        snackbar(R.string.text_to_speech_started)
+    }
+
     override fun showLinkLongPressDialog(longPress: LongPress) {
         BrowserDialog.show(
             this, longPress.targetUrl,
@@ -1927,7 +2053,11 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
      */
     override fun showCloseBrowserDialog(id: Int) {
         BrowserDialog.show(
-            this, R.string.dialog_title_close_browser,
+            this,
+            getString(
+                R.string.dialog_title_tab_management,
+                tabPager.estimatedMemoryForTab(id)
+            ),
             DialogItem(title = R.string.close_tab) {
                 presenter.onCloseBrowserEvent(id, BrowserContract.CloseTabEvent.CLOSE_CURRENT)
             },
@@ -1946,6 +2076,22 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     fun clearAllHistoryFromHistoryPage() {
         presenter.onClearAllHistoryClick()
+    }
+
+    fun clearAllDownloadsFromDownloadsPage() {
+        presenter.onClearAllDownloadsClick()
+        snackbar(R.string.downloads_history_cleared)
+    }
+
+    fun showDownloadDecoyModePrompt() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.download_decoy_mode_title)
+            .setMessage(R.string.download_decoy_mode_message)
+            .setPositiveButton(R.string.download_decoy_mode_start) { _, _ ->
+                presenter.onDownloadDecoyModeConfirmed()
+            }
+            .setNegativeButton(R.string.action_cancel, null)
+            .show()
     }
 
     fun showHistoryDecoyModePrompt() {
@@ -2117,3 +2263,4 @@ private const val ADDRESS_OVERLAY_SHADOW_DELAY_MS = 90L
 private const val ADDRESS_OVERLAY_SHADOW_DURATION_MS = 320L
 private const val PRESS_FEEDBACK_DURATION_MS = 95L
 private const val RELEASE_FEEDBACK_DURATION_MS = 260L
+private const val TTS_CHUNK_LENGTH = 3500

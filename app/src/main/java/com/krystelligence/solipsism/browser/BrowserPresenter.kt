@@ -32,9 +32,12 @@ import com.krystelligence.solipsism.database.SearchSuggestion
 import com.krystelligence.solipsism.database.WebPage
 import com.krystelligence.solipsism.database.asFolder
 import com.krystelligence.solipsism.database.bookmark.BookmarkRepository
+import com.krystelligence.solipsism.database.bookmark.BookmarkSortOrder
 import com.krystelligence.solipsism.database.downloads.DownloadEntry
 import com.krystelligence.solipsism.database.downloads.DownloadsRepository
 import com.krystelligence.solipsism.database.history.HistoryRepository
+import com.krystelligence.solipsism.database.vault.VaultRepository
+import com.krystelligence.solipsism.download.DecoyDownloadFactory
 import com.krystelligence.solipsism.html.bookmark.BookmarkPageFactory
 import com.krystelligence.solipsism.html.history.HistoryPageFactory
 import com.krystelligence.solipsism.haptics.HapticFeedbackController
@@ -84,6 +87,7 @@ class BrowserPresenter @Inject constructor(
     private val bookmarkRepository: BookmarkRepository,
     private val downloadsRepository: DownloadsRepository,
     private val historyRepository: HistoryRepository,
+    private val vaultRepository: VaultRepository,
     @DiskScheduler private val diskScheduler: Scheduler,
     @MainScheduler private val mainScheduler: Scheduler,
     @DatabaseScheduler private val databaseScheduler: Scheduler,
@@ -893,6 +897,11 @@ class BrowserPresenter @Inject constructor(
         view?.updateState(viewState.copy(findInPage = ""))
     }
 
+    /** Extract page text for the system Text to Speech action without modifying the page. */
+    fun onReadPageAloud() {
+        currentTab?.readPageText { text -> view?.speakPageText(text) }
+    }
+
     /**
      * Call when the user selects a search suggestion that was suggested by the search box.
      */
@@ -942,7 +951,10 @@ class BrowserPresenter @Inject constructor(
     }
 
     private fun BookmarkRepository.bookmarksAndFolders(folder: Bookmark.Folder): Single<List<Bookmark>> =
-        getBookmarksFromFolderSorted(folder = folder.title)
+        getBookmarksFromFolderSorted(
+            folder = folder.title,
+            sortOrder = userPreferences.bookmarkSortOrder
+        )
             .concatWith(Single.defer {
                 if (folder == Bookmark.Folder.Root) {
                     getFoldersSorted()
@@ -981,7 +993,7 @@ class BrowserPresenter @Inject constructor(
     }
 
     fun onUserAgentChoiceSelected(choice: Int) {
-        userPreferences.userAgentChoice = choice.coerceIn(1, 4)
+        userPreferences.userAgentChoice = choice.coerceIn(1, 5)
         if (userPreferences.userAgentChoice == 4) {
             view?.showCustomUserAgentDialog(userPreferences.userAgentString)
             return
@@ -1310,6 +1322,25 @@ class BrowserPresenter @Inject constructor(
             }
     }
 
+    fun onClearAllDownloadsClick() {
+        compositeDisposable += downloadsRepository.deleteAllDownloads()
+            .subscribeOn(databaseScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy {
+                if (currentTab?.url?.isDownloadsUrl() == true) reload()
+            }
+    }
+
+    fun onDownloadDecoyModeConfirmed() {
+        compositeDisposable += downloadsRepository
+            .replaceWithDecoyDownloads(DecoyDownloadFactory.create(count = 8))
+            .subscribeOn(databaseScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy {
+                if (currentTab?.url?.isDownloadsUrl() == true) reload()
+            }
+    }
+
     fun onHistoryDecoyModeConfirmed(timeframe: DecoyTimeframe) {
         val now = System.currentTimeMillis()
         val startTime = when (timeframe) {
@@ -1546,6 +1577,30 @@ class BrowserPresenter @Inject constructor(
      */
     fun onQrButtonLongClick() {
         currentTab?.url?.takeIf { !it.isSpecialUrl() }?.let(navigator::showQrCode)
+    }
+
+    fun onVaultButtonClick() {
+        val tab = currentTab
+        if (tab == null) {
+            view?.showVaultSaveFailed()
+            return
+        }
+        val url = tab.url
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            view?.showVaultSaveFailed()
+            return
+        }
+        compositeDisposable += vaultRepository.savePage(url, tab.title)
+            .subscribeOn(databaseScheduler)
+            .observeOn(mainScheduler)
+            .subscribe(
+                { view?.showVaultSaved() },
+                { view?.showVaultSaveFailed() }
+            )
+    }
+
+    fun onVaultButtonLongClick() {
+        view?.openVault()
     }
 
     private fun createDecoyHistoryEntries(startTime: Long, endTime: Long): List<HistoryEntry> {

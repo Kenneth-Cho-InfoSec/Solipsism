@@ -15,6 +15,7 @@ import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.preference.DeveloperPreferences
 import com.krystelligence.solipsism.audio.AudioPreset
 import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
+import com.krystelligence.solipsism.browser.ui.RailUtilityAction
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.html.homepage.StaticHomepageSanitizer
 import android.net.Uri
@@ -172,6 +173,12 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             preference = SETTINGS_SWAP_QR_AND_TABS,
             isChecked = userPreferences.swapQrAndTabsButtons,
             onCheckChange = { userPreferences.swapQrAndTabsButtons = it }
+        )
+
+        clickableDynamicPreference(
+            preference = SETTINGS_RAIL_UTILITY_ACTION,
+            summary = getString(userPreferences.railUtilityAction.labelRes),
+            onClick = ::showRailUtilityActionPicker
         )
 
         togglePreference(
@@ -504,6 +511,23 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             setPositiveButton(resources.getString(R.string.action_ok), null)
         }.create()
         positionDialog.show()
+    }
+
+    private fun showRailUtilityActionPicker(summaryUpdater: SummaryUpdater) {
+        val actions = RailUtilityAction.values()
+        MaterialAlertDialogBuilder(requireActivity()).apply {
+            setTitle(R.string.settings_rail_utility_action)
+            setSingleChoiceItems(
+                actions.map { getString(it.labelRes) }.toTypedArray(),
+                actions.indexOf(userPreferences.railUtilityAction)
+            ) { dialog, which ->
+                val selected = actions[which]
+                userPreferences.railUtilityAction = selected
+                summaryUpdater.updateSummary(getString(selected.labelRes))
+                dialog.dismiss()
+            }
+            setPositiveButton(R.string.action_ok, null)
+        }.resizeAndShow()
     }
 
     private fun showExperimentalRailWarning(onContinue: () -> Unit) {
@@ -1123,6 +1147,7 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_RAIL_SIZE = "rail_size"
         private const val SETTINGS_RAIL_POSITION = "rail_position"
         private const val SETTINGS_SWAP_QR_AND_TABS = "swap_qr_and_tabs_buttons"
+        private const val SETTINGS_RAIL_UTILITY_ACTION = "rail_utility_action"
         private const val SETTINGS_BLACK_STATUS = "black_status_bar"
 
         private const val HOMEPAGE_WALLPAPER_DEFAULT = 0

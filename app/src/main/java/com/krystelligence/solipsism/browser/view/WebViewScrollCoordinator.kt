@@ -124,6 +124,11 @@ class WebViewScrollCoordinator @Inject constructor(
     }
 
     private fun View.animateTranslation(y: Float) {
+        if (userPreferences.reducedMotionEnabled) {
+            animate().cancel()
+            translationY = y
+            return
+        }
         animate()
             .setDuration(250)
             .setInterpolator(BezierDecelerateInterpolator())
@@ -165,7 +170,7 @@ class WebViewScrollCoordinator @Inject constructor(
                             webView.translationY = height - trans
                         }
                     }
-                    hideAnimation.duration = 250
+                    hideAnimation.duration = if (userPreferences.reducedMotionEnabled) 0 else 250
                     hideAnimation.interpolator = BezierDecelerateInterpolator()
                     toolbar.startAnimation(hideAnimation)
                 }
@@ -190,7 +195,7 @@ class WebViewScrollCoordinator @Inject constructor(
                             webView.translationY = trans
                         }
                     }
-                    show.duration = 250
+                    show.duration = if (userPreferences.reducedMotionEnabled) 0 else 250
                     show.interpolator = BezierDecelerateInterpolator()
                     toolbar.startAnimation(show)
                 }

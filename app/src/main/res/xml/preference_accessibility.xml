@@ -36,5 +36,23 @@
             android:key="accessibility_overview_mode"
             android:summary="@string/settings_accessibility_overview_summary"
             android:title="@string/overViewMode" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_action_expand"
+            android:key="accessibility_reduced_motion"
+            android:summary="@string/settings_accessibility_reduced_motion_summary"
+            android:title="@string/settings_accessibility_reduced_motion" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_action_expand"
+            android:key="accessibility_large_targets"
+            android:summary="@string/settings_accessibility_large_targets_summary"
+            android:title="@string/settings_accessibility_large_targets" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_settings"
+            android:key="accessibility_announcements"
+            android:summary="@string/settings_accessibility_announcements_summary"
+            android:title="@string/settings_accessibility_announcements" />
     </PreferenceCategory>
 </PreferenceScreen>

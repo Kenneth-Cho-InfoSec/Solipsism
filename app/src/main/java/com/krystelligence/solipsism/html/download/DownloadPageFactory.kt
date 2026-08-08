@@ -53,7 +53,45 @@ class DownloadPageFactory @Inject constructor(
     override fun buildPage(): Single<String> = manager
         .getAllDownloads()
         .map { list ->
-            parse(listPageReader.provideHtml()) andBuild {
+            val html = listPageReader.provideHtml().replace(
+                "<!--ACTION_BAR-->",
+                """
+                <div class="page_actions visible">
+                    <header class="page_header"><div class="page_icon" aria-hidden="true">⇩</div><h1>${application.getString(R.string.action_downloads)}</h1></header>
+                    <button class="history_clear_button" type="button">${application.getString(R.string.downloads_clear_history)}</button>
+                </div>
+                <script>
+                    (function () {
+                        var button = document.querySelector('.history_clear_button');
+                        if (!button) return;
+                        var timer = null;
+                        var longPress = false;
+                        button.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            if (longPress) { longPress = false; return false; }
+                            window.location.href = 'solipsism://clear-download-history';
+                            return false;
+                        });
+                        button.addEventListener('contextmenu', function (event) {
+                            event.preventDefault();
+                            longPress = true;
+                            window.location.href = 'solipsism://download-decoy-mode';
+                            return false;
+                        });
+                        button.addEventListener('touchstart', function () {
+                            longPress = false;
+                            timer = window.setTimeout(function () {
+                                longPress = true;
+                                window.location.href = 'solipsism://download-decoy-mode';
+                            }, 260);
+                        }, { passive: false });
+                        button.addEventListener('touchend', function () { if (timer) window.clearTimeout(timer); });
+                        button.addEventListener('touchcancel', function () { if (timer) window.clearTimeout(timer); });
+                    }());
+                </script>
+                """.trimIndent()
+            )
+            parse(html) andBuild {
                 title { application.getString(R.string.action_downloads) }
                 style { content ->
                     content.replace("--body-bg: {COLOR}", "--body-bg: #$backgroundColor;")
@@ -66,7 +104,7 @@ class DownloadPageFactory @Inject constructor(
                     id("content") {
                         list.forEach {
                             appendChild(repeatableElement.clone {
-                                tag("a") { attr("href", createFileUrl(it.title)) }
+                                tag("a") { attr("href", if (it.isDecoy) "#" else createFileUrl(it.title)) }
                                 id("title") { text(createFileTitle(it)) }
                                 id("url") { text(it.url) }
                             })

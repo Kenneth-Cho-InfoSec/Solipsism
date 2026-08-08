@@ -60,6 +60,24 @@ class AccessibilitySettingsFragment : AbstractSettingsFragment() {
             isChecked = userPreferences.overviewModeEnabled,
             onCheckChange = { userPreferences.overviewModeEnabled = it }
         )
+
+        togglePreference(
+            preference = SETTINGS_REDUCED_MOTION,
+            isChecked = userPreferences.reducedMotionEnabled,
+            onCheckChange = { userPreferences.reducedMotionEnabled = it }
+        )
+
+        togglePreference(
+            preference = SETTINGS_LARGE_TARGETS,
+            isChecked = userPreferences.largeAccessibilityTargetsEnabled,
+            onCheckChange = { userPreferences.largeAccessibilityTargetsEnabled = it }
+        )
+
+        togglePreference(
+            preference = SETTINGS_ANNOUNCEMENTS,
+            isChecked = userPreferences.accessibilityAnnouncementsEnabled,
+            onCheckChange = { userPreferences.accessibilityAnnouncementsEnabled = it }
+        )
     }
 
     private fun showTextSizePicker() {
@@ -141,5 +159,8 @@ class AccessibilitySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_VIEWPORT = "accessibility_wide_viewport"
         private const val SETTINGS_ALLOW_ZOOM_RESTRICTED = "accessibility_allow_zoom_restricted"
         private const val SETTINGS_OVERVIEW_MODE = "accessibility_overview_mode"
+        private const val SETTINGS_REDUCED_MOTION = "accessibility_reduced_motion"
+        private const val SETTINGS_LARGE_TARGETS = "accessibility_large_targets"
+        private const val SETTINGS_ANNOUNCEMENTS = "accessibility_announcements"
     }
 }

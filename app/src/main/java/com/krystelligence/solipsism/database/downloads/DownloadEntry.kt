@@ -10,5 +10,6 @@ package com.krystelligence.solipsism.database.downloads
 data class DownloadEntry(
     val url: String,
     val title: String,
-    val contentSize: String
+    val contentSize: String,
+    val isDecoy: Boolean = false
 )

@@ -2,11 +2,14 @@ package com.krystelligence.solipsism.settings.fragment
 
 import android.os.Bundle
 import android.view.View
+import android.annotation.SuppressLint
 import androidx.annotation.XmlRes
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroup
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceGroupAdapter
 import androidx.preference.SwitchPreferenceCompat
 import com.krystelligence.solipsism.R
 
@@ -34,12 +37,62 @@ abstract class AbstractSettingsFragment : PreferenceFragmentCompat() {
         listView.apply {
             clipToPadding = false
             setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
+            post(::restylePreferenceGroups)
+            addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrolled(
+                    recyclerView: androidx.recyclerview.widget.RecyclerView,
+                    dx: Int,
+                    dy: Int
+                ) = restylePreferenceGroups()
+            })
         }
     }
 
     open fun applySettingsSearch(query: String) {
         val normalizedQuery = query.trim().lowercase()
         preferenceScreen?.filterChildren(normalizedQuery)
+        listView?.post(::restylePreferenceGroups)
+    }
+
+    /**
+     * Applies the expressive grouped-row shape model used by the settings prototype.
+     * Rows within one category have small inner corners and a narrow separation. The first and
+     * last visible rows retain the larger outer corners. This is calculated from the adapter so
+     * filtering and dynamically wired preferences keep the correct shape.
+     */
+    @SuppressLint("RestrictedApi")
+    private fun restylePreferenceGroups() {
+        val adapter = listView?.adapter as? PreferenceGroupAdapter ?: return
+        val groups = mutableListOf<MutableList<View>>()
+
+        var current = mutableListOf<View>()
+        for (index in 0 until adapter.itemCount) {
+            val item = adapter.getItem(index)
+            val child = listView?.layoutManager?.findViewByPosition(index) ?: continue
+            if (item is PreferenceCategory) {
+                if (current.isNotEmpty()) groups += current
+                current = mutableListOf()
+                continue
+            }
+            if (item is Preference && child.visibility == View.VISIBLE) current += child
+        }
+        if (current.isNotEmpty()) groups += current
+
+        groups.flatten().forEach { it.background = null }
+        groups.forEach { rows ->
+            val background = when (rows.size) {
+                1 -> R.drawable.preference_group_item_background_single
+                else -> null
+            }
+            rows.forEachIndexed { index, row ->
+                val resource = background ?: when (index) {
+                    0 -> R.drawable.preference_group_item_background_top
+                    rows.lastIndex -> R.drawable.preference_group_item_background_bottom
+                    else -> R.drawable.preference_group_item_background_middle
+                }
+                row.setBackgroundResource(resource)
+            }
+        }
     }
 
     private fun Preference.matches(query: String): Boolean =

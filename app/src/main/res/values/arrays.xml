@@ -5,6 +5,7 @@
         <item>@string/agent_desktop</item>
         <item>@string/agent_mobile</item>
         <item>@string/agent_custom</item>
+        <item>@string/agent_folding</item>
     </string-array>
 
     <string-array name="download_folder">
@@ -25,6 +26,34 @@
         <item>@string/powered_by_baidu</item>
         <item>@string/powered_by_naver</item>
         <item>@string/search_suggestions_off</item>
+    </string-array>
+
+    <string-array name="bookmark_import_mode_values">
+        <item>merge</item>
+        <item>replace</item>
+        <item>ask</item>
+    </string-array>
+
+    <string-array name="bookmark_import_mode_labels">
+        <item>@string/bookmark_import_merge</item>
+        <item>@string/bookmark_import_replace</item>
+        <item>@string/bookmark_import_ask</item>
+    </string-array>
+
+    <string-array name="bookmark_sort_order_values">
+        <item>manual</item>
+        <item>title_asc</item>
+        <item>title_desc</item>
+        <item>url_asc</item>
+        <item>url_desc</item>
+    </string-array>
+
+    <string-array name="bookmark_sort_order_labels">
+        <item>@string/bookmark_sort_manual</item>
+        <item>@string/bookmark_sort_title_asc</item>
+        <item>@string/bookmark_sort_title_desc</item>
+        <item>@string/bookmark_sort_url_asc</item>
+        <item>@string/bookmark_sort_url_desc</item>
     </string-array>
 
 </resources>

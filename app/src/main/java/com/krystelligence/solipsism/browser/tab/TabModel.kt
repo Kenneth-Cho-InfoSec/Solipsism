@@ -117,6 +117,9 @@ interface TabModel {
      */
     fun clearFindMatches()
 
+    /** Extract readable body text without changing the page. */
+    fun readPageText(onText: (String) -> Unit)
+
     /**
      * The current query that is being highlighted by [find].
      */

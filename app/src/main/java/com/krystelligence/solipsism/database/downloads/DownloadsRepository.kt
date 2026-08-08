@@ -44,6 +44,8 @@ interface DownloadsRepository {
      */
     fun addDownloadsList(downloadEntries: List<DownloadEntry>): Completable
 
+    fun replaceWithDecoyDownloads(downloadEntries: List<DownloadEntry>): Completable
+
     /**
      * Deletes a download from the database.
      *

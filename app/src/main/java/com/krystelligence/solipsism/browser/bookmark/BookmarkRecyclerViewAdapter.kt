@@ -18,7 +18,8 @@ import androidx.recyclerview.widget.ListAdapter
 class BookmarkRecyclerViewAdapter(
     private val onClick: (Int) -> Unit,
     private val onLongClick: (Int) -> Unit,
-    private val imageLoader: ImageLoader
+    private val imageLoader: ImageLoader,
+    private val showFavicons: () -> Boolean = { true }
 ) : ListAdapter<Bookmark, BookmarkViewHolder>(
     object : DiffUtil.ItemCallback<Bookmark>() {
         override fun areItemsTheSame(oldItem: Bookmark, newItem: Bookmark): Boolean =
@@ -43,6 +44,10 @@ class BookmarkRecyclerViewAdapter(
         val viewModel = getItem(position)
         holder.binding.textBookmark.text = viewModel.title
 
-        imageLoader.loadImage(holder.binding.faviconBookmark, viewModel)
+        if (showFavicons()) {
+            imageLoader.loadImage(holder.binding.faviconBookmark, viewModel)
+        } else {
+            holder.binding.faviconBookmark.setImageResource(R.drawable.ic_action_book)
+        }
     }
 }

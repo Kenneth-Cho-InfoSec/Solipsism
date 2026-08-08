@@ -25,6 +25,7 @@ import com.krystelligence.solipsism.settings.fragment.SitePermissionsSettingsFra
 import com.krystelligence.solipsism.settings.fragment.UserScriptsSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.VirusTotalSettingsFragment
 import com.krystelligence.solipsism.qr.QrScannerActivity
+import com.krystelligence.solipsism.vault.VaultActivity
 import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
@@ -64,6 +65,8 @@ interface AppComponent {
     fun inject(activity: UserScriptEditorActivity)
 
     fun inject(activity: QrScannerActivity)
+
+    fun inject(activity: VaultActivity)
 
     fun inject(fragment: HapticsSettingsFragment)
 

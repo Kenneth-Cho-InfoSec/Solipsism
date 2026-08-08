@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/material_grid_margin"
     android:layout_marginEnd="@dimen/material_grid_margin"
-    android:layout_marginBottom="8dp"
+    android:layout_marginBottom="@dimen/preference_group_gap"
     android:background="@drawable/preference_group_item_background"
     android:baselineAligned="false"
     android:clipToPadding="false"

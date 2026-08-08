@@ -27,6 +27,7 @@ class RecyclerViewStringAdapter<T>(
     override fun onBindViewHolder(holder: SimpleStringViewHolder, position: Int) {
         val item = listItems[position]
         holder.title.text = item.convertToString()
+        holder.itemView.applyDialogRowShape(position, itemCount)
         holder.itemView.setOnClickListener { onItemClickListener?.invoke(item) }
     }
 

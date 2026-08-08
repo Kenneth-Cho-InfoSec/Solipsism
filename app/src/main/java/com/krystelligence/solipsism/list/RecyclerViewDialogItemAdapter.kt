@@ -31,6 +31,7 @@ class RecyclerViewDialogItemAdapter(
         item.icon?.let(holder.icon::setImageResource) ?: holder.icon.setImageDrawable(null)
         item.colorTint?.let { holder.icon.setColorFilter(it, PorterDuff.Mode.SRC_IN) }
         holder.title.setText(item.title)
+        holder.itemView.applyDialogRowShape(position, itemCount)
         holder.itemView.setOnClickListener { onItemClickListener?.invoke(item) }
     }
 

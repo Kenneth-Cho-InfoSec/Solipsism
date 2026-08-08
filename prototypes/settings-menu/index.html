@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy settings prototype</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --canvas: #28292c;
+      --surface: #3a3b3f;
+      --surface-strong: #424348;
+      --surface-pressed: #4b4c52;
+      --text: #f1f0f5;
+      --muted: #c4c3c9;
+      --section: #e1e0e7;
+      --divider: rgba(255,255,255,.055);
+      --accent: #c6c6ff;
+      --accent-thumb: #252b55;
+      --outline: rgba(255,255,255,.35);
+      --page-width: 900px;
+    }
+
+    :root.light {
+      color-scheme: light;
+      --canvas: #f7f5fb;
+      --surface: #eeedf3;
+      --surface-strong: #e6e4ec;
+      --surface-pressed: #dcd9e5;
+      --text: #1c1b20;
+      --muted: #615e68;
+      --section: #44414b;
+      --divider: rgba(20,18,25,.08);
+      --accent: #5a54b8;
+      --accent-thumb: #ffffff;
+      --outline: rgba(20,18,25,.36);
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--canvas); }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: var(--canvas);
+      color: var(--text);
+      font-family: Roboto, "Google Sans", system-ui, -apple-system, sans-serif;
+      letter-spacing: .005em;
+    }
+
+    .app-shell {
+      width: min(100%, var(--page-width));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 22px clamp(18px, 4vw, 48px) 64px;
+    }
+
+    .top-bar {
+      display: grid;
+      grid-template-columns: 48px 1fr auto auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 64px;
+      margin-bottom: 34px;
+    }
+
+    .icon-button {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--text);
+      font-size: 31px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .icon-button:hover,
+    .icon-button:focus-visible { background: var(--surface); outline: 3px solid color-mix(in srgb, var(--accent) 65%, transparent); }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(25px, 4vw, 36px);
+      font-weight: 450;
+      letter-spacing: -.025em;
+    }
+
+    .section { margin-top: 30px; }
+    .section h2 {
+      margin: 0 0 14px 36px;
+      color: var(--section);
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: .01em;
+    }
+
+    .group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .setting {
+      display: flex;
+      min-height: 90px;
+      align-items: center;
+      gap: 18px;
+      padding: 19px 26px 19px 28px;
+      background: var(--surface);
+      transition: background-color .18s ease;
+    }
+
+    .setting:hover { background: var(--surface-strong); }
+    .setting:focus-within { background: var(--surface-pressed); }
+    .setting { border-radius: 8px; }
+    .setting:first-child { border-radius: 30px 30px 8px 8px; }
+    .setting:last-child { border-radius: 8px 8px 30px 30px; }
+    .setting:only-child { border-radius: 30px; }
+    .setting.is-action { cursor: pointer; }
+
+    .copy { min-width: 0; flex: 1; }
+    .title {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(17px, 2.5vw, 22px);
+      font-weight: 420;
+      line-height: 1.22;
+    }
+    .summary {
+      max-width: 720px;
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: clamp(14px, 2vw, 17px);
+      line-height: 1.3;
+    }
+
+    .chevron { color: var(--muted); font-size: 31px; line-height: 1; }
+
+    .switch {
+      position: relative;
+      flex: 0 0 auto;
+      width: 58px;
+      height: 34px;
+      border: 2px solid var(--outline);
+      border-radius: 999px;
+      background: transparent;
+      cursor: pointer;
+      transition: background-color .18s ease, border-color .18s ease;
+    }
+    .switch::after {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--muted);
+      content: "";
+      transition: transform .18s ease, background-color .18s ease;
+    }
+    .switch[aria-checked="true"] { border-color: var(--accent); background: var(--accent); }
+    .switch[aria-checked="true"]::after { background: var(--accent-thumb); transform: translateX(24px); }
+    .switch:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 72%, transparent); outline-offset: 3px; }
+
+    .note {
+      margin: 18px 36px 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 560px) {
+      .app-shell { padding: 12px 18px 44px; }
+      .top-bar { grid-template-columns: 44px 1fr 44px 44px; margin-bottom: 26px; }
+      .icon-button { width: 44px; height: 44px; font-size: 28px; }
+      .section h2 { margin-left: 22px; font-size: 16px; }
+      .setting { min-height: 82px; padding: 17px 20px 17px 22px; gap: 12px; }
+      .setting:first-child { border-radius: 24px 24px 8px 8px; }
+      .setting:last-child { border-radius: 8px 8px 24px 24px; }
+      .setting:only-child { border-radius: 24px; }
+      .note { margin-left: 22px; margin-right: 22px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="top-bar">
+      <button class="icon-button" aria-label="Go back">‹</button>
+      <h1>Brave Shields &amp; privacy</h1>
+      <button class="icon-button" id="theme" aria-label="Switch theme">☾</button>
+      <button class="icon-button" aria-label="Close settings">×</button>
+    </header>
+
+    <section class="section" aria-labelledby="clear-heading">
+      <h2 id="clear-heading">Clear browsing data</h2>
+      <div class="group">
+        <div class="setting">
+          <div class="copy"><p class="title">Clear data on exit</p><p class="summary">Clears all browsing data</p></div>
+          <button class="switch" role="switch" aria-checked="false" aria-label="Clear data on exit"></button>
+        </div>
+        <button class="setting is-action" type="button">
+          <span class="copy"><span class="title">Delete browsing data</span><span class="summary">Delete history, cookies, site data, cache...</span></span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="social-heading">
+      <h2 id="social-heading">Social Media Blocking</h2>
+      <div class="group">
+        <div class="setting"><div class="copy"><p class="title">Allow Facebook logins and embedded posts</p></div><button class="switch" role="switch" aria-checked="true" aria-label="Allow Facebook logins and embedded posts"></button></div>
+        <div class="setting"><div class="copy"><p class="title">Allow Twitter embedded tweets</p></div><button class="switch" role="switch" aria-checked="true" aria-label="Allow Twitter embedded tweets"></button></div>
+        <div class="setting"><div class="copy"><p class="title">Allow LinkedIn embedded posts</p></div><button class="switch" role="switch" aria-checked="false" aria-label="Allow LinkedIn embedded posts"></button></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="other-heading">
+      <h2 id="other-heading">Other privacy settings</h2>
+      <div class="group">
+        <div class="setting"><div class="copy"><p class="title">Open external links in Solipsism</p><p class="summary">Opens links from other apps in a Solipsism WebView. Solipsism must be your default browser.</p></div><button class="switch" role="switch" aria-checked="true" aria-label="Open external links in Solipsism"></button></div>
+        <button class="setting is-action" type="button"><span class="copy"><span class="title">Safe Browsing</span><span class="summary">Standard protection is on</span></span><span class="chevron" aria-hidden="true">›</span></button>
+        <div class="setting"><div class="copy"><p class="title">Allow app links to open in apps outside Solipsism</p></div><button class="switch" role="switch" aria-checked="true" aria-label="Allow app links to open in apps outside Solipsism"></button></div>
+        <button class="setting is-action" type="button"><span class="copy"><span class="title">WebRTC IP handling policy</span><span class="summary">Default protection</span></span><span class="chevron" aria-hidden="true">›</span></button>
+      </div>
+    </section>
+    <p class="note">Prototype interaction: switches toggle state, the moon button changes theme, and action rows are keyboard accessible.</p>
+  </main>
+  <script>
+    document.querySelectorAll('.switch').forEach((button) => {
+      button.addEventListener('click', () => {
+        const next = button.getAttribute('aria-checked') !== 'true';
+        button.setAttribute('aria-checked', String(next));
+      });
+      button.addEventListener('keydown', (event) => {
+        if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); button.click(); }
+      });
+    });
+    document.getElementById('theme').addEventListener('click', () => {
+      document.documentElement.classList.toggle('light');
+    });
+  </script>
+</body>
+</html>

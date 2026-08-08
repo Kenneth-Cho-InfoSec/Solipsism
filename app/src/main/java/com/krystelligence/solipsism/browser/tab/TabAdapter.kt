@@ -28,6 +28,7 @@ import android.webkit.WebView
 import android.webkit.JavascriptInterface
 import android.util.Log
 import org.json.JSONObject
+import org.json.JSONTokener
 import androidx.activity.result.ActivityResult
 import androidx.core.graphics.createBitmap
 import dagger.assisted.Assisted
@@ -364,6 +365,25 @@ class TabAdapter @AssistedInject constructor(
         findInPageQuery = null
     }
 
+    override fun readPageText(onText: (String) -> Unit) {
+        val script = """
+            (function() {
+                var body = document.body;
+                if (!body) return '';
+                return body.innerText || body.textContent || '';
+            })();
+        """.trimIndent()
+        webView.evaluateJavascript(script) { result ->
+            val text = runCatching { JSONTokener(result).nextValue() as? String }
+                .getOrNull()
+                .orEmpty()
+                .replace(Regex("\\s+"), " ")
+                .trim()
+                .take(MAX_READ_ALOUD_CHARACTERS)
+            onText(text)
+        }
+    }
+
     override val preview: Pair<String?, Long>
         get() = previewPath to previewGeneratedTime
 
@@ -527,5 +547,6 @@ class TabAdapter @AssistedInject constructor(
         private const val BLOB_CHUNK_SIZE = 32 * 1024
         private const val MAX_BLOB_BYTES = 16L * 1024L * 1024L
         private const val MAX_BLOB_BASE64_CHARS = ((MAX_BLOB_BYTES + 2L) / 3L * 4L).toInt()
+        private const val MAX_READ_ALOUD_CHARACTERS = 120_000
     }
 }

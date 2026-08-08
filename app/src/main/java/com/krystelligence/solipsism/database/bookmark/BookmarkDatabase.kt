@@ -150,6 +150,20 @@ class BookmarkDatabase @Inject constructor(
             }
         }
 
+    override fun replaceAllBookmarks(bookmarkItems: List<Bookmark.Entry>): Completable =
+        Completable.fromAction {
+            database.beginTransaction()
+            try {
+                database.delete(TABLE_BOOKMARK, null, null)
+                bookmarkItems.forEach { entry ->
+                    database.insert(TABLE_BOOKMARK, null, entry.bindBookmarkToContentValues())
+                }
+                database.setTransactionSuccessful()
+            } finally {
+                database.endTransaction()
+            }
+        }
+
     private fun insertBookmarkIfNotExists(entry: Bookmark.Entry): Boolean {
         queryWithOptionalEndSlash(entry.url).use {
             if (it.moveToFirst()) return false
@@ -194,7 +208,7 @@ class BookmarkDatabase @Inject constructor(
         updateWithOptionalEndSlash(oldBookmark.url, contentValues)
     }
 
-    override fun getAllBookmarksSorted(): Single<List<Bookmark.Entry>> = Single.fromCallable {
+    override fun getAllBookmarksSorted(sortOrder: BookmarkSortOrder): Single<List<Bookmark.Entry>> = Single.fromCallable {
         return@fromCallable database.query(
             TABLE_BOOKMARK,
             null,
@@ -202,11 +216,14 @@ class BookmarkDatabase @Inject constructor(
             null,
             null,
             null,
-            "$KEY_FOLDER, $KEY_POSITION ASC, $KEY_TITLE COLLATE NOCASE ASC, $KEY_URL ASC"
+            "$KEY_FOLDER ASC, ${sortOrder.orderBy()}"
         ).useMap { it.bindToBookmarkEntry() }
     }
 
-    override fun getBookmarksFromFolderSorted(folder: String?): Single<List<Bookmark>> =
+    override fun getBookmarksFromFolderSorted(
+        folder: String?,
+        sortOrder: BookmarkSortOrder
+    ): Single<List<Bookmark>> =
         Single.fromCallable {
             val finalFolder = folder ?: ""
             return@fromCallable database.query(
@@ -216,7 +233,7 @@ class BookmarkDatabase @Inject constructor(
                 arrayOf(finalFolder),
                 null,
                 null,
-                "$KEY_POSITION ASC, $KEY_TITLE COLLATE NOCASE ASC, $KEY_URL ASC"
+                sortOrder.orderBy()
             ).useMap { it.bindToBookmarkEntry() }
         }
 
@@ -316,6 +333,14 @@ class BookmarkDatabase @Inject constructor(
         private const val KEY_FOLDER = "folder"
         private const val KEY_POSITION = "position"
 
+    }
+
+    private fun BookmarkSortOrder.orderBy(): String = when (this) {
+        BookmarkSortOrder.MANUAL -> "$KEY_POSITION ASC, $KEY_TITLE COLLATE NOCASE ASC, $KEY_URL ASC"
+        BookmarkSortOrder.TITLE_ASC -> "$KEY_TITLE COLLATE NOCASE ASC, $KEY_URL ASC"
+        BookmarkSortOrder.TITLE_DESC -> "$KEY_TITLE COLLATE NOCASE DESC, $KEY_URL ASC"
+        BookmarkSortOrder.URL_ASC -> "$KEY_URL COLLATE NOCASE ASC, $KEY_TITLE COLLATE NOCASE ASC"
+        BookmarkSortOrder.URL_DESC -> "$KEY_URL COLLATE NOCASE DESC, $KEY_TITLE COLLATE NOCASE ASC"
     }
 
 }

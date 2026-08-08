@@ -53,6 +53,15 @@ class UrlHandler @Inject constructor(
             (activity as? BrowserActivity)?.showHistoryDecoyModePrompt()
             return true
         }
+        if (url == DOWNLOADS_CLEAR_URL) {
+            (activity as? BrowserActivity)?.clearAllDownloadsFromDownloadsPage()
+            return true
+        }
+        if (url == DOWNLOADS_DECOY_URL) {
+            (activity as? BrowserActivity)?.showDownloadDecoyModePrompt()
+            return true
+        }
+        if (url.startsWith(DECOY_DOWNLOAD_URL_PREFIX)) return true
         if (incognitoMode) {
             // If we are in incognito, immediately load, we don't want the url to leave the app
             return continueLoadingUrl(view, url, headers)
@@ -151,5 +160,8 @@ class UrlHandler @Inject constructor(
         private const val TAG = "UrlHandler"
         private const val HISTORY_CLEAR_URL = "solipsism://clear-history"
         private const val HISTORY_DECOY_URL = "solipsism://decoy-mode"
+        private const val DOWNLOADS_CLEAR_URL = "solipsism://clear-download-history"
+        private const val DOWNLOADS_DECOY_URL = "solipsism://download-decoy-mode"
+        private const val DECOY_DOWNLOAD_URL_PREFIX = "solipsism://decoy-download/"
     }
 }

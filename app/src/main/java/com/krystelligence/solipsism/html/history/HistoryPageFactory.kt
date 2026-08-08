@@ -57,6 +57,7 @@ class HistoryPageFactory @Inject constructor(
                 "<!--ACTION_BAR-->",
                 """
                 <div class="page_actions visible">
+                    <header class="page_header"><div class="page_icon" aria-hidden="true">↺</div><h1>${title}</h1></header>
                     <button class="history_clear_button" type="button">${application.getString(R.string.history_clear_all)}</button>
                 </div>
                 <script>

@@ -34,17 +34,20 @@ class DownloadsDatabase @Inject constructor(
                 "${DatabaseUtils.sqlEscapeString(KEY_ID)} INTEGER PRIMARY KEY," +
                 "${DatabaseUtils.sqlEscapeString(KEY_URL)} TEXT," +
                 "${DatabaseUtils.sqlEscapeString(KEY_TITLE)} TEXT," +
-                "${DatabaseUtils.sqlEscapeString(KEY_SIZE)} TEXT" +
+                "${DatabaseUtils.sqlEscapeString(KEY_SIZE)} TEXT," +
+                "${DatabaseUtils.sqlEscapeString(KEY_IS_DECOY)} INTEGER NOT NULL DEFAULT 0" +
                 ')'
         db.execSQL(createDownloadsTable)
     }
 
     // Upgrading database
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // Drop older table if it exists
-        db.execSQL("DROP TABLE IF EXISTS ${DatabaseUtils.sqlEscapeString(TABLE_DOWNLOADS)}")
-        // Create tables again
-        onCreate(db)
+        if (oldVersion < 2) {
+            db.execSQL(
+                "ALTER TABLE ${DatabaseUtils.sqlEscapeString(TABLE_DOWNLOADS)} " +
+                    "ADD COLUMN ${DatabaseUtils.sqlEscapeString(KEY_IS_DECOY)} INTEGER NOT NULL DEFAULT 0"
+            )
+        }
     }
 
     override fun findDownloadForUrl(url: String): Maybe<DownloadEntry> = Maybe.fromCallable {
@@ -109,6 +112,20 @@ class DownloadsDatabase @Inject constructor(
             }
         }
 
+    override fun replaceWithDecoyDownloads(downloadEntries: List<DownloadEntry>): Completable =
+        Completable.fromAction {
+            database.beginTransaction()
+            try {
+                database.delete(TABLE_DOWNLOADS, null, null)
+                downloadEntries.forEach { entry ->
+                    database.insert(TABLE_DOWNLOADS, null, entry.toContentValues())
+                }
+                database.setTransactionSuccessful()
+            } finally {
+                database.endTransaction()
+            }
+        }
+
     override fun deleteDownload(url: String): Single<Boolean> = Single.fromCallable {
         return@fromCallable database.delete(TABLE_DOWNLOADS, "$KEY_URL=?", arrayOf(url)) > 0
     }
@@ -137,10 +154,11 @@ class DownloadsDatabase @Inject constructor(
     /**
      * Maps the fields of [DownloadEntry] to [ContentValues].
      */
-    private fun DownloadEntry.toContentValues() = ContentValues(3).apply {
+    private fun DownloadEntry.toContentValues() = ContentValues(4).apply {
         put(KEY_TITLE, title)
         put(KEY_URL, url)
         put(KEY_SIZE, contentSize)
+        put(KEY_IS_DECOY, if (isDecoy) 1 else 0)
     }
 
     /**
@@ -149,13 +167,14 @@ class DownloadsDatabase @Inject constructor(
     private fun Cursor.bindToDownloadItem() = DownloadEntry(
         url = getString(getColumnIndex(KEY_URL)),
         title = getString(getColumnIndex(KEY_TITLE)),
-        contentSize = getString(getColumnIndex(KEY_SIZE))
+        contentSize = getString(getColumnIndex(KEY_SIZE)),
+        isDecoy = getInt(getColumnIndex(KEY_IS_DECOY)) != 0
     )
 
     companion object {
 
         // Database version
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
 
         // Database name
         private const val DATABASE_NAME = "downloadManager"
@@ -168,6 +187,7 @@ class DownloadsDatabase @Inject constructor(
         private const val KEY_URL = "url"
         private const val KEY_TITLE = "title"
         private const val KEY_SIZE = "size"
+        private const val KEY_IS_DECOY = "is_decoy"
 
     }
 

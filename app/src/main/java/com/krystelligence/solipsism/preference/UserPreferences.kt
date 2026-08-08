@@ -21,8 +21,10 @@ import com.krystelligence.solipsism.preference.delegates.nullableStringPreferenc
 import com.krystelligence.solipsism.preference.delegates.stringPreference
 import com.krystelligence.solipsism.search.SearchEngineProvider
 import com.krystelligence.solipsism.search.engine.GoogleSearch
+import com.krystelligence.solipsism.database.bookmark.BookmarkSortOrder
 import com.krystelligence.solipsism.utils.FileUtils
 import android.content.SharedPreferences
+import com.krystelligence.solipsism.browser.ui.RailUtilityAction
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -241,6 +243,15 @@ class UserPreferences @Inject constructor(
     /** Override restrictive viewport metadata so pinch zoom remains available. */
     var allowZoomOnRestrictedPages by preferences.booleanPreference(ALLOW_ZOOM_ON_RESTRICTED_PAGES, false)
 
+    /** Reduce non-essential motion and transitions for users who prefer a calmer interface. */
+    var reducedMotionEnabled by preferences.booleanPreference(REDUCED_MOTION, false)
+
+    /** Keep interactive controls at a larger touch target size. */
+    var largeAccessibilityTargetsEnabled by preferences.booleanPreference(LARGE_ACCESSIBILITY_TARGETS, false)
+
+    /** Announce important state changes to accessibility services. */
+    var accessibilityAnnouncementsEnabled by preferences.booleanPreference(ACCESSIBILITY_ANNOUNCEMENTS, true)
+
     /**
      * The index of the user agent choice that should be used by the browser.
      *
@@ -349,6 +360,29 @@ class UserPreferences @Inject constructor(
 
     /** True when the QR scanner and Tabs controls should exchange their rail positions. */
     var swapQrAndTabsButtons by preferences.booleanPreference(SWAP_QR_AND_TABS_BUTTONS, false)
+
+    var bookmarkDecoyModeEnabled by preferences.booleanPreference(
+        BOOKMARK_DECOY_MODE_ENABLED,
+        false
+    )
+
+    var bookmarkFaviconsEnabled by preferences.booleanPreference(
+        BOOKMARK_FAVICONS_ENABLED,
+        true
+    )
+
+    var bookmarkImportMode by preferences.stringPreference(BOOKMARK_IMPORT_MODE, "merge")
+
+    var bookmarkSortOrder by preferences.enumPreference(
+        BOOKMARK_SORT_ORDER,
+        BookmarkSortOrder.MANUAL
+    )
+
+    /** The action shown by the configurable Solipsism rail utility button. */
+    var railUtilityAction by preferences.enumPreference(
+        RAIL_UTILITY_ACTION,
+        RailUtilityAction.QR
+    )
 
     /** When false, page audio is left untouched by Solipsism. */
     var audioEffectsEnabled by preferences.booleanPreference(AUDIO_EFFECTS_ENABLED, false)
@@ -573,6 +607,9 @@ private const val TEXT_SIZE = "textsize"
 private const val CUSTOM_FONT_PATH = "customFontPath"
 private const val USE_WIDE_VIEWPORT = "wideviewport"
 private const val ALLOW_ZOOM_ON_RESTRICTED_PAGES = "allowZoomOnRestrictedPages"
+private const val REDUCED_MOTION = "accessibilityReducedMotion"
+private const val LARGE_ACCESSIBILITY_TARGETS = "accessibilityLargeTargets"
+private const val ACCESSIBILITY_ANNOUNCEMENTS = "accessibilityAnnouncements"
 private const val USER_AGENT = "agentchoose"
 private const val USER_AGENT_STRING = "userAgentString"
 private const val CHROMPATIBILITY_MODE = "chrompatibilityMode"
@@ -594,6 +631,11 @@ private const val SOLIPSISM_RAIL_SIZE = "solipsismRailSize"
 private const val SOLIPSISM_RAIL_ON_LEFT = "solipsismRailOnLeft"
 private const val SOLIPSISM_RAIL_POSITION = "solipsismRailPosition"
 private const val SWAP_QR_AND_TABS_BUTTONS = "swapQrAndTabsButtons"
+private const val BOOKMARK_DECOY_MODE_ENABLED = "bookmarkDecoyModeEnabled"
+private const val BOOKMARK_FAVICONS_ENABLED = "bookmarkFaviconsEnabled"
+private const val BOOKMARK_IMPORT_MODE = "bookmarkImportMode"
+private const val BOOKMARK_SORT_ORDER = "bookmarkSortOrder"
+private const val RAIL_UTILITY_ACTION = "railUtilityAction"
 private const val AUDIO_EFFECTS_ENABLED = "audioEffectsEnabled"
 private const val AUDIO_CUSTOM_EQ_ENABLED = "audioCustomEqEnabled"
 private const val AUDIO_PRESET = "audioPreset"

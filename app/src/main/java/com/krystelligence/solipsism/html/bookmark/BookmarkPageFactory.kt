@@ -22,6 +22,7 @@ import com.krystelligence.solipsism.html.jsoup.style
 import com.krystelligence.solipsism.html.jsoup.tag
 import com.krystelligence.solipsism.html.jsoup.title
 import com.krystelligence.solipsism.utils.ThemeUtils
+import com.krystelligence.solipsism.preference.UserPreferences
 import android.app.Application
 import android.graphics.Bitmap
 import androidx.core.net.toUri
@@ -42,7 +43,8 @@ class BookmarkPageFactory @Inject constructor(
     @DatabaseScheduler private val databaseScheduler: Scheduler,
     @DiskScheduler private val diskScheduler: Scheduler,
     private val bookmarkPageReader: BookmarkPageReader,
-    private val themeProvider: ThemeProvider
+    private val themeProvider: ThemeProvider,
+    private val userPreferences: UserPreferences
 ) : HtmlPageFactory {
 
     private val title = application.getString(R.string.action_bookmarks)
@@ -67,7 +69,7 @@ class BookmarkPageFactory @Inject constructor(
         get() = themeProvider.color(R.attr.autoCompleteTitleColor).toColor()
 
     override fun buildPage(): Single<String> = bookmarkModel
-        .getAllBookmarksSorted()
+        .getAllBookmarksSorted(userPreferences.bookmarkSortOrder)
         .flattenAsObservable { it }
         .groupBy<Bookmark.Folder, Bookmark>(Bookmark.Entry::folder) { it }
         .flatMapSingle { bookmarksInFolder ->
@@ -156,6 +158,9 @@ class BookmarkPageFactory @Inject constructor(
     }
 
     private fun createViewModelForBookmark(entry: Bookmark.Entry): BookmarkViewModel {
+        if (!userPreferences.bookmarkFaviconsEnabled) {
+            return BookmarkViewModel(entry.title, entry.url, defaultIconFile.toString())
+        }
         val bookmarkUri = entry.url.toUri().toValidUri()
 
         val iconUrl = if (bookmarkUri != null) {

@@ -4,8 +4,7 @@
 <head>
     <meta content=en-us http-equiv=Content-Language>
     <meta content='text/html; charset=utf-8' http-equiv=Content-Type>
-    <meta name=viewport
-          content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+    <meta name=viewport content='width=device-width, initial-scale=1'>
     <title>
         ${TITLE}
     </title>
@@ -43,10 +42,18 @@
         background-color: var(--box-bg);
         font-family: Arial;
         color: var(--box-txt);
-        font-size: 12px;
+        font-size: 1rem;
         -moz-border-radius: 8px;
         -webkit-border-radius: 8px;
         border-radius: 8px
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
     }
     
     .box-content {
@@ -59,7 +66,7 @@
     
     p.ellipses {
         width: 130px;
-        font-size: small;
+        font-size: 0.875rem;
         font-family: Arial, Helvetica, 'sans-serif';
         white-space: nowrap;
         overflow: hidden;

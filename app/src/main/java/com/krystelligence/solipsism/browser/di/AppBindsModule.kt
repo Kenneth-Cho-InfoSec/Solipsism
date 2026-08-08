@@ -16,6 +16,8 @@ import com.krystelligence.solipsism.database.downloads.DownloadsDatabase
 import com.krystelligence.solipsism.database.downloads.DownloadsRepository
 import com.krystelligence.solipsism.database.history.HistoryDatabase
 import com.krystelligence.solipsism.database.history.HistoryRepository
+import com.krystelligence.solipsism.database.vault.VaultDatabase
+import com.krystelligence.solipsism.database.vault.VaultRepository
 import com.krystelligence.solipsism.ssl.SessionSslWarningPreferences
 import com.krystelligence.solipsism.ssl.SslWarningPreferences
 import dagger.Binds
@@ -35,6 +37,9 @@ interface AppBindsModule {
 
     @Binds
     fun bindsHistoryModel(historyDatabase: HistoryDatabase): HistoryRepository
+
+    @Binds
+    fun bindsVaultRepository(vaultDatabase: VaultDatabase): VaultRepository
 
     @Binds
     fun bindsAdBlockAllowListModel(adBlockAllowListDatabase: AdBlockAllowListDatabase): AdBlockAllowListRepository

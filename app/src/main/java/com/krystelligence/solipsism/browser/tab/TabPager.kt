@@ -8,6 +8,10 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.core.view.children
+import kotlin.math.max
+import kotlin.math.min
+import java.util.Locale
+import android.os.Debug
 import javax.inject.Inject
 
 /**
@@ -139,6 +143,28 @@ class TabPager @Inject constructor(
     }
 
     /**
+     * Returns a conservative per-tab RAM estimate for the tab-management title.
+     * Android WebView does not expose exact per-tab renderer memory, so this combines the shared
+     * process PSS with the tab's rendered surface footprint and deliberately marks the value as an
+     * estimate in the UI.
+     */
+    fun estimatedMemoryForTab(id: Int): String {
+        val webView = webViews[id]?.takeIf { it.isInitialized() }?.value
+        val processShareKb = (Debug.getPss() / webViews.size.coerceAtLeast(1)).coerceAtLeast(0L)
+        val renderedSurfaceKb = webView?.let {
+            val width = max(it.width, it.resources.displayMetrics.widthPixels)
+            val height = max(it.height, it.resources.displayMetrics.heightPixels)
+            val contentHeight = min(
+                (it.contentHeight * it.scale).toLong(),
+                MAX_ESTIMATED_CONTENT_HEIGHT_PX
+            )
+            max(width.toLong() * height, width.toLong() * contentHeight) * 4L / 1024L
+        } ?: 0L
+        val estimateMb = max(processShareKb, renderedSurfaceKb) / 1024.0
+        return String.format(Locale.US, "~%.0f MB", estimateMb.coerceAtLeast(1.0))
+    }
+
+    /**
      * Show the toolbar/search box if it is currently hidden.
      */
     fun showToolbar() {
@@ -187,6 +213,10 @@ class TabPager @Inject constructor(
         }
         transitionCurrentId = null
         transitionTargetId = null
+    }
+
+    private companion object {
+        private const val MAX_ESTIMATED_CONTENT_HEIGHT_PX = 16_777_216L
     }
 
     private fun Int.sign(): Int = if (this >= 0) 1 else -1

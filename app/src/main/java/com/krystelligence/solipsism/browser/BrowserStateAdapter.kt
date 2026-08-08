@@ -97,6 +97,10 @@ class BrowserStateAdapter(private val browserActivity: BrowserActivity) : Browse
         browserActivity.showFindInPageDialog()
     }
 
+    override fun speakPageText(text: String) {
+        browserActivity.speakPageText(text)
+    }
+
     override fun showLinkLongPressDialog(longPress: LongPress) {
         browserActivity.showLinkLongPressDialog(longPress)
     }
@@ -163,6 +167,18 @@ class BrowserStateAdapter(private val browserActivity: BrowserActivity) : Browse
 
     override fun showScreenshotCaptureFailed() {
         browserActivity.showScreenshotCaptureFailed()
+    }
+
+    override fun openVault() {
+        browserActivity.openVault()
+    }
+
+    override fun showVaultSaved() {
+        browserActivity.showVaultSaved()
+    }
+
+    override fun showVaultSaveFailed() {
+        browserActivity.showVaultSaveFailed()
     }
 
     override fun showLocalFileBlockedDialog() {

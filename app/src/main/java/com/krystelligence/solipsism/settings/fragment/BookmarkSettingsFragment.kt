@@ -6,11 +6,13 @@ package com.krystelligence.solipsism.settings.fragment
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.bookmark.LegacyBookmarkImporter
 import com.krystelligence.solipsism.bookmark.NetscapeBookmarkFormatImporter
+import com.krystelligence.solipsism.bookmark.DecoyBookmarkFactory
 import com.krystelligence.solipsism.browser.di.DatabaseScheduler
 import com.krystelligence.solipsism.browser.di.MainScheduler
 import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.database.bookmark.BookmarkExporter
 import com.krystelligence.solipsism.database.bookmark.BookmarkRepository
+import com.krystelligence.solipsism.database.Bookmark
 import com.krystelligence.solipsism.dialog.BrowserDialog
 import com.krystelligence.solipsism.dialog.DialogItem
 import com.krystelligence.solipsism.extensions.fileInputStream
@@ -20,6 +22,8 @@ import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.extensions.toast
 import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.utils.Utils
+import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.settings.preference.LongPressPreference
 import android.app.Activity
 import android.app.Application
 import android.content.Intent
@@ -29,6 +33,7 @@ import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
 
 class BookmarkSettingsFragment : AbstractSettingsFragment() {
@@ -40,6 +45,7 @@ class BookmarkSettingsFragment : AbstractSettingsFragment() {
     @Inject @DatabaseScheduler internal lateinit var databaseScheduler: Scheduler
     @Inject @MainScheduler internal lateinit var mainScheduler: Scheduler
     @Inject internal lateinit var logger: Logger
+    @Inject internal lateinit var userPreferences: UserPreferences
 
     private var importSubscription: Disposable? = null
     private var exportDisposable: Disposable? = null
@@ -51,7 +57,15 @@ class BookmarkSettingsFragment : AbstractSettingsFragment() {
         injector.inject(this)
 
         clickablePreference(preference = SETTINGS_EXPORT, onClick = this::showBookmarkExportChooser)
-        clickablePreference(preference = SETTINGS_IMPORT, onClick = this::showFileChooser)
+        val importPreference = findPreference<LongPressPreference>(SETTINGS_IMPORT)!!
+        importPreference.onPreferenceClickListener = androidx.preference.Preference.OnPreferenceClickListener {
+            showFileChooser()
+            true
+        }
+        importPreference.onLongPress = {
+            showBookmarkDecoyModePrompt()
+            true
+        }
         clickablePreference(
             preference = SETTINGS_DELETE_BOOKMARKS,
             onClick = this::deleteAllBookmarks
@@ -159,6 +173,35 @@ class BookmarkSettingsFragment : AbstractSettingsFragment() {
         startActivityForResult(intent, IMPORT_FILE_REQUEST_CODE)
     }
 
+    private fun showBookmarkDecoyModePrompt() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.bookmark_decoy_mode_title)
+            .setMessage(R.string.bookmark_decoy_mode_message)
+            .setNegativeButton(R.string.action_cancel, null)
+            .setPositiveButton(R.string.bookmark_decoy_mode_start) { _, _ ->
+                enableBookmarkDecoyMode()
+            }
+            .show()
+    }
+
+    private fun enableBookmarkDecoyMode() {
+        importSubscription?.dispose()
+        importSubscription = bookmarkRepository
+            .replaceAllBookmarks(DecoyBookmarkFactory.create())
+            .subscribeOn(databaseScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy(
+                onComplete = {
+                    userPreferences.bookmarkDecoyModeEnabled = true
+                    activity?.snackbar(R.string.bookmark_decoy_mode_enabled)
+                },
+                onError = {
+                    logger.log(TAG, "Unable to enable bookmark decoy mode", it)
+                    activity?.toast(R.string.bookmark_decoy_mode_failed)
+                }
+            )
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
@@ -190,23 +233,71 @@ class BookmarkSettingsFragment : AbstractSettingsFragment() {
                     legacyBookmarkImporter.importBookmarks(it)
                 }
             }
-            .flatMapSingle {
-                bookmarkRepository.addBookmarkList(it).andThen(Single.just(it.size))
+            .subscribeOn(databaseScheduler)
+            .observeOn(mainScheduler)
+            .subscribeBy(
+                onSuccess = { imported -> handleImportedBookmarks(imported) },
+                onError = {
+                    logger.log(TAG, "onError: importing bookmarks", it)
+                    showImportError()
+                }
+            )
+    }
+
+    private fun handleImportedBookmarks(imported: List<Bookmark.Entry>) {
+        if (imported.isEmpty()) {
+            showImportError()
+            return
+        }
+        when (userPreferences.bookmarkImportMode) {
+            IMPORT_MODE_REPLACE -> confirmBookmarkReplacement(imported)
+            IMPORT_MODE_ASK -> showImportChoice(imported)
+            else -> applyImportedBookmarks(imported, replace = false)
+        }
+    }
+
+    private fun showImportChoice(imported: List<Bookmark.Entry>) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.bookmark_import_behaviour)
+            .setMessage(getString(R.string.bookmark_import_choice_message, imported.size))
+            .setNegativeButton(R.string.bookmark_import_merge) { _, _ ->
+                applyImportedBookmarks(imported, replace = false)
             }
+            .setPositiveButton(R.string.bookmark_import_replace) { _, _ ->
+                confirmBookmarkReplacement(imported)
+            }
+            .show()
+    }
+
+    private fun confirmBookmarkReplacement(imported: List<Bookmark.Entry>) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.bookmark_import_replace)
+            .setMessage(R.string.bookmark_import_replace_warning)
+            .setNegativeButton(R.string.action_cancel, null)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                applyImportedBookmarks(imported, replace = true)
+            }
+            .show()
+    }
+
+    private fun applyImportedBookmarks(imported: List<Bookmark.Entry>, replace: Boolean) {
+        importSubscription?.dispose()
+        val operation = if (replace) {
+            bookmarkRepository.replaceAllBookmarks(imported)
+        } else {
+            bookmarkRepository.addBookmarkList(imported)
+        }
+        importSubscription = operation
+            .andThen(Single.just(imported.size))
             .subscribeOn(databaseScheduler)
             .observeOn(mainScheduler)
             .subscribeBy(
                 onSuccess = { count ->
-                    activity?.apply {
-                        snackbar("$count ${getString(R.string.message_import)}")
-                    }
-                },
-                onComplete = {
-                    logger.log(TAG, "onComplete: importing bookmarks")
-                    showImportError()
+                    userPreferences.bookmarkDecoyModeEnabled = false
+                    activity?.snackbar("$count ${getString(R.string.message_import)}")
                 },
                 onError = {
-                    logger.log(TAG, "onError: importing bookmarks", it)
+                    logger.log(TAG, "onError: saving imported bookmarks", it)
                     showImportError()
                 }
             )
@@ -236,6 +327,8 @@ class BookmarkSettingsFragment : AbstractSettingsFragment() {
         private const val EXTENSION_HTML = "html"
 
         private const val BOOKMARK_EXPORT_FILE = "ExportedBookmarks.txt"
+        private const val IMPORT_MODE_REPLACE = "replace"
+        private const val IMPORT_MODE_ASK = "ask"
 
         private const val SETTINGS_EXPORT = "export_bookmark"
         private const val SETTINGS_IMPORT = "import_bookmark"

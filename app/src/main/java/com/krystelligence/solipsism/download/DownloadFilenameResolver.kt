@@ -82,6 +82,15 @@ object DownloadFilenameResolver {
         "image/gif" to "gif",
         "image/avif" to "avif",
         "image/bmp" to "bmp",
-        "image/svg+xml" to "svg"
+        "image/svg+xml" to "svg",
+        "application/pdf" to "pdf",
+        "application/zip" to "zip",
+        "application/json" to "json",
+        "text/plain" to "txt",
+        "text/html" to "html",
+        "audio/mpeg" to "mp3",
+        "audio/mp4" to "m4a",
+        "video/mp4" to "mp4",
+        "application/vnd.android.package-archive" to "apk"
     )
 }
