@@ -1,0 +1,48 @@
+---
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+
+<header class="site-header">
+  <div class="header-inner shell">
+    <a class="brand" href={base} aria-label="Solipsism Browser home">
+      <img
+        src={`${base}assets/solipsism-logo.png`}
+        width="42"
+        height="42"
+        alt=""
+      />
+      <span>Solipsism</span>
+    </a>
+    <button
+      class="nav-toggle icon-button"
+      data-nav-toggle
+      aria-controls="primary-nav"
+      aria-expanded="false"
+      aria-label="Open navigation">☰</button
+    >
+    <nav id="primary-nav" data-mobile-nav aria-label="Primary navigation">
+      <a href={`${base}#features`}>Features</a><a href={`${base}#privacy`}
+        >Privacy</a
+      ><a href={`${base}releases/`}>Releases</a>
+      <a
+        href="https://github.com/Kenneth-Cho-InfoSec/Solipsism"
+        target="_blank"
+        rel="noopener noreferrer">GitHub</a
+      >
+    </nav>
+    <div class="header-actions">
+      <button
+        class="icon-button theme-control"
+        data-theme-control
+        aria-label="Theme: system"
+        title="Theme: system">◐</button
+      >
+      <a
+        class="button button-small latest-download"
+        data-latest-download
+        href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest"
+        >Download latest APK</a
+      >
+    </div>
+  </div>
+</header>

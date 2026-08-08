@@ -1,0 +1,29 @@
+---
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+
+<footer>
+  <div class="shell footer-grid">
+    <div>
+      <a class="brand" href={base}
+        ><img
+          src={`${base}assets/solipsism-logo.png`}
+          width="38"
+          height="38"
+          alt=""
+        /><span>Solipsism</span></a
+      ><p>Private by intention. Adaptable by design.</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href={`${base}releases/`}>Release archive</a><a
+        href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/issues">Issues</a
+      ><a
+        href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE"
+        >MPL 2.0</a
+      >
+    </nav>
+    <p class="footer-note">
+      Built in the open. No analytics or tracking scripts.
+    </p>
+  </div>
+</footer>

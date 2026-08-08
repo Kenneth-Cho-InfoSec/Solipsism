@@ -1,0 +1,36 @@
+---
+interface Props {
+  mode: 'latest' | 'archive';
+}
+const { mode } = Astro.props;
+---
+
+<div class="release-app" data-release-app={mode} aria-live="polite">
+  <div class="release-controls" hidden={mode !== 'archive'}>
+    <label><input type="checkbox" data-prerelease /> Include prereleases</label>
+    <label>
+      Order
+      <select data-sort>
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+      </select>
+    </label>
+  </div>
+  <div class="release-status" data-release-status>
+    <span class="spinner" aria-hidden="true"></span><p>
+      Checking GitHub Releases…
+    </p>
+  </div>
+  <div data-release-list></div>
+  <noscript
+    ><p class="notice">
+      JavaScript is required to load live release data. <a
+        href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases"
+        >Browse releases on GitHub</a
+      >.
+    </p></noscript
+  >
+</div>
+<script>
+  import '../scripts/releases';
+</script>

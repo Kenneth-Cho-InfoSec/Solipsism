@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ReleaseMount from '../../components/ReleaseMount.astro';
+---
+
+<BaseLayout
+  title="Release archive — Solipsism Browser"
+  description="Every public Solipsism Browser release and its direct GitHub-hosted APK downloads."
+  path="/releases/"
+>
+  <Header />
+  <main id="main">
+    <section class="archive-hero shell">
+      <p class="kicker">Release archive</p><h1>
+        Every version.<br /><em>Direct from GitHub.</em>
+      </h1><p>
+        This live archive follows GitHub Releases automatically. APK buttons use
+        the exact assets attached by the project maintainer.
+      </p>
+    </section><section
+      class="shell archive-section"
+      aria-labelledby="archive-heading"
+    >
+      <h2 id="archive-heading" class="sr-only">All releases</h2><ReleaseMount
+        mode="archive"
+      />
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

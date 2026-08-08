@@ -216,6 +216,10 @@ Generated APKs are written under:
 app/build/outputs/apk/
 ```
 
+## Product website
+
+The official Astro product website lives in [`website/`](website/). It retrieves release notes and APK assets directly from GitHub Releases at runtime, includes a complete paginated archive, and deploys automatically through GitHub Pages. See the [website README](website/README.md) for development, testing, caching, and deployment instructions.
+
 The GitHub release page contains the current signed release APK. Release signing credentials are intentionally kept outside the repository.
 
 ## Translations

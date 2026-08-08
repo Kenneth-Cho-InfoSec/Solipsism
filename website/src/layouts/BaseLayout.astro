@@ -1,0 +1,138 @@
+---
+import '@fontsource-variable/manrope';
+import '@fontsource-variable/space-grotesk';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  path?: string;
+}
+const { title, description, path = '/' } = Astro.props;
+const canonical = new URL(path.replace(/^\//, ''), Astro.site);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const socialImage = new URL(`${base}/assets/solipsism-logo.png`, Astro.site);
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Solipsism Browser',
+  applicationCategory: 'BrowserApplication',
+  operatingSystem: 'Android',
+  description,
+  downloadUrl:
+    'https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest',
+  codeRepository: 'https://github.com/Kenneth-Cho-InfoSec/Solipsism',
+  license: 'https://www.mozilla.org/MPL/2.0/',
+};
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta
+      name="theme-color"
+      content="#f7f6fb"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#070709"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link rel="canonical" href={canonical} />
+    <link
+      rel="icon"
+      type="image/png"
+      href={`${base}/assets/solipsism-logo.png`}
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <title>{title}</title>
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem('solipsism-theme') || 'system';
+        const dark =
+          saved === 'dark' ||
+          (saved === 'system' &&
+            matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.documentElement.dataset.themeMode = saved;
+      })();
+    </script>
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(schema)}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+    <script>
+      const themeButton = document.querySelector<HTMLButtonElement>(
+        '[data-theme-control]',
+      );
+      const labels = {
+        system: 'Theme: system',
+        light: 'Theme: light',
+        dark: 'Theme: dark',
+      } as const;
+      function applyTheme(mode: keyof typeof labels) {
+        const dark =
+          mode === 'dark' ||
+          (mode === 'system' &&
+            matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.documentElement.dataset.themeMode = mode;
+        localStorage.setItem('solipsism-theme', mode);
+        if (themeButton) {
+          themeButton.textContent =
+            mode === 'system' ? '◐' : mode === 'dark' ? '●' : '○';
+          themeButton.setAttribute('aria-label', labels[mode]);
+          themeButton.title = labels[mode];
+        }
+      }
+      const initial = (localStorage.getItem('solipsism-theme') ||
+        'system') as keyof typeof labels;
+      applyTheme(initial in labels ? initial : 'system');
+      themeButton?.addEventListener('click', () => {
+        const mode = document.documentElement.dataset
+          .themeMode as keyof typeof labels;
+        applyTheme(
+          mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system',
+        );
+      });
+      matchMedia('(prefers-color-scheme: dark)').addEventListener(
+        'change',
+        () => {
+          if (document.documentElement.dataset.themeMode === 'system')
+            applyTheme('system');
+        },
+      );
+      const toggle =
+        document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+      const nav = document.querySelector<HTMLElement>('[data-mobile-nav]');
+      toggle?.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!open));
+        nav?.toggleAttribute('data-open', !open);
+      });
+      nav?.querySelectorAll('a').forEach((link) =>
+        link.addEventListener('click', () => {
+          toggle?.setAttribute('aria-expanded', 'false');
+          nav.removeAttribute('data-open');
+        }),
+      );
+    </script>
+  </body>
+</html>

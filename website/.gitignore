@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+playwright-report/
+test-results/
+.e2e-root/
+.local-preview/
+.env
+.env.*
+!.env.example
