@@ -145,6 +145,14 @@ class BrowserStateAdapter(private val browserActivity: BrowserActivity) : Browse
         )
     }
 
+    override fun showUserAgentDialog(currentChoice: Int) {
+        browserActivity.showUserAgentDialog(currentChoice)
+    }
+
+    override fun showCustomUserAgentDialog(currentValue: String) {
+        browserActivity.showCustomUserAgentDialog(currentValue)
+    }
+
     override fun showCookieManager(url: String) {
         browserActivity.showCookieManager(url)
     }

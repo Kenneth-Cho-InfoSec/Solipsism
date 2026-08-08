@@ -9,7 +9,10 @@ object DownloadFilenameResolver {
     fun resolve(url: String, contentDisposition: String?, mimeType: String?, saveImagesAsJpeg: Boolean = false): String {
         val normalizedMimeType = mimeType?.substringBefore(';')?.trim()?.lowercase()
         val guessed = sanitizeFileName(fallbackGuess(url, contentDisposition))
-        if (saveImagesAsJpeg && isRasterImage(mimeType) && !guessed.equals("download", true)) {
+        if (saveImagesAsJpeg &&
+            (isRasterImage(mimeType) || isRasterImageFileName(guessed)) &&
+            !guessed.equals("download", true)
+        ) {
             return sanitizeFileName(guessed.substringBeforeLast('.', guessed) + ".jpg")
         }
         if (!isGeneric(guessed)) return guessed
@@ -25,6 +28,12 @@ object DownloadFilenameResolver {
     fun isRasterImage(mimeType: String?): Boolean {
         return mimeType?.substringBefore(';')?.trim()?.lowercase() in
             setOf("image/jpeg", "image/png", "image/webp", "image/gif", "image/avif", "image/bmp")
+    }
+
+    @JvmStatic
+    fun isRasterImageFileName(fileName: String?): Boolean {
+        val extension = fileName?.substringAfterLast('.', "")?.lowercase()
+        return extension in setOf("jpg", "jpeg", "png", "webp", "gif", "avif", "bmp")
     }
 
     private fun isGeneric(filename: String): Boolean {

@@ -165,7 +165,11 @@ class DownloadPermissionsHelper @Inject constructor(
             return
         }
         val normalizedMimeType = mimeType?.substringBefore(';')?.trim()?.lowercase()
-        val convertImages = userPreferences.saveImagesAsJpeg && DownloadFilenameResolver.isRasterImage(normalizedMimeType)
+        val guessedFileName = URLUtil.guessFileName(url, contentDisposition, normalizedMimeType)
+        val convertImages = userPreferences.saveImagesAsJpeg && (
+            DownloadFilenameResolver.isRasterImage(normalizedMimeType) ||
+                DownloadFilenameResolver.isRasterImageFileName(guessedFileName)
+            )
         val fileName = DownloadFilenameResolver.resolve(url, contentDisposition, normalizedMimeType, convertImages)
         val downloadSize: String = if (contentLength > 0) {
             Formatter.formatFileSize(activity, contentLength)

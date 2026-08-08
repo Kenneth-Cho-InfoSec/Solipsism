@@ -118,7 +118,7 @@ public class DownloadHandler {
             if (bytes.length > MAX_BLOB_BYTES) {
                 throw new IOException("Blob download exceeds the safety limit");
             }
-            if (preferences.getSaveImagesAsJpeg() && DownloadFilenameResolver.isRasterImage(contentType)) {
+            if (preferences.getSaveImagesAsJpeg()) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 if (bitmap != null) {
                     filename = filename.replaceFirst("(?i)\\.[^.]+$", "") + ".jpg";

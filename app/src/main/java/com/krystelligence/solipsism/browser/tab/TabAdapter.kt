@@ -299,6 +299,11 @@ class TabAdapter @AssistedInject constructor(
         toggleDesktop = !toggleDesktop
     }
 
+    override fun applyUserAgentPreference() {
+        webView.settings.userAgentString = userPreferences.userAgent(defaultUserAgent)
+        toggleDesktop = false
+    }
+
     override fun reload() {
         webView.reload()
     }

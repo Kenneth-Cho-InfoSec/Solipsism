@@ -74,6 +74,9 @@ interface TabModel {
      */
     fun toggleDesktopAgent()
 
+    /** Apply the currently selected global user-agent preference to this tab. */
+    fun applyUserAgentPreference()
+
     /**
      * Reload the page the browser is currently showing.
      */

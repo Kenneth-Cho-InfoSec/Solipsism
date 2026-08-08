@@ -1042,6 +1042,9 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         container.addView(createActionMenuRow(R.drawable.ic_action_screenshot, R.string.action_screenshot) {
             presenter.onScreenshotClick()
         })
+        container.addView(createActionMenuRow(R.drawable.ic_action_desktop, R.string.title_user_agent) {
+            presenter.onUserAgentMenuClick()
+        })
         if (presenter.viewState.displayUrl.startsWith("http://") || presenter.viewState.displayUrl.startsWith("https://")) {
             container.addView(createActionMenuRow(R.drawable.ic_settings_text, R.string.block_element) {
                 presenter.onPickElement()
@@ -1218,6 +1221,28 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                 onClick = presenter::onCookieManager
             )
         )
+    }
+
+    override fun showUserAgentDialog(currentChoice: Int) {
+        val choices = resources.getStringArray(R.array.user_agent)
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.title_user_agent)
+            .setSingleChoiceItems(choices, (currentChoice - 1).coerceIn(0, choices.lastIndex)) { dialog, which ->
+                presenter.onUserAgentChoiceSelected(which + 1)
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.action_cancel, null)
+            .resizeAndShow()
+    }
+
+    override fun showCustomUserAgentDialog(currentValue: String) {
+        BrowserDialog.showEditText(
+            this,
+            R.string.title_user_agent,
+            R.string.agent_custom,
+            currentValue,
+            R.string.action_ok
+        ) { presenter.onCustomUserAgentEntered(it) }
     }
 
     override fun showCookieManager(url: String) {

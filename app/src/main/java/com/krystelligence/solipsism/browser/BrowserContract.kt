@@ -149,6 +149,10 @@ interface BrowserContract {
             shouldShowElementPicker: Boolean
         )
 
+        fun showUserAgentDialog(currentChoice: Int)
+
+        fun showCustomUserAgentDialog(currentValue: String)
+
         /**
          * Show the cookie manager for the current HTTP(S) page.
          */

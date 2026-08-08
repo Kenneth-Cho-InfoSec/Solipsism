@@ -39,6 +39,7 @@ import com.krystelligence.solipsism.html.bookmark.BookmarkPageFactory
 import com.krystelligence.solipsism.html.history.HistoryPageFactory
 import com.krystelligence.solipsism.haptics.HapticFeedbackController
 import com.krystelligence.solipsism.log.Logger
+import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.search.SearchEngineProvider
 import com.krystelligence.solipsism.ssl.SslState
 import com.krystelligence.solipsism.utils.Option
@@ -100,6 +101,7 @@ class BrowserPresenter @Inject constructor(
     private val tabCountNotifier: TabCountNotifier,
     private val hapticFeedback: HapticFeedbackController,
     private val logger: Logger,
+    private val userPreferences: UserPreferences,
     @SuggestionsClient private val okHttpClient: Single<OkHttpClient>,
     @IncognitoMode private val incognitoMode: Boolean
 ) {
@@ -976,6 +978,29 @@ class BrowserPresenter @Inject constructor(
             shouldShowAdBlockOption = !currentUrl.isSpecialUrl(),
             shouldShowElementPicker = currentUrl.startsWith("http://") || currentUrl.startsWith("https://")
         )
+    }
+
+    fun onUserAgentMenuClick() {
+        view?.showUserAgentDialog(userPreferences.userAgentChoice)
+    }
+
+    fun onUserAgentChoiceSelected(choice: Int) {
+        userPreferences.userAgentChoice = choice.coerceIn(1, 4)
+        if (userPreferences.userAgentChoice == 4) {
+            view?.showCustomUserAgentDialog(userPreferences.userAgentString)
+            return
+        }
+        currentTab?.applyUserAgentPreference()
+        currentTab?.reload()
+    }
+
+    fun onCustomUserAgentEntered(value: String) {
+        val custom = value.trim()
+        if (custom.isEmpty()) return
+        userPreferences.userAgentString = custom
+        userPreferences.userAgentChoice = 4
+        currentTab?.applyUserAgentPreference()
+        currentTab?.reload()
     }
 
     fun onPickElement() {

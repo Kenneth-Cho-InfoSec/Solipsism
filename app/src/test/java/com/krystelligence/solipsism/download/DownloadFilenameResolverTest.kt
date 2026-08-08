@@ -59,4 +59,16 @@ class DownloadFilenameResolverTest {
             )
         ).isEqualTo("download.bin")
     }
+
+    @Test
+    fun `converts image filename when MIME is unavailable`() {
+        assertThat(
+            DownloadFilenameResolver.resolve(
+                "https://example.test/photo.png",
+                null,
+                null,
+                saveImagesAsJpeg = true
+            )
+        ).isEqualTo("photo.jpg")
+    }
 }
