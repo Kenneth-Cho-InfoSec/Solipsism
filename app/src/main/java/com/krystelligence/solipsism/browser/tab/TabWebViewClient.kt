@@ -134,6 +134,7 @@ class TabWebViewClient @AssistedInject constructor(
 
     override fun onPageFinished(view: WebView, url: String) {
         super.onPageFinished(view, url)
+        ViewportZoomOverride.applyIfEnabled(view, userPreferences.allowZoomOnRestrictedPages)
         userScriptRuntime.injectAfterPageFinished(view, url)
         cosmeticFilterRuntime.injectAfterPageFinished(view, url)
         sitePermissionRuntime.injectAfterPageFinished(view, url)

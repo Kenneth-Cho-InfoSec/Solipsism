@@ -17,6 +17,7 @@
     <attr name="sheetHeaderBackground" format="reference|color" />
     <attr name="sheetFooterBackground" format="reference|color" />
     <attr name="sheetHandleColor" format="reference|color" />
+    <attr name="railBackground" format="reference|color" />
 
     <declare-styleable name="TabCountView">
         <attr name="tabIconColor" format="reference|color" />

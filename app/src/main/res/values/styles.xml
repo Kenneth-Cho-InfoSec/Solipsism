@@ -86,6 +86,7 @@
         <item name="toolbarStyle">@style/Widget.Solipsism.Toolbar</item>
         <item name="toolbarSurfaceStyle">@style/Widget.Solipsism.Toolbar.Surface</item>
         <item name="drawerBackground">@color/md3_surface_container</item>
+        <item name="railBackground">@color/md3_surface_container_low</item>
         <item name="dividerColor">@color/md3_outline_variant</item>
 
         <item name="iconColor">@color/icon_light_theme</item>
@@ -143,6 +144,7 @@
         <item name="toolbarStyle">@style/Widget.Solipsism.Toolbar</item>
         <item name="toolbarSurfaceStyle">@style/Widget.Solipsism.Toolbar.Surface</item>
         <item name="drawerBackground">@color/md3_dark_surface_container</item>
+        <item name="railBackground">@color/md3_dark_surface_container_low</item>
         <item name="dividerColor">@color/md3_dark_outline_variant</item>
 
         <item name="iconColor">@color/icon_dark_theme</item>
@@ -199,6 +201,7 @@
         <item name="toolbarStyle">@style/Widget.Solipsism.Toolbar</item>
         <item name="toolbarSurfaceStyle">@style/Widget.Solipsism.Toolbar.Surface</item>
         <item name="drawerBackground">@color/md3_black_surface_container</item>
+        <item name="railBackground">@color/black</item>
         <item name="dividerColor">@color/md3_black_surface_container_highest</item>
 
         <item name="iconColor">@color/icon_dark_theme</item>

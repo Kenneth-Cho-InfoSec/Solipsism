@@ -25,6 +25,12 @@
             android:summary="@string/settings_accessibility_wide_viewport_summary"
             android:title="@string/wideViewPort" />
         <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_action_expand"
+            android:key="accessibility_allow_zoom_restricted"
+            android:summary="@string/settings_accessibility_allow_zoom_summary"
+            android:title="@string/settings_accessibility_allow_zoom" />
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:icon="@drawable/ic_action_desktop"
             android:key="accessibility_overview_mode"

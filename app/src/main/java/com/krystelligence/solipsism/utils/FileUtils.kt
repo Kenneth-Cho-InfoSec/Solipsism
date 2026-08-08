@@ -28,18 +28,25 @@ object FileUtils {
     fun writeBundleToStorage(app: Application, bundle: Bundle, name: String): Completable =
         Completable.fromAction {
             val outputFile = File(app.filesDir, name)
+            val temporaryFile = File(app.filesDir, "$name.tmp")
             var outputStream: FileOutputStream? = null
             try {
-                outputStream = FileOutputStream(outputFile)
+                outputStream = FileOutputStream(temporaryFile)
                 val parcel = Parcel.obtain()
                 parcel.writeBundle(bundle)
                 outputStream.write(parcel.marshall())
                 outputStream.flush()
                 parcel.recycle()
+                outputStream.close()
+                outputStream = null
+                if (!temporaryFile.renameTo(outputFile)) {
+                    throw IOException("Unable to replace bundle snapshot")
+                }
             } catch (e: IOException) {
                 Log.e(TAG, "Unable to write bundle to storage")
             } finally {
                 Utils.close(outputStream)
+                if (temporaryFile.exists()) temporaryFile.delete()
             }
         }
 

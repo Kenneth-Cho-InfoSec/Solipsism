@@ -1,6 +1,5 @@
 package com.krystelligence.solipsism.browser
 
-import com.krystelligence.solipsism.AppTheme
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.ThemableBrowserActivity
 import com.krystelligence.solipsism.animation.AnimationUtils
@@ -35,6 +34,7 @@ import com.krystelligence.solipsism.browser.data.CookieManagerDialog
 import com.krystelligence.solipsism.browser.data.CookieManagerRepository
 import com.krystelligence.solipsism.browser.view.delegates.SolipsismRailViewDelegate
 import com.krystelligence.solipsism.browser.view.targetUrl.LongPress
+import com.krystelligence.solipsism.system.SystemBarsController
 import com.krystelligence.solipsism.browser.history.DecoyTimeframe
 import com.krystelligence.solipsism.constant.HTTP
 import com.krystelligence.solipsism.database.Bookmark
@@ -105,8 +105,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toDrawable
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -129,12 +127,14 @@ import kotlin.math.roundToInt
 abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View {
 
     private lateinit var binding: ViewDelegate
+    private lateinit var systemBarsController: SystemBarsController
     private lateinit var tabsAdapter: ListAdapter<TabViewState, TabViewHolder>
     private lateinit var bookmarksAdapter: BookmarkRecyclerViewAdapter
     private var activeRecyclerView: RecyclerView? = null
     private var customView: View? = null
     private var customViewOriginalOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     private var customViewHidSystemUi = false
+    private var immersiveFullscreen = false
     private var previousSystemUiVisibility = 0
     private var browserMenuPopup: PopupWindow? = null
     private var urlRailTransition: BrowserPresenter.UrlBarTabTransition? = null
@@ -202,8 +202,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         val railPosition = activeSolipsismRailPosition()
         val railOnLeft = railPosition == SolipsismRailPosition.LEFT
         val superCompact = userPreferences.solipsismRailSize <= SUPER_COMPACT_RAIL_WIDTH_DP
+        val hideRail = !railPosition.isExperimental &&
+            ((userPreferences.fullScreenEnabled && userPreferences.hideRailInFullscreen) ||
+                immersiveFullscreen)
 
         if (railPosition.isExperimental) {
+            binding.toolbarLayout.visibility = View.VISIBLE
             applyHorizontalSolipsismRailPreferences(railWidth, superCompact)
             applyQrAndTabsButtonPositions()
             configureHorizontalSolipsismRailConstraints(railWidth)
@@ -222,6 +226,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
         binding.actionHome.visibility = View.VISIBLE
         binding.actionAddBookmark.visibility = View.VISIBLE
+        binding.toolbarLayout.visibility = if (hideRail) View.INVISIBLE else View.VISIBLE
 
         binding.toolbarLayout.updateLayoutParams<FrameLayout.LayoutParams> {
             width = railWidth
@@ -292,20 +297,34 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
         applyQrAndTabsButtonPositions()
 
-        binding.contentFrame.applyRailMargin(railWidth, railOnLeft)
-        binding.progressView.applyRailMargin(railWidth, railOnLeft)
+        val contentRailWidth = if (hideRail) 0 else railWidth
+        binding.contentFrame.applyRailMargin(contentRailWidth, railOnLeft)
+        binding.progressView.applyRailMargin(contentRailWidth, railOnLeft)
         binding.addressOverlay?.applyRailMargin(
-            railWidth = railWidth,
+            railWidth = contentRailWidth,
             railOnLeft = railOnLeft,
             oppositeMargin = resources.getDimensionPixelSize(R.dimen.chrome_outer_margin),
-            extraRailMargin = ADDRESS_OVERLAY_RAIL_GAP_DP.dp
+            extraRailMargin = if (hideRail) 0 else ADDRESS_OVERLAY_RAIL_GAP_DP.dp
         )
         binding.findBar.applyRailMargin(
-            railWidth = railWidth,
+            railWidth = contentRailWidth,
             railOnLeft = railOnLeft,
             oppositeMargin = resources.getDimensionPixelSize(R.dimen.chrome_outer_margin),
-            extraRailMargin = FIND_BAR_RAIL_GAP_DP.dp
+            extraRailMargin = if (hideRail) 0 else FIND_BAR_RAIL_GAP_DP.dp
         )
+    }
+
+    private fun setImmersiveFullscreen(enabled: Boolean) {
+        immersiveFullscreen = enabled
+        if (::systemBarsController.isInitialized) {
+            systemBarsController.setImmersiveHidden(enabled)
+        }
+        if (::binding.isInitialized && ::uiConfiguration.isInitialized &&
+            uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM
+        ) {
+            applySolipsismRailPreferences()
+        }
+        snackbar(if (enabled) R.string.fullscreen_enabled else R.string.fullscreen_disabled)
     }
 
     private fun applyHorizontalSolipsismRailPreferences(railHeight: Int, superCompact: Boolean) {
@@ -637,7 +656,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         }
 
         setContentView(binding.root)
-        applyStatusBarPreferences()
+        systemBarsController = SystemBarsController(
+            activity = this,
+            protectionView = binding.root.findViewById(R.id.status_bar_protection),
+            userPreferences = userPreferences
+        )
+        systemBarsController.apply()
         setSupportActionBar(binding.toolbar)
         applySolipsismRailPreferences()
 
@@ -799,6 +823,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.actionBack.setOnClickListener { presenter.onBackClick() }
         binding.actionForward.setOnClickListener { presenter.onForwardClick() }
         binding.actionHome.setOnClickListener { presenter.onHomeClick() }
+        binding.actionHome.setOnLongClickListener {
+            setImmersiveFullscreen(!immersiveFullscreen)
+            true
+        }
         binding.newTabButton.setOnClickListener { presenter.onNewTabClick() }
         binding.newTabButton.setOnLongClickListener {
             presenter.onNewTabLongClick()
@@ -844,7 +872,11 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         tabPager.longPressListener = presenter::onPageLongPress
 
         onBackPressedDispatcher.addCallback {
-            presenter.onNavigateBack()
+            if (immersiveFullscreen) {
+                setImmersiveFullscreen(false)
+            } else {
+                presenter.onNavigateBack()
+            }
         }
     }
 
@@ -868,7 +900,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun onResume() {
         super.onResume()
         presenter.onViewResumed()
-        applyStatusBarPreferences()
+        if (::systemBarsController.isInitialized) systemBarsController.apply()
         if (::binding.isInitialized && ::uiConfiguration.isInitialized &&
             uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM
         ) {
@@ -877,17 +909,11 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         intentExtractor.extractUrlFromIntent(intent)?.let(presenter::onNewAction)
     }
 
-    private fun applyStatusBarPreferences() {
-        val controller = WindowCompat.getInsetsController(window, window.decorView)
-        controller.systemBarsBehavior =
-            androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        if (userPreferences.hideStatusBarEnabled) {
-            controller.hide(WindowInsetsCompat.Type.statusBars())
-        } else {
-            controller.show(WindowInsetsCompat.Type.statusBars())
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus && ::systemBarsController.isInitialized) {
+            systemBarsController.applyAfterWindowFocus()
         }
-        controller.isAppearanceLightStatusBars =
-            !userPreferences.useBlackStatusBar && userPreferences.useTheme == AppTheme.LIGHT
     }
 
     @SuppressLint("DiscouragedPrivateApi")

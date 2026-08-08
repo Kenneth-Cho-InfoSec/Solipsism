@@ -79,6 +79,18 @@ class UserPreferences @Inject constructor(
         FileUtils.DEFAULT_DOWNLOAD_PATH
     )
 
+    /** Route eligible direct downloads to the selected external manager. */
+    var customDownloadManagerEnabled by preferences.booleanPreference(CUSTOM_DOWNLOAD_MANAGER_ENABLED, false)
+
+    /** Selected external manager package name. */
+    var customDownloadManagerPackage by preferences.stringPreference(CUSTOM_DOWNLOAD_MANAGER_PACKAGE, "idm.internet.download.manager")
+
+    /** Comma-separated user-configured manager package names. */
+    var customDownloadManagerPackages by preferences.stringPreference(
+        CUSTOM_DOWNLOAD_MANAGER_PACKAGES,
+        "idm.internet.download.manager,com.dv.adm,org.freedownloadmanager.fdm"
+    )
+
     /** Convert downloaded raster images to JPEG before saving them. */
     var saveImagesAsJpeg by preferences.booleanPreference(SAVE_IMAGES_AS_JPEG, true)
 
@@ -105,6 +117,9 @@ class UserPreferences @Inject constructor(
      * immobile.
      */
     var fullScreenEnabled by preferences.booleanPreference(FULL_SCREEN, true)
+
+    /** Hide the Solipsism side rail while full-screen mode is enabled. */
+    var hideRailInFullscreen by preferences.booleanPreference(HIDE_RAIL_IN_FULLSCREEN, false)
 
     /**
      * True if the system status bar should be hidden throughout the app, false if it should be
@@ -219,6 +234,9 @@ class UserPreferences @Inject constructor(
      * True if the browser should fit web pages to the view port, false otherwise.
      */
     var useWideViewPortEnabled by preferences.booleanPreference(USE_WIDE_VIEWPORT, true)
+
+    /** Override restrictive viewport metadata so pinch zoom remains available. */
+    var allowZoomOnRestrictedPages by preferences.booleanPreference(ALLOW_ZOOM_ON_RESTRICTED_PAGES, false)
 
     /**
      * The index of the user agent choice that should be used by the browser.
@@ -523,6 +541,9 @@ private const val BLOCK_IMAGES = "blockimages"
 private const val CLEAR_CACHE_EXIT = "cache"
 private const val COOKIES = "cookies"
 private const val DOWNLOAD_DIRECTORY = "downloadLocation"
+private const val CUSTOM_DOWNLOAD_MANAGER_ENABLED = "customDownloadManagerEnabled"
+private const val CUSTOM_DOWNLOAD_MANAGER_PACKAGE = "customDownloadManagerPackage"
+private const val CUSTOM_DOWNLOAD_MANAGER_PACKAGES = "customDownloadManagerPackages"
 private const val SAVE_IMAGES_AS_JPEG = "saveImagesAsJpeg"
 private const val VIRUS_TOTAL_SCANNING = "virusTotalScanning"
 private const val VIRUS_TOTAL_SCAN_IMAGES = "virusTotalScanImages"
@@ -530,6 +551,7 @@ private const val VIRUS_TOTAL_SCAN_VIDEOS = "virusTotalScanVideos"
 private const val MALWARE_DEFINITIONS_AUTO_UPDATE = "malwareDefinitionsAutoUpdate"
 private const val VIRUS_TOTAL_CLOUD_ENABLED = "virusTotalCloudEnabled"
 private const val FULL_SCREEN = "fullscreen"
+private const val HIDE_RAIL_IN_FULLSCREEN = "hideRailInFullscreen"
 private const val HIDE_STATUS_BAR = "hidestatus"
 private const val HOMEPAGE = "home"
 private const val INCOGNITO_COOKIES = "incognitocookies"
@@ -546,6 +568,7 @@ private const val TEXT_REFLOW = "textreflow"
 private const val TEXT_SIZE = "textsize"
 private const val CUSTOM_FONT_PATH = "customFontPath"
 private const val USE_WIDE_VIEWPORT = "wideviewport"
+private const val ALLOW_ZOOM_ON_RESTRICTED_PAGES = "allowZoomOnRestrictedPages"
 private const val USER_AGENT = "agentchoose"
 private const val USER_AGENT_STRING = "userAgentString"
 private const val CHROMPATIBILITY_MODE = "chrompatibilityMode"

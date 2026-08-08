@@ -8,6 +8,7 @@ import com.krystelligence.solipsism.constant.SCHEME_BOOKMARKS
 import com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
 import com.krystelligence.solipsism.dialog.BrowserDialog
 import com.krystelligence.solipsism.extensions.withSingleChoiceItems
+import com.krystelligence.solipsism.extensions.toast
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.search.SearchEngineProvider
@@ -34,6 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
 
 /**
@@ -110,6 +112,18 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
             isChecked = userPreferences.saveImagesAsJpeg,
             summary = getString(R.string.save_images_as_jpeg_summary),
             onCheckChange = { userPreferences.saveImagesAsJpeg = it }
+        )
+
+        togglePreference(
+            preference = SETTINGS_CUSTOM_DOWNLOAD_MANAGER_ENABLED,
+            isChecked = userPreferences.customDownloadManagerEnabled,
+            onCheckChange = { userPreferences.customDownloadManagerEnabled = it }
+        )
+
+        clickableDynamicPreference(
+            preference = SETTINGS_CUSTOM_DOWNLOAD_MANAGER,
+            summary = selectedDownloadManagerSummary(),
+            onClick = ::showCustomDownloadManagerPicker
         )
 
         clickableDynamicPreference(
@@ -510,6 +524,63 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         }
     }
 
+    private fun selectedDownloadManagerSummary(): String {
+        val packageName = userPreferences.customDownloadManagerPackage
+        val label = com.krystelligence.solipsism.browser.download.CustomDownloadManager
+            .installedLabel(requireContext(), packageName)
+        return if (label == null) {
+            getString(R.string.custom_download_manager_selected, packageName) +
+                " (" + getString(R.string.custom_download_manager_unavailable) + ")"
+        } else {
+            getString(R.string.custom_download_manager_selected, label)
+        }
+    }
+
+    private fun showCustomDownloadManagerPicker(summaryUpdater: SummaryUpdater) {
+        val packageNames = userPreferences.customDownloadManagerPackages
+            .split(',').map(String::trim)
+            .filter { it.isNotEmpty() && com.krystelligence.solipsism.browser.download.CustomDownloadManager.isValidPackageName(it) }
+            .distinct().toMutableList()
+        val labels = packageNames.map { packageName ->
+            val manager = com.krystelligence.solipsism.browser.download.CustomDownloadManager
+            val label = manager.installedLabel(requireContext(), packageName) ?: packageName
+            if (manager.installedLabel(requireContext(), packageName) == null) {
+                "$label (${getString(R.string.custom_download_manager_unavailable)})"
+            } else label
+        }.toMutableList()
+        labels.add(getString(R.string.custom_download_manager_add))
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.custom_download_manager)
+            .setSingleChoiceItems(labels.toTypedArray(), packageNames.indexOf(userPreferences.customDownloadManagerPackage)) { dialog, which ->
+                if (which == packageNames.size) {
+                    dialog.dismiss()
+                    BrowserDialog.showEditText(
+                        requireActivity(),
+                        R.string.custom_download_manager_add,
+                        R.string.custom_download_manager_add_hint,
+                        R.string.action_ok
+                    ) { input ->
+                        val packageName = input.trim()
+                        val manager = com.krystelligence.solipsism.browser.download.CustomDownloadManager
+                        if (!manager.isValidPackageName(packageName) || manager.installedLabel(requireContext(), packageName) == null) {
+                            activity?.toast(R.string.custom_download_manager_invalid_package)
+                        } else {
+                            packageNames.add(packageName)
+                            userPreferences.customDownloadManagerPackages = packageNames.joinToString(",")
+                            userPreferences.customDownloadManagerPackage = packageName
+                            summaryUpdater.updateSummary(selectedDownloadManagerSummary())
+                        }
+                    }
+                } else {
+                    userPreferences.customDownloadManagerPackage = packageNames[which]
+                    summaryUpdater.updateSummary(selectedDownloadManagerSummary())
+                    dialog.dismiss()
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     private fun convertSearchEngineToString(searchEngines: List<BaseSearchEngine>): Array<CharSequence> =
         searchEngines.map { getString(it.titleRes) }.toTypedArray()
 
@@ -608,6 +679,8 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_CHROMPATIBILITY = "chrompatibility_mode"
         private const val SETTINGS_DOWNLOAD = "download"
         private const val SETTINGS_SAVE_IMAGES_AS_JPEG = "save_images_as_jpeg"
+        private const val SETTINGS_CUSTOM_DOWNLOAD_MANAGER_ENABLED = "custom_download_manager_enabled"
+        private const val SETTINGS_CUSTOM_DOWNLOAD_MANAGER = "custom_download_manager"
         private const val SETTINGS_HOME = "home"
         private const val SETTINGS_SEARCH_ENGINE = "search"
         private const val SETTINGS_SUGGESTIONS = "suggestions_choice"

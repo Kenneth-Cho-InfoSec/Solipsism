@@ -50,6 +50,12 @@ class AccessibilitySettingsFragment : AbstractSettingsFragment() {
         )
 
         togglePreference(
+            preference = SETTINGS_ALLOW_ZOOM_RESTRICTED,
+            isChecked = userPreferences.allowZoomOnRestrictedPages,
+            onCheckChange = { userPreferences.allowZoomOnRestrictedPages = it }
+        )
+
+        togglePreference(
             preference = SETTINGS_OVERVIEW_MODE,
             isChecked = userPreferences.overviewModeEnabled,
             onCheckChange = { userPreferences.overviewModeEnabled = it }
@@ -133,6 +139,7 @@ class AccessibilitySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_RENDERING_MODE = "accessibility_rendering_mode"
         private const val SETTINGS_REFLOW = "accessibility_text_reflow"
         private const val SETTINGS_VIEWPORT = "accessibility_wide_viewport"
+        private const val SETTINGS_ALLOW_ZOOM_RESTRICTED = "accessibility_allow_zoom_restricted"
         private const val SETTINGS_OVERVIEW_MODE = "accessibility_overview_mode"
     }
 }

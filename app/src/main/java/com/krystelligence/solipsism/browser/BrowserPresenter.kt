@@ -632,11 +632,7 @@ class BrowserPresenter @Inject constructor(
             .subscribe {
                 if (needToSelectNextTab) {
                     nextTab?.id?.let {
-                        val shouldClose = currentTab?.tabType == TabModel.Type.EPHEMERAL
                         selectTab(model.selectTab(it), focusTab = false)
-                        if (shouldClose) {
-                            navigator.backgroundBrowser()
-                        }
                     } ?: run {
                         selectTab(tabModel = null)
                         navigator.closeBrowser()

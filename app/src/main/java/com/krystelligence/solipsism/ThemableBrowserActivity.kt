@@ -11,6 +11,7 @@ import com.krystelligence.solipsism.utils.CustomFontManager
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Build
 import android.view.Menu
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
@@ -97,10 +98,12 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
     }
 
     private fun resetPreferences() {
-        if (userPreferences.useBlackStatusBar || userPreferences.tabConfiguration == TabConfiguration.DESKTOP) {
-            window.statusBarColor = Color.BLACK
-        } else {
-            window.statusBarColor = ThemeUtils.getStatusBarColor(this)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            if (userPreferences.useBlackStatusBar || userPreferences.tabConfiguration == TabConfiguration.DESKTOP) {
+                window.statusBarColor = Color.BLACK
+            } else {
+                window.statusBarColor = ThemeUtils.getStatusBarColor(this)
+            }
         }
     }
 

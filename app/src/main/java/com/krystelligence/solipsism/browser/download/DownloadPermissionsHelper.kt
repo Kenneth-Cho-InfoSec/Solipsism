@@ -178,10 +178,25 @@ class DownloadPermissionsHelper @Inject constructor(
         }
 
         val directDownload = {
-            downloadWithoutScanning(
-                activity, url, userAgent, contentDisposition, normalizedMimeType, downloadSize,
-                blobData, fileName, convertImages
-            )
+            val dispatched = if (userPreferences.customDownloadManagerEnabled &&
+                blobData == null && !convertImages
+            ) {
+                CustomDownloadManager.dispatch(
+                    activity,
+                    userPreferences.customDownloadManagerPackage,
+                    url,
+                    normalizedMimeType,
+                    fileName
+                )
+            } else false
+            if (dispatched) {
+                activity.snackbar(R.string.download_pending)
+            } else {
+                downloadWithoutScanning(
+                    activity, url, userAgent, contentDisposition, normalizedMimeType, downloadSize,
+                    blobData, fileName, convertImages
+                )
+            }
         }
         if (siteDecision == SitePermissionDecision.ALLOW) {
             directDownload()
