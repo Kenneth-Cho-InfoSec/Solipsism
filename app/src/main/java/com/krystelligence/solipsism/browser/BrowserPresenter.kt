@@ -70,6 +70,7 @@ import okhttp3.Request
 import org.jsoup.Jsoup
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.system.exitProcess
@@ -1221,9 +1222,23 @@ class BrowserPresenter @Inject constructor(
     }
 
     fun onScreenshotClick() {
-        currentTab?.captureVisiblePage()
-            ?.let { view?.showScreenshot(it) }
-            ?: view?.showScreenshotCaptureFailed()
+        captureScreenshot(attempt = 0)
+    }
+
+    private fun captureScreenshot(attempt: Int) {
+        currentTab?.captureVisiblePage()?.let { bitmap ->
+            view?.showScreenshot(bitmap)
+            return
+        }
+        if (attempt < MAX_SCREENSHOT_CAPTURE_RETRIES) {
+            mainScheduler.scheduleDirect(
+                { captureScreenshot(attempt + 1) },
+                SCREENSHOT_CAPTURE_RETRY_DELAY_MS,
+                TimeUnit.MILLISECONDS
+            )
+        } else {
+            view?.showScreenshotCaptureFailed()
+        }
     }
 
     /**
@@ -1683,6 +1698,8 @@ class BrowserPresenter @Inject constructor(
     }
 
     companion object {
+        private const val MAX_SCREENSHOT_CAPTURE_RETRIES = 3
+        private const val SCREENSHOT_CAPTURE_RETRY_DELAY_MS = 120L
         private const val TAG = "BrowserPresenter"
         private const val DUCKDUCKGO_HTML_SEARCH = "https://html.duckduckgo.com/html/?q="
         private const val DUCKDUCKGO_SEARCH = "https://duckduckgo.com/?q="

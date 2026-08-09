@@ -330,12 +330,14 @@ class TabAdapter @AssistedInject constructor(
 
     override fun captureVisiblePage(): Bitmap? {
         val view = webView
-        if (view.width <= 0 || view.height <= 0) return null
+        if (view.width <= 0 || view.height <= 0 || !view.isLaidOut) return null
 
         return runCatching {
             Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888).also { bitmap ->
                 view.draw(Canvas(bitmap))
             }
+        }.onFailure { error ->
+            Log.w(TAG, "Unable to capture visible page", error)
         }.getOrNull()
     }
 

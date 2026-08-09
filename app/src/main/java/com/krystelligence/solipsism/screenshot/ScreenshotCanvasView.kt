@@ -31,12 +31,17 @@ class ScreenshotCanvasView @JvmOverloads constructor(
     private val imagePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = 5f
+        strokeWidth = 20f
+        alpha = 128
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
     }
     private var bitmap: Bitmap? = null
+    private val imageRect = RectF()
+    private var imageScale = 1f
     private var drawing = false
+    private var startX = 0f
+    private var startY = 0f
     var hasSelection: Boolean = false
         private set
 
@@ -82,12 +87,13 @@ class ScreenshotCanvasView @JvmOverloads constructor(
         super.onDraw(canvas)
         canvas.drawColor(Color.BLACK)
         bitmap?.let { source ->
-            val scale = min(width.toFloat() / source.width, height.toFloat() / source.height)
-            val left = (width - source.width * scale) / 2f
-            val top = (height - source.height * scale) / 2f
+            imageScale = min(width.toFloat() / source.width, height.toFloat() / source.height)
+            val left = (width - source.width * imageScale) / 2f
+            val top = (height - source.height * imageScale) / 2f
+            imageRect.set(left, top, left + source.width * imageScale, top + source.height * imageScale)
             canvas.save()
             canvas.translate(left, top)
-            canvas.scale(scale, scale)
+            canvas.scale(imageScale, imageScale)
             canvas.drawBitmap(source, 0f, 0f, imagePaint)
             canvas.restore()
         }
@@ -102,6 +108,8 @@ class ScreenshotCanvasView @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 path.reset()
                 path.moveTo(event.x, event.y)
+                startX = event.x
+                startY = event.y
                 drawing = true
                 hasSelection = false
                 invalidate()
@@ -113,6 +121,12 @@ class ScreenshotCanvasView @JvmOverloads constructor(
                 return true
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> if (drawing) {
+                // Explicitly add the closing segment before closing the Path. This keeps
+                // the outline visibly connected even when the final point is far from the
+                // starting point or the platform does not redraw Path.close() immediately.
+                if (event.actionMasked == MotionEvent.ACTION_UP) {
+                    path.lineTo(startX, startY)
+                }
                 path.close()
                 drawing = false
                 val bounds = RectF()
@@ -139,12 +153,11 @@ class ScreenshotCanvasView @JvmOverloads constructor(
         if (!hasSelection) return null
         val bounds = RectF()
         path.computeBounds(bounds, true)
-        val sx = source.width / width.toFloat()
-        val sy = source.height / height.toFloat()
-        val left = max(0, (bounds.left * sx).toInt())
-        val top = max(0, (bounds.top * sy).toInt())
-        val right = min(source.width, (bounds.right * sx).toInt())
-        val bottom = min(source.height, (bounds.bottom * sy).toInt())
+        if (imageRect.isEmpty || imageScale <= 0f) return null
+        val left = max(0, ((bounds.left - imageRect.left) / imageScale).toInt())
+        val top = max(0, ((bounds.top - imageRect.top) / imageScale).toInt())
+        val right = min(source.width, ((bounds.right - imageRect.left) / imageScale).toInt())
+        val bottom = min(source.height, ((bounds.bottom - imageRect.top) / imageScale).toInt())
         if (right <= left || bottom <= top) return null
         val output = Bitmap.createBitmap(right - left, bottom - top, Bitmap.Config.ARGB_8888)
         Canvas(output).apply {

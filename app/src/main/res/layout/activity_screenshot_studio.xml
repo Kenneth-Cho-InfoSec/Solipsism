@@ -42,6 +42,15 @@
             android:contentDescription="@string/action_cancel"
             android:src="@drawable/ic_action_delete"
             app:tint="?attr/iconColor" />
+        <ImageButton
+            android:id="@+id/clear_selection_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/solipsism_blend_button_background"
+            android:contentDescription="@string/screenshot_studio_clear_selection"
+            android:src="@drawable/ic_action_refresh"
+            app:tint="?attr/iconColor" />
     </LinearLayout>
 
     <com.krystelligence.solipsism.screenshot.ScreenshotCanvasView
@@ -58,27 +67,27 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/clear_selection_button"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/screenshot_studio_clear_selection"
-            android:text="@string/screenshot_studio_clear_selection" />
-        <com.google.android.material.button.MaterialButton
             android:id="@+id/save_button"
-            style="@style/Widget.Material3.Button.TextButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
             android:layout_weight="1"
-            android:text="@string/screenshot_studio_save" />
+            android:minHeight="56dp"
+            android:text="@string/screenshot_studio_save"
+            android:textColor="?attr/colorOnSurface"
+            app:backgroundTint="?attr/colorSecondaryContainer"
+            app:cornerRadius="20dp" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/search_button"
-            style="@style/Widget.Material3.Button.TextButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_weight="1"
-            android:text="@string/screenshot_studio_search" />
+            android:minHeight="56dp"
+            android:text="@string/screenshot_studio_search"
+            android:textColor="?attr/colorOnSurface"
+            app:backgroundTint="?attr/colorSecondaryContainer"
+            app:cornerRadius="20dp" />
     </LinearLayout>
 </LinearLayout>
