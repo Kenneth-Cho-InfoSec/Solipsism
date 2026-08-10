@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solipsism Rail &amp; Menu Studio</title>
+<style>
+:root{color-scheme:dark;--screen:#111918;--panel:#1b2724;--panel2:#263632;--text:#f0f8f4;--muted:#b4c7bf;--accent:#a8d8ce;--accentText:#12302b;--danger:#ffb4ab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0c1110;font:14px system-ui;color:var(--text)}
+button{font:inherit;color:inherit}
+.phone{position:relative;width:min(92vw,390px);aspect-ratio:9/21;padding:11px;border:2px solid #73857f;border-radius:40px;background:#050807;box-shadow:0 24px 80px #000b}
+.screen{position:relative;height:100%;overflow:hidden;border-radius:30px;background:#22342f}
+.webpage{position:absolute;inset:0;padding:45px 22px;background:linear-gradient(135deg,#29483e,#111918 70%)}
+.line{height:7px;width:75%;margin:13px 0;border-radius:9px;background:#cce6dc44}.line.short{width:48%}
+.webpage h2{position:absolute;bottom:105px;left:22px;max-width:220px;font-size:20px}
+.confirm{position:absolute;z-index:15;top:18px;left:17px;border:0;border-radius:15px;padding:9px 13px;background:var(--accent);color:var(--accentText);font-weight:800;cursor:pointer}
+.rail{position:absolute;z-index:10;right:0;top:0;bottom:0;display:flex;width:82px;flex-direction:column;align-items:center;gap:7px;padding:27px 10px 13px}
+.rail.target{background:#a8d8ce20}
+.rail-slot{position:relative;display:grid;width:54px;min-height:52px;place-items:center;border:1px dashed transparent;border-radius:17px;color:#eff8f3;cursor:grab}.rail-slot:hover,.rail-slot.target{border-color:var(--accent);background:#a8d8ce30}.rail-slot.locked{cursor:default}.rail-icon{font-size:23px;line-height:1}
+.rail-url{display:flex;flex:1;width:54px;min-height:80px;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 0;border-radius:28px;background:#293835}.rail-url .url{writing-mode:vertical-rl;overflow:hidden;max-height:100%;color:#b4c7bf;font-size:10px}
+.menu{position:absolute;z-index:12;left:14px;right:92px;top:63px;bottom:14px;overflow:auto;padding:12px 10px 16px;border:1px solid #ffffff21;border-radius:24px;background:#17221feF;box-shadow:0 16px 35px #0007}
+.menu h1{margin:1px 5px 12px;font-size:21px;letter-spacing:-.04em}.section{margin:13px 5px 4px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.menu-item{display:flex;align-items:center;gap:9px;min-height:43px;margin:3px 0;padding:6px 8px;border:1px solid transparent;border-radius:14px;background:var(--panel2);cursor:grab}.menu-item:hover{border-color:var(--accent)}.menu-icon{display:grid;width:30px;height:30px;place-items:center;border-radius:9px;background:#ffffff18;font-size:16px}.menu-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.handle{display:none}
+.toast{position:absolute;z-index:30;left:50%;bottom:24px;width:max-content;max-width:80%;padding:9px 13px;border-radius:14px;background:#000c;color:#fff;opacity:0;transform:translate(-50%,8px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="phone" aria-label="Solipsism rail and menu studio phone preview">
+<div class="screen">
+<button class="confirm" id="confirm" type="button">Confirm</button>
+<div class="webpage"><div class="line"></div><div class="line short"></div><h2>Leave the webpage as the visual surface.</h2><div class="line"></div></div>
+<div class="rail" id="rail" aria-label="Rail drop targets"></div>
+<div class="menu" id="menu"><h1>Overflow menu</h1><div id="menuItems"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+</div>
+<script>
+const actions={tabs:["Tabs","▣",true],refresh:["Refresh","↻"],utility:["Utility","⌁"],back:["Back","←"],forward:["Forward","→"],home:["Home","⌂"],bookmark:["Bookmark","☆"],overflow:["Overflow menu","⋮",true],qr:["QR scanner","▦"],vault:["Vault","▤"],screenshot:["Screenshot","▧"],newtab:["New tab","＋"],incognito:["Incognito tab","◐"],lucky:["I’m feeling lucky","✦"],homepage:["Install website","⌂"],history:["History","↺"],downloads:["Downloads","⇩"],bookmarks:["Bookmarks","☆"],find:["Find in page","⌕"],read:["Read page aloud","◖"],copy:["Copy link","⧉"],useragent:["User agent","◌"],block:["Block element","⊘"],cookies:["Cookie manager","●"],settings:["Settings","⚙"]};
+const groups={newtab:"Browsing",incognito:"Browsing",lucky:"Browsing",homepage:"Browsing",history:"Library",downloads:"Library",bookmarks:"Library",find:"Tools",read:"Accessibility",copy:"Tools",screenshot:"Tools",useragent:"Privacy",block:"Privacy",cookies:"Privacy",settings:"System"};
+const MAX_MOVABLE=8;
+let rail=["tabs","refresh","utility","back","forward","home","bookmark","overflow"],menu=["newtab","incognito","lucky","homepage","history","downloads","bookmarks","find","read","copy","screenshot","useragent","block","cookies","settings"],dragId=null;
+const railEl=document.getElementById("rail"),menuEl=document.getElementById("menuItems"),toast=document.getElementById("toast");
+function message(t){toast.textContent=t;toast.classList.add("show");clearTimeout(message.timer);message.timer=setTimeout(()=>toast.classList.remove("show"),1800)}
+function start(e,id){dragId=id;e.dataTransfer.effectAllowed="copy";e.dataTransfer.setData("text/plain",id);e.currentTarget.style.opacity=".45"}
+function end(e){e.currentTarget.style.opacity="";document.querySelectorAll(".target").forEach(x=>x.classList.remove("target"));dragId=null}
+function insert(id,target){if(!id||rail.includes(id))return false;if(rail.filter(x=>!actions[x][2]).length>=MAX_MOVABLE){message("The rail has eight movable actions already.");return false}const index=target?rail.indexOf(target):-1;if(index>=0)rail.splice(index,0,id);else rail.push(id);menu=menu.filter(x=>x!==id);message(actions[id][0]+" moved to the rail.");renderRail();renderMenu();return true}
+function bindDrop(el,target){el.addEventListener("dragover",e=>{e.preventDefault();el.classList.add("target")});el.addEventListener("dragleave",()=>el.classList.remove("target"));el.addEventListener("drop",e=>{e.preventDefault();el.classList.remove("target");const source=dragId||e.dataTransfer.getData("text/plain");if(!source)return;if(rail.includes(source)&&target){const from=rail.indexOf(source),to=rail.indexOf(target);rail.splice(from,1);rail.splice(to,0,source);message(actions[source][0]+" moved.");renderRail()}else insert(source,target)})}
+function renderRail(){railEl.innerHTML="";rail.forEach(id=>{const a=actions[id];if(id==="utility")return;if(id==="refresh"){const url=document.createElement("div");url.className="rail-url";url.innerHTML="<span>↻</span><span class=\"url\">solipsism.com</span>"+(rail.includes("utility")?"<span>⌁</span>":"");bindDrop(url,null);railEl.appendChild(url);return}const slot=document.createElement("div");slot.className="rail-slot"+(a[2]?" locked":"");slot.title=a[0];slot.innerHTML="<span class=\"rail-icon\">"+a[1]+"</span>";if(!a[2]){slot.draggable=true;slot.addEventListener("dragstart",e=>start(e,id))}slot.addEventListener("dragend",end);bindDrop(slot,id);railEl.appendChild(slot)})}
+function renderMenu(){menuEl.innerHTML="";menu.forEach(id=>{const a=actions[id];const item=document.createElement("div");item.className="menu-item";item.draggable=true;item.setAttribute("aria-label",a[0]);item.innerHTML="<span class=\"menu-icon\">"+a[1]+"</span><span class=\"menu-name\">"+a[0]+"</span>";item.addEventListener("dragstart",e=>start(e,id));item.addEventListener("dragend",end);menuEl.appendChild(item)})}
+bindDrop(railEl,null);menuEl.addEventListener("dragover",e=>{if(dragId&&rail.includes(dragId)&&dragId!=="tabs"){e.preventDefault();menuEl.classList.add("target")}});menuEl.addEventListener("dragleave",()=>menuEl.classList.remove("target"));menuEl.addEventListener("drop",e=>{e.preventDefault();menuEl.classList.remove("target");const source=dragId||e.dataTransfer.getData("text/plain");if(source&&rail.includes(source)){if(source==="tabs"){message("Tabs is required and cannot be removed.");return}rail=rail.filter(x=>x!==source);if(!menu.includes(source))menu.push(source);message(actions[source][0]+" moved to the overflow menu.");renderRail();renderMenu()}});document.getElementById("confirm").addEventListener("click",()=>message("Layout confirmed in this prototype."));renderRail();renderMenu();
+</script>
+</body>
+</html>

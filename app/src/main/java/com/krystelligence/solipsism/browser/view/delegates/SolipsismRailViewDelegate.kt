@@ -59,4 +59,8 @@ class SolipsismRailViewDelegate(binding: BrowserActivitySolipsismBinding) : View
     override val settingsButton: ImageView = binding.settingsButton
     override val addressRail: LinearLayout = binding.addressRail
     override val railNav: LinearLayout = binding.railNav
+    val railTopActions: LinearLayout = binding.railTopActions
+    val railBottomActions: LinearLayout = binding.railBottomActions
+    val addressTopActions: LinearLayout = binding.addressTopActions
+    val addressBottomActions: LinearLayout = binding.addressBottomActions
 }

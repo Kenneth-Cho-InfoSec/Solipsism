@@ -46,6 +46,13 @@ export interface PaginatedReleases {
   pagination: PaginationMetadata;
 }
 
+export interface ReleaseManifest {
+  schemaVersion: number;
+  generatedAt: string;
+  repository: string;
+  releases: GitHubRelease[];
+}
+
 const authorSchema = z.object({
   login: z.string(),
   avatar_url: z.url(),
@@ -162,6 +169,31 @@ export async function fetchLatestRelease(): Promise<GitHubRelease> {
   if (release.draft || release.prerelease)
     throw new Error('No stable public release is available.');
   return release;
+}
+
+export async function fetchReleaseManifest(): Promise<ReleaseManifest> {
+  const response = await fetch(
+    `${import.meta.env.BASE_URL}release-manifest.json`,
+    { headers: requestHeaders() },
+  );
+  if (!response.ok)
+    throw new Error(`Release manifest request failed (${response.status}).`);
+  const value = await response.json();
+  return z
+    .object({
+      schemaVersion: z.number(),
+      generatedAt: z.string(),
+      repository: z.string(),
+      releases: z.array(releaseSchema),
+    })
+    .parse(value);
+}
+
+export function findReleaseByTag(
+  releases: GitHubRelease[],
+  tagName: string,
+): GitHubRelease | null {
+  return releases.find((release) => release.tag_name === tagName) ?? null;
 }
 
 export async function fetchReleasePage(

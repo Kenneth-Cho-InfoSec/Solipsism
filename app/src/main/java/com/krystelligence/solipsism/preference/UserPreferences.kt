@@ -17,6 +17,7 @@ import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.preference.delegates.booleanPreference
 import com.krystelligence.solipsism.preference.delegates.enumPreference
 import com.krystelligence.solipsism.preference.delegates.intPreference
+import com.krystelligence.solipsism.preference.delegates.longPreference
 import com.krystelligence.solipsism.preference.delegates.nullableStringPreference
 import com.krystelligence.solipsism.preference.delegates.stringPreference
 import com.krystelligence.solipsism.search.SearchEngineProvider
@@ -25,6 +26,8 @@ import com.krystelligence.solipsism.database.bookmark.BookmarkSortOrder
 import com.krystelligence.solipsism.utils.FileUtils
 import android.content.SharedPreferences
 import com.krystelligence.solipsism.browser.ui.RailUtilityAction
+import com.krystelligence.solipsism.browser.ui.RailMenuLayout
+import com.krystelligence.solipsism.browser.ui.RailMenuLayoutCodec
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,6 +39,24 @@ class UserPreferences @Inject constructor(
     @UserPrefs preferences: SharedPreferences,
     screenSize: ScreenSize
 ) {
+
+    /** Show release notes once after the app version changes. */
+    var releaseNotesEnabled by preferences.booleanPreference(RELEASE_NOTES_ENABLED, true)
+
+    /** Check for newer stable releases and show an optional reminder. */
+    var updateNotificationsEnabled by preferences.booleanPreference(UPDATE_NOTIFICATIONS_ENABLED, true)
+
+    /** Version used to distinguish a first install from an application update. */
+    var lastAcknowledgedAppVersion by preferences.nullableStringPreference(LAST_ACKNOWLEDGED_APP_VERSION)
+
+    /** Release tag whose notes have already been dismissed. */
+    var releaseNotesShownVersion by preferences.nullableStringPreference(RELEASE_NOTES_SHOWN_VERSION)
+
+    /** Latest release tag already shown in the update reminder. */
+    var lastNotifiedReleaseTag by preferences.nullableStringPreference(LAST_NOTIFIED_RELEASE_TAG)
+
+    /** Epoch time until which update reminders remain snoozed. */
+    var updateReminderSnoozeUntil by preferences.longPreference(UPDATE_REMINDER_SNOOZE_UNTIL, 0L)
 
     /**
      * True if Web RTC is enabled in the browser, false otherwise.
@@ -384,6 +405,15 @@ class UserPreferences @Inject constructor(
         RailUtilityAction.QR
     )
 
+    /** Persisted arrangement created in Rail & Menu Studio. */
+    private var railMenuLayoutJson by preferences.stringPreference(RAIL_MENU_LAYOUT, "")
+
+    var railMenuLayout: RailMenuLayout
+        get() = RailMenuLayoutCodec.decode(railMenuLayoutJson)
+        set(value) {
+            railMenuLayoutJson = RailMenuLayoutCodec.encode(value)
+        }
+
     /** When false, page audio is left untouched by Solipsism. */
     var audioEffectsEnabled by preferences.booleanPreference(AUDIO_EFFECTS_ENABLED, false)
 
@@ -610,6 +640,12 @@ private const val ALLOW_ZOOM_ON_RESTRICTED_PAGES = "allowZoomOnRestrictedPages"
 private const val REDUCED_MOTION = "accessibilityReducedMotion"
 private const val LARGE_ACCESSIBILITY_TARGETS = "accessibilityLargeTargets"
 private const val ACCESSIBILITY_ANNOUNCEMENTS = "accessibilityAnnouncements"
+private const val RELEASE_NOTES_ENABLED = "releaseNotesEnabled"
+private const val UPDATE_NOTIFICATIONS_ENABLED = "updateNotificationsEnabled"
+private const val LAST_ACKNOWLEDGED_APP_VERSION = "lastAcknowledgedAppVersion"
+private const val RELEASE_NOTES_SHOWN_VERSION = "releaseNotesShownVersion"
+private const val LAST_NOTIFIED_RELEASE_TAG = "lastNotifiedReleaseTag"
+private const val UPDATE_REMINDER_SNOOZE_UNTIL = "updateReminderSnoozeUntil"
 private const val USER_AGENT = "agentchoose"
 private const val USER_AGENT_STRING = "userAgentString"
 private const val CHROMPATIBILITY_MODE = "chrompatibilityMode"
@@ -636,6 +672,7 @@ private const val BOOKMARK_FAVICONS_ENABLED = "bookmarkFaviconsEnabled"
 private const val BOOKMARK_IMPORT_MODE = "bookmarkImportMode"
 private const val BOOKMARK_SORT_ORDER = "bookmarkSortOrder"
 private const val RAIL_UTILITY_ACTION = "railUtilityAction"
+private const val RAIL_MENU_LAYOUT = "railMenuLayout"
 private const val AUDIO_EFFECTS_ENABLED = "audioEffectsEnabled"
 private const val AUDIO_CUSTOM_EQ_ENABLED = "audioCustomEqEnabled"
 private const val AUDIO_PRESET = "audioPreset"

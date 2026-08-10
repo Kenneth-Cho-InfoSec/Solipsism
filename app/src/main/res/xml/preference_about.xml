@@ -19,6 +19,18 @@
             android:icon="@drawable/ic_settings_info"
             android:key="pref_version"
             android:title="@string/version" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_history"
+            android:key="release_notes_enabled"
+            android:title="@string/release_notes_enabled"
+            android:summary="@string/release_notes_enabled_summary" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_settings_download"
+            android:key="update_notifications_enabled"
+            android:title="@string/update_notifications_enabled"
+            android:summary="@string/update_notifications_enabled_summary" />
         <Preference
             android:icon="@drawable/ic_settings_info"
             android:selectable="false"

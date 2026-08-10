@@ -1,6 +1,8 @@
 import {
   fetchAllReleases,
   fetchLatestRelease,
+  fetchReleaseManifest,
+  findReleaseByTag,
   findApkAssets,
   formatFileSize,
   formatReleaseDate,
@@ -80,14 +82,30 @@ function updateGlobalDownload(release: GitHubRelease): void {
 }
 
 async function loadLatest(root: HTMLElement): Promise<void> {
-  const release = await withLocalCache('latest-v1', fetchLatestRelease);
+  const release = await withLocalCache('latest-v2', async () => {
+    try {
+      const manifest = await fetchReleaseManifest();
+      return (
+        manifest.releases.find((item) => !item.prerelease && !item.draft) ??
+        (await fetchLatestRelease())
+      );
+    } catch {
+      return fetchLatestRelease();
+    }
+  });
   updateGlobalDownload(release);
   const list = root.querySelector<HTMLElement>('[data-release-list]');
   if (list) list.innerHTML = await releaseCard(release, true);
 }
 
 async function loadArchive(root: HTMLElement): Promise<void> {
-  const all = await withLocalCache('all-releases-v1', fetchAllReleases);
+  const all = await withLocalCache('all-releases-v2', async () => {
+    try {
+      return (await fetchReleaseManifest()).releases;
+    } catch {
+      return fetchAllReleases();
+    }
+  });
   const list = root.querySelector<HTMLElement>('[data-release-list]');
   const prerelease = root.querySelector<HTMLInputElement>('[data-prerelease]');
   const sort = root.querySelector<HTMLSelectElement>('[data-sort]');
@@ -110,6 +128,17 @@ async function loadArchive(root: HTMLElement): Promise<void> {
             )
           ).join('')
         : '<p class="notice">No releases match these filters.</p>';
+    const requestedTag = new URLSearchParams(location.search).get('release');
+    const requestedAnchor = location.hash.slice(1);
+    const requested = requestedTag
+      ? findReleaseByTag(releases, requestedTag)
+      : null;
+    const target = requested
+      ? `release-${requested.tag_name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+      : requestedAnchor;
+    if (target) {
+      document.getElementById(target)?.scrollIntoView({ block: 'start' });
+    }
     const stable = all.find((release) => !release.prerelease && !release.draft);
     if (stable) updateGlobalDownload(stable);
   };

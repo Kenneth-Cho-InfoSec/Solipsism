@@ -105,16 +105,15 @@
             android:icon="@drawable/ic_action_forward"
             android:key="rail_position"
             android:title="@string/settings_rail_position" />
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:icon="@drawable/ic_action_tabs"
-            android:key="swap_qr_and_tabs_buttons"
-            android:title="@string/settings_swap_qr_tabs"
-            android:summary="@string/settings_swap_qr_tabs_summary" />
         <Preference
             android:icon="@drawable/ic_action_vault"
             android:key="rail_utility_action"
             android:title="@string/settings_rail_utility_action"
             android:summary="@string/settings_rail_utility_action_summary" />
+        <Preference
+            android:icon="@drawable/ic_action_more_vertical"
+            android:key="rail_menu_studio"
+            android:title="@string/settings_rail_menu_studio"
+            android:summary="@string/settings_rail_menu_studio_summary" />
     </PreferenceCategory>
 </PreferenceScreen>

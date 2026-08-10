@@ -25,6 +25,7 @@ import com.krystelligence.solipsism.browser.ui.BookmarkConfiguration
 import com.krystelligence.solipsism.browser.ui.TabConfiguration
 import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
 import com.krystelligence.solipsism.browser.ui.RailUtilityAction
+import com.krystelligence.solipsism.browser.ui.RailActionId
 import com.krystelligence.solipsism.browser.ui.UiConfiguration
 import com.krystelligence.solipsism.browser.view.ViewDelegate
 import com.krystelligence.solipsism.browser.view.delegates.BottomTabViewDelegate
@@ -124,6 +125,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.krystelligence.solipsism.release.ReleaseUpdateCoordinator
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -556,85 +558,165 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         }
     }
 
-    /** Reparents the two rail controls while leaving their click listeners and accessibility intact. */
+    /**
+     * Renders the user-owned side-rail arrangement. The pre-existing physical controls are moved
+     * instead of recreated so their browser state, long presses, and accessibility wiring remain
+     * intact. Experimental horizontal rails deliberately retain their established layout.
+     */
     private fun applyQrAndTabsButtonPositions() {
-        val tabsButton = binding.homeButton
-        val qrButton = binding.searchRefresh
-        val tabsParent = tabsButton.parent as? ViewGroup ?: return
-        val qrParent = qrButton.parent as? ViewGroup ?: return
-        val shouldSwap = userPreferences.swapQrAndTabsButtons
-        val alreadySwapped = (tabsButton.parent as? View)?.id == R.id.address_rail
-        val addressRail = listOf(tabsParent, qrParent).firstOrNull { it.id == R.id.address_rail } ?: return
+        if (activeSolipsismRailPosition().isExperimental) return
+        renderRailMenuLayout()
+    }
 
-        if (activeSolipsismRailPosition().isExperimental) {
-            if (shouldSwap == alreadySwapped) return
-            val tabsWidth = tabsButton.layoutParams.width
-            val tabsHeight = tabsButton.layoutParams.height
-            val qrWidth = qrButton.layoutParams.width
-            val qrHeight = qrButton.layoutParams.height
-            tabsParent.removeView(tabsButton)
-            qrParent.removeView(qrButton)
-            if (shouldSwap) {
-                addressRail.addView(tabsButton, LinearLayout.LayoutParams(tabsWidth, tabsHeight))
-                toolbarLayoutForRail().addView(qrButton, horizontalRailButtonParams(qrWidth, qrHeight))
+    private fun renderRailMenuLayout() {
+        val railBinding = binding as? SolipsismRailViewDelegate ?: return
+        val layout = userPreferences.railMenuLayout
+        val staticControls = mapOf(
+            RailActionId.TABS to binding.homeButton,
+            RailActionId.REFRESH to (binding.settingsButton ?: return),
+            RailActionId.UTILITY to binding.searchRefresh,
+            RailActionId.BACK to binding.actionBack,
+            RailActionId.FORWARD to binding.actionForward,
+            RailActionId.HOME to binding.actionHome,
+            RailActionId.ADD_BOOKMARK to binding.actionAddBookmark
+        )
+        val controls = staticControls.values + binding.toolbar
+        controls.forEach { control -> (control.parent as? ViewGroup)?.removeView(control) }
+        railBinding.railTopActions.removeAllViews()
+        railBinding.addressTopActions.removeAllViews()
+        railBinding.addressBottomActions.removeAllViews()
+        railBinding.railBottomActions.removeAllViews()
+        railBinding.railNav.removeAllViews()
+
+        layout.topActions.forEach { action ->
+            val control = staticControls[action] ?: createConfiguredRailAction(action)
+            railBinding.railTopActions.addView(control, railActionLayoutParams())
+        }
+        layout.addressActions.forEach { action ->
+            val control = staticControls[action] ?: createConfiguredRailAction(action)
+            val container = if (layout.addressActions.indexOf(action) == 0) {
+                railBinding.addressTopActions
             } else {
-                toolbarLayoutForRail().addView(tabsButton, horizontalRailButtonParams(tabsWidth, tabsHeight))
-                addressRail.addView(qrButton, LinearLayout.LayoutParams(qrWidth, qrHeight))
+                railBinding.addressBottomActions
             }
-            return
+            container.addView(control, railActionLayoutParams())
         }
-
-        addressRail.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
-            if (shouldSwap) {
-                topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-                topToBottom = -1
-                topMargin = tabsButton.layoutParams.height +
-                    resources.getDimensionPixelSize(R.dimen.solipsism_address_rail_top_gap)
-            } else {
-                topToTop = -1
-                topToBottom = R.id.home_button
-                topMargin = resources.getDimensionPixelSize(R.dimen.solipsism_address_rail_top_gap)
-            }
+        // Preserve the familiar refresh-at-top / utility-at-bottom address preset while still
+        // allowing Studio to move any action into this region. The first address action is above
+        // the URL text and all following actions are below it.
+        railBinding.railNav.addView(railBinding.railBottomActions)
+        layout.bottomActions.forEach { action ->
+            val control = staticControls[action] ?: createConfiguredRailAction(action)
+            railBinding.railBottomActions.addView(control, railActionLayoutParams())
         }
+        railBinding.railNav.addView(binding.toolbar, railActionLayoutParams())
+    }
 
-        if (shouldSwap == alreadySwapped) return
-
-        val tabsWidth = tabsButton.layoutParams.width
-        val tabsHeight = tabsButton.layoutParams.height
-        val qrWidth = qrButton.layoutParams.width
-        val qrHeight = qrButton.layoutParams.height
-        tabsParent.removeView(tabsButton)
-        qrParent.removeView(qrButton)
-
-        if (shouldSwap) {
-            val swappedTabsParams = LinearLayout.LayoutParams(
-                tabsWidth,
-                tabsHeight
-            ).apply { gravity = Gravity.CENTER }
-            val swappedQrParams = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(
-                qrWidth,
-                qrHeight
-            ).apply {
-                startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-                endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-                topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-            }
-            qrParent.addView(tabsButton, swappedTabsParams)
-            tabsParent.addView(qrButton, swappedQrParams)
-        } else {
-            val restoredTabsParams = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(
-                tabsWidth,
-                tabsHeight
-            ).apply {
-                startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-                endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-                topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-            }
-            val restoredQrParams = LinearLayout.LayoutParams(qrWidth, qrHeight)
-                .apply { gravity = Gravity.CENTER }
-            qrParent.addView(tabsButton, restoredTabsParams)
-            tabsParent.addView(qrButton, restoredQrParams)
+    private fun railActionLayoutParams(): LinearLayout.LayoutParams {
+        val size = binding.actionBack.layoutParams.width.takeIf { it > 0 } ?: 42.dp
+        return LinearLayout.LayoutParams(size, size).apply {
+            gravity = Gravity.CENTER
+            bottomMargin = 6.dp
         }
+    }
+
+    private fun createConfiguredRailAction(action: RailActionId): ImageButton = ImageButton(this).apply {
+        background = drawable(R.drawable.solipsism_blend_button_background)
+        contentDescription = getString(railActionLabel(action))
+        setImageResource(railActionIcon(action))
+        setColorFilter(themeProvider.color(R.attr.iconColor))
+        setPadding(8.dp, 8.dp, 8.dp, 8.dp)
+        isFocusable = true
+        isClickable = true
+        isEnabled = railActionAvailable(action)
+        setOnClickListener { runConfiguredRailAction(action) }
+    }
+
+    private fun railActionAvailable(action: RailActionId): Boolean = when (action) {
+        RailActionId.BLOCK_ELEMENT, RailActionId.COOKIE_MANAGER ->
+            presenter.viewState.displayUrl.startsWith("http://") || presenter.viewState.displayUrl.startsWith("https://")
+        else -> true
+    }
+
+    private fun runConfiguredRailAction(action: RailActionId) {
+        if (!railActionAvailable(action)) return
+        when (action) {
+            RailActionId.REFRESH -> presenter.onReloadClick()
+            RailActionId.UTILITY -> binding.searchRefresh.performClick()
+            RailActionId.BACK -> presenter.onBackClick()
+            RailActionId.FORWARD -> presenter.onForwardClick()
+            RailActionId.HOME -> presenter.onHomeClick()
+            RailActionId.ADD_BOOKMARK -> presenter.onStarClick()
+            RailActionId.NEW_TAB -> presenter.onMenuClick(MenuSelection.NEW_TAB)
+            RailActionId.INCOGNITO -> presenter.onMenuClick(MenuSelection.NEW_INCOGNITO_TAB)
+            RailActionId.FEELING_LUCKY -> presenter.onMenuClick(MenuSelection.FEELING_LUCKY)
+            RailActionId.ADD_TO_HOME -> presenter.onMenuClick(MenuSelection.ADD_TO_HOME)
+            RailActionId.HISTORY -> presenter.onMenuClick(MenuSelection.HISTORY)
+            RailActionId.DOWNLOADS -> presenter.onMenuClick(MenuSelection.DOWNLOADS)
+            RailActionId.BOOKMARKS -> presenter.onMenuClick(MenuSelection.BOOKMARKS)
+            RailActionId.FIND -> presenter.onMenuClick(MenuSelection.FIND)
+            RailActionId.READ_ALOUD -> presenter.onReadPageAloud()
+            RailActionId.COPY_LINK -> presenter.onMenuClick(MenuSelection.COPY_LINK)
+            RailActionId.SCREENSHOT -> presenter.onScreenshotClick()
+            RailActionId.USER_AGENT -> presenter.onUserAgentMenuClick()
+            RailActionId.BLOCK_ELEMENT -> presenter.onPickElement()
+            RailActionId.COOKIE_MANAGER -> presenter.onCookieManager()
+            RailActionId.SETTINGS -> presenter.onMenuClick(MenuSelection.SETTINGS)
+            else -> Unit
+        }
+    }
+
+    @DrawableRes
+    private fun railActionIcon(action: RailActionId): Int = when (action) {
+        RailActionId.TABS -> R.drawable.ic_action_tabs
+        RailActionId.REFRESH -> R.drawable.ic_action_refresh
+        RailActionId.UTILITY -> userPreferences.railUtilityAction.iconRes
+        RailActionId.BACK -> R.drawable.ic_action_back
+        RailActionId.FORWARD -> R.drawable.ic_action_forward
+        RailActionId.HOME -> R.drawable.ic_action_home
+        RailActionId.ADD_BOOKMARK -> R.drawable.ic_action_star
+        RailActionId.NEW_TAB -> R.drawable.ic_action_plus
+        RailActionId.INCOGNITO -> R.drawable.incognito_mode
+        RailActionId.FEELING_LUCKY -> R.drawable.ic_action_invert
+        RailActionId.ADD_TO_HOME -> R.drawable.ic_webpage
+        RailActionId.HISTORY -> R.drawable.ic_history
+        RailActionId.DOWNLOADS -> R.drawable.ic_settings_download
+        RailActionId.BOOKMARKS -> R.drawable.ic_bookmark
+        RailActionId.FIND -> R.drawable.ic_search
+        RailActionId.READ_ALOUD -> R.drawable.ic_settings_audio
+        RailActionId.COPY_LINK -> R.drawable.ic_insert
+        RailActionId.SCREENSHOT -> R.drawable.ic_action_screenshot
+        RailActionId.USER_AGENT -> R.drawable.ic_action_desktop
+        RailActionId.BLOCK_ELEMENT -> R.drawable.ic_settings_text
+        RailActionId.COOKIE_MANAGER -> R.drawable.ic_settings_privacy
+        RailActionId.SETTINGS -> R.drawable.ic_action_settings
+        else -> R.drawable.ic_action_more_vertical
+    }
+
+    private fun railActionLabel(action: RailActionId): Int = when (action) {
+        RailActionId.TABS -> R.string.tabs
+        RailActionId.REFRESH -> R.string.action_refresh
+        RailActionId.UTILITY -> userPreferences.railUtilityAction.labelRes
+        RailActionId.BACK -> R.string.action_back
+        RailActionId.FORWARD -> R.string.action_forward
+        RailActionId.HOME -> R.string.action_homepage
+        RailActionId.ADD_BOOKMARK -> R.string.action_add_bookmark
+        RailActionId.NEW_TAB -> R.string.action_new_tab
+        RailActionId.INCOGNITO -> R.string.action_incognito
+        RailActionId.FEELING_LUCKY -> R.string.action_feeling_lucky
+        RailActionId.ADD_TO_HOME -> R.string.action_add_to_homescreen
+        RailActionId.HISTORY -> R.string.action_history
+        RailActionId.DOWNLOADS -> R.string.action_downloads
+        RailActionId.BOOKMARKS -> R.string.action_bookmarks
+        RailActionId.FIND -> R.string.action_find
+        RailActionId.READ_ALOUD -> R.string.action_read_aloud
+        RailActionId.COPY_LINK -> R.string.action_copy
+        RailActionId.SCREENSHOT -> R.string.action_screenshot
+        RailActionId.USER_AGENT -> R.string.title_user_agent
+        RailActionId.BLOCK_ELEMENT -> R.string.block_element
+        RailActionId.COOKIE_MANAGER -> R.string.cookie_manager
+        RailActionId.SETTINGS -> R.string.settings
+        else -> R.string.action_more
     }
 
     private fun toolbarLayoutForRail(): androidx.constraintlayout.widget.ConstraintLayout = binding.toolbarLayout
@@ -806,6 +888,11 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
         presenter.onViewAttached(BrowserStateAdapter(this))
         maybeShowFirstRunDonationDialog()
+        window.decorView.post {
+            lifecycleScope.launch {
+                ReleaseUpdateCoordinator(this@BrowserActivity, userPreferences).check(this@BrowserActivity)
+            }
+        }
 
         val suggestionsAdapter = SuggestionsAdapter(this, isIncognito = isIncognito()).apply {
             onSuggestionInsertClick = {
@@ -1078,73 +1165,50 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             setPadding(9.dp, 9.dp, 9.dp, 9.dp)
         }
 
-        container.addView(LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-            val quickActions = listOf(
-                OverflowAction(R.drawable.ic_action_back, R.string.action_back, MenuSelection.BACK),
-                OverflowAction(R.drawable.ic_action_star, R.string.action_add_bookmark, MenuSelection.ADD_BOOKMARK),
-                OverflowAction(R.drawable.ic_settings_download, R.string.action_downloads, MenuSelection.DOWNLOADS),
-                OverflowAction(R.drawable.ic_settings_info, R.string.action_site_info, null) {
-                    presenter.onSslIconClick()
-                },
-                OverflowAction(R.drawable.ic_action_refresh, R.string.action_refresh, null) {
-                    presenter.onReloadClick()
-                }
-            )
-            quickActions.forEachIndexed { index, action ->
-                addView(createQuickActionButton(action).apply {
-                    if (index > 0) {
-                        setStartMargin(6.dp)
-                    }
+        val layout = userPreferences.railMenuLayout
+        val quickActions = layout.quickActions.filter(::railActionAvailable)
+        if (layout.quickActionsEnabled && quickActions.isNotEmpty()) {
+            container.addView(LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    42.dp
+                ).apply { bottomMargin = 5.dp }
+                gravity = Gravity.CENTER
+                orientation = LinearLayout.HORIZONTAL
+                quickActions.forEach { action -> addView(createQuickActionButton(action)) }
+            })
+            container.addView(createMenuDivider())
+        }
+
+        layout.visibleOverflowActions
+            .filter(::railActionAvailable)
+            .forEach { action ->
+                container.addView(createActionMenuRow(railActionIcon(action), railActionLabel(action)) {
+                    browserMenuPopup?.dismiss()
+                    runConfiguredRailAction(action)
                 })
             }
-        })
-
-        container.addView(createMenuRow(R.drawable.ic_action_plus, R.string.action_new_tab, MenuSelection.NEW_TAB))
-        container.addView(createMenuRow(R.drawable.incognito_mode, R.string.action_incognito, MenuSelection.NEW_INCOGNITO_TAB))
-        container.addView(createMenuRow(R.drawable.ic_action_invert, R.string.action_feeling_lucky, MenuSelection.FEELING_LUCKY))
-        container.addView(createMenuRow(R.drawable.ic_webpage, R.string.action_add_to_homescreen, MenuSelection.ADD_TO_HOME))
-        container.addView(createMenuDivider())
-        container.addView(createMenuRow(R.drawable.ic_history, R.string.action_history, MenuSelection.HISTORY))
-        container.addView(createMenuRow(R.drawable.ic_settings_download, R.string.action_downloads, MenuSelection.DOWNLOADS))
-        container.addView(createMenuDivider())
-        container.addView(createMenuRow(R.drawable.ic_bookmark, R.string.action_bookmarks, MenuSelection.BOOKMARKS))
-        container.addView(createMenuRow(R.drawable.ic_search, R.string.action_find, MenuSelection.FIND))
-        container.addView(createActionMenuRow(R.drawable.ic_settings_audio, R.string.action_read_aloud) {
-            presenter.onReadPageAloud()
-        })
-        container.addView(createMenuRow(R.drawable.ic_insert, R.string.action_copy, MenuSelection.COPY_LINK))
-        container.addView(createActionMenuRow(R.drawable.ic_action_screenshot, R.string.action_screenshot) {
-            presenter.onScreenshotClick()
-        })
-        container.addView(createActionMenuRow(R.drawable.ic_action_desktop, R.string.title_user_agent) {
-            presenter.onUserAgentMenuClick()
-        })
-        if (presenter.viewState.displayUrl.startsWith("http://") || presenter.viewState.displayUrl.startsWith("https://")) {
-            container.addView(createActionMenuRow(R.drawable.ic_settings_text, R.string.block_element) {
-                presenter.onPickElement()
-            })
-            container.addView(createActionMenuRow(R.drawable.ic_settings_privacy, R.string.cookie_manager) {
-                presenter.onCookieManager()
-            })
-        }
-        container.addView(createMenuDivider())
-        container.addView(createMenuRow(R.drawable.ic_action_settings, R.string.settings, MenuSelection.SETTINGS))
 
         return container
     }
 
-    private fun createQuickActionButton(action: OverflowAction): ImageButton =
+    private fun createQuickActionButton(action: RailActionId): ImageButton =
         ImageButton(this).apply {
-            layoutParams = LinearLayout.LayoutParams(38.dp, 38.dp)
+            layoutParams = LinearLayout.LayoutParams(40.dp, 40.dp).apply {
+                marginStart = 2.dp
+                marginEnd = 2.dp
+            }
             background = drawable(R.drawable.browser_overflow_quick_button_background)
-            contentDescription = getString(action.title)
+            contentDescription = getString(railActionLabel(action))
             setPadding(8.dp, 8.dp, 8.dp, 8.dp)
-            setImageResource(action.icon)
+            setImageResource(railActionIcon(action))
             setColorFilter(themeProvider.color(R.attr.colorOnSurface))
             scaleType = ImageView.ScaleType.CENTER
-            setOnClickListener { runOverflowAction(action) }
+            isEnabled = railActionAvailable(action)
+            setOnClickListener {
+                browserMenuPopup?.dismiss()
+                runConfiguredRailAction(action)
+            }
         }
 
     private fun createMenuRow(
@@ -1220,11 +1284,6 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             setBackgroundColor(themeProvider.color(R.attr.colorOutlineVariant))
             alpha = 0.7f
         }
-
-    private fun runOverflowAction(action: OverflowAction) {
-        browserMenuPopup?.dismiss()
-        action.customAction?.invoke() ?: action.selection?.let(presenter::onMenuClick)
-    }
 
     /**
      * @see BrowserContract.View.openBookmarkDrawer
@@ -2232,13 +2291,6 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         }
     }
 }
-
-private data class OverflowAction(
-    @DrawableRes val icon: Int,
-    val title: Int,
-    val selection: MenuSelection?,
-    val customAction: (() -> Unit)? = null
-)
 
 private const val SUPER_COMPACT_RAIL_WIDTH_DP = 30
 private const val MIN_SOLIPSISM_RAIL_WIDTH_DP = SUPER_COMPACT_RAIL_WIDTH_DP

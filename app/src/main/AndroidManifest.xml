@@ -225,6 +225,15 @@
             android:screenOrientation="portrait"
             android:label="@string/screenshot_studio_title" />
 
+        <activity
+            android:name=".browser.ui.RailMenuStudioActivity"
+            android:colorMode="wideColorGamut"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard"
+            android:exported="false"
+            android:label="@string/settings_rail_menu_studio"
+            android:parentActivityName=".settings.activity.SettingsActivity"
+            android:windowSoftInputMode="adjustResize" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

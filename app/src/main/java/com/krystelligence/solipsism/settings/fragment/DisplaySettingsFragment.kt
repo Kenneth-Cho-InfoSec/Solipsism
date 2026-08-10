@@ -16,10 +16,12 @@ import com.krystelligence.solipsism.preference.DeveloperPreferences
 import com.krystelligence.solipsism.audio.AudioPreset
 import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
 import com.krystelligence.solipsism.browser.ui.RailUtilityAction
+import com.krystelligence.solipsism.browser.ui.RailMenuStudioActivity
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.html.homepage.StaticHomepageSanitizer
 import android.net.Uri
 import android.os.Bundle
+import android.content.Intent
 import android.os.Build
 import android.view.Gravity
 import android.view.ViewGroup
@@ -169,17 +171,15 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             onClick = ::showRailPositionPicker
         )
 
-        togglePreference(
-            preference = SETTINGS_SWAP_QR_AND_TABS,
-            isChecked = userPreferences.swapQrAndTabsButtons,
-            onCheckChange = { userPreferences.swapQrAndTabsButtons = it }
-        )
-
         clickableDynamicPreference(
             preference = SETTINGS_RAIL_UTILITY_ACTION,
             summary = getString(userPreferences.railUtilityAction.labelRes),
             onClick = ::showRailUtilityActionPicker
         )
+
+        clickablePreference(SETTINGS_RAIL_MENU_STUDIO) {
+            startActivity(Intent(requireContext(), RailMenuStudioActivity::class.java))
+        }
 
         togglePreference(
             preference = SETTINGS_HIDESTATUSBAR,
@@ -1146,8 +1146,8 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_HOMEPAGE_DATETIME_OPACITY = "homepage_datetime_opacity"
         private const val SETTINGS_RAIL_SIZE = "rail_size"
         private const val SETTINGS_RAIL_POSITION = "rail_position"
-        private const val SETTINGS_SWAP_QR_AND_TABS = "swap_qr_and_tabs_buttons"
         private const val SETTINGS_RAIL_UTILITY_ACTION = "rail_utility_action"
+        private const val SETTINGS_RAIL_MENU_STUDIO = "rail_menu_studio"
         private const val SETTINGS_BLACK_STATUS = "black_status_bar"
 
         private const val HOMEPAGE_WALLPAPER_DEFAULT = 0

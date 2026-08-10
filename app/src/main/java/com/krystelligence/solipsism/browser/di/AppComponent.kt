@@ -19,6 +19,7 @@ import com.krystelligence.solipsism.settings.fragment.BookmarkSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.DebugSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment
 import com.krystelligence.solipsism.settings.fragment.GeneralSettingsFragment
+import com.krystelligence.solipsism.settings.fragment.AboutSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.PrivacySettingsFragment
 import com.krystelligence.solipsism.settings.fragment.RootSettingsFragment
 import com.krystelligence.solipsism.settings.fragment.SitePermissionsSettingsFragment
@@ -83,6 +84,8 @@ interface AppComponent {
     fun inject(activity: RootSettingsFragment)
 
     fun inject(generalSettingsFragment: GeneralSettingsFragment)
+
+    fun inject(aboutSettingsFragment: AboutSettingsFragment)
 
     fun inject(displaySettingsFragment: DisplaySettingsFragment)
 

@@ -141,17 +141,24 @@
                     android:paddingBottom="28dp"
                     android:tag="solipsism_fixed_chrome">
 
-                    <FrameLayout
-                        android:id="@+id/home_button"
-                        android:layout_width="@dimen/solipsism_rail_button_size"
-                        android:layout_height="@dimen/solipsism_rail_button_size"
-                        android:background="@drawable/solipsism_blend_button_background"
-                        android:clickable="true"
-                        android:contentDescription="@string/tabs"
-                        android:focusable="true"
+                    <LinearLayout
+                        android:id="@+id/rail_top_actions"
+                        android:layout_width="@dimen/solipsism_address_rail_width"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
+
+                        <FrameLayout
+                            android:id="@+id/home_button"
+                            android:layout_width="@dimen/solipsism_rail_button_size"
+                            android:layout_height="@dimen/solipsism_rail_button_size"
+                            android:background="@drawable/solipsism_blend_button_background"
+                            android:clickable="true"
+                            android:contentDescription="@string/tabs"
+                            android:focusable="true">
 
                         <ImageView
                             android:id="@+id/home_image_view"
@@ -172,7 +179,8 @@
                             app:tabIconBorderWidth="2dp"
                             app:tabIconColor="?attr/iconColor"
                             app:tabIconTextSize="14dp" />
-                    </FrameLayout>
+                        </FrameLayout>
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/address_rail"
@@ -191,19 +199,27 @@
                         app:layout_constraintBottom_toTopOf="@+id/rail_nav"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/home_button">
+                        app:layout_constraintTop_toBottomOf="@+id/rail_top_actions">
 
-                        <ImageView
-                            android:id="@+id/settings_button"
-                            android:layout_width="34dp"
-                            android:layout_height="34dp"
-                            android:background="@drawable/solipsism_blend_button_background"
-                            android:clickable="true"
-                            android:contentDescription="@string/action_refresh"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            app:srcCompat="@drawable/ic_action_refresh"
-                            app:tint="?attr/iconColor" />
+                        <LinearLayout
+                            android:id="@+id/address_top_actions"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/settings_button"
+                                android:layout_width="34dp"
+                                android:layout_height="34dp"
+                                android:background="@drawable/solipsism_blend_button_background"
+                                android:clickable="true"
+                                android:contentDescription="@string/action_refresh"
+                                android:focusable="true"
+                                android:padding="8dp"
+                                app:srcCompat="@drawable/ic_action_refresh"
+                                app:tint="?attr/iconColor" />
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/vertical_url_text"
@@ -224,17 +240,25 @@
                             android:textSize="15sp"
                             tools:text="solipsism.com" />
 
-                        <ImageView
-                            android:id="@+id/search_refresh"
-                            android:layout_width="38dp"
-                            android:layout_height="38dp"
-                            android:background="@drawable/solipsism_blend_button_background"
-                            android:clickable="true"
-                            android:contentDescription="@string/action_scan_qr"
-                            android:focusable="true"
-                            android:padding="8dp"
-                            app:srcCompat="@drawable/ic_action_qr_code"
-                            app:tint="?attr/iconColor" />
+                        <LinearLayout
+                            android:id="@+id/address_bottom_actions"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/search_refresh"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:background="@drawable/solipsism_blend_button_background"
+                                android:clickable="true"
+                                android:contentDescription="@string/action_scan_qr"
+                                android:focusable="true"
+                                android:padding="8dp"
+                                app:srcCompat="@drawable/ic_action_qr_code"
+                                app:tint="?attr/iconColor" />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <LinearLayout
@@ -246,6 +270,13 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent">
+
+                        <LinearLayout
+                            android:id="@+id/rail_bottom_actions"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical" />
 
                         <ImageView
                             android:id="@+id/action_back"
