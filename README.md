@@ -14,9 +14,14 @@
 
 Solipsism Browser is a privacy-focused Android WebView browser built around a rail-first, one-handed interface. Navigation, tabs, search, QR scanning, refresh, bookmarks, and browser tools live in a compact rail on the left or right, leaving the webpage as the main surface.
 
-Current release: **5.3.1**<br>
+Latest release: [**Solipsism Browser v6.1.0**](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest)<br>
 Application ID: `com.krystelligence.solipsism`<br>
 Developer: **Kenneth-Cho-InfoSec**
+
+[![Latest release](https://img.shields.io/github/v/release/Kenneth-Cho-InfoSec/Solipsism?label=latest%20release)](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest)
+[![F-Droid submission](https://img.shields.io/badge/F--Droid-submission-blue)](https://gitlab.com/Kenneth-Cho-InfoSec/fdroiddata/-/merge_requests/5)
+
+Solipsism is loosely based on the open-source [Lightning Browser](https://github.com/anthonycr/Lightning-Browser). It should be understood as a continuation fork: the original project provided an early foundation, while Solipsism has been extensively modernised, secured, redesigned, and customised for current Android WebView, privacy, accessibility, and one-handed browsing needs.
 
 ## Why Solipsism?
 
@@ -46,6 +51,23 @@ This is a WebView-compatible userscript runtime, not the full Tampermonkey exten
 The three-dot menu includes a screenshot action that captures the current webpage surface without the Solipsism rail. The capture provides visual feedback with a 70% shrink animation, rounded corners, a brief translucent white flash, and device vibration.
 
 <img src="docs/screenshots/overflow-tools.png" alt="Solipsism Browser tools menu showing screenshot, downloads, history, bookmarks and user-agent actions" width="150">
+
+### Rail & Menu Studio
+
+Rail & Menu Studio lets users customise the browser rail and overflow menu:
+
+- Move supported actions between the rail and overflow menu.
+- Reorder rail icons with drag and drop.
+- Configure up to eight movable rail actions.
+- Keep Tabs and the overflow menu action permanently available.
+- Configure five optional quick actions in the overflow menu.
+- Prevent duplicate actions across the rail and menu.
+- Resize the URL bar automatically as rail actions change.
+- Restore the default layout at any time.
+
+### Release notes and update reminders
+
+Solipsism can check the official GitHub release feed for release notes belonging to the installed version and notifications about newer stable releases. Where available, update prompts link directly to the corresponding GitHub APK asset. Both behaviours can be disabled independently in About settings.
 
 ### Site permissions
 
@@ -117,12 +139,17 @@ Malware Scanner is a defence-in-depth feature. Users should still use trusted so
 - Small, Medium, Large, and Super Compact rail sizes.
 - Experimental top and bottom rail layouts behind Debug settings.
 - QR code scanning with an optional downloadable module design.
+- Configurable rail and overflow-menu actions through Rail & Menu Studio.
 - Long-press refresh with JavaScript-disabled reload.
 - Find in page, copy link, share, add bookmark, history, and downloads.
 - Install Website as App through Android shortcuts.
 - File upload support through Android’s system picker.
 - Fullscreen video support with rail and system-bar handling.
 - Current-page screenshot capture without the browser rail.
+- Screenshot Studio with save and image-search workflows.
+- Optional automatic conversion of downloaded images to JPEG.
+- Text-to-speech accessibility support.
+- Folding-phone user-agent option.
 
 <img src="docs/screenshots/tab-overview.png" alt="Solipsism Browser tab overview in AMOLED-black mode" width="150">
 
