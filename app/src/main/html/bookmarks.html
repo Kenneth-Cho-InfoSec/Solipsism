@@ -29,7 +29,40 @@
         margin: 0 auto;
         text-align: center
     }
-    
+
+    .page_header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-height: 72px;
+        margin: 8px 24px 14px;
+        padding: 12px 18px;
+        border-radius: 28px;
+        background: var(--box-bg);
+        color: var(--box-txt);
+        text-align: left;
+    }
+
+    .page_header h1 {
+        margin: 0;
+        color: var(--box-txt);
+        font-size: 30px;
+        font-weight: 650;
+        letter-spacing: -0.04em;
+    }
+
+    .page_icon {
+        display: grid;
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--body-bg);
+        color: var(--box-txt);
+        font-size: 26px;
+    }
+
     .box {
         vertical-align: middle;
         text-align: center;
@@ -123,6 +156,11 @@
 
 <body>
 <div id=content>
+
+    <header class=page_header>
+        <div class=page_icon aria-hidden=true>☆</div>
+        <h1 id=bookmark-title></h1>
+    </header>
 
     <input id=bookmark-search type=search placeholder="Search bookmarks" aria-label="Search bookmarks" autocomplete=off />
 

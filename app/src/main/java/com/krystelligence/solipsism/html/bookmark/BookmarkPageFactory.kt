@@ -126,6 +126,7 @@ class BookmarkPageFactory @Inject constructor(
                     .replace("--box-txt: {COLOR}", "--box-txt: #$textColor;")
             }
             body {
+                id("bookmark-title") { appendText(title) }
                 val repeatableElement = findId("repeated").removeElement()
                 id("content") {
                     list.forEach {

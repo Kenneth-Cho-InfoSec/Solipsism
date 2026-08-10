@@ -14,11 +14,14 @@
     <string name="action_screenshot">Screenshot</string>
     <string name="screenshot_saved">Screenshot saved</string>
     <string name="screenshot_failed">Could not save screenshot</string>
+    <string name="screenshot_search_failed">Could not search this screenshot</string>
     <string name="screenshot_studio_kicker">Solipsism Browser</string>
     <string name="screenshot_studio_title">Screenshot Studio</string>
-    <string name="screenshot_studio_canvas_description">Draw a circle around the part of the screenshot to search</string>
+    <string name="screenshot_studio_canvas_description">Optionally draw a circle around part of the screenshot to search only that area, or search the complete screenshot</string>
     <string name="screenshot_studio_save">Save image</string>
     <string name="screenshot_studio_search">Search</string>
+    <string name="screenshot_studio_searching">Searching image</string>
+    <string name="screenshot_studio_searching_message">Preparing your selection and finding related images…</string>
     <string name="screenshot_studio_draw_first">Draw a circle around an image first</string>
     <string name="action_site_info">Site information</string>
     <string name="action_scan_qr">Scan QR code</string>

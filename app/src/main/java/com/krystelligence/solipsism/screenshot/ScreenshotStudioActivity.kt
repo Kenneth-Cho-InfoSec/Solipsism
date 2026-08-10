@@ -7,7 +7,11 @@ import android.os.Build
 import android.os.Environment
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
+import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.lifecycle.lifecycleScope
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -20,6 +24,7 @@ import com.krystelligence.solipsism.accessibility.AccessibilityAnnouncer
 import java.io.File
 import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -32,6 +37,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 class ScreenshotStudioActivity : ThemableBrowserActivity() {
     private lateinit var binding: ActivityScreenshotStudioBinding
     private var sourceFile: File? = null
+    private var sourceBitmap: android.graphics.Bitmap? = null
+    private var searchProgressDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +54,7 @@ class ScreenshotStudioActivity : ThemableBrowserActivity() {
         sourceFile = intent.getStringExtra(EXTRA_PATH)?.let(::File)
         val bitmap = sourceFile?.takeIf { it.exists() }?.let { BitmapFactory.decodeFile(it.absolutePath) }
         if (bitmap == null) { finish(); return }
+        sourceBitmap = bitmap
         binding.screenshotCanvas.setBitmap(bitmap)
         binding.closeButton.setOnClickListener { finish() }
         binding.clearSelectionButton.setOnClickListener { binding.screenshotCanvas.clearSelection() }
@@ -85,24 +93,28 @@ class ScreenshotStudioActivity : ThemableBrowserActivity() {
     }
 
     private fun searchSelection() {
-        val selected = binding.screenshotCanvas.selectedBitmap()
-        if (selected == null) {
-            Toast.makeText(this, R.string.screenshot_studio_draw_first, Toast.LENGTH_SHORT).show()
-            AccessibilityAnnouncer.announce(binding.root, getString(R.string.screenshot_studio_draw_first))
-            return
-        }
+        // With no drawn region, search the complete screenshot. If a region exists,
+        // selectedBitmap() returns only that cropped area.
+        val selected = binding.screenshotCanvas.selectedBitmap() ?: sourceBitmap
+        if (selected == null) return
+        binding.searchButton.isEnabled = false
+        searchProgressDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.screenshot_studio_searching)
+            .setMessage(R.string.screenshot_studio_searching_message)
+            .setView(ProgressBar(this).apply { isIndeterminate = true })
+            .setCancelable(false)
+            .create()
+            .also { it.show() }
         lifecycleScope.launch {
-            val result = runCatching { uploadToYandexImages(selected) }
-            result.onSuccess { location ->
+            try {
+                val location = uploadToYandexImages(selected)
                 // Yandex is used only as a short-lived background visual classifier. Never
                 // expose its page to the user; send the first recognised label to Google Images.
-                val titleResult = runCatching { resolveYandexTitle(location) }.getOrNull()
-                if (titleResult.isNullOrBlank()) {
-                    Toast.makeText(this@ScreenshotStudioActivity, R.string.screenshot_failed, Toast.LENGTH_SHORT).show()
-                    return@onSuccess
-                }
+                val titleResult = resolveYandexTitle(location)
+                val translatedTitle = RussianEnglishDictionary.get(this@ScreenshotStudioActivity)
+                    .translateWords(titleResult)
                 val googleImagesUrl = Uri.parse("https://www.google.com/search").buildUpon()
-                    .appendQueryParameter("q", titleResult)
+                    .appendQueryParameter("q", translatedTitle)
                     .appendQueryParameter("tbm", "isch")
                     .build()
                 startActivity(Intent(this@ScreenshotStudioActivity, DefaultBrowserActivity::class.java).apply {
@@ -111,11 +123,21 @@ class ScreenshotStudioActivity : ThemableBrowserActivity() {
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 })
                 finish()
-            }.onFailure {
-                Toast.makeText(this@ScreenshotStudioActivity, R.string.screenshot_failed, Toast.LENGTH_SHORT).show()
-                AccessibilityAnnouncer.announce(binding.root, getString(R.string.screenshot_failed))
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+                Log.e(TAG, "Screenshot image search failed", error)
+                Toast.makeText(this@ScreenshotStudioActivity, R.string.screenshot_search_failed, Toast.LENGTH_SHORT).show()
+                AccessibilityAnnouncer.announce(binding.root, getString(R.string.screenshot_search_failed))
+            } finally {
+                hideSearchProgress()
             }
         }
+    }
+
+    private fun hideSearchProgress() {
+        searchProgressDialog?.dismiss()
+        searchProgressDialog = null
+        if (::binding.isInitialized) binding.searchButton.isEnabled = true
     }
 
     private suspend fun uploadToYandexImages(bitmap: android.graphics.Bitmap): String = withContext(Dispatchers.IO) {
@@ -189,9 +211,13 @@ class ScreenshotStudioActivity : ThemableBrowserActivity() {
     }
 
     override fun onDestroy() {
+        hideSearchProgress()
         sourceFile?.delete()
         super.onDestroy()
     }
 
-    companion object { const val EXTRA_PATH = "com.krystelligence.solipsism.extra.SCREENSHOT_PATH" }
+    companion object {
+        private const val TAG = "ScreenshotStudio"
+        const val EXTRA_PATH = "com.krystelligence.solipsism.extra.SCREENSHOT_PATH"
+    }
 }
