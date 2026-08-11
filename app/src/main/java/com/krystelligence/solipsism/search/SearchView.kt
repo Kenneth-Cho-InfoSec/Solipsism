@@ -36,6 +36,7 @@ class SearchView @JvmOverloads constructor(
             MotionEvent.ACTION_CANCEL -> isBeingClicked = false
             MotionEvent.ACTION_UP -> if (isBeingClicked && !isLongPress(timePressedNs)) {
                 onPreFocusListener?.onPreFocus()
+                performClick()
             }
         }
 

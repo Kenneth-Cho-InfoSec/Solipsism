@@ -454,6 +454,7 @@
     <string name="notification_incognito_running_description">Notification incognito permanente</string>
     <plurals name="notification_incognito_running_title">
         <item quantity="one">%1$d onglet incognito ouvert</item>
+        <item quantity="many">%1$d onglets incognito ouverts</item>
         <item quantity="other">%1$d onglets incognito ouverts</item>
     </plurals>
     <string name="search_engine_ask">Ask</string>

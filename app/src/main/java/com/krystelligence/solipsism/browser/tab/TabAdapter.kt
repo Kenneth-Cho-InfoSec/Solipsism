@@ -138,6 +138,9 @@ class TabAdapter @AssistedInject constructor(
                     }
                     focusObservable.onNext(true)
                 }
+                if (event.action == MotionEvent.ACTION_UP && view.isClickable) {
+                    view.performClick()
+                }
                 false
             }
         }

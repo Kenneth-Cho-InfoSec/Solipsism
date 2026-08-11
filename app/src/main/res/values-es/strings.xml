@@ -386,7 +386,7 @@
     <string name="ublock_origin_summary">Coloque filtros de red compatibles con uBlock Origin además del bloqueo de hosts.</string>
     <string name="unknown_size">Tamaño desconocido</string>
     <string name="userscripts">Guiones de usuario</string>
-    <string name="userscripts_delete">Eliminar guión</string>
+    <string name="userscripts_delete">Eliminar guion</string>
     <string name="userscripts_delete_message">Se eliminarán el script y las dependencias descargadas.</string>
     <string name="userscripts_delete_title">¿Eliminar %1$s?</string>
     <string name="userscripts_deleted">Eliminado %1$s</string>
@@ -447,6 +447,7 @@
     <string name="webrtc_support">Soporte WebRTC</string>
     <plurals name="notification_incognito_running_title">
         <item quantity="one">%1$d pestaña de incógnito abierta</item>
+        <item quantity="many">%1$d pestañas de incógnito abiertas</item>
         <item quantity="other">%1$d pestañas de incógnito abiertas</item>
     </plurals>
     <string name="settings_custom_language_clear">Borrar idioma personalizado</string>
@@ -527,7 +528,7 @@
     <string name="settings_rail_position_top_unoptimized">Top (Unoptimized)</string>
     <string name="settings_rail_position_bottom_unoptimized">Bottom (Unoptimized)</string>
     <string name="settings_rail_experimental_title">Experimental rail layout</string>
-    <string name="settings_rail_experimental_message">The purpose of Solipsism Browser is its side rail interface. Top and bottom rail layouts are experimental and unoptimized. Some features may be missing, behave incorrectly, or contain bugs that are not currently priority support. Continue only if you understand and accept this limitation.</string>
+    <string name="settings_rail_experimental_message">The purpose of Solipsism Browser is its side rail interfaz. Top and bottom rail layouts are experimental and unoptimized. Some features may be missing, behave incorrectly, or contain bugs that are not currently priority support. Continue only if you understand and accept this limitation.</string>
     <string name="settings_rail_experimental_continue">Continue</string>
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
@@ -547,7 +548,7 @@
     <string name="settings_haptics_off">Screenshot haptics: Off</string>
     <string name="settings_haptics_global">Enable haptics</string><string name="settings_haptics_rail">Rail swipe haptics</string><string name="settings_haptics_rail_intensity">Rail swipe intensity: %1$d%%</string><string name="settings_haptics_completion">Tab-switch completion feedback</string><string name="settings_haptics_completion_intensity">Completion intensity: %1$d%%</string><string name="settings_haptics_test_screenshot">Test screenshot vibration</string><string name="settings_haptics_test_rail">Test rail vibration</string>
     <string name="settings_custom_font">Custom font</string>
-    <string name="settings_custom_font_summary">Use an imported font for Solipsism interface text.</string>
+    <string name="settings_custom_font_summary">Use an imported font for Solipsism interfaz text.</string>
     <string name="settings_custom_font_default">System default</string>
     <string name="settings_custom_font_invalid">That file is not a supported or valid font.</string>
     <string name="audio_preset_flat">Flat</string>

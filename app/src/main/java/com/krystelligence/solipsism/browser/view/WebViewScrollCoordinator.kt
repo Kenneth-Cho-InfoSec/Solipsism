@@ -239,6 +239,9 @@ class WebViewScrollCoordinator @Inject constructor(
                 } else if (distance < -SCROLL_UP_THRESHOLD) {
                     toggleListener?.hideToolbar()
                 }
+                if (kotlin.math.abs(distance) <= SCROLL_UP_THRESHOLD && view.isClickable) {
+                    view.performClick()
+                }
                 location = 0f
             }
             gestureDetector.onTouchEvent(arg1)

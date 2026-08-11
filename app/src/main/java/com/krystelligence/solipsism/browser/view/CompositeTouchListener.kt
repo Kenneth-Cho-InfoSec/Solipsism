@@ -14,6 +14,9 @@ class CompositeTouchListener(
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         delegates.values.forEach { it?.onTouch(v, event) }
+        if (event.actionMasked == MotionEvent.ACTION_UP && v.isClickable) {
+            v.performClick()
+        }
         return false
     }
 

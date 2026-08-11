@@ -17,9 +17,12 @@ import android.os.Bundle
 import android.webkit.WebView
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
 
 class PrivacySettingsFragment : AbstractSettingsFragment() {
+
+    private val disposables = CompositeDisposable()
 
     @Inject internal lateinit var historyRepository: HistoryRepository
     @Inject internal lateinit var userPreferences: UserPreferences
@@ -93,6 +96,11 @@ class PrivacySettingsFragment : AbstractSettingsFragment() {
 
     }
 
+    override fun onDestroyView() {
+        disposables.clear()
+        super.onDestroyView()
+    }
+
     private fun clearHistoryDialog() {
         BrowserDialog.showPositiveNegativeDialog(
             activity = requireActivity(),
@@ -104,7 +112,7 @@ class PrivacySettingsFragment : AbstractSettingsFragment() {
                     .observeOn(mainScheduler)
                     .subscribe {
                         requireActivity().snackbar(R.string.message_clear_history)
-                    }
+                    }.also(disposables::add)
             },
             negativeButton = DialogItem(title = R.string.action_no) {},
             onCancel = {}
@@ -122,7 +130,7 @@ class PrivacySettingsFragment : AbstractSettingsFragment() {
                     .observeOn(mainScheduler)
                     .subscribe {
                         requireActivity().snackbar(R.string.message_cookies_cleared)
-                    }
+                    }.also(disposables::add)
             },
             negativeButton = DialogItem(title = R.string.action_no) {},
             onCancel = {}

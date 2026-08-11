@@ -462,6 +462,7 @@
     <string name="webrtc_support">Supporto WebRTC</string>
     <plurals name="notification_incognito_running_title">
         <item quantity="one">%1$d incognito tab open</item>
+        <item quantity="many">%1$d incognito tabs open</item>
         <item quantity="other">%1$d incognito tabs open</item>
     </plurals>
     <string name="settings_custom_language_clear">Lingua personalizzata chiara</string>

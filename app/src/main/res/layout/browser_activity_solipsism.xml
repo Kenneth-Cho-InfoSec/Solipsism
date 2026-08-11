@@ -5,7 +5,6 @@
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
     tools:context=".browser.BrowserActivity">
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -107,7 +106,7 @@
                             app:layout_constraintEnd_toStartOf="@+id/search_qr"
                             app:layout_constraintStart_toEndOf="@+id/search_ssl_status"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_goneMarginLeft="12dp" />
+                            app:layout_goneMarginStart="12dp" />
 
                         <ImageView
                             android:id="@+id/search_qr"
@@ -382,8 +381,9 @@
                         android:ellipsize="end"
                         android:gravity="center_vertical"
                         android:hint="@string/action_find"
-                        android:imeOptions="actionSearch"
-                        android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:importantForAutofill="no"
                         android:paddingStart="@dimen/material_grid_margin"
                         android:paddingEnd="@dimen/material_grid_margin"
                         android:singleLine="true"
@@ -542,10 +542,10 @@
 
             <EditText
                 android:id="@+id/bookmark_search"
+                android:importantForAutofill="no"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
-                android:autofillHints=""
                 android:hint="@string/search_bookmarks"
                 android:inputType="text"
                 android:maxLines="1"

@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/material_grid_unit"
         android:paddingStart="@dimen/material_grid_unit"
+        android:paddingEnd="@dimen/material_grid_unit"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         tools:text="Test Cert Authority" />
 
@@ -36,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/material_grid_unit"
         android:paddingStart="@dimen/material_grid_unit"
+        android:paddingEnd="@dimen/material_grid_unit"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         tools:text="Test Company" />
 
@@ -53,6 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/material_grid_unit"
         android:paddingStart="@dimen/material_grid_unit"
+        android:paddingEnd="@dimen/material_grid_unit"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         tools:text="today" />
 
@@ -70,6 +73,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/material_grid_unit"
         android:paddingStart="@dimen/material_grid_unit"
+        android:paddingEnd="@dimen/material_grid_unit"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         tools:text="tomorrow" />
 </LinearLayout>

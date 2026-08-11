@@ -198,7 +198,7 @@
     <string name="malware_definitions_update_failed_title">עדכון ההגדרה נכשל</string>
     <string name="malware_definitions_update_time_unknown">זמן לא ידוע</string>
     <string name="malware_definitions_updated">הגדרות תוכנה זדונית עודכנו</string>
-    <string name="malware_definitions_updating">מוריד ומאמת הגדרות...</string>
+    <string name="malware_definitions_updating">מוריד ומאמת הגדרות…</string>
     <string name="malware_local_blocked_message">%1$s לא הורד מכיוון שה-hash שלו SHA-256 תואם למסד הנתונים המוכר של תוכנות זדוניות במכשיר. מסנני פריחה יכולים להפיק תוצאות שגויות נדירות.</string>
     <string name="malware_local_detection">התאמת תוכנה זדונית ידועה: %1$s</string>
     <string name="malware_scanner">סורק תוכנות זדוניות</string>

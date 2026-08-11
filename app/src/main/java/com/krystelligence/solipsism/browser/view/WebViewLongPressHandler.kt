@@ -66,6 +66,9 @@ class WebViewLongPressHandler @Inject constructor(private val activity: Activity
     ) : View.OnTouchListener {
         override fun onTouch(v: View, event: MotionEvent): Boolean {
             gestureDetector.onTouchEvent(event)
+            if (event.actionMasked == MotionEvent.ACTION_UP && v.isClickable) {
+                v.performClick()
+            }
             return false
         }
     }

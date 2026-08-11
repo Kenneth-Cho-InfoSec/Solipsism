@@ -434,8 +434,7 @@
     <string name="virus_total_scanning_file">악성 코드 스캐너가 %1$s를 확인 중입니다. 통과하지 않으면 파일이 저장되지 않습니다.</string>
     <string name="virus_total_view_report">보고서 보기</string>
     <plurals name="notification_incognito_running_title">
-        <item quantity="one">%1$d incognito tab open</item>
-        <item quantity="other">%1$d incognito tabs open</item>
+                <item quantity="other">%1$d incognito tabs open</item>
     </plurals>
     <string-array name="proxy_choices_array">
         <item>없음</item><item>Orbot</item><item>수동</item>

@@ -405,7 +405,10 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             mono.isEnabled = enabled
         }
         fun updatePresetLabel() {
-            preset.text = getString(R.string.settings_audio_preset) + ": " + audioPresetName(userPreferences.audioPreset)
+            preset.text = getString(
+                R.string.settings_audio_preset_label,
+                audioPresetName(userPreferences.audioPreset)
+            )
             preset.setOnClickListener {
                 val presets = AudioPreset.entries
                 MaterialAlertDialogBuilder(requireActivity())
@@ -665,14 +668,18 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
     ): SeekBar {
         val labelView = TextView(requireContext()).apply {
             setPadding(0, 12.dp, 0, 0)
-            text = "${getString(label)}: ${summary(value)}"
+            text = getString(R.string.settings_value_label, getString(label), summary(value))
         }
         val seekBar = SeekBar(requireContext()).apply {
             this.max = max - min
             progress = value - min
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    labelView.text = "${getString(label)}: ${summary(progress + min)}"
+                    labelView.text = getString(
+                        R.string.settings_value_label,
+                        getString(label),
+                        summary(progress + min)
+                    )
                 }
                 override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
                 override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit

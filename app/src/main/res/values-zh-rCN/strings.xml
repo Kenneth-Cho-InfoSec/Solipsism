@@ -238,8 +238,7 @@
 
     <!-- Notifications -->
     <plurals name="notification_incognito_running_title">
-        <item quantity="one">打开了 %1$d 个无痕标签页</item>
-        <item quantity="other">打开了 %1$d 个无痕标签页</item>
+                <item quantity="other">打开了 %1$d 个无痕标签页</item>
     </plurals>
     <string name="notification_incognito_running_message">轻触以打开</string>
     <string name="notification_incognito_running_description">进行中的无痕标签页通知</string>
@@ -338,7 +337,7 @@
     <string name="malware_definitions_update_failed_title">定义更新失败</string>
     <string name="malware_definitions_update_time_unknown">时间未知</string>
     <string name="malware_definitions_updated">恶意软件定义已更新</string>
-    <string name="malware_definitions_updating">下载并验证定义...</string>
+    <string name="malware_definitions_updating">下载并验证定义…</string>
     <string name="malware_local_blocked_message">%1$s 未下载，因为其 SHA-256 哈希与设备上的已知恶意软件数据库匹配。布隆过滤器会产生罕见的误报。</string>
     <string name="malware_local_detection">已知恶意软件匹配：%1$s</string>
     <string name="malware_scanner">恶意软件扫描仪</string>

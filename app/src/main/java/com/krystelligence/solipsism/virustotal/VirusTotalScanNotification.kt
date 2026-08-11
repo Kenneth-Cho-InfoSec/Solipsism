@@ -19,15 +19,13 @@ class VirusTotalScanNotification @Inject constructor(
     private val notificationManager: NotificationManager
 ) {
     init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(
-                NotificationChannel(
-                    CHANNEL_ID,
-                    application.getString(R.string.virus_total_notification_channel),
-                    NotificationManager.IMPORTANCE_LOW
-                )
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_ID,
+                application.getString(R.string.virus_total_notification_channel),
+                NotificationManager.IMPORTANCE_LOW
             )
-        }
+        )
     }
 
     fun showScanning(fileName: String) {

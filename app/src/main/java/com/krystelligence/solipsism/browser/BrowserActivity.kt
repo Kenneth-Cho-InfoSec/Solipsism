@@ -1732,7 +1732,6 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             }
         }
         rail.setOnTouchListener(listener)
-        binding.verticalUrlText?.setOnTouchListener(listener)
     }
 
     private fun animateUrlRailTabSwitch(view: View, direction: Int) {
@@ -2276,12 +2275,17 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                     .start()
 
                 android.view.MotionEvent.ACTION_UP,
-                android.view.MotionEvent.ACTION_CANCEL -> touchedView.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(RELEASE_FEEDBACK_DURATION_MS)
-                    .setInterpolator(expressiveSpatialInterpolator)
-                    .start()
+                android.view.MotionEvent.ACTION_CANCEL -> {
+                    touchedView.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(RELEASE_FEEDBACK_DURATION_MS)
+                        .setInterpolator(expressiveSpatialInterpolator)
+                        .start()
+                    if (event.actionMasked == android.view.MotionEvent.ACTION_UP && touchedView.isClickable) {
+                        touchedView.performClick()
+                    }
+                }
             }
             false
         }

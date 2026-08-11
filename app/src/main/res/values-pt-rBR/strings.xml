@@ -185,7 +185,7 @@
     <string name="site_permission_reset">Reset site permission</string>
     <string name="site_permission_clear_all">Clear all site permissions</string>
     <string name="site_permission_clear_all_summary">Remove all saved per-site decisions.</string>
-    <string name="site_permission_camera">Camera</string>
+    <string name="site_permission_camera">Câmera</string>
     <string name="site_permission_microphone">Microphone</string>
     <string name="site_permission_notifications">Notifications</string>
     <string name="site_permission_clipboard">Clipboard</string>

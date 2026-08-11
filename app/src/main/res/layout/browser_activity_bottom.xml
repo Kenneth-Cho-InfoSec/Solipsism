@@ -4,7 +4,6 @@
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
     tools:context=".browser.BrowserActivity">
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -69,8 +68,8 @@
                         android:id="@+id/toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
-                        android:paddingLeft="0dp"
-                        android:paddingRight="0dp"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
                         android:paddingBottom="0dp"
                         app:contentInsetEnd="0dp"
                         app:contentInsetStart="0dp"
@@ -107,6 +106,7 @@
                                     android:layout_width="@dimen/browser_icon_button_size"
                                     android:layout_height="match_parent"
                                     android:background="@drawable/icon_button_background"
+                                    android:contentDescription="@string/action_site_info"
                                     android:padding="6dp"
                                     android:visibility="gone"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -137,7 +137,7 @@
                                     app:layout_constraintEnd_toStartOf="@+id/search_qr"
                                     app:layout_constraintStart_toEndOf="@+id/search_ssl_status"
                                     app:layout_constraintTop_toTopOf="parent"
-                                    app:layout_goneMarginLeft="8dp" />
+                                    app:layout_goneMarginStart="8dp" />
 
                                 <ImageView
                                     android:id="@+id/search_qr"
@@ -145,6 +145,7 @@
                                     android:layout_height="match_parent"
                                     android:background="@drawable/icon_button_background"
                                     android:clickable="true"
+                                    android:contentDescription="@string/action_scan_qr"
                                     android:focusable="true"
                                     android:padding="6dp"
                                     app:layout_constraintEnd_toStartOf="@+id/search_refresh"
@@ -158,6 +159,7 @@
                                     android:layout_height="match_parent"
                                     android:background="@drawable/icon_button_background"
                                     android:clickable="true"
+                                    android:contentDescription="@string/action_refresh"
                                     android:focusable="true"
                                     android:padding="6dp"
                                     app:layout_constraintEnd_toEndOf="parent"
@@ -256,7 +258,9 @@
                         android:hint="@string/action_find"
                         android:imeOptions="actionSearch"
                         android:inputType="text"
-                        android:paddingLeft="@dimen/material_grid_margin"
+                        android:importantForAutofill="no"
+                        android:paddingStart="@dimen/material_grid_margin"
+                        android:paddingEnd="@dimen/material_grid_margin"
                         android:singleLine="true"
                         android:textAppearance="?android:attr/textAppearanceListItem"
                         android:textSize="18sp" />
@@ -333,7 +337,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/material_grid_margin"
+                    android:layout_marginStart="@dimen/material_grid_margin"
                     android:layout_marginEnd="@dimen/material_grid_margin"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
@@ -443,7 +447,8 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/material_grid_margin"
+                    android:layout_marginStart="@dimen/material_grid_margin"
+                    android:layout_marginEnd="@dimen/material_grid_margin"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
                     android:maxLines="1"
@@ -454,10 +459,10 @@
 
             <EditText
                 android:id="@+id/bookmark_search"
+                android:importantForAutofill="no"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
-                android:autofillHints=""
                 android:hint="@string/search_bookmarks"
                 android:inputType="text"
                 android:maxLines="1"

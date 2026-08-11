@@ -42,13 +42,17 @@ object CustomDownloadManager {
                         Intent.URI_INTENT_SCHEME
                     )
                 }.getOrElse { return false }
-            else -> Intent(Intent.ACTION_VIEW, url.toUri()).apply {
-                setPackage(packageName)
-                if (!mimeType.isNullOrBlank()) type = mimeType
+            else -> if (mimeType.isNullOrBlank()) {
+                Intent(Intent.ACTION_VIEW, url.toUri()).apply { setPackage(packageName) }
+            } else {
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(url.toUri(), mimeType)
+                    setPackage(packageName)
+                }
             }
         }.apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            if (!mimeType.isNullOrBlank() && type == null) type = mimeType
+            if (!mimeType.isNullOrBlank() && type == null) setDataAndType(data, mimeType)
         }
         return try {
             context.startActivity(intent)

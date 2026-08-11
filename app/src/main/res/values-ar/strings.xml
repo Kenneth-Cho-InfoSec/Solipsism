@@ -214,7 +214,7 @@
     <string name="malware_definitions_update_failed_title">فشل تحديث التعريف</string>
     <string name="malware_definitions_update_time_unknown">الوقت غير معروف</string>
     <string name="malware_definitions_updated">تم تحديث تعريفات البرامج الضارة</string>
-    <string name="malware_definitions_updating">جارٍ تنزيل التعريفات والتحقق من صحتها...</string>
+    <string name="malware_definitions_updating">جارٍ تنزيل التعريفات والتحقق من صحتها…</string>
     <string name="malware_local_blocked_message">لم يتم تنزيل %1$s لأن تجزئة SHA-256 الخاصة به تطابقت مع قاعدة بيانات البرامج الضارة المعروفة الموجودة على الجهاز. مرشحات بلوم يمكن أن تنتج نتائج إيجابية كاذبة نادرة.</string>
     <string name="malware_local_detection">تطابق البرامج الضارة المعروفة: %1$s</string>
     <string name="malware_scanner">ماسح البرامج الضارة</string>

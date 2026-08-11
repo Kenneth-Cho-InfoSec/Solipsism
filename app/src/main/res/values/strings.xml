@@ -258,7 +258,7 @@
     <string name="bookmark_import_merge">Merge and skip duplicates</string>
     <string name="bookmark_import_replace">Replace all bookmarks</string>
     <string name="bookmark_import_ask">Ask every time</string>
-    <string name="bookmark_import_choice_message">Import %1$d bookmarks. Merge them with your existing bookmarks or replace the entire collection?</string>
+    <string name="bookmark_import_choice_message">Bookmarks to import: %1$d. Merge them with your existing bookmarks or replace the entire collection?</string>
     <string name="bookmark_import_replace_warning">This will delete your current bookmarks before importing the selected file. Continue?</string>
     <string name="bookmark_sort_order">Sort order</string>
     <string name="bookmark_sort_order_summary">Choose how bookmarks are ordered in lists.</string>
@@ -276,7 +276,7 @@
     <string name="settings_custom_language_format_title">Custom language XML format</string>
     <string name="settings_custom_language_format_message">Use a UTF-8 XML file with this structure:\n\n&lt;resources&gt;\n  &lt;string name=&quot;settings_general&quot;&gt;My language&lt;/string&gt;\n&lt;/resources&gt;\n\nOnly &lt;string&gt; resources that already exist in Solipsism are accepted. Unknown names, duplicate names, external entities, scripts, and files larger than 512 KB are rejected. Unspecified strings continue using the selected built-in language.</string>
     <string name="settings_custom_language_choose">Choose XML file</string>
-    <string name="settings_custom_language_loaded">Custom language loaded (%1$d strings)</string>
+    <string name="settings_custom_language_loaded">Custom language entries loaded: %1$d</string>
     <string name="settings_custom_language_invalid">Could not load custom language XML: %1$s</string>
     <string name="settings_custom_language_cleared">Custom language overrides cleared</string>
     <string name="settings_custom_language_clear">Clear custom language</string>
@@ -326,6 +326,14 @@
     <string name="site_permission_invalid_site">Enter a valid HTTP or HTTPS site origin.</string>
     <string name="cookie_manager">Cookie Manager</string>
     <string name="cookie_manager_summary">View and manage cookies visible to a specific site.</string>
+    <string name="cookie_manager_field_name">Name</string>
+    <string name="cookie_manager_field_value">Value</string>
+    <string name="cookie_manager_field_domain">Domain (optional)</string>
+    <string name="cookie_manager_field_path">Path</string>
+    <string name="cookie_manager_field_secure">Secure</string>
+    <string name="cookie_manager_field_http_only">HttpOnly</string>
+    <string name="cookie_manager_field_same_site">SameSite (Strict, Lax, or None)</string>
+    <string name="settings_value_label">%1$s: %2$s</string>
     <string name="cookie_manager_explanation">Only cookies visible to this URL are shown. Android WebView does not expose every cookie domain and path, so site cleanup may be best effort.</string>
     <string name="cookie_manager_site">Site: %1$s</string>
     <string name="cookie_manager_empty">No cookies are visible to this URL.</string>
@@ -431,8 +439,8 @@
     <string name="settings_homepage_wallpaper_opacity">Wallpaper opacity</string>
     <string name="settings_homepage_wallpaper_position_x">Wallpaper horizontal position</string>
     <string name="settings_homepage_wallpaper_position_y">Wallpaper vertical position</string>
-    <string name="settings_homepage_size_summary">%1$d sp</string>
-    <string name="settings_homepage_columns_summary">%1$d columns</string>
+    <string name="settings_homepage_size_summary">Size: %1$dsp</string>
+    <string name="settings_homepage_columns_summary">Columns: %1$d</string>
     <string name="settings_homepage_percent_summary">%1$d%%</string>
     <string name="settings_homepage_html_label">HTML body</string>
     <string name="settings_homepage_css_label">Safe CSS</string>
@@ -519,7 +527,7 @@
     <string name="virus_total_scanning_file">Malware Scanner is checking %1$s. The file will not be saved unless it passes.</string>
     <string name="virus_total_notification_channel">Malware Scanner downloads</string>
     <string name="virus_total_download_blocked">Malware download blocked</string>
-    <string name="virus_total_detection_count">%1$d detection(s): %2$s</string>
+    <string name="virus_total_detection_count">Detections: %1$d | %2$s</string>
     <string name="malware_local_detection">Known-malware match: %1$s</string>
     <string name="malware_local_blocked_message">%1$s was not downloaded because its SHA-256 hash matched the on-device known-malware database. Bloom filters can produce rare false positives.</string>
     <string name="virus_total_blocked_message">%1$s was not downloaded because %2$d VirusTotal antivirus engine(s) reported it as malicious.</string>
@@ -641,12 +649,12 @@
     <string name="block_gif_summary">Blocks GIF resources, including animated GIFs; static GIFs may also be blocked</string>
     <string name="custom_filters">Custom filters</string>
     <string name="custom_filters_summary">Write or edit uBlock-compatible network and element rules</string>
-    <string name="custom_filters_count">%1$d enabled custom filters</string>
+    <string name="custom_filters_count">Enabled custom filters: %1$d</string>
     <string name="custom_filters_hint">example.com##.advertisement</string>
     <string name="custom_filters_help">Filter language help</string>
     <string name="custom_filters_help_message">Supported examples:\n\nexample.com##.advertisement\nexample.com#@#.keep-this\n##.global-banner\n||ads.example.com^\n@@||trusted.example.com^\n\nUse ## to hide elements and #@# to create an exception. CSS selectors must be valid. JavaScript, +js, #?#, and snippet filters are not supported. Keep selectors specific to avoid breaking pages.</string>
     <string name="custom_filters_saved">Custom filters saved</string>
-    <string name="custom_filters_invalid">Saved with %1$d invalid line(s) skipped</string>
+    <string name="custom_filters_invalid">Invalid lines skipped: %1$d</string>
 
     <string name="infinity">∞</string>
 
@@ -673,6 +681,7 @@
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
     <string name="settings_audio_preset">Preset</string>
+    <string name="settings_audio_preset_label">Preset: %1$s</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
     <string name="settings_audio_limiter">Limiter</string>

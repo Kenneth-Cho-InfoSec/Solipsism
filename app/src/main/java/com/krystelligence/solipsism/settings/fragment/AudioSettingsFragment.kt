@@ -140,7 +140,10 @@ class AudioSettingsFragment : AbstractSettingsFragment() {
             mono.isEnabled = enabled
         }
         fun updatePresetLabel() {
-            preset.text = getString(R.string.settings_audio_preset) + ": " + presetName(userPreferences.audioPreset)
+            preset.text = getString(
+                R.string.settings_audio_preset_label,
+                presetName(userPreferences.audioPreset)
+            )
             preset.setOnClickListener {
                 val presets = AudioPreset.entries
                 MaterialAlertDialogBuilder(requireActivity())

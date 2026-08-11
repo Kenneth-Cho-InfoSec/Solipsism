@@ -40,6 +40,7 @@ import com.krystelligence.solipsism.haptics.HapticFeedbackController
 import com.permissionx.guolindev.PermissionX
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.SerialDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import javax.inject.Inject
 
@@ -57,6 +58,8 @@ class DownloadPermissionsHelper @Inject constructor(
     @NetworkScheduler private val networkScheduler: Scheduler,
     @MainScheduler private val mainScheduler: Scheduler
 ) {
+
+    private val disposables = CompositeDisposable()
 
     fun download(
         activity: FragmentActivity,
@@ -127,7 +130,7 @@ class DownloadPermissionsHelper @Inject constructor(
                     logger.log(TAG, "Unable to resolve download metadata", it)
                     showDownloadDialog(activity, url, userAgent, contentDisposition, mimeType, contentLength, origin, blobData)
                 }
-            )
+            ).also(disposables::add)
     }
 
     private fun needsMetadataResolution(
@@ -268,14 +271,14 @@ class DownloadPermissionsHelper @Inject constructor(
                         logger.log(TAG, "error saving blob download", it)
                         activity.snackbar(R.string.cannot_download)
                     }
-                )
+                ).also(disposables::add)
         } else if (convertImages) {
             downloadHandler.downloadImageAsJpeg(activity, userPreferences, url, userAgent, fileName)
                 .subscribeOn(networkScheduler).observeOn(mainScheduler)
                 .subscribeBy(
                     onSuccess = { storedUrl -> saveDownload(storedUrl, fileName, downloadSize); activity.snackbar(R.string.download_pending) },
                     onError = { logger.log(TAG, "error converting image to JPEG", it); activity.snackbar(R.string.cannot_download) }
-                )
+                ).also(disposables::add)
         } else {
             downloadHandler.onDownloadStart(
                 activity, userPreferences, url, userAgent, contentDisposition, mimeType, downloadSize
@@ -459,7 +462,7 @@ class DownloadPermissionsHelper @Inject constructor(
             DownloadEntry(url = storedUrl, title = fileName, contentSize = downloadSize)
         ).subscribeOn(databaseScheduler).subscribeBy {
             if (!it) logger.log(TAG, "error saving download to database")
-        }
+        }.also(disposables::add)
     }
 
     companion object {

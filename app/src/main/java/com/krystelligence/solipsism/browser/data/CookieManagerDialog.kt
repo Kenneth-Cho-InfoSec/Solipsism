@@ -214,13 +214,13 @@ object CookieManagerDialog {
             orientation = LinearLayout.VERTICAL
             setPadding(context.dp(20))
         }
-        val name = editor(context, existing?.name.orEmpty(), "Name")
-        val value = editor(context, existing?.value.orEmpty(), "Value", password = true)
-        val domain = editor(context, "", "Domain (optional)")
-        val path = editor(context, "/", "Path")
-        val secure = MaterialCheckBox(context).apply { text = "Secure" }
-        val httpOnly = MaterialCheckBox(context).apply { text = "HttpOnly" }
-        val sameSite = editor(context, "", "SameSite (Strict, Lax, or None)")
+        val name = editor(context, existing?.name.orEmpty(), context.getString(R.string.cookie_manager_field_name))
+        val value = editor(context, existing?.value.orEmpty(), context.getString(R.string.cookie_manager_field_value), password = true)
+        val domain = editor(context, "", context.getString(R.string.cookie_manager_field_domain))
+        val path = editor(context, "/", context.getString(R.string.cookie_manager_field_path))
+        val secure = MaterialCheckBox(context).apply { text = context.getString(R.string.cookie_manager_field_secure) }
+        val httpOnly = MaterialCheckBox(context).apply { text = context.getString(R.string.cookie_manager_field_http_only) }
+        val sameSite = editor(context, "", context.getString(R.string.cookie_manager_field_same_site))
         listOf(name.layout, value.layout, domain.layout, path.layout, secure, httpOnly, sameSite.layout)
             .forEach(form::addView)
         lateinit var editorDialog: androidx.appcompat.app.AlertDialog

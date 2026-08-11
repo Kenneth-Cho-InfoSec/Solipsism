@@ -38,7 +38,7 @@ class UserScriptRuntime @Inject constructor(
         val newHandlers = mutableListOf<ScriptHandler>()
         val originRules = setOf("*")
         val startSource = dispatcher(manager.matchingSource(UserScriptRunAt.DOCUMENT_START))
-        if (startSource.isNotBlank()) {
+        if (startSource.isNotBlank() && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
             newHandlers += WebViewCompat.addDocumentStartJavaScript(webView, startSource, originRules)
         }
         if (WebViewFeature.isFeatureSupported(WebViewFeature.JS_INJECTION_IN_FRAME_AND_WORLD)) {

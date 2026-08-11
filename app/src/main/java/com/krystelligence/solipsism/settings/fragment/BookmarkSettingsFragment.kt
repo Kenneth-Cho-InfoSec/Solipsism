@@ -118,6 +118,9 @@ class BookmarkSettingsFragment : AbstractSettingsFragment() {
                                 showExportError()
                             }
                         )
+            }.also { subscription ->
+                importSubscription?.dispose()
+                importSubscription = subscription
             }
     }
 

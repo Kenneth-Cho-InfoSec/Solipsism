@@ -28,6 +28,7 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.Locale
 import javax.inject.Inject
@@ -54,6 +55,7 @@ class SuggestionsAdapter(
     private val webPageIcon = context.drawable(R.drawable.ic_history)
     private val bookmarkIcon = context.drawable(R.drawable.ic_bookmark)
     private var suggestionsRepository: SuggestionsRepository
+    private val disposables = CompositeDisposable()
 
     /**
      * The listener that is fired when the insert button on a [SearchSuggestion] is clicked.
@@ -81,6 +83,7 @@ class SuggestionsAdapter(
             .subscribeOn(databaseScheduler)
             .observeOn(mainScheduler)
             .subscribe(::publishResults)
+            .also(disposables::add)
     }
 
     fun refreshPreferences() {
@@ -96,7 +99,7 @@ class SuggestionsAdapter(
             .subscribeOn(databaseScheduler)
             .subscribe { list ->
                 allBookmarks = list
-            }
+            }.also(disposables::add)
     }
 
     override fun getCount(): Int = filteredList.size

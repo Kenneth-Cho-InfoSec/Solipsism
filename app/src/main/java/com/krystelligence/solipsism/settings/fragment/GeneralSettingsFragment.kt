@@ -29,6 +29,7 @@ import android.os.Environment
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import java.util.Locale
 import android.view.LayoutInflater
 import android.webkit.URLUtil
 import android.widget.EditText
@@ -319,7 +320,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         eProxyPort.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxCharacters - 1))
 
         eProxyHost.text = userPreferences.proxyHost
-        eProxyPort.text = userPreferences.proxyPort.toString()
+        eProxyPort.text = String.format(Locale.ROOT, "%d", userPreferences.proxyPort)
 
         BrowserDialog.showCustomDialog(activity) {
             setTitle(R.string.manual_proxy)

@@ -175,7 +175,7 @@ object BrowserDialog {
         @StringRes action: Int,
         textInputListener: (String) -> Unit
     ) {
-        val dialogView = LayoutInflater.from(activity).inflate(R.layout.dialog_edit_text, null)
+        val dialogView = LayoutInflater.from(activity).inflate(R.layout.dialog_edit_text, activity.window.decorView as ViewGroup, false)
         val editText = dialogView.findViewById<EditText>(R.id.dialog_edit_text)
 
         editText.setHint(hint)

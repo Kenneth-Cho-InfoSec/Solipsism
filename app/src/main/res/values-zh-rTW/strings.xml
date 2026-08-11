@@ -229,8 +229,7 @@
 
     <!-- Notifications -->
     <plurals name="notification_incognito_running_title">
-        <item quantity="one">已開啟 %1$d 個無痕式分頁</item>
-        <item quantity="other">已開啟 %1$d 個無痕式分頁</item>
+                <item quantity="other">已開啟 %1$d 個無痕式分頁</item>
     </plurals>
     <string name="notification_incognito_running_message">點觸以開啟</string>
     <string name="notification_incognito_running_description">正在顯示無痕通知</string>
@@ -321,7 +320,7 @@
     <string name="malware_definitions_update_failed_title">定義更新失敗</string>
     <string name="malware_definitions_update_time_unknown">時間未知</string>
     <string name="malware_definitions_updated">惡意軟體定義已更新</string>
-    <string name="malware_definitions_updating">下載並驗證定義...</string>
+    <string name="malware_definitions_updating">下載並驗證定義…</string>
     <string name="malware_local_blocked_message">%1$s 未下載，因為其 SHA-256 雜湊與裝置上的已知惡意軟體資料庫相符。布隆過濾器會產生罕見的誤報。</string>
     <string name="malware_local_detection">已知惡意軟體符合：%1$s</string>
     <string name="malware_scanner">惡意軟體掃描儀</string>
@@ -395,7 +394,7 @@
     <string name="settings_rail_size_super_compact">超級緊湊</string>
     <string name="settings_search_hint">搜尋設定</string>
     <string name="ssl_info_expires_on">到期日</string>
-    <string name="ssl_info_issued_by">由...發出</string>
+    <string name="ssl_info_issued_by">由…發出</string>
     <string name="ssl_info_issued_on">發佈於</string>
     <string name="ssl_info_issued_to">發給</string>
     <string name="tab_frozen">冷凍…</string>

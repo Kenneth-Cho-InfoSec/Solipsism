@@ -29,6 +29,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
 
 /**
@@ -229,6 +230,8 @@ abstract class HtmlPageFactoryInitializer(
     @MainScheduler private val foregroundScheduler: Scheduler
 ) : TabInitializer {
 
+    private val disposables = CompositeDisposable()
+
     override fun initialize(webView: WebView, headers: Map<String, String>) {
         htmlPageFactory
             .buildPage()
@@ -245,7 +248,7 @@ abstract class HtmlPageFactoryInitializer(
                 webView.settings.allowFileAccess =
                     NavigationSecurity.isTrustedInternalFileUrl(pageUrl, trustedRoots)
                 webView.loadUrl(pageUrl, headers)
-            })
+            }).also(disposables::add)
     }
 
 }

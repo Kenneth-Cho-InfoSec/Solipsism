@@ -7,6 +7,7 @@ import com.krystelligence.solipsism.log.Logger
 import androidx.core.net.toUri
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,6 +22,7 @@ class SessionAllowListModel @Inject constructor(
 ) : AllowListModel {
 
     private var whitelistSet = hashSetOf<String>()
+    private val disposables = CompositeDisposable()
 
     init {
         adBlockAllowListModel
@@ -28,6 +30,7 @@ class SessionAllowListModel @Inject constructor(
             .map { it.map(AllowListEntry::domain).toHashSet() }
             .subscribeOn(ioScheduler)
             .subscribe { hashSet -> whitelistSet = hashSet }
+            .also(disposables::add)
     }
 
     override fun isUrlAllowedAds(url: String): Boolean =
@@ -49,6 +52,7 @@ class SessionAllowListModel @Inject constructor(
                 }
                 .subscribeOn(ioScheduler)
                 .subscribe { logger.log(TAG, "whitelist item added to database") }
+                .also(disposables::add)
 
             whitelistSet.add(host)
         }
@@ -61,6 +65,7 @@ class SessionAllowListModel @Inject constructor(
                 .flatMapCompletable(adBlockAllowListModel::removeAllowListItem)
                 .subscribeOn(ioScheduler)
                 .subscribe { logger.log(TAG, "whitelist item removed from database") }
+                .also(disposables::add)
 
             whitelistSet.remove(host)
         }

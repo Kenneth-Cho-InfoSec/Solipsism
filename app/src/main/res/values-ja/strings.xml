@@ -445,8 +445,7 @@
     <string name="virus_total_view_report">レポートを見る</string>
     <string name="webrtc_support">WebRTC サポート</string>
     <plurals name="notification_incognito_running_title">
-        <item quantity="one">%1$d incognito tab open</item>
-        <item quantity="other">%1$d incognito tabs open</item>
+                <item quantity="other">%1$d incognito tabs open</item>
     </plurals>
     <string name="settings_custom_language_clear">カスタム言語をクリアする</string>
     <string name="settings_custom_language_cleared">カスタム言語のオーバーライドがクリアされました</string>

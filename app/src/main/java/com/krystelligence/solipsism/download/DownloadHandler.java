@@ -143,9 +143,8 @@ public class DownloadHandler {
                 Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
                 if (uri == null) throw new IOException("Unable to create download entry");
                 try {
-                    OutputStream output = resolver.openOutputStream(uri);
-                    if (output == null) throw new IOException("Unable to open download entry");
-                    try (OutputStream stream = output) {
+                    try (OutputStream stream = resolver.openOutputStream(uri)) {
+                        if (stream == null) throw new IOException("Unable to open download entry");
                         stream.write(bytes);
                     }
                     ContentValues completed = new ContentValues();
@@ -224,10 +223,9 @@ public class DownloadHandler {
             Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
             if (uri == null) throw new IOException("Unable to create download entry");
             try {
-                OutputStream output = resolver.openOutputStream(uri);
-                if (output == null) throw new IOException("Unable to open download entry");
-                try (FileInputStream input = new FileInputStream(source);
-                     OutputStream stream = output) {
+                try (OutputStream stream = resolver.openOutputStream(uri);
+                     FileInputStream input = new FileInputStream(source)) {
+                    if (stream == null) throw new IOException("Unable to open download entry");
                     byte[] buffer = new byte[64 * 1024];
                     int count;
                     while ((count = input.read(buffer)) != -1) {
