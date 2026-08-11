@@ -3,6 +3,7 @@ description: Suggest an improvement for Solipsism Browser.
 title: "[Feature]: "
 labels:
   - enhancement
+  - needs-triage
 body:
   - type: markdown
     attributes:

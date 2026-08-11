@@ -3,6 +3,7 @@ description: Report a reproducible problem in Solipsism Browser.
 title: "[Bug]: "
 labels:
   - bug
+  - needs-triage
 body:
   - type: markdown
     attributes:
