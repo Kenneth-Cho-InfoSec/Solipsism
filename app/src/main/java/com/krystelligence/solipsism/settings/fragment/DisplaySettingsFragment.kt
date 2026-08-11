@@ -12,9 +12,7 @@ import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import com.krystelligence.solipsism.extensions.withSingleChoiceItems
 import com.krystelligence.solipsism.utils.CustomFontManager
 import com.krystelligence.solipsism.preference.UserPreferences
-import com.krystelligence.solipsism.preference.DeveloperPreferences
 import com.krystelligence.solipsism.audio.AudioPreset
-import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
 import com.krystelligence.solipsism.browser.ui.RailUtilityAction
 import com.krystelligence.solipsism.browser.ui.RailMenuStudioActivity
 import com.krystelligence.solipsism.html.homepage.HomepageSource
@@ -51,7 +49,6 @@ import javax.inject.Inject
 class DisplaySettingsFragment : AbstractSettingsFragment() {
 
     @Inject internal lateinit var userPreferences: UserPreferences
-    @Inject internal lateinit var developerPreferences: DeveloperPreferences
     private var wallpaperSummaryUpdater: SummaryUpdater? = null
     private val wallpaperPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::copyHomepageWallpaper)
@@ -163,12 +160,6 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             preference = SETTINGS_RAIL_SIZE,
             summary = userPreferences.solipsismRailSize.toRailSizeDisplayString(),
             onClick = ::showRailSizePicker
-        )
-
-        clickableDynamicPreference(
-            preference = SETTINGS_RAIL_POSITION,
-            summary = currentRailPosition().toRailPositionDisplayString(),
-            onClick = ::showRailPositionPicker
         )
 
         clickableDynamicPreference(
@@ -482,37 +473,6 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         }.resizeAndShow()
     }
 
-    private fun showRailPositionPicker(summaryUpdater: SummaryUpdater) {
-        val values = buildList {
-            add(SolipsismRailPosition.RIGHT to getString(R.string.settings_rail_position_right))
-            add(SolipsismRailPosition.LEFT to getString(R.string.settings_rail_position_left))
-            if (experimentalRailLayoutsAvailable()) {
-                add(SolipsismRailPosition.TOP to getString(R.string.settings_rail_position_top_unoptimized))
-                add(SolipsismRailPosition.BOTTOM to getString(R.string.settings_rail_position_bottom_unoptimized))
-            }
-        }
-        lateinit var positionDialog: AlertDialog
-        positionDialog = MaterialAlertDialogBuilder(requireActivity()).apply {
-            setTitle(R.string.settings_rail_position)
-            setSingleChoiceItems(
-                values.map { it.second }.toTypedArray(),
-                values.indexOfFirst { it.first == currentRailPosition() }
-            ) { _, which ->
-                val selected = values[which].first
-                if (selected.isExperimental) {
-                    positionDialog.dismiss()
-                    showExperimentalRailWarning {
-                        saveRailPosition(selected, summaryUpdater)
-                    }
-                } else {
-                    saveRailPosition(selected, summaryUpdater)
-                }
-            }
-            setPositiveButton(resources.getString(R.string.action_ok), null)
-        }.create()
-        positionDialog.show()
-    }
-
     private fun showRailUtilityActionPicker(summaryUpdater: SummaryUpdater) {
         val actions = RailUtilityAction.values()
         MaterialAlertDialogBuilder(requireActivity()).apply {
@@ -528,44 +488,6 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             }
             setPositiveButton(R.string.action_ok, null)
         }.resizeAndShow()
-    }
-
-    private fun showExperimentalRailWarning(onContinue: () -> Unit) {
-        MaterialAlertDialogBuilder(requireActivity())
-            .setTitle(R.string.settings_rail_experimental_title)
-            .setMessage(R.string.settings_rail_experimental_message)
-            .setNegativeButton(R.string.action_cancel, null)
-            .setPositiveButton(R.string.settings_rail_experimental_continue) { _, _ -> onContinue() }
-            .resizeAndShow()
-    }
-
-    private fun saveRailPosition(position: SolipsismRailPosition, summaryUpdater: SummaryUpdater) {
-        userPreferences.solipsismRailPosition = position
-        if (position == SolipsismRailPosition.LEFT || position == SolipsismRailPosition.RIGHT) {
-            userPreferences.solipsismRailOnLeft = position == SolipsismRailPosition.LEFT
-        }
-        summaryUpdater.updateSummary(position.toRailPositionDisplayString())
-        if (position.isExperimental) {
-            // The browser activity is paused behind Settings. Closing this activity lets its
-            // onResume() detect the new placement and recreate the browser immediately.
-            requireActivity().finish()
-        }
-    }
-
-    private fun experimentalRailLayoutsAvailable(): Boolean =
-        developerPreferences.experimentalRailLayoutsEnabled
-
-    private fun currentRailPosition(): SolipsismRailPosition {
-        val stored = userPreferences.solipsismRailPosition
-        return if (stored.isExperimental && !experimentalRailLayoutsAvailable()) {
-            if (userPreferences.solipsismRailOnLeft) {
-                SolipsismRailPosition.LEFT
-            } else {
-                SolipsismRailPosition.RIGHT
-            }
-        } else {
-            stored
-        }
     }
 
     private fun showHomepageWallpaperPicker(summaryUpdater: SummaryUpdater) {
@@ -1084,15 +1006,6 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         else -> RAIL_SIZE_MEDIUM
     }
 
-    private fun SolipsismRailPosition.toRailPositionDisplayString(): String = getString(
-        when (this) {
-            SolipsismRailPosition.LEFT -> R.string.settings_rail_position_left
-            SolipsismRailPosition.TOP -> R.string.settings_rail_position_top_unoptimized
-            SolipsismRailPosition.BOTTOM -> R.string.settings_rail_position_bottom_unoptimized
-            SolipsismRailPosition.RIGHT -> R.string.settings_rail_position_right
-        }
-    )
-
     private fun Int.toWallpaperModeDisplayString(): String = getString(
         when (coerceToKnownWallpaperMode()) {
             HOMEPAGE_WALLPAPER_CUSTOM -> R.string.settings_homepage_wallpaper_custom
@@ -1145,7 +1058,6 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_HOMEPAGE_DATE_FORMAT = "homepage_date_format"
         private const val SETTINGS_HOMEPAGE_DATETIME_OPACITY = "homepage_datetime_opacity"
         private const val SETTINGS_RAIL_SIZE = "rail_size"
-        private const val SETTINGS_RAIL_POSITION = "rail_position"
         private const val SETTINGS_RAIL_UTILITY_ACTION = "rail_utility_action"
         private const val SETTINGS_RAIL_MENU_STUDIO = "rail_menu_studio"
         private const val SETTINGS_BLACK_STATUS = "black_status_bar"

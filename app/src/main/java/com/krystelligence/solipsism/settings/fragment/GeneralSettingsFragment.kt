@@ -3,6 +3,8 @@ package com.krystelligence.solipsism.settings.fragment
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.injector
 import com.krystelligence.solipsism.browser.proxy.ProxyChoice
+import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
+import com.krystelligence.solipsism.preference.DeveloperPreferences
 import com.krystelligence.solipsism.constant.SCHEME_BLANK
 import com.krystelligence.solipsism.constant.SCHEME_BOOKMARKS
 import com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
@@ -36,6 +38,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.appcompat.app.AlertDialog
+import com.krystelligence.solipsism.extensions.resizeAndShow
 import javax.inject.Inject
 
 /**
@@ -45,6 +49,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
 
     @Inject lateinit var searchEngineProvider: SearchEngineProvider
     @Inject lateinit var userPreferences: UserPreferences
+    @Inject lateinit var developerPreferences: DeveloperPreferences
 
     private lateinit var proxyChoices: Array<String>
 
@@ -88,10 +93,20 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
             onClick = ::showProxyPicker
         )
 
-        clickableDynamicPreference(
+        val displayAsPreference = clickableDynamicPreference(
             preference = SETTINGS_USER_AGENT,
             summary = choiceToUserAgent(userPreferences.userAgentChoice),
             onClick = ::showUserAgentChooserDialog
+        )
+        displayAsPreference.title = getString(
+            R.string.display_as_current,
+            choiceToUserAgent(userPreferences.userAgentChoice)
+        )
+
+        clickableDynamicPreference(
+            preference = SETTINGS_RAIL_POSITION,
+            summary = currentRailPosition().toRailPositionDisplayString(),
+            onClick = ::showRailPositionPicker
         )
 
         togglePreference(
@@ -336,13 +351,16 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
 
     private fun showUserAgentChooserDialog(summaryUpdater: SummaryUpdater) {
         BrowserDialog.showCustomDialog(activity) {
-            setTitle(resources.getString(R.string.title_user_agent))
+            setTitle(resources.getString(R.string.display_as))
             setSingleChoiceItems(
                 R.array.user_agent,
                 userPreferences.userAgentChoice - 1
             ) { _, which ->
                 userPreferences.userAgentChoice = which + 1
-                summaryUpdater.updateSummary(choiceToUserAgent(userPreferences.userAgentChoice))
+                val selectedLabel = choiceToUserAgent(userPreferences.userAgentChoice)
+                summaryUpdater.updateSummary(selectedLabel)
+                findPreference<androidx.preference.Preference>(SETTINGS_USER_AGENT)?.title =
+                    getString(R.string.display_as_current, selectedLabel)
                 when (which) {
                     in 0..2 -> Unit
                     3 -> {
@@ -359,13 +377,16 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         activity?.let {
             BrowserDialog.showEditText(
                 it,
-                R.string.title_user_agent,
-                R.string.title_user_agent,
+                R.string.display_as,
+                R.string.display_as,
                 userPreferences.userAgentString,
                 R.string.action_ok
             ) { s ->
                 userPreferences.userAgentString = s
-                summaryUpdater.updateSummary(it.getString(R.string.agent_custom))
+                val selectedLabel = it.getString(R.string.agent_custom)
+                summaryUpdater.updateSummary(selectedLabel)
+                findPreference<androidx.preference.Preference>(SETTINGS_USER_AGENT)?.title =
+                    it.getString(R.string.display_as_current, selectedLabel)
             }
         }
     }
@@ -668,6 +689,69 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         }
     }
 
+    private fun showRailPositionPicker(summaryUpdater: SummaryUpdater) {
+        val values = buildList {
+            add(SolipsismRailPosition.RIGHT to getString(R.string.settings_rail_position_right))
+            add(SolipsismRailPosition.LEFT to getString(R.string.settings_rail_position_left))
+            if (developerPreferences.experimentalRailLayoutsEnabled) {
+                add(SolipsismRailPosition.TOP to getString(R.string.settings_rail_position_top_unoptimized))
+                add(SolipsismRailPosition.BOTTOM to getString(R.string.settings_rail_position_bottom_unoptimized))
+            }
+        }
+        lateinit var positionDialog: AlertDialog
+        positionDialog = MaterialAlertDialogBuilder(requireActivity()).apply {
+            setTitle(R.string.settings_rail_position)
+            setSingleChoiceItems(
+                values.map { it.second }.toTypedArray(),
+                values.indexOfFirst { it.first == currentRailPosition() }
+            ) { _, which ->
+                val selected = values[which].first
+                if (selected.isExperimental) {
+                    positionDialog.dismiss()
+                    showExperimentalRailWarning { saveRailPosition(selected, summaryUpdater) }
+                } else {
+                    saveRailPosition(selected, summaryUpdater)
+                }
+            }
+            setPositiveButton(R.string.action_ok, null)
+        }.create()
+        positionDialog.show()
+    }
+
+    private fun showExperimentalRailWarning(onContinue: () -> Unit) {
+        MaterialAlertDialogBuilder(requireActivity())
+            .setTitle(R.string.settings_rail_experimental_title)
+            .setMessage(R.string.settings_rail_experimental_message)
+            .setNegativeButton(R.string.action_cancel, null)
+            .setPositiveButton(R.string.settings_rail_experimental_continue) { _, _ -> onContinue() }
+            .resizeAndShow()
+    }
+
+    private fun saveRailPosition(position: SolipsismRailPosition, summaryUpdater: SummaryUpdater) {
+        userPreferences.solipsismRailPosition = position
+        if (position == SolipsismRailPosition.LEFT || position == SolipsismRailPosition.RIGHT) {
+            userPreferences.solipsismRailOnLeft = position == SolipsismRailPosition.LEFT
+        }
+        summaryUpdater.updateSummary(position.toRailPositionDisplayString())
+        if (position.isExperimental) requireActivity().finish()
+    }
+
+    private fun currentRailPosition(): SolipsismRailPosition {
+        val stored = userPreferences.solipsismRailPosition
+        return if (stored.isExperimental && !developerPreferences.experimentalRailLayoutsEnabled) {
+            if (userPreferences.solipsismRailOnLeft) SolipsismRailPosition.LEFT else SolipsismRailPosition.RIGHT
+        } else stored
+    }
+
+    private fun SolipsismRailPosition.toRailPositionDisplayString(): String = getString(
+        when (this) {
+            SolipsismRailPosition.LEFT -> R.string.settings_rail_position_left
+            SolipsismRailPosition.TOP -> R.string.settings_rail_position_top_unoptimized
+            SolipsismRailPosition.BOTTOM -> R.string.settings_rail_position_bottom_unoptimized
+            SolipsismRailPosition.RIGHT -> R.string.settings_rail_position_right
+        }
+    )
+
     companion object {
         private const val SETTINGS_LANGUAGE = "app_language"
         private const val SETTINGS_CUSTOM_LANGUAGE = "custom_language_xml"
@@ -677,6 +761,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_JAVASCRIPT = "cb_javascript"
         private const val SETTINGS_COLOR_MODE = "cb_colormode"
         private const val SETTINGS_USER_AGENT = "agent"
+        private const val SETTINGS_RAIL_POSITION = "rail_position"
         private const val SETTINGS_CHROMPATIBILITY = "chrompatibility_mode"
         private const val SETTINGS_DOWNLOAD = "download"
         private const val SETTINGS_SAVE_IMAGES_AS_JPEG = "save_images_as_jpeg"

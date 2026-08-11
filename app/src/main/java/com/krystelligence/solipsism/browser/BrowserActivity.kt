@@ -622,7 +622,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     private fun createConfiguredRailAction(action: RailActionId): ImageButton = ImageButton(this).apply {
         background = drawable(R.drawable.solipsism_blend_button_background)
-        contentDescription = getString(railActionLabel(action))
+        contentDescription = railActionContentDescription(action)
         setImageResource(railActionIcon(action))
         setColorFilter(themeProvider.color(R.attr.iconColor))
         setPadding(8.dp, 8.dp, 8.dp, 8.dp)
@@ -712,12 +712,28 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         RailActionId.READ_ALOUD -> R.string.action_read_aloud
         RailActionId.COPY_LINK -> R.string.action_copy
         RailActionId.SCREENSHOT -> R.string.action_screenshot
-        RailActionId.USER_AGENT -> R.string.title_user_agent
+        RailActionId.USER_AGENT -> R.string.display_as
         RailActionId.BLOCK_ELEMENT -> R.string.block_element
         RailActionId.COOKIE_MANAGER -> R.string.cookie_manager
         RailActionId.SETTINGS -> R.string.settings
         else -> R.string.action_more
     }
+
+    private fun railActionContentDescription(action: RailActionId): String =
+        if (action == RailActionId.USER_AGENT) {
+            getString(
+                R.string.display_as_current,
+                when (userPreferences.userAgentChoice) {
+                    2 -> getString(R.string.agent_desktop)
+                    3 -> getString(R.string.agent_mobile)
+                    4 -> getString(R.string.agent_custom)
+                    5 -> getString(R.string.agent_folding)
+                    else -> getString(R.string.agent_default)
+                }
+            )
+        } else {
+            getString(railActionLabel(action))
+        }
 
     private fun toolbarLayoutForRail(): androidx.constraintlayout.widget.ConstraintLayout = binding.toolbarLayout
 
@@ -1183,7 +1199,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         layout.visibleOverflowActions
             .filter(::railActionAvailable)
             .forEach { action ->
-                container.addView(createActionMenuRow(railActionIcon(action), railActionLabel(action)) {
+                container.addView(createActionMenuRow(railActionIcon(action), railActionContentDescription(action)) {
                     browserMenuPopup?.dismiss()
                     runConfiguredRailAction(action)
                 })
@@ -1199,7 +1215,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                 marginEnd = 2.dp
             }
             background = drawable(R.drawable.browser_overflow_quick_button_background)
-            contentDescription = getString(railActionLabel(action))
+            contentDescription = railActionContentDescription(action)
             setPadding(8.dp, 8.dp, 8.dp, 8.dp)
             setImageResource(railActionIcon(action))
             setColorFilter(themeProvider.color(R.attr.colorOnSurface))
@@ -1244,7 +1260,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         }
     }
 
-    private fun createActionMenuRow(icon: Int, title: Int, action: () -> Unit): View =
+    private fun createActionMenuRow(icon: Int, title: String, action: () -> Unit): View =
         LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
@@ -1262,7 +1278,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             addView(TextView(context).apply {
                 layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                     .apply { marginStart = 7.dp }
-                text = getString(title)
+                text = title
                 setTextColor(themeProvider.color(R.attr.colorOnSurface))
                 textSize = 15f
                 maxLines = 1
@@ -1361,7 +1377,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun showUserAgentDialog(currentChoice: Int) {
         val choices = resources.getStringArray(R.array.user_agent)
         MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.title_user_agent)
+            .setTitle(R.string.display_as)
             .setSingleChoiceItems(choices, (currentChoice - 1).coerceIn(0, choices.lastIndex)) { dialog, which ->
                 presenter.onUserAgentChoiceSelected(which + 1)
                 dialog.dismiss()
@@ -1373,7 +1389,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun showCustomUserAgentDialog(currentValue: String) {
         BrowserDialog.showEditText(
             this,
-            R.string.title_user_agent,
+            R.string.display_as,
             R.string.agent_custom,
             currentValue,
             R.string.action_ok

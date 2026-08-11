@@ -388,7 +388,7 @@ class RailMenuStudioActivity : ThemableBrowserActivity() {
         RailActionId.READ_ALOUD -> StudioActionDescriptor(R.drawable.ic_settings_audio, R.string.action_read_aloud)
         RailActionId.COPY_LINK -> StudioActionDescriptor(R.drawable.ic_insert, R.string.action_copy)
         RailActionId.SCREENSHOT -> StudioActionDescriptor(R.drawable.ic_action_screenshot, R.string.action_screenshot)
-        RailActionId.USER_AGENT -> StudioActionDescriptor(R.drawable.ic_action_desktop, R.string.title_user_agent)
+        RailActionId.USER_AGENT -> StudioActionDescriptor(R.drawable.ic_action_desktop, R.string.display_as)
         RailActionId.BLOCK_ELEMENT -> StudioActionDescriptor(R.drawable.ic_settings_text, R.string.block_element)
         RailActionId.COOKIE_MANAGER -> StudioActionDescriptor(R.drawable.ic_settings_privacy, R.string.cookie_manager)
         RailActionId.SETTINGS -> StudioActionDescriptor(R.drawable.ic_action_settings, R.string.settings)

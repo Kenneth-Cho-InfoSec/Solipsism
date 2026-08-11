@@ -102,10 +102,6 @@
             android:key="rail_size"
             android:title="@string/settings_rail_size" />
         <Preference
-            android:icon="@drawable/ic_action_forward"
-            android:key="rail_position"
-            android:title="@string/settings_rail_position" />
-        <Preference
             android:icon="@drawable/ic_action_vault"
             android:key="rail_utility_action"
             android:title="@string/settings_rail_utility_action"
