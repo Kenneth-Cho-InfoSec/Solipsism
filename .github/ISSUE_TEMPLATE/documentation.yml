@@ -1,0 +1,37 @@
+name: Documentation request
+description: Report missing, unclear, or incorrect Solipsism documentation.
+title: "[Docs]: "
+labels:
+  - documentation
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please describe what documentation is missing or needs clarification.
+        Do not include passwords, private browsing data, or other sensitive information.
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Documentation location
+      description: Link to the page, README section, wiki page, setting, or feature involved.
+      placeholder: https://github.com/Kenneth-Cho-InfoSec/Solipsism/wiki/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: request
+    attributes:
+      label: What should be changed?
+      description: Explain what is missing, unclear, inaccurate, or difficult to follow.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested wording or examples
+      description: Optional. Include proposed text, screenshots, or examples that would help.
+    validations:
+      required: false

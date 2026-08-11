@@ -1,0 +1,38 @@
+name: Licensing and attribution
+description: Report a licensing, attribution, or third-party notice concern.
+title: "[Licensing]: "
+labels:
+  - licensing
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not include confidential legal advice or private information.
+        For a security vulnerability, use the repository security policy instead.
+
+  - type: input
+    id: component
+    attributes:
+      label: Component or dependency
+      description: Name the code, dependency, asset, or documentation entry involved.
+      placeholder: Example library or app component
+    validations:
+      required: true
+
+  - type: textarea
+    id: concern
+    attributes:
+      label: Licensing concern
+      description: Explain the missing notice, attribution, version, source link, or other issue.
+    validations:
+      required: true
+
+  - type: input
+    id: source
+    attributes:
+      label: Source or reference
+      description: Link to the relevant licence, repository, dependency page, or file.
+      placeholder: https://...
+    validations:
+      required: false
