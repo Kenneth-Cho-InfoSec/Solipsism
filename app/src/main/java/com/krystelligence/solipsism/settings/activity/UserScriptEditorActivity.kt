@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.core.content.edit
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.injector
@@ -80,9 +81,7 @@ class UserScriptEditorActivity : ThemableSettingsActivity() {
         binding.pasteButton.setOnClickListener { pasteFromClipboard() }
         binding.syntaxHighlightingSwitch.setOnCheckedChangeListener { _, enabled ->
             syntaxHighlightingEnabled = enabled
-            getPreferences(MODE_PRIVATE).edit()
-                .putBoolean(SYNTAX_HIGHLIGHTING_KEY, enabled)
-                .apply()
+            getPreferences(MODE_PRIVATE).edit { putBoolean(SYNTAX_HIGHLIGHTING_KEY, enabled) }
             if (enabled) UserScriptSyntaxHighlighter.apply(binding.sourceEditor)
             else UserScriptSyntaxHighlighter.clear(binding.sourceEditor)
         }

@@ -12,7 +12,6 @@
     <string name="action_forward">前往</string>
     <string name="settings">設定</string>
     <string name="location">允許網站存取地理位置</string>
-    <string name="agent">使用者代理</string>
     <string name="home">首頁</string>
     <string name="fullscreen">全螢幕模式</string>
     <string name="java">啟用 JavaScript</string>
@@ -49,7 +48,6 @@
     <string name="unknown_size">未知大小</string>
     <string name="action_cancel">取消</string>
     <string name="title_warning">警告</string>
-    <string name="title_user_agent">使用者代理</string>
     <string name="title_download_location">下載位置</string>
     <string name="title_custom_homepage">自訂首頁</string>
     <string name="action_webpage">網頁</string>
@@ -90,8 +88,6 @@
     <string name="block_ads">封鎖廣告</string>
 
     <!-- certificate -->
-    <string name="ssl_warning_dont_ask_again">不要再詢問此瀏覽階段。</string>
-    <string name="message_insecure_connection">此網站的連線不安全：\n%1$s\n仍要繼續？</string>
     <string name="message_certificate_date_invalid">憑證日期無效</string>
     <string name="message_certificate_expired">憑證已到期</string>
     <string name="message_certificate_domain_mismatch">憑證中的網域與網站中的網域不符</string>
@@ -137,7 +133,6 @@
     <string name="folder_custom">自訂</string>
     <string name="untitled">無標題</string>
     <string name="mpl_license">Mozilla Public License v. 2.0</string>
-    <string name="freeware">免費軟體</string>
     <string name="android_open_source_project">Android 開放原始碼計畫 (AOSP)</string>
     <string name="hphosts_ad_server_list">hpHosts 廣告伺服器清單</string>
     <string name="rendering_mode">轉換模式</string>
@@ -146,8 +141,6 @@
     <string name="name_inverted_grayscale">反轉灰階</string>
     <string name="name_increase_contrast">增加對比度</string>
     <string name="name_normal">標準</string>
-    <string name="library_netcipher">NetCipher</string>
-    <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">匯出書籤至備份檔</string>    
     <string name="import_backup">自備份檔匯入書籤</string>
     <string name="bookmark_export_path">書籤已匯出至</string>
@@ -164,9 +157,7 @@
     <string name="close_other_tabs">關閉其他分頁</string>
     <string name="third_party">封鎖第三方 Cookie</string>    
     <string name="color_mode">啟用色彩模式</string>
-    <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML 解析器</string>
-    <string name="mit_license">MIT 授權</string>
     <string name="url_contents">網址方塊內容</string>
     <string name="text_encoding">文字編碼</string>
     <string-array name="url_content_array">
@@ -196,8 +187,6 @@
     <string name="action_delete_all_bookmarks">刪除所有書籤</string>
     <string name="message_open_download_fail">此檔案不存在</string>
 
-    <string name="faq">FAQ</string>
-    <string name="faq_description">常見問題集</string>
         
     <!-- debug strings -->
     <string name="debug_title">偵錯設定</string>
@@ -215,7 +204,6 @@
     <string name="dialog_copy_link">複製連結</string>
     <string name="dialog_rename_folder">重新命名資料夾</string>
     <string name="dialog_remove_folder">移除資料夾</string>
-    <string name="dialog_title_close_browser">關閉瀏覽器</string>
     <string name="dialog_delete_all_downloads">刪除所有下載</string>
 
 
@@ -318,8 +306,6 @@
     <string name="history_decoy_mode_48_hours">過去 48 小時</string>
     <string name="history_decoy_mode_4_hours">最後 4 小時</string>
     <string name="history_decoy_mode_all_time">所有瀏覽記錄</string>
-    <string name="history_decoy_mode_done">誘餌歷史已創建</string>
-    <string name="history_decoy_mode_message">選擇瀏覽歷史記錄的時間範圍以替換為現實的誘餌搜尋：</string>
     <string name="history_decoy_mode_start">啟動誘餌模式</string>
     <string name="history_decoy_mode_title">啟動誘餌模式？</string>
     <string name="incognito_cookies_pie">隱身模式在單獨的進程中運行，該進程在每次會話後都會重置。隱身 cookie 首選項現在由常規 cookie 首選項控制。</string>
@@ -370,7 +356,6 @@
     <string name="settings_adblock_summary">使用自訂篩選器封鎖廣告、追蹤器和頁面元素。</string>
     <string name="settings_advanced_explain">選項卡恢復、彈出視窗、cookie、渲染、文字編碼和 URL 顯示。</string>
     <string name="settings_cluster_basics">基礎知識</string>
-    <string name="settings_cluster_other">其他</string>
     <string name="settings_debug_explain">僅供開發人員使用的診斷和故障排除選項。</string>
     <string name="settings_graphics_summary">自訂主題、顏色、壁紙和介面佈局。</string>
     <string name="settings_homepage_date_format">主頁日期格式</string>
@@ -383,9 +368,7 @@
     <string name="settings_homepage_domain_safe_mode">此主頁禁用 JavaScript、下載、表單、框架、檔案存取和彈出視窗。</string>
     <string name="settings_homepage_format_hint">使用 SimpleDateFormat 模式，例如 HH:mm 或 EEEE、d MMMM yyyy</string>
     <string name="settings_homepage_format_title">%1$s 格式</string>
-    <string name="settings_homepage_html_import">導入靜態 HTML</string>
     <string name="settings_homepage_html_invalid">無法清理 HTML 文件。</string>
-    <string name="settings_homepage_html_limit">HTML 已被淨化。 JavaScript、下載、表單、框架、遠端資源和可執行內容將被刪除。限制：512 KB HTML 和 128 KB CSS。</string>
     <string name="settings_homepage_html_too_large">HTML 檔案超出了 512 KB 限制。</string>
     <string name="settings_homepage_opacity_summary">%1$d%%</string>
     <string name="settings_homepage_opacity_title">主頁日期和時間不透明度</string>
@@ -411,8 +394,6 @@
     <string name="settings_rail_size_small">小的</string>
     <string name="settings_rail_size_super_compact">超級緊湊</string>
     <string name="settings_search_hint">搜尋設定</string>
-    <string name="settings_swap_qr_tabs">交換 QR 和 Tabs 按鈕</string>
-    <string name="settings_swap_qr_tabs_summary">將選項卡按鈕移至 QR 掃描器位置，以便更輕鬆地單手存取。</string>
     <string name="ssl_info_expires_on">到期日</string>
     <string name="ssl_info_issued_by">由...發出</string>
     <string name="ssl_info_issued_on">發佈於</string>
@@ -427,7 +408,6 @@
     <string name="userscripts_delete_title">刪除%1$s？</string>
     <string name="userscripts_deleted">已刪除 %1$s</string>
     <string name="userscripts_edit">編輯來源</string>
-    <string name="userscripts_edit_title">編輯%1$s</string>
     <string name="userscripts_enable">啟用使用者腳本</string>
     <string name="userscripts_enabled_summary">腳本僅在啟用並與當前頁面相符時運行</string>
     <string name="userscripts_explain">安裝和控制安全的非特權瀏覽器使用者腳本</string>
@@ -439,7 +419,6 @@
     <string name="userscripts_installed">已安裝的腳本</string>
     <string name="userscripts_no_scripts">未安裝使用者腳本</string>
     <string name="userscripts_options">使用者腳本選項</string>
-    <string name="userscripts_saved">已儲存 %1$s</string>
    <string name="userscripts_script_summary">版本 %1$s · %2$s</string>
     <string name="userscripts_write">Write userscript</string>
     <string name="userscripts_write_summary">Write a userscript or paste one from the clipboard</string>
@@ -454,22 +433,17 @@
     <string name="userscripts_clipboard_empty">No text userscript is available in the clipboard.</string>
     <string name="userscripts_privileged_title">Privileged userscript API requested</string>
     <string name="userscripts_privileged_message">This script requests privileged APIs. It can be saved, but Solipsism only executes scripts using @grant none; GM_* and other native APIs are not available.</string>
-    <string name="virus_total">病毒總數</string>
     <string name="virus_total_api_key">VirusTotal API 金鑰</string>
     <string name="virus_total_api_key_configured">使用 Android 金鑰庫進行設定和加密</string>
     <string name="virus_total_api_key_explanation">您的金鑰在此裝置上加密，並且僅傳送至官方 VirusTotal API。它永遠不會包含在下載或日誌中。</string>
     <string name="virus_total_api_key_hint">貼上您的個人 API 金鑰</string>
     <string name="virus_total_api_key_missing">未配置 — 本機掃描無需金鑰仍可運作</string>
-    <string name="virus_total_api_key_required">需要 VirusTotal API 金鑰</string>
-    <string name="virus_total_api_key_required_message">在「設定」→「VirusTotal」中新增您的個人 VirusTotal API 金鑰，或在下載提示中選擇「下載（跳過掃描）」。</string>
     <string name="virus_total_blocked_message">%1$s 未下載，因為 %2$d VirusTotal 防毒引擎將其報告為惡意軟體。</string>
     <string name="virus_total_clean_downloaded">惡意軟體掃描已通過；下載已儲存</string>
     <string name="virus_total_cloud_enabled">使用 VirusTotal 作為第二意見</string>
     <string name="virus_total_cloud_enabled_summary">本機檢查完成後，使用您的API key查詢或上傳符合條件的檔案。預設關閉。</string>
     <string name="virus_total_detection_count">%1$d 檢測：%2$s</string>
     <string name="virus_total_download_blocked">惡意軟體下載被阻止</string>
-    <string name="virus_total_enabled">使用 VirusTotal 掃描下載</string>
-    <string name="virus_total_enabled_summary">預設啟用。文件是私密暫存的，僅在通過掃描後才保存。</string>
     <string name="virus_total_error_api_key">VirusTotal API 金鑰遺失、無效或不允許執行此掃描。</string>
     <string name="virus_total_error_generic">無法驗證該文件。它沒有被下載。檢查網路並重試。</string>
     <string name="virus_total_error_rate_limit">VirusTotal 的 API 請求限制已達到。等待並重試，或直接下載而不掃描。</string>
@@ -486,7 +460,6 @@
     <string name="virus_total_scan_videos_summary">預設關閉以減少大量上傳和個人檔案的暴露。</string>
     <string name="virus_total_scanning">掃描下載</string>
     <string name="virus_total_scanning_file">惡意軟體掃描程式正在檢查 %1$s。除非通過，否則文件不會被儲存。</string>
-    <string name="virus_total_settings_summary">在儲存之前掃描符合條件的下載。</string>
     <string name="virus_total_view_report">查看報告</string>
     <string name="settings_custom_language_clear">清除自訂語言</string>
     <string name="settings_custom_language_cleared">已清除自訂語言替換。</string>
@@ -571,7 +544,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
@@ -619,7 +591,6 @@
     <string name="settings_haptics_preset_pixel">Pixel</string>
     <string name="settings_haptics_preset_samsung">Samsung</string>
     <string name="settings_haptics_preset_accessibility">Accessibility optimized</string>
-    <string name="settings_haptics_apply_preset">Apply preset</string>
     <string name="settings_haptics_import_preset">Import preset file</string>
     <string name="settings_haptics_export_preset">Export current preset</string>
     <string name="settings_haptics_preset_file_error">The preset file is invalid or contains unsupported values.</string>

@@ -29,8 +29,7 @@ fun <T> AlertDialog.Builder.withSingleChoiceItems(
 /**
  * Ensures that the dialog is appropriately sized and displays it.
  */
-@Suppress("NOTHING_TO_INLINE")
-inline fun AlertDialog.Builder.resizeAndShow(): Dialog =
+fun AlertDialog.Builder.resizeAndShow(): Dialog =
     show().also { BrowserDialog.setDialogSize(context, it) }
 
 /** Adds the same 24dp horizontal inset used by Material dialog text content. */

@@ -26,7 +26,6 @@
     <string name="action_forward">Avançar</string>
     <string name="settings">Definições</string>
     <string name="location">Acesso de localização</string>
-    <string name="agent">Agente</string>
     <string name="home">Página inicial</string>
     <string name="fullscreen">Modo de ecrã completo</string>
     <string name="java">Ativar JavaScript</string>
@@ -62,7 +61,6 @@
     <string name="dialog_download">Deseja descarregar este ficheiro? (%1$s)</string>
     <string name="action_cancel">Cancelar</string>
     <string name="title_warning">Aviso</string>
-    <string name="title_user_agent">Agente de utilizador</string>
     <string name="title_download_location">Local para as descargas</string>
     <string name="title_custom_homepage">Página inicial personalizada</string>
     <string name="action_webpage">Página web</string>
@@ -102,7 +100,6 @@
     <string name="licenses">Licenças Open Source</string>
     <string name="suggestion">Pesquisar por</string>
     <string name="block_ads">Bloquear anúncios</string>
-    <string name="message_insecure_connection">A ligação a este site não é segura:\n%1$s\nContinuar?</string>
     <string name="message_certificate_date_invalid">data de certificado inválida</string>
     <string name="message_certificate_expired">certificado expirado</string>
     <string name="message_certificate_domain_mismatch">domínio do certificado não coincide com o domínio do site</string>
@@ -139,7 +136,6 @@
     <string name="folder_custom">Personalizada</string>
     <string name="untitled">Sem título</string>
     <string name="mpl_license">Mozilla Public License v. 2.0</string>
-    <string name="freeware">Freeware</string>
     <string name="android_open_source_project">Projeto Android Open Source</string>
     <string name="hphosts_ad_server_list">hpHosts Ad Server List</string>
     <string name="rendering_mode">Modo de processamento</string>
@@ -148,8 +144,6 @@
     <string name="name_inverted_grayscale">Escala de cinzento invertida</string>
     <string name="name_increase_contrast">Aumentar contraste</string>
     <string name="name_normal">Normal</string>
-    <string name="library_netcipher">NetCipher</string>
-    <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">Exportar marcadores para backup</string>
     <string name="import_backup">Importar marcadores de um backup</string>
     <string name="bookmark_export_path">Marcadores guardados em</string>
@@ -165,9 +159,7 @@
     <string name="close_other_tabs">Fechar os outros separadores</string>
     <string name="third_party">Bloquear cookies de terceiros</string>
     <string name="color_mode">Ativar modo de cor</string>
-    <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
-    <string name="mit_license">Licença MIT</string>
     <string name="url_contents">Conteúdo da caixa do URL</string>
     <string name="text_encoding">Codificação do texto</string>
     <string-array name="url_content_array">
@@ -193,8 +185,6 @@
     <string name="message_added_to_homescreen">Atalho adicionado ao ecrã</string>
     <string name="action_delete_all_bookmarks">Apagar todos os marcadores</string>
 
-    <string name="faq">FAQ</string>
-    <string name="faq_description">Perguntas frequentes</string>
 
     <!-- debug strings -->
     <string name="debug_title">Definições de depuração</string>
@@ -212,7 +202,6 @@
     <string name="dialog_copy_link">Copiar ligação</string>
     <string name="dialog_rename_folder">Renomear pasta</string>
     <string name="dialog_remove_folder">Remover pasta</string>
-    <string name="dialog_title_close_browser">Fechar navegador</string>
     <string name="action_clear">Claro</string>
     <string name="action_donate">Doar</string>
     <string name="action_downloads">Transferências</string>
@@ -292,8 +281,6 @@
     <string name="history_decoy_mode_48_hours">Últimas 48 horas</string>
     <string name="history_decoy_mode_4_hours">Últimas 4 horas</string>
     <string name="history_decoy_mode_all_time">Todo o histórico de navegação</string>
-    <string name="history_decoy_mode_done">História de isca criada</string>
-    <string name="history_decoy_mode_message">Selecione o período do histórico de navegação para substituir por pesquisas falsas realistas:</string>
     <string name="history_decoy_mode_start">Iniciar o modo chamariz</string>
     <string name="history_decoy_mode_title">Iniciar o modo chamariz?</string>
     <string name="incognito_cookies_pie">O modo de navegação anônima é executado em um processo separado que é redefinido após cada sessão. As preferências de cookies anônimos agora são controladas pelas preferências de cookies normais.</string>
@@ -363,7 +350,6 @@
     <string name="settings_advanced_explain">Restauração de guias, pop-ups, cookies, renderização, codificação de texto e exibição de URL.</string>
     <string name="settings_black_status_bar">Barra de status preta</string>
     <string name="settings_cluster_basics">Noções básicas</string>
-    <string name="settings_cluster_other">Outro</string>
     <string name="settings_debug_explain">Diagnósticos e opções de solução de problemas somente para desenvolvedores.</string>
     <string name="settings_graphics_summary">Personalize temas, cores, papéis de parede e layout da interface.</string>
     <string name="settings_homepage_date_format">Formato de data da página inicial</string>
@@ -376,9 +362,7 @@
     <string name="settings_homepage_domain_safe_mode">JavaScript, downloads, formulários, frames, acesso a arquivos e janelas pop-up estão desativados para esta página inicial.</string>
     <string name="settings_homepage_format_hint">Use padrões SimpleDateFormat, por exemplo HH:mm ou EEEE, d MMMM yyyy</string>
     <string name="settings_homepage_format_title">Formato %1$s</string>
-    <string name="settings_homepage_html_import">Importar HTML estático</string>
     <string name="settings_homepage_html_invalid">O arquivo HTML não pôde ser limpo.</string>
-    <string name="settings_homepage_html_limit">HTML é higienizado. JavaScript, downloads, formulários, frames, recursos remotos e conteúdo executável são removidos. Limite: 512 KB HTML e 128 KB CSS.</string>
     <string name="settings_homepage_html_too_large">O arquivo HTML excede o limite de 512 KB.</string>
     <string name="settings_homepage_opacity_summary">%1$d%%</string>
     <string name="settings_homepage_opacity_title">Opacidade de data e hora da página inicial</string>
@@ -404,14 +388,11 @@
     <string name="settings_rail_size_small">Pequeno</string>
     <string name="settings_rail_size_super_compact">Supercompacto</string>
     <string name="settings_search_hint">Configurações de pesquisa</string>
-    <string name="settings_swap_qr_tabs">Trocar botões QR e Tabs</string>
-    <string name="settings_swap_qr_tabs_summary">Mova o botão Guias para a posição do scanner QR para facilitar o acesso com uma mão.</string>
     <string name="shortcut_message_failed_to_add">Desculpe, seu iniciador não suporta atalhos.</string>
     <string name="ssl_info_expires_on">Expira em</string>
     <string name="ssl_info_issued_by">Emitida pela</string>
     <string name="ssl_info_issued_on">Emitido em</string>
     <string name="ssl_info_issued_to">Emitido para</string>
-    <string name="ssl_warning_dont_ask_again">Não solicite novamente esta sessão de navegação.</string>
     <string name="tab_frozen">Congelado…</string>
     <string name="title_file_chooser">Escolha o arquivo</string>
     <string name="title_permission_request">Solicitação de permissão</string>
@@ -424,7 +405,6 @@
     <string name="userscripts_delete_title">Excluir %1$s?</string>
     <string name="userscripts_deleted">Excluído %1$s</string>
     <string name="userscripts_edit">Editar fonte</string>
-    <string name="userscripts_edit_title">Editar %1$s</string>
     <string name="userscripts_enable">Habilitar scripts de usuário</string>
     <string name="userscripts_enabled_summary">Os scripts são executados somente quando estão ativados e correspondem à página atual</string>
     <string name="userscripts_explain">Instale e controle scripts de usuário de navegador seguros e sem privilégios</string>
@@ -436,7 +416,6 @@
     <string name="userscripts_installed">Scripts instalados</string>
     <string name="userscripts_no_scripts">Nenhum script de usuário instalado</string>
     <string name="userscripts_options">Opções de script de usuário</string>
-    <string name="userscripts_saved">Salvo %1$s</string>
    <string name="userscripts_script_summary">Versão %1$s · %2$s</string>
     <string name="userscripts_write">Write userscript</string>
     <string name="userscripts_write_summary">Write a userscript or paste one from the clipboard</string>
@@ -451,22 +430,17 @@
     <string name="userscripts_clipboard_empty">No text userscript is available in the clipboard.</string>
     <string name="userscripts_privileged_title">Privileged userscript API requested</string>
     <string name="userscripts_privileged_message">This script requests privileged APIs. It can be saved, but Solipsism only executes scripts using @grant none; GM_* and other native APIs are not available.</string>
-    <string name="virus_total">VirusTotal</string>
     <string name="virus_total_api_key">Chave de API do VirusTotal</string>
     <string name="virus_total_api_key_configured">Configurado e criptografado com Android Keystore</string>
     <string name="virus_total_api_key_explanation">Sua chave é criptografada neste dispositivo e enviada apenas para a API oficial do VirusTotal. Nunca é incluído em downloads ou registros.</string>
     <string name="virus_total_api_key_hint">Cole sua chave de API pessoal</string>
     <string name="virus_total_api_key_missing">Não configurado — a verificação local ainda funciona sem chave</string>
-    <string name="virus_total_api_key_required">Chave de API VirusTotal necessária</string>
-    <string name="virus_total_api_key_required_message">Adicione sua chave de API pessoal do VirusTotal em Configurações → VirusTotal ou escolha “Baixar (pular verificação)” no prompt de download.</string>
     <string name="virus_total_blocked_message">%1$s não foi baixado porque o(s) mecanismo(s) antivírus %2$d VirusTotal o(s) relataram como malicioso.</string>
     <string name="virus_total_clean_downloaded">Verificação de malware aprovada; download salvo</string>
     <string name="virus_total_cloud_enabled">Use o VirusTotal como uma segunda opinião</string>
     <string name="virus_total_cloud_enabled_summary">Após a verificação local, consulte ou carregue os arquivos qualificados usando sua chave de API. Desativado por padrão.</string>
     <string name="virus_total_detection_count">Detecção(ões) %1$d: %2$s</string>
     <string name="virus_total_download_blocked">Download de malware bloqueado</string>
-    <string name="virus_total_enabled">Verifique downloads com VirusTotal</string>
-    <string name="virus_total_enabled_summary">Habilitado por padrão. Os arquivos são armazenados de forma privada e salvos somente após passarem pela verificação.</string>
     <string name="virus_total_error_api_key">A chave da API do VirusTotal está ausente, é inválida ou não tem permissão para executar esta verificação.</string>
     <string name="virus_total_error_generic">O arquivo não pôde ser verificado. Não foi baixado. Verifique a rede e tente novamente.</string>
     <string name="virus_total_error_rate_limit">O limite de solicitações de API do VirusTotal foi atingido. Aguarde e tente novamente ou baixe explicitamente sem digitalizar.</string>
@@ -483,7 +457,6 @@
     <string name="virus_total_scan_videos_summary">Desativado por padrão para reduzir uploads grandes e exposição de arquivos pessoais.</string>
     <string name="virus_total_scanning">Download de digitalização</string>
     <string name="virus_total_scanning_file">O Malware Scanner está verificando %1$s. O arquivo não será salvo a menos que seja aprovado.</string>
-    <string name="virus_total_settings_summary">Verifique os downloads qualificados antes de salvá-los.</string>
     <string name="virus_total_view_report">Ver relatório</string>
     <string name="webrtc_support">Suporte WebRTC</string>
     <plurals name="notification_incognito_running_title">
@@ -573,7 +546,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
@@ -621,7 +593,6 @@
     <string name="settings_haptics_preset_pixel">Pixel</string>
     <string name="settings_haptics_preset_samsung">Samsung</string>
     <string name="settings_haptics_preset_accessibility">Accessibility optimized</string>
-    <string name="settings_haptics_apply_preset">Apply preset</string>
     <string name="settings_haptics_import_preset">Import preset file</string>
     <string name="settings_haptics_export_preset">Export current preset</string>
     <string name="settings_haptics_preset_file_error">The preset file is invalid or contains unsupported values.</string>

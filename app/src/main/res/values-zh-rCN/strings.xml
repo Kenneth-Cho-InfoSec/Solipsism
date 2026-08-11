@@ -12,7 +12,6 @@
     <string name="action_forward">前进</string>
     <string name="settings">设置</string>
     <string name="location">位置信息访问</string>
-    <string name="agent">用户代理</string>
     <string name="home">主页</string>
     <string name="fullscreen">全屏模式</string>
     <string name="java">启用 JavaScript</string>
@@ -48,7 +47,6 @@
     <string name="unknown_size">未知大小</string>
     <string name="action_cancel">取消</string>
     <string name="title_warning">警告</string>
-    <string name="title_user_agent">用户代理</string>
     <string name="title_download_location">下载位置</string>
     <string name="title_custom_homepage">自定义主页</string>
     <string name="action_webpage">网页</string>
@@ -105,8 +103,6 @@
     <string name="action_message_canceled">操作已取消</string>
 
     <!-- SSL warnings -->
-    <string name="ssl_warning_dont_ask_again">本次会话中不再询问</string>
-    <string name="message_insecure_connection">与此页的连接不安全：\n%1$s\n无论如何都要继续吗？</string>
     <string name="message_certificate_date_invalid">证书的日期无效</string>
     <string name="message_certificate_expired">证书已过期</string>
     <string name="message_certificate_domain_mismatch">证书中的域名与站点域名不匹配</string>
@@ -202,8 +198,6 @@
     <string name="action_delete_all_bookmarks">删除所有书签</string>
     <string name="message_open_download_fail">文件不存在</string>
 
-    <string name="faq">FAQ</string>
-    <string name="faq_description">常见问题</string>
 
     <!-- debug strings -->
     <string name="debug_title">调试设置</string>
@@ -220,7 +214,6 @@
     <string name="dialog_copy_link">复制链接</string>
     <string name="dialog_rename_folder">重命名文件夹</string>
     <string name="dialog_remove_folder">移除文件夹</string>
-    <string name="dialog_title_close_browser">关闭浏览器</string>
     <string name="dialog_delete_all_downloads">删除所有下载内容</string>
 
     <!-- Tools dialog -->
@@ -325,20 +318,15 @@
     <string name="donation_prompt_title">支持唯我论浏览器</string>
     <string name="download_donation_message">请考虑捐赠以支持发展。</string>
     <string name="download_skip_scanning">下载（跳过扫描）</string>
-    <string name="freeware">免费软件</string>
     <string name="history_clear_all">清除所有历史记录</string>
     <string name="history_decoy_mode_48_hours">过去 48 小时</string>
     <string name="history_decoy_mode_4_hours">最后 4 小时</string>
     <string name="history_decoy_mode_all_time">所有浏览历史记录</string>
-    <string name="history_decoy_mode_done">诱饵历史已创建</string>
-    <string name="history_decoy_mode_message">选择浏览历史记录的时间范围以替换为现实的诱饵搜索：</string>
     <string name="history_decoy_mode_start">启动诱饵模式</string>
     <string name="history_decoy_mode_title">启动诱饵模式？</string>
     <string name="hphosts_ad_server_list">hpHosts 广告服务器列表</string>
     <string name="infinity">∞</string>
     <string name="jsoup">jsoup：Java HTML 解析器</string>
-    <string name="library_netcipher">网络密码</string>
-    <string name="license_gnu">GNU 较宽松的通用公共许可证</string>
     <string name="malware_definitions">更新恶意软件定义</string>
     <string name="malware_definitions_auto_update">自动更新定义</string>
     <string name="malware_definitions_auto_update_summary">每周检查一次。设备上的数据库限制为 10 MB。</string>
@@ -357,7 +345,6 @@
     <string name="malware_scanner_enabled">扫描下载的恶意软件</string>
     <string name="malware_scanner_enabled_summary">默认启用。文件在本地检查，通过后才保存。</string>
     <string name="malware_scanner_settings_summary">使用可选的 VirusTotal 第二意见进行设备上扫描。</string>
-    <string name="mit_license">麻省理工学院许可证</string>
     <string name="mpl_license">Mozilla 公共许可证 v.2.0</string>
     <string name="permission_description_storage">将文件下载到您的设备需要存储权限。</string>
     <string name="qr_scanner_hint">将二维码对齐到框架内</string>
@@ -385,7 +372,6 @@
     <string name="settings_adblock_summary">使用自定义过滤器阻止广告、跟踪器和页面元素。</string>
     <string name="settings_advanced_explain">选项卡恢复、弹出窗口、cookie、渲染、文本编码和 URL 显示。</string>
     <string name="settings_cluster_basics">基础知识</string>
-    <string name="settings_cluster_other">其他</string>
     <string name="settings_debug_explain">仅供开发人员使用的诊断和故障排除选项。</string>
     <string name="settings_graphics_summary">自定义主题、颜色、壁纸和界面布局。</string>
     <string name="settings_homepage_date_format">主页日期格式</string>
@@ -398,9 +384,7 @@
     <string name="settings_homepage_domain_safe_mode">此主页禁用 JavaScript、下载、表单、框架、文件访问和弹出窗口。</string>
     <string name="settings_homepage_format_hint">使用 SimpleDateFormat 模式，例如 HH:mm 或 EEEE、d MMMM yyyy</string>
     <string name="settings_homepage_format_title">%1$s 格式</string>
-    <string name="settings_homepage_html_import">导入静态 HTML</string>
     <string name="settings_homepage_html_invalid">无法清理 HTML 文件。</string>
-    <string name="settings_homepage_html_limit">HTML 已被净化。 JavaScript、下载、表单、框架、远程资源和可执行内容将被删除。限制：512 KB HTML 和 128 KB CSS。</string>
     <string name="settings_homepage_html_too_large">HTML 文件超出了 512 KB 限制。</string>
     <string name="settings_homepage_opacity_summary">%1$d%%</string>
     <string name="settings_homepage_opacity_title">主页日期和时间不透明度</string>
@@ -426,9 +410,6 @@
     <string name="settings_rail_size_small">小的</string>
     <string name="settings_rail_size_super_compact">超级紧凑</string>
     <string name="settings_search_hint">搜索设置</string>
-    <string name="settings_swap_qr_tabs">交换 QR 和 Tabs 按钮</string>
-    <string name="settings_swap_qr_tabs_summary">将选项卡按钮移至 QR 扫描仪位置，以便更轻松地单手访问。</string>
-    <string name="snacktory">小吃店</string>
     <string name="title_file_chooser">选择文件</string>
     <string name="ublock_origin">内置 uBlock Origin 过滤器</string>
     <string name="ublock_origin_summary">在主机阻止之上分层 uBlock Origin 兼容网络过滤器。</string>
@@ -439,7 +420,6 @@
     <string name="userscripts_delete_title">删除%1$s？</string>
     <string name="userscripts_deleted">已删除 %1$s</string>
     <string name="userscripts_edit">编辑来源</string>
-    <string name="userscripts_edit_title">编辑%1$s</string>
     <string name="userscripts_enable">启用用户脚本</string>
     <string name="userscripts_enabled_summary">脚本仅在启用并与当前页面匹配时运行</string>
     <string name="userscripts_explain">安装和控制安全的非特权浏览器用户脚本</string>
@@ -451,7 +431,6 @@
     <string name="userscripts_installed">已安装的脚本</string>
     <string name="userscripts_no_scripts">未安装用户脚本</string>
     <string name="userscripts_options">用户脚本选项</string>
-    <string name="userscripts_saved">已保存 %1$s</string>
    <string name="userscripts_script_summary">版本 %1$s · %2$s</string>
     <string name="userscripts_write">Write userscript</string>
     <string name="userscripts_write_summary">Write a userscript or paste one from the clipboard</string>
@@ -466,22 +445,17 @@
     <string name="userscripts_clipboard_empty">No text userscript is available in the clipboard.</string>
     <string name="userscripts_privileged_title">Privileged userscript API requested</string>
     <string name="userscripts_privileged_message">This script requests privileged APIs. It can be saved, but Solipsism only executes scripts using @grant none; GM_* and other native APIs are not available.</string>
-    <string name="virus_total">病毒总数</string>
     <string name="virus_total_api_key">VirusTotal API 密钥</string>
     <string name="virus_total_api_key_configured">使用 Android 密钥库进行配置和加密</string>
     <string name="virus_total_api_key_explanation">您的密钥在此设备上加密，并且仅发送到官方 VirusTotal API。它永远不会包含在下载或日志中。</string>
     <string name="virus_total_api_key_hint">粘贴您的个人 API 密钥</string>
     <string name="virus_total_api_key_missing">未配置 — 本地扫描无需密钥仍可工作</string>
-    <string name="virus_total_api_key_required">需要 VirusTotal API 密钥</string>
-    <string name="virus_total_api_key_required_message">在“设置”→“VirusTotal”中添加您的个人 VirusTotal API 密钥，或在下载提示中选择“下载（跳过扫描）”。</string>
     <string name="virus_total_blocked_message">%1$s 未下载，因为 %2$d VirusTotal 防病毒引擎将其报告为恶意软件。</string>
     <string name="virus_total_clean_downloaded">恶意软件扫描已通过；下载已保存</string>
     <string name="virus_total_cloud_enabled">使用 VirusTotal 作为第二意见</string>
     <string name="virus_total_cloud_enabled_summary">本地检查完成后，使用您的API key查询或上传符合条件的文件。默认关闭。</string>
     <string name="virus_total_detection_count">%1$d 检测：%2$s</string>
     <string name="virus_total_download_blocked">恶意软件下载被阻止</string>
-    <string name="virus_total_enabled">使用 VirusTotal 扫描下载</string>
-    <string name="virus_total_enabled_summary">默认启用。文件是私密暂存的，仅在通过扫描后才保存。</string>
     <string name="virus_total_error_api_key">VirusTotal API 密钥丢失、无效或不允许执行此扫描。</string>
     <string name="virus_total_error_generic">无法验证该文件。它没有被下载。检查网络并重试。</string>
     <string name="virus_total_error_rate_limit">VirusTotal 的 API 请求限制已达到。等待并重试，或者直接下载而不扫描。</string>
@@ -498,7 +472,6 @@
     <string name="virus_total_scan_videos_summary">默认关闭以减少大量上传和个人文件的暴露。</string>
     <string name="virus_total_scanning">扫描下载</string>
     <string name="virus_total_scanning_file">恶意软件扫描程序正在检查 %1$s。除非通过，否则文件不会被保存。</string>
-    <string name="virus_total_settings_summary">在保存之前扫描符合条件的下载。</string>
     <string name="virus_total_view_report">查看报告</string>
     <string name="settings_custom_language_clear">清除自定义语言</string>
     <string name="settings_custom_language_cleared">已清除自定义语言替换。</string>
@@ -583,7 +556,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
@@ -631,7 +603,6 @@
     <string name="settings_haptics_preset_pixel">Pixel</string>
     <string name="settings_haptics_preset_samsung">Samsung</string>
     <string name="settings_haptics_preset_accessibility">Accessibility optimized</string>
-    <string name="settings_haptics_apply_preset">Apply preset</string>
     <string name="settings_haptics_import_preset">Import preset file</string>
     <string name="settings_haptics_export_preset">Export current preset</string>
     <string name="settings_haptics_preset_file_error">The preset file is invalid or contains unsupported values.</string>

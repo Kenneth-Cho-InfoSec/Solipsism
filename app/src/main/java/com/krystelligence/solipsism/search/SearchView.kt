@@ -42,6 +42,8 @@ class SearchView @JvmOverloads constructor(
         return super.onTouchEvent(event)
     }
 
+    override fun performClick(): Boolean = super.performClick()
+
     private fun isLongPress(actionDownTime: Long): Boolean =
         TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - actionDownTime) >= ViewConfiguration.getLongPressTimeout()
 

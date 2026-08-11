@@ -33,7 +33,6 @@ class JvmObjectStore<T>(
         "object-store-${hashingAlgorithm.hash(key)}"
     )
 
-    @Suppress("UNCHECKED_CAST")
     override suspend fun retrieve(): T? = withContext(objectStoreDispatcher) {
         val storageFile = createStorageFile()
         if (storageFile.exists()) {

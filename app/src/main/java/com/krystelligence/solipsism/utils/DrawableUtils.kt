@@ -14,6 +14,7 @@ import android.graphics.Typeface
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
 import com.krystelligence.solipsism.R
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -26,7 +27,7 @@ object DrawableUtils {
     @JvmStatic
     fun createImageInsetInRoundedSquare(context: Context, @DrawableRes drawableRes: Int): Bitmap {
         val icon = ThemeUtils.getBitmapFromVectorDrawable(context, drawableRes)
-        val image = Bitmap.createBitmap(icon.width, icon.height, Bitmap.Config.ARGB_8888)
+        val image = createBitmap(icon.width, icon.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(image)
         val paint = Paint().apply {
             color = Color.WHITE
@@ -57,7 +58,7 @@ object DrawableUtils {
      */
     @JvmStatic
     fun createRoundedLetterImage(character: Char, width: Int, height: Int, color: Int): Bitmap {
-        val image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val image = createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(image)
         val paint = Paint().apply {
             this.color = color

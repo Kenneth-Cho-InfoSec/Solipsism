@@ -18,6 +18,7 @@ import com.krystelligence.solipsism.browser.ui.RailMenuStudioActivity
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.html.homepage.StaticHomepageSanitizer
 import android.net.Uri
+import androidx.core.net.toUri
 import android.os.Bundle
 import android.content.Intent
 import android.os.Build
@@ -556,7 +557,7 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             .setViewWithDialogMargins(input)
             .setNegativeButton(R.string.action_cancel, null)
             .setPositiveButton(R.string.action_ok) { _, _ ->
-                val uri = Uri.parse(input.text.toString().trim())
+                val uri = input.text.toString().trim().toUri()
                 if ((uri.scheme == "http" || uri.scheme == "https") && !uri.host.isNullOrBlank()) {
                     userPreferences.homepage = uri.toString()
                     userPreferences.homepageSource = HomepageSource.DOMAIN.value

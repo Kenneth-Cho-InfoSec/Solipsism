@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 import android.os.Build
 import android.text.format.Formatter
 import android.webkit.CookieManager
@@ -220,7 +221,7 @@ class DownloadPermissionsHelper @Inject constructor(
                 }
             }
             .setNeutralButton(R.string.action_donate) { _, _ ->
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(KO_FI_URL)))
+                activity.startActivity(Intent(Intent.ACTION_VIEW, KO_FI_URL.toUri()))
             }
         if (scanEligible) {
             builder.setNegativeButton(R.string.download_skip_scanning) { _, _ -> directDownload() }
@@ -426,7 +427,7 @@ class DownloadPermissionsHelper @Inject constructor(
                 activity.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://www.virustotal.com/gui/file/${result.sha256}")
+                        "https://www.virustotal.com/gui/file/${result.sha256}".toUri()
                     )
                 )
             }

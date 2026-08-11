@@ -11,7 +11,6 @@
     <string name="action_forward">Εμπρός</string>
     <string name="settings">Ρυθμίσειs</string>
     <string name="location">Πρόσβαση σε τοποθεσία</string>
-    <string name="agent">User Agent</string>
     <string name="home">Αρχική σελίδα</string>
     <string name="fullscreen">Λειτουργία πλήρης οθόνης</string>
     <string name="java">Ενεργοποίηση JavaScript</string>
@@ -47,7 +46,6 @@
     <string name="dialog_download">Θα θέλατε να κατεβάσετε αυτό το αρχείο; (%1$s)</string>
     <string name="action_cancel">Ακύρωση</string>
     <string name="title_warning">Προσοχή</string>
-    <string name="title_user_agent">User Agent</string>
     <string name="title_download_location">Τοποθεσία λήψης</string>
     <string name="title_custom_homepage">Συγκεκριμένη Αρχική Σελίδα</string>
     <string name="action_webpage">Σελίδα</string>
@@ -104,7 +102,6 @@
     <string name="folder_custom">Συγκεκριμένο</string>
     <string name="untitled">Χωρίς τίτλο</string>
     <string name="mpl_license">Mozilla Public License v. 2.0</string>
-    <string name="freeware">Freeware</string>
     <string name="android_open_source_project">Android Open Source Project</string>
     <string name="hphosts_ad_server_list">hpHosts Ad Server List</string>
     <string name="rendering_mode">Rendering</string>
@@ -112,8 +109,6 @@
     <string name="name_grayscale">Grayscale</string>
     <string name="name_inverted_grayscale">Inverted Grayscale</string>
     <string name="name_normal">Normal</string>
-    <string name="library_netcipher">NetCipher</string>
-    <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">Εξαγωγή σελιδοδεικτών σε αρχείο</string>
     <string name="import_backup">Εισαγωγή σελιδοδεικτών απο αρχείο</string>
     <string name="bookmark_export_path">Σελιδοδείκτες εξάχθηκαν στο</string>
@@ -217,7 +212,6 @@
     <string name="dialog_remove_folder">Κατάργηση φακέλου</string>
     <string name="dialog_remove_from_history">Αφαίρεση από το ιστορικό</string>
     <string name="dialog_rename_folder">Μετονομασία φακέλου</string>
-    <string name="dialog_title_close_browser">Κλείστε το πρόγραμμα περιήγησης</string>
     <string name="dialog_toggle_desktop">Εναλλαγή του πράκτορα χρήστη επιτραπέζιου υπολογιστή</string>
     <string name="dialog_tools_title">Εργαλεία σελίδας</string>
     <string name="do_not_track">Αίτημα \'Να μην παρακολουθείται\'</string>
@@ -225,15 +219,11 @@
     <string name="donation_prompt_title">Υποστήριξη του προγράμματος περιήγησης Solipsism</string>
     <string name="download_donation_message">Εξετάστε το ενδεχόμενο να κάνετε δωρεά για να υποστηρίξετε την ανάπτυξη.</string>
     <string name="download_skip_scanning">Λήψη (Παράλειψη σάρωσης)</string>
-    <string name="faq">FAQ</string>
-    <string name="faq_description">Συχνές ερωτήσεις</string>
     <string name="folder">Όνομα φακέλου</string>
     <string name="history_clear_all">Εκκαθάριση όλης της ιστορίας</string>
     <string name="history_decoy_mode_48_hours">Τελευταίες 48 ώρες</string>
     <string name="history_decoy_mode_4_hours">Τελευταίες 4 ώρες</string>
     <string name="history_decoy_mode_all_time">Όλο το ιστορικό περιήγησης</string>
-    <string name="history_decoy_mode_done">Δημιουργήθηκε ιστορία δόλωμα</string>
-    <string name="history_decoy_mode_message">Επιλέξτε το χρονικό πλαίσιο του ιστορικού περιήγησης που θα αντικαταστήσετε με ρεαλιστικές αναζητήσεις δόλωμα:</string>
     <string name="history_decoy_mode_start">Ξεκινήστε τη λειτουργία Decoy</string>
     <string name="history_decoy_mode_title">Έναρξη λειτουργίας Decoy;</string>
     <string name="host">Πλήθος:</string>
@@ -269,11 +259,9 @@
     <string name="message_certificate_invalid">Το πιστοποιητικό δεν είναι έγκυρο</string>
     <string name="message_certificate_not_yet_valid">Το πιστοποιητικό δεν είναι ακόμη έγκυρο</string>
     <string name="message_certificate_untrusted">Το πιστοποιητικό δεν είναι αξιόπιστο</string>
-    <string name="message_insecure_connection">Η σύνδεση σε αυτόν τον ιστότοπο δεν είναι ασφαλής:\n%1$s\nΘέλετε να συνεχίσετε;</string>
     <string name="message_open_download_fail">Αυτό το αρχείο δεν υπάρχει πια</string>
     <string name="message_permission_request">%1$sZ\n\nθα ήθελα να χρησιμοποιήσω:\nZ\n%2$s</string>
     <string name="message_web_storage_cleared">Ο χώρος αποθήκευσης Ιστού εκκαθαρίστηκε</string>
-    <string name="mit_license">Άδεια MIT</string>
     <string name="name_increase_contrast">Αυξήστε την αντίθεση</string>
     <string name="notification_incognito_running_description">Ειδοποίηση ανώνυμης περιήγησης σε εξέλιξη</string>
     <string name="notification_incognito_running_message">Αγγίξτε για άνοιγμα</string>
@@ -326,7 +314,6 @@
     <string name="settings_advanced_explain">Επαναφορά καρτελών, αναδυόμενα παράθυρα, cookie, απόδοση, κωδικοποίηση κειμένου και εμφάνιση URL.</string>
     <string name="settings_black_status_bar">Μαύρη γραμμή κατάστασης</string>
     <string name="settings_cluster_basics">Βασικά</string>
-    <string name="settings_cluster_other">Αλλος</string>
     <string name="settings_debug_explain">Επιλογές διάγνωσης και αντιμετώπισης προβλημάτων μόνο για προγραμματιστές.</string>
     <string name="settings_graphics_summary">Προσαρμόστε θέματα, χρώματα, ταπετσαρίες και διάταξη διεπαφής.</string>
     <string name="settings_homepage_date_format">Μορφή ημερομηνίας αρχικής σελίδας</string>
@@ -339,9 +326,7 @@
     <string name="settings_homepage_domain_safe_mode">Η JavaScript, οι λήψεις, οι φόρμες, τα πλαίσια, η πρόσβαση σε αρχεία και τα αναδυόμενα παράθυρα είναι απενεργοποιημένα για αυτήν την αρχική σελίδα.</string>
     <string name="settings_homepage_format_hint">Χρησιμοποιήστε μοτίβα SimpleDateFormat, για παράδειγμα ΩΩ:λλ ή ΕΕΕΕ, η ΜΜΜΜ εεεε</string>
     <string name="settings_homepage_format_title">Μορφή %1$s</string>
-    <string name="settings_homepage_html_import">Εισαγωγή στατικού HTML</string>
     <string name="settings_homepage_html_invalid">Δεν ήταν δυνατή η απολύμανση του αρχείου HTML.</string>
-    <string name="settings_homepage_html_limit">Η HTML απολυμαίνεται. Το JavaScript, οι λήψεις, οι φόρμες, τα πλαίσια, οι απομακρυσμένοι πόροι και το εκτελέσιμο περιεχόμενο καταργούνται. Όριο: 512 KB HTML και 128 KB CSS.</string>
     <string name="settings_homepage_html_too_large">Το αρχείο HTML υπερβαίνει το όριο των 512 KB.</string>
     <string name="settings_homepage_opacity_summary">%1$d%%</string>
     <string name="settings_homepage_opacity_title">Αδιαφάνεια ημερομηνίας και ώρας αρχικής σελίδας</string>
@@ -367,15 +352,11 @@
     <string name="settings_rail_size_small">Μικρό</string>
     <string name="settings_rail_size_super_compact">Super Compact</string>
     <string name="settings_search_hint">Ρυθμίσεις αναζήτησης</string>
-    <string name="settings_swap_qr_tabs">Εναλλαγή κουμπιών QR και Tabs</string>
-    <string name="settings_swap_qr_tabs_summary">Μετακινήστε το κουμπί Tabs στη θέση του σαρωτή QR για ευκολότερη πρόσβαση με το ένα χέρι.</string>
     <string name="shortcut_message_failed_to_add">Λυπούμαστε, το πρόγραμμα εκκίνησης δεν υποστηρίζει συντομεύσεις.</string>
-    <string name="snacktory">Σνακ</string>
     <string name="ssl_info_expires_on">Λήγει στις</string>
     <string name="ssl_info_issued_by">Εκδόθηκε από</string>
     <string name="ssl_info_issued_on">Εκδόθηκε στις</string>
     <string name="ssl_info_issued_to">Εκδόθηκε σε</string>
-    <string name="ssl_warning_dont_ask_again">Μην ζητήσετε ξανά αυτήν την περίοδο περιήγησης.</string>
     <string name="tab_frozen">Παγωμένος…</string>
     <string name="tabs">Καρτέλες</string>
     <string name="text_encoding">Κωδικοποίηση κειμένου</string>
@@ -394,7 +375,6 @@
     <string name="userscripts_delete_title">Διαγραφή %1$s;</string>
     <string name="userscripts_deleted">Διαγράφηκε το %1$s</string>
     <string name="userscripts_edit">Επεξεργασία πηγής</string>
-    <string name="userscripts_edit_title">Επεξεργασία %1$s</string>
     <string name="userscripts_enable">Ενεργοποιήστε τα σενάρια χρήστη</string>
     <string name="userscripts_enabled_summary">Τα σενάρια εκτελούνται μόνο όταν είναι ενεργοποιημένα και αντιστοιχίζονται στην τρέχουσα σελίδα</string>
     <string name="userscripts_explain">Εγκαταστήστε και ελέγξτε ασφαλή, μη προνομιούχα σενάρια χρήστη του προγράμματος περιήγησης</string>
@@ -406,7 +386,6 @@
     <string name="userscripts_installed">Εγκατεστημένα σενάρια</string>
     <string name="userscripts_no_scripts">Δεν έχουν εγκατασταθεί σενάρια χρήστη</string>
     <string name="userscripts_options">Επιλογές σεναρίου χρήστη</string>
-    <string name="userscripts_saved">Αποθηκεύτηκε %1$s</string>
    <string name="userscripts_script_summary">Έκδοση %1$s · %2$s</string>
     <string name="userscripts_write">Write userscript</string>
     <string name="userscripts_write_summary">Write a userscript or paste one from the clipboard</string>
@@ -421,22 +400,17 @@
     <string name="userscripts_clipboard_empty">No text userscript is available in the clipboard.</string>
     <string name="userscripts_privileged_title">Privileged userscript API requested</string>
     <string name="userscripts_privileged_message">This script requests privileged APIs. It can be saved, but Solipsism only executes scripts using @grant none; GM_* and other native APIs are not available.</string>
-    <string name="virus_total">VirusTotal</string>
     <string name="virus_total_api_key">Κλειδί API VirusTotal</string>
     <string name="virus_total_api_key_configured">Διαμορφώθηκε και κρυπτογραφήθηκε με το Android Keystore</string>
     <string name="virus_total_api_key_explanation">Το κλειδί σας είναι κρυπτογραφημένο σε αυτήν τη συσκευή και αποστέλλεται μόνο στο επίσημο API του VirusTotal. Δεν περιλαμβάνεται ποτέ σε λήψεις ή αρχεία καταγραφής.</string>
     <string name="virus_total_api_key_hint">Επικολλήστε το προσωπικό σας κλειδί API</string>
     <string name="virus_total_api_key_missing">Δεν έχει ρυθμιστεί — η τοπική σάρωση εξακολουθεί να λειτουργεί χωρίς κλειδί</string>
-    <string name="virus_total_api_key_required">Απαιτείται κλειδί API VirusTotal</string>
-    <string name="virus_total_api_key_required_message">Προσθέστε το προσωπικό σας κλειδί VirusTotal API στις Ρυθμίσεις → VirusTotal ή επιλέξτε "Λήψη (Παράλειψη σάρωσης)" στη γραμμή εντολών λήψης.</string>
     <string name="virus_total_blocked_message">Δεν έγινε λήψη του %1$s επειδή οι μηχανές προστασίας από ιούς %2$d VirusTotal το ανέφεραν ως κακόβουλο.</string>
     <string name="virus_total_clean_downloaded">Η σάρωση κακόβουλου λογισμικού πέρασε. η λήψη αποθηκεύτηκε</string>
     <string name="virus_total_cloud_enabled">Χρησιμοποιήστε το VirusTotal ως δεύτερη γνώμη</string>
     <string name="virus_total_cloud_enabled_summary">Μετά τον τοπικό έλεγχο, υποβάλετε ερώτημα ή μεταφορτώστε τα κατάλληλα αρχεία χρησιμοποιώντας το κλειδί API σας. Απενεργοποίηση από προεπιλογή.</string>
     <string name="virus_total_detection_count">Ανίχνευση %1$d: %2$s</string>
     <string name="virus_total_download_blocked">Αποκλείστηκε η λήψη κακόβουλου λογισμικού</string>
-    <string name="virus_total_enabled">Σάρωση λήψεων με το VirusTotal</string>
-    <string name="virus_total_enabled_summary">Ενεργοποιημένο από προεπιλογή. Τα αρχεία τοποθετούνται ιδιωτικά και αποθηκεύονται μόνο αφού περάσουν τη σάρωση.</string>
     <string name="virus_total_error_api_key">Το κλειδί API VirusTotal λείπει, δεν είναι έγκυρο ή δεν επιτρέπεται να πραγματοποιήσει αυτήν τη σάρωση.</string>
     <string name="virus_total_error_generic">Δεν ήταν δυνατή η επαλήθευση του αρχείου. Δεν έγινε λήψη. Ελέγξτε το δίκτυο και δοκιμάστε ξανά.</string>
     <string name="virus_total_error_rate_limit">Το όριο αιτημάτων API του VirusTotal έχει συμπληρωθεί. Περιμένετε και δοκιμάστε ξανά ή κατεβάστε ρητά χωρίς σάρωση.</string>
@@ -453,7 +427,6 @@
     <string name="virus_total_scan_videos_summary">Απενεργοποίηση από προεπιλογή για μείωση μεγάλων μεταφορτώσεων και έκθεσης προσωπικών αρχείων.</string>
     <string name="virus_total_scanning">Λήψη σάρωσης</string>
     <string name="virus_total_scanning_file">Ο σαρωτής κακόβουλου λογισμικού ελέγχει το %1$s. Το αρχείο δεν θα αποθηκευτεί αν δεν περάσει.</string>
-    <string name="virus_total_settings_summary">Σαρώστε τις κατάλληλες λήψεις πριν τις αποθηκεύσετε.</string>
     <string name="virus_total_view_report">Προβολή αναφοράς</string>
     <string name="webrtc_support">Υποστήριξη WebRTC</string>
     <plurals name="notification_incognito_running_title">
@@ -549,7 +522,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
@@ -597,7 +569,6 @@
     <string name="settings_haptics_preset_pixel">Pixel</string>
     <string name="settings_haptics_preset_samsung">Samsung</string>
     <string name="settings_haptics_preset_accessibility">Accessibility optimized</string>
-    <string name="settings_haptics_apply_preset">Apply preset</string>
     <string name="settings_haptics_import_preset">Import preset file</string>
     <string name="settings_haptics_export_preset">Export current preset</string>
     <string name="settings_haptics_preset_file_error">The preset file is invalid or contains unsupported values.</string>

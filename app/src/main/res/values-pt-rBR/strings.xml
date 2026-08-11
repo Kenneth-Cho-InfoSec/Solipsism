@@ -26,7 +26,6 @@
     <string name="action_forward">Avançar</string>
     <string name="settings">Configurações</string>
     <string name="location">Acesso de localização</string>
-    <string name="agent">Agente</string>
     <string name="home">Página inicial</string>
     <string name="fullscreen">Modo de tela completa</string>
     <string name="java">Ativar JavaScript</string>
@@ -62,7 +61,6 @@
     <string name="dialog_download">Gostaria de transferir este arquivo? (%1$s)</string>
     <string name="action_cancel">Cancelar</string>
     <string name="title_warning">Aviso</string>
-    <string name="title_user_agent">Agente de utilizador</string>
     <string name="title_download_location">Local das transferências</string>
     <string name="title_custom_homepage">Página inicial personalizada</string>
     <string name="action_webpage">Página web</string>
@@ -127,7 +125,6 @@
     <string name="folder_custom">Personalizado</string>
     <string name="untitled">Sem título</string>
     <string name="mpl_license">Mozilla Public License v. 2.0</string>
-    <string name="freeware">Freeware</string>
     <string name="android_open_source_project">Projeto Android Open Source</string>
     <string name="hphosts_ad_server_list">hpHosts Ad Server List</string>
     <string name="rendering_mode">Modo de renderização</string>
@@ -135,8 +132,6 @@
     <string name="name_grayscale">Escala cinza</string>
     <string name="name_inverted_grayscale">Escala cinza invertida</string>
     <string name="name_normal">Normal</string>
-    <string name="library_netcipher">NetCipher</string>
-    <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">Exportar favoritos para backup</string>
     <string name="import_backup">Importar favoritos de um backup</string>
     <string name="bookmark_export_path">Favoritos salvos em</string>
@@ -151,9 +146,7 @@
     <string name="close_all_tabs">Fechar todas as abas</string>
     <string name="third_party">Bloquear cookies de terceiros</string>
     <string name="color_mode">Ativar modo de cor</string>
-    <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
-    <string name="mit_license">MIT License</string>
     <string name="url_contents">Conteúdo da caixa do URL</string>
     <string-array name="url_content_array">
         <item>Domínio (padrão)</item>
@@ -245,7 +238,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>

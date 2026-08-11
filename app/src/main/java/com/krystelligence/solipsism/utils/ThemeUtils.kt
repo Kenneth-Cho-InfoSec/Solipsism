@@ -14,6 +14,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
 import com.krystelligence.solipsism.R
 
 object ThemeUtils {
@@ -85,7 +86,7 @@ object ThemeUtils {
     @JvmStatic
     fun getBitmapFromVectorDrawable(context: Context, drawableId: Int): Bitmap {
         val drawable = getVectorDrawable(context, drawableId)
-        val bitmap = Bitmap.createBitmap(
+        val bitmap = createBitmap(
             drawable.intrinsicWidth,
             drawable.intrinsicHeight,
             Bitmap.Config.ARGB_8888
@@ -108,7 +109,7 @@ object ThemeUtils {
     @JvmStatic
     fun createThemedBitmap(context: Context, @DrawableRes res: Int, @ColorInt color: Int): Bitmap {
         val sourceBitmap = getBitmapFromVectorDrawable(context, res)
-        val resultBitmap = Bitmap.createBitmap(
+        val resultBitmap = createBitmap(
             sourceBitmap.width,
             sourceBitmap.height,
             Bitmap.Config.ARGB_8888

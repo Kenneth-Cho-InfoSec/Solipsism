@@ -10,7 +10,6 @@
     <string name="action_forward">Вперёд</string>
     <string name="settings">Настройки</string>
     <string name="location">Местоположение</string>
-    <string name="agent">User Agent</string>
     <string name="home">Новая вкладка</string>
     <string name="fullscreen">Во весь экран</string>
     <string name="java">Включить JavaScript</string>
@@ -46,7 +45,6 @@
     <string name="dialog_download">Загрузить файл? (%1$s)</string>
     <string name="action_cancel">Отмена</string>
     <string name="title_warning">Внимание</string>
-    <string name="title_user_agent">User Agent</string>
     <string name="title_download_location">Путь загрузки</string>
     <string name="title_custom_homepage">Введите адрес</string>
     <string name="action_webpage">Открыть адрес</string>
@@ -86,7 +84,6 @@
     <string name="licenses">Open Source Licenses</string>
     <string name="suggestion">Искать</string>
     <string name="block_ads">Блокировать рекламу</string>
-    <string name="message_insecure_connection">Соединение не защищено:\n%1$s\nВсё равно продолжить?</string>
     <string name="message_certificate_date_invalid">дата сертификата недействительна</string>
     <string name="message_certificate_expired">истёк срок действия сертификата</string>
     <string name="message_certificate_domain_mismatch">имя сертификата не соответствует имени сайта</string>
@@ -121,7 +118,6 @@
     <string name="folder_custom">Выбрать</string>
     <string name="untitled">Без названия</string>
     <string name="mpl_license">Mozilla Public License v. 2.0</string>
-    <string name="freeware">Freeware</string>
     <string name="android_open_source_project">Android Open Source Project</string>
     <string name="hphosts_ad_server_list">Список рекламных серверов</string>
     <string name="rendering_mode">Режим отображения страниц</string>
@@ -130,8 +126,6 @@
     <string name="name_inverted_grayscale">Инвертированные оттенки серого</string>
     <string name="name_increase_contrast">Повышенный контраст</string>
     <string name="name_normal">Нормальный</string>
-    <string name="library_netcipher">NetCipher</string>
-    <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">Сделать резервную копию закладок</string>
     <string name="import_backup">Восстановить закладки из резервной копии</string>
     <string name="bookmark_export_path">Экспортировать закладки в </string>
@@ -147,9 +141,7 @@
     <string name="close_other_tabs">Закрыть остальные вкладки</string>
     <string name="third_party">Блокировать куки со сторонних сайтов</string>
     <string name="color_mode">Включить цветной режим</string>
-    <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
-    <string name="mit_license">MIT License</string>
     <string name="url_contents">Содержимое поля URL</string>
     <string name="text_encoding">Кодировка текста</string>
     <string-array name="url_content_array">
@@ -174,8 +166,6 @@
     <string name="message_added_to_homescreen">Ярлык добавлен на домашний экран</string>
     <string name="action_delete_all_bookmarks">Удалить все закладки</string>
 
-    <string name="faq">FAQ</string>
-    <string name="faq_description">Часто задаваемые вопросы</string>
 
     <!-- debug strings -->
     <string name="debug_title">Настройки отладки</string>
@@ -195,7 +185,6 @@
     <string name="dialog_remove_folder">Удалить папку</string>
     <string name="dialog_remove_from_history">Удалить из истории</string>
     <string name="dialog_rename_folder">Переименовать папку</string>
-    <string name="dialog_title_close_browser">Закрыть браузер</string>
     <string name="label_realm">Серверное сообщение: %s</string>
     <string name="message_open_download_fail">Файл не доступен</string>
     <string name="powered_by_baidu">Используя Baidu</string>
@@ -289,8 +278,6 @@
     <string name="history_decoy_mode_48_hours">Последние 48 часов</string>
     <string name="history_decoy_mode_4_hours">Последние 4 часа</string>
     <string name="history_decoy_mode_all_time">Вся история просмотров</string>
-    <string name="history_decoy_mode_done">История приманок создана</string>
-    <string name="history_decoy_mode_message">Выберите временной интервал истории посещений, чтобы заменить его реалистичными поисковыми ложными поисками:</string>
     <string name="history_decoy_mode_start">Запустить режим приманки</string>
     <string name="history_decoy_mode_title">Запустить режим приманки?</string>
     <string name="incognito_cookies_pie">Режим инкогнито запускается в отдельном процессе, который сбрасывается после каждого сеанса. Настройки файлов cookie в режиме инкогнито теперь контролируются обычными настройками файлов cookie.</string>
@@ -346,7 +333,6 @@
     <string name="settings_adblock_summary">Блокируйте рекламу, трекеры и элементы страниц с помощью настраиваемых фильтров.</string>
     <string name="settings_advanced_explain">Восстановление вкладок, всплывающие окна, файлы cookie, рендеринг, кодировка текста и отображение URL-адресов.</string>
     <string name="settings_cluster_basics">Основы</string>
-    <string name="settings_cluster_other">Другой</string>
     <string name="settings_debug_explain">Возможности диагностики и устранения неполадок, доступные только для разработчиков.</string>
     <string name="settings_graphics_summary">Настраивайте темы, цвета, обои и макет интерфейса.</string>
     <string name="settings_homepage_date_format">Формат даты на главной странице</string>
@@ -359,9 +345,7 @@
     <string name="settings_homepage_domain_safe_mode">На этой домашней странице отключены JavaScript, загрузки, формы, фреймы, доступ к файлам и всплывающие окна.</string>
     <string name="settings_homepage_format_hint">Используйте шаблоны SimpleDateFormat, например HH:mm или EEEE, d MMMM гггг.</string>
     <string name="settings_homepage_format_title">Формат %1$s</string>
-    <string name="settings_homepage_html_import">Импорт статического HTML</string>
     <string name="settings_homepage_html_invalid">HTML-файл не удалось очистить.</string>
-    <string name="settings_homepage_html_limit">HTML дезинфицируется. JavaScript, загрузки, формы, фреймы, удаленные ресурсы и исполняемый контент удаляются. Ограничение: 512 КБ HTML и 128 КБ CSS.</string>
     <string name="settings_homepage_html_too_large">Размер HTML-файла превышает ограничение в 512 КБ.</string>
     <string name="settings_homepage_opacity_summary">%1$d%%</string>
     <string name="settings_homepage_opacity_title">Непрозрачность даты и времени на главной странице</string>
@@ -387,14 +371,11 @@
     <string name="settings_rail_size_small">Маленький</string>
     <string name="settings_rail_size_super_compact">Супер Компактный</string>
     <string name="settings_search_hint">Настройки поиска</string>
-    <string name="settings_swap_qr_tabs">Поменяйте местами кнопки QR и вкладок</string>
-    <string name="settings_swap_qr_tabs_summary">Переместите кнопку «Вкладки» в положение QR-сканера для облегчения доступа одной рукой.</string>
     <string name="shortcut_message_failed_to_add">К сожалению, ваш лаунчер не поддерживает ярлыки.</string>
     <string name="ssl_info_expires_on">Срок действия истекает</string>
     <string name="ssl_info_issued_by">Выдан</string>
     <string name="ssl_info_issued_on">Выпущено</string>
     <string name="ssl_info_issued_to">Выдано</string>
-    <string name="ssl_warning_dont_ask_again">Больше не спрашивать об этом сеансе просмотра.</string>
     <string name="tab_frozen">Замороженный…</string>
     <string name="title_file_chooser">Выбрать файл</string>
     <string name="title_permission_request">Запрос разрешения</string>
@@ -406,7 +387,6 @@
     <string name="userscripts_delete_title">Удалить %1$s?</string>
     <string name="userscripts_deleted">Удален %1$s</string>
     <string name="userscripts_edit">Изменить источник</string>
-    <string name="userscripts_edit_title">Редактировать %1$s</string>
     <string name="userscripts_enable">Включить пользовательские скрипты</string>
     <string name="userscripts_enabled_summary">Скрипты запускаются только тогда, когда они включены и сопоставлены с текущей страницей.</string>
     <string name="userscripts_explain">Устанавливайте и контролируйте безопасные непривилегированные пользовательские сценарии браузера.</string>
@@ -418,7 +398,6 @@
     <string name="userscripts_installed">Установленные скрипты</string>
     <string name="userscripts_no_scripts">Пользовательские скрипты не установлены</string>
     <string name="userscripts_options">Параметры пользовательского скрипта</string>
-    <string name="userscripts_saved">Сохранено %1$s</string>
    <string name="userscripts_script_summary">Версия %1$s · %2$s</string>
     <string name="userscripts_write">Write userscript</string>
     <string name="userscripts_write_summary">Write a userscript or paste one from the clipboard</string>
@@ -433,22 +412,17 @@
     <string name="userscripts_clipboard_empty">No text userscript is available in the clipboard.</string>
     <string name="userscripts_privileged_title">Privileged userscript API requested</string>
     <string name="userscripts_privileged_message">This script requests privileged APIs. It can be saved, but Solipsism only executes scripts using @grant none; GM_* and other native APIs are not available.</string>
-    <string name="virus_total">Всего вирусов</string>
     <string name="virus_total_api_key">Ключ API VirusTotal</string>
     <string name="virus_total_api_key_configured">Настроен и зашифрован с помощью хранилища ключей Android.</string>
     <string name="virus_total_api_key_explanation">Ваш ключ зашифрован на этом устройстве и отправляется только в официальный API VirusTotal. Он никогда не включается в загрузки или журналы.</string>
     <string name="virus_total_api_key_hint">Вставьте свой личный ключ API</string>
     <string name="virus_total_api_key_missing">Не настроено — локальное сканирование по-прежнему работает без ключа</string>
-    <string name="virus_total_api_key_required">Требуется ключ API VirusTotal.</string>
-    <string name="virus_total_api_key_required_message">Добавьте свой личный API-ключ VirusTotal в «Настройки» → «VirusTotal» или выберите «Загрузить (пропустить сканирование)» в приглашении к загрузке.</string>
     <string name="virus_total_blocked_message">%1$s не был загружен, поскольку антивирусная система %2$d VirusTotal определила его как вредоносный.</string>
     <string name="virus_total_clean_downloaded">Проверка на наличие вредоносного ПО пройдена; загрузка сохранена</string>
     <string name="virus_total_cloud_enabled">Используйте VirusTotal в качестве второго мнения</string>
     <string name="virus_total_cloud_enabled_summary">После локальной проверки запросите или загрузите подходящие файлы, используя свой ключ API. По умолчанию выключено.</string>
     <string name="virus_total_detection_count">%1$d обнаружение(я): %2$s</string>
     <string name="virus_total_download_blocked">Загрузка вредоносного ПО заблокирована</string>
-    <string name="virus_total_enabled">Сканировать загрузки с помощью VirusTotal</string>
-    <string name="virus_total_enabled_summary">Включено по умолчанию. Файлы хранятся конфиденциально и сохраняются только после прохождения сканирования.</string>
     <string name="virus_total_error_api_key">Ключ API VirusTotal отсутствует, недействителен или не разрешен для выполнения этого сканирования.</string>
     <string name="virus_total_error_generic">Файл не удалось проверить. Он не был загружен. Проверьте сеть и повторите попытку.</string>
     <string name="virus_total_error_rate_limit">Достигнут лимит запросов API VirusTotal. Подождите и повторите попытку или загрузите явно без сканирования.</string>
@@ -465,7 +439,6 @@
     <string name="virus_total_scan_videos_summary">По умолчанию отключено, чтобы уменьшить объем загрузки и раскрытие личных файлов.</string>
     <string name="virus_total_scanning">Сканирование загрузки</string>
     <string name="virus_total_scanning_file">Сканер вредоносных программ проверяет %1$s. Файл не будет сохранен, если он не пройдет.</string>
-    <string name="virus_total_settings_summary">Сканируйте подходящие загрузки перед сохранением.</string>
     <string name="virus_total_view_report">Посмотреть отчет</string>
     <string name="webrtc_support">Поддержка WebRTC</string>
     <plurals name="notification_incognito_running_title">
@@ -557,7 +530,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
@@ -605,7 +577,6 @@
     <string name="settings_haptics_preset_pixel">Pixel</string>
     <string name="settings_haptics_preset_samsung">Samsung</string>
     <string name="settings_haptics_preset_accessibility">Accessibility optimized</string>
-    <string name="settings_haptics_apply_preset">Apply preset</string>
     <string name="settings_haptics_import_preset">Import preset file</string>
     <string name="settings_haptics_export_preset">Export current preset</string>
     <string name="settings_haptics_preset_file_error">The preset file is invalid or contains unsupported values.</string>

@@ -82,7 +82,6 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.provider.MediaStore
 import android.speech.tts.TextToSpeech
-import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
@@ -110,6 +109,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -1066,7 +1067,6 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         }
     }
 
-    @SuppressLint("DiscouragedPrivateApi")
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (::uiConfiguration.isInitialized &&
             uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM
@@ -1136,7 +1136,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             ViewGroup.LayoutParams.WRAP_CONTENT,
             true
         ).apply {
-            setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+            setBackgroundDrawable(android.graphics.Color.TRANSPARENT.toDrawable())
             elevation = 18.dp.toFloat()
             isOutsideTouchable = true
             setAnimationStyle(android.R.style.Animation_Dialog)
@@ -1615,7 +1615,6 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         qrScannerLauncher.launch(Intent(this, QrScannerActivity::class.java))
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun installUrlRailGestures() {
         val rail = binding.verticalUrlText?.parent as? View ?: return
         var downY = 0f
@@ -1947,7 +1946,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             return
         }
 
-        preferences.edit().putBoolean(DONATION_PROMPT_SHOWN, true).apply()
+        preferences.edit { putBoolean(DONATION_PROMPT_SHOWN, true) }
         mainHandler.post {
             MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.donation_prompt_title)
@@ -1959,7 +1958,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     private fun openDonationPage() {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(KO_FI_URL)))
+        startActivity(Intent(Intent.ACTION_VIEW, KO_FI_URL.toUri()))
     }
 
     override fun showHistoryOptionsDialog(historyEntry: HistoryEntry) {

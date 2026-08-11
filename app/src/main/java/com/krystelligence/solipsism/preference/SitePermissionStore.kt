@@ -1,6 +1,7 @@
 package com.krystelligence.solipsism.preference
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.krystelligence.solipsism.browser.di.UserPrefs
 import org.json.JSONObject
 import java.net.URI
@@ -60,7 +61,7 @@ class SitePermissionStore @Inject constructor(
             site.put(permission.name, decision.name)
         }
         if (site.length() == 0) root.remove(normalized) else root.put(normalized, site)
-        preferences.edit().putString(STORAGE_KEY, root.toString()).apply()
+        preferences.edit { putString(STORAGE_KEY, root.toString()) }
     }
 
     /**
@@ -77,7 +78,7 @@ class SitePermissionStore @Inject constructor(
         val root = read()
         if (!root.has(normalized)) {
             root.put(normalized, JSONObject())
-            preferences.edit().putString(STORAGE_KEY, root.toString()).apply()
+            preferences.edit { putString(STORAGE_KEY, root.toString()) }
         }
         return true
     }
@@ -85,11 +86,11 @@ class SitePermissionStore @Inject constructor(
     fun clearOrigin(origin: String) {
         normalizeOrigin(origin)?.let {
             val root = read().also { json -> json.remove(it) }
-            preferences.edit().putString(STORAGE_KEY, root.toString()).apply()
+            preferences.edit { putString(STORAGE_KEY, root.toString()) }
         }
     }
 
-    fun clearAll() = preferences.edit().remove(STORAGE_KEY).apply()
+    fun clearAll() = preferences.edit { remove(STORAGE_KEY) }
 
     companion object {
         private const val STORAGE_KEY = "sitePermissionProfiles"

@@ -17,6 +17,7 @@ import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.webkit.WebView
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import java.io.File
 import javax.inject.Inject
 
@@ -112,7 +113,7 @@ class UrlHandler @Inject constructor(
             if (NavigationSecurity.isTrustedInternalFileUrl(url, trustedInternalRoots())) {
                 return false
             }
-            val path = runCatching { android.net.Uri.parse(url).path }.getOrNull()
+            val path = runCatching { url.toUri().path }.getOrNull()
             val file = path?.let(::File)
 
             if (file?.isFile == true) {

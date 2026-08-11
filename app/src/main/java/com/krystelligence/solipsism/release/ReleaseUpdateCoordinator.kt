@@ -3,6 +3,7 @@ package com.krystelligence.solipsism.release
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.krystelligence.solipsism.BuildConfig
@@ -66,14 +67,14 @@ class ReleaseUpdateCoordinator(
             .setNegativeButton(R.string.action_not_now, null)
         release.preferredApk?.let { asset ->
             builder.setPositiveButton(R.string.update_download) { _, _ ->
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(asset.browserDownloadUrl)))
+                context.startActivity(Intent(Intent.ACTION_VIEW, asset.browserDownloadUrl.toUri()))
             }
         } ?: builder.setPositiveButton(R.string.release_notes_view_online) { _, _ -> openReleasePage(release) }
         builder.show()
     }
 
     private fun openReleasePage(release: ReleaseInfo) {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(release.htmlUrl)))
+        context.startActivity(Intent(Intent.ACTION_VIEW, release.htmlUrl.toUri()))
     }
 
     private companion object {

@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import androidx.core.content.ContextCompat
 import com.krystelligence.solipsism.preference.UserPreferences
 import javax.inject.Inject
 
@@ -17,7 +18,7 @@ class HapticFeedbackController @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             application.getSystemService(VibratorManager::class.java)?.defaultVibrator
         } else {
-            @Suppress("DEPRECATION") application.getSystemService(Vibrator::class.java)
+            ContextCompat.getSystemService(application, Vibrator::class.java)
         }
     }
 
@@ -35,11 +36,7 @@ class HapticFeedbackController @Inject constructor(
         val duration = config.second.coerceIn(10, 500).toLong()
         val amplitude = (255 * config.third.coerceIn(0, 100) / 100).coerceIn(1, 255)
         vibrator?.takeIf { it.hasVibrator() }?.let {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                it.vibrate(VibrationEffect.createOneShot(duration, amplitude))
-            } else {
-                @Suppress("DEPRECATION") it.vibrate(duration)
-            }
+            it.vibrate(VibrationEffect.createOneShot(duration, amplitude))
         }
     }
 

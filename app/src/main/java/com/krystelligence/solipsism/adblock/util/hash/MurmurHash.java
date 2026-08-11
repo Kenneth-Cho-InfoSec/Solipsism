@@ -16,7 +16,6 @@ package com.krystelligence.solipsism.adblock.util.hash;
  * @version 1.0.2
  * @see <a href="https://github.com/mstorsjo/vlc-android/blob/8887725c89e2ad9ca04490300595479fe6d170e8/vlc-android/src/org/videolan/vlc/util/MurmurHash.java">github.com/vlc-android</a>
  */
-@SuppressWarnings({"WeakerAccess", "PointlessArithmeticExpression", "unused"})
 public final class MurmurHash {
 
     private MurmurHash() {}

@@ -3,8 +3,8 @@ plugins {
     id("com.github.ben-manes.versions")
     id("com.google.devtools.ksp") version "2.3.7"
     id("com.anthonycr.plugins.mezzanine") version "2.3.0"
-    id("com.autonomousapps.dependency-analysis") version "3.9.0"
-    id("com.squareup.sort-dependencies") version "0.16"
+    id("com.autonomousapps.dependency-analysis") version "3.18.0"
+    id("com.squareup.sort-dependencies") version "0.20.0"
 }
 
 android {
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "6.1.2"
+        versionName = "6.1.3"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -55,7 +55,7 @@ android {
             buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"true\")")
             buildConfigField("String", "RELEASE_SITE_URL", "\"https://kenneth-cho-infosec.github.io/Solipsism/\"")
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 136
+            versionCode = 137
         }
     }
     packaging {
@@ -72,11 +72,11 @@ android {
 dependencies {
     val robolectric = "4.16.1"
     val mezzanineVersion = "2.3.0"
-    val daggerVersion = "2.59.2"
+    val daggerVersion = "2.60.1"
     val kotlin = "2.3.21"
     val datastore = "1.2.1"
     val coil = "3.4.0"
-    val cameraX = "1.6.0"
+    val cameraX = "1.6.1"
 
     implementation("androidx.activity:activity:1.13.0")
     implementation("androidx.annotation:annotation:1.10.0")
@@ -85,7 +85,7 @@ dependencies {
     implementation("androidx.camera:camera-core:$cameraX")
     implementation("androidx.camera:camera-lifecycle:$cameraX")
     implementation("androidx.camera:camera-view:$cameraX")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.2")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
     implementation("androidx.core:core:1.18.0")
     implementation("androidx.core:core-ktx:1.18.0")
@@ -95,19 +95,19 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences-core:$datastore")
     implementation("androidx.drawerlayout:drawerlayout:1.2.0")
     implementation("androidx.fragment:fragment:1.8.9")
-    implementation("androidx.lifecycle:lifecycle-common:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-common:2.11.0")
     implementation("androidx.palette:palette:1.0.0")
     implementation("androidx.preference:preference:1.2.1")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("androidx.webkit:webkit:1.16.0")
     implementation("com.anthonycr.mezzanine:core:$mezzanineVersion")
-    implementation("com.google.android.material:material:1.14.0-beta01")
+    implementation("com.google.android.material:material:1.14.0")
     implementation("com.google.dagger:dagger:$daggerVersion")
-    implementation("com.google.guava:guava:32.0.1-android")
-    implementation("com.google.zxing:core:3.5.3")
+    implementation("com.google.guava:guava:33.6.0-android")
+    implementation("com.google.zxing:core:3.5.4")
     implementation("com.guolindev.permissionx:permissionx:1.8.1")
-    implementation("com.squareup.okhttp3:okhttp:5.3.2")
-    implementation("com.squareup.okio:okio:3.17.0")
+    implementation("com.squareup.okhttp3:okhttp:5.4.0")
+    implementation("com.squareup.okio:okio:3.18.1")
     implementation("io.coil-kt.coil3:coil:$coil")
     implementation("io.coil-kt.coil3:coil-core:$coil")
     implementation("io.coil-kt.coil3:coil-network-okhttp:$coil")
@@ -115,11 +115,10 @@ dependencies {
     implementation("io.reactivex.rxjava3:rxjava:3.1.12")
     implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
     implementation("javax.inject:javax.inject:1")
-    //noinspection GradleDependency
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    implementation("org.jsoup:jsoup:1.22.2")
-    implementation("org.jspecify:jspecify:1.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+    implementation("org.jsoup:jsoup:1.23.1")
+    implementation("org.jspecify:jspecify:1.0.1")
     implementation("org.reactivestreams:reactive-streams:1.0.4")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")

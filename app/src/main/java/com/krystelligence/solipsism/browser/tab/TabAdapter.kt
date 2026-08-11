@@ -17,7 +17,6 @@ import com.krystelligence.solipsism.ssl.SslCertificateInfo
 import com.krystelligence.solipsism.ssl.SslState
 import com.krystelligence.solipsism.utils.Option
 import com.krystelligence.solipsism.utils.value
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -27,6 +26,7 @@ import android.view.View
 import android.webkit.WebView
 import android.webkit.JavascriptInterface
 import android.util.Log
+import androidx.core.graphics.createBitmap
 import org.json.JSONObject
 import org.json.JSONTokener
 import androidx.activity.result.ActivityResult
@@ -45,7 +45,6 @@ import java.util.concurrent.TimeUnit
 /**
  * Creates the adaptation between a [WebView] and the [TabModel] interface used by the browser.
  */
-@SuppressLint("ClickableViewAccessibility")
 class TabAdapter @AssistedInject constructor(
     @Assisted private val tabInitializer: TabInitializer,
     @Assisted private val webViewLazy: Lazy<WebView>,
@@ -333,7 +332,7 @@ class TabAdapter @AssistedInject constructor(
         if (view.width <= 0 || view.height <= 0 || !view.isLaidOut) return null
 
         return runCatching {
-            Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888).also { bitmap ->
+            createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888).also { bitmap ->
                 view.draw(Canvas(bitmap))
             }
         }.onFailure { error ->

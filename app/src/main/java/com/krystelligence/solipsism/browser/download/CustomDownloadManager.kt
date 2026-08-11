@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 
 /** Dispatches direct URL downloads to a user-selected installed application. */
 object CustomDownloadManager {
@@ -41,7 +42,7 @@ object CustomDownloadManager {
                         Intent.URI_INTENT_SCHEME
                     )
                 }.getOrElse { return false }
-            else -> Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            else -> Intent(Intent.ACTION_VIEW, url.toUri()).apply {
                 setPackage(packageName)
                 if (!mimeType.isNullOrBlank()) type = mimeType
             }

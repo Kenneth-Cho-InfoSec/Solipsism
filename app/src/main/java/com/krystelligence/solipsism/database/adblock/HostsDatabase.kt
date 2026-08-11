@@ -4,7 +4,6 @@ import com.krystelligence.solipsism.browser.di.DatabaseScheduler
 import com.krystelligence.solipsism.database.databaseDelegate
 import com.krystelligence.solipsism.extensions.safeUse
 import com.krystelligence.solipsism.extensions.useMap
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.ContentValues
 import android.database.DatabaseUtils
@@ -19,7 +18,6 @@ import javax.inject.Singleton
 /**
  * A database that holds hosts, backed by SQLite.
  */
-@SuppressLint("Range")
 @Singleton
 class HostsDatabase @Inject constructor(
     application: Application,
@@ -100,7 +98,7 @@ class HostsDatabase @Inject constructor(
             null,
             null
         ).useMap {
-            Host(name = it.getString(it.getColumnIndex(KEY_NAME)))
+            Host(name = it.getString(it.getColumnIndexOrThrow(KEY_NAME)))
         }
     }
 

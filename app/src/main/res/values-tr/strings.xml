@@ -12,7 +12,6 @@
     <string name="action_forward">İleri</string>
     <string name="settings">Ayarlar</string>
     <string name="location">Konum erişimi</string>
-    <string name="agent">Tarayıcı kimliği</string>
     <string name="home">Ana sayfa</string>
     <string name="fullscreen">Tam ekran modu</string>
     <string name="java">Javascript\'i etkinleştir</string>
@@ -49,7 +48,6 @@
     <string name="unknown_size">Bilinmeyen boyut</string>
     <string name="action_cancel">İptal</string>
     <string name="title_warning">Uyarı</string>
-    <string name="title_user_agent">Tarayıcı kimliği</string>
     <string name="title_download_location">İndirme konumu</string>
     <string name="title_custom_homepage">Özel ana sayfa</string>
     <string name="action_webpage">Web sayfası</string>
@@ -106,8 +104,6 @@
     <string name="action_message_canceled">İşlem iptal edildi.</string>
 
     <!-- SSL warnings -->
-    <string name="ssl_warning_dont_ask_again">Bu göz atma oturumu için tekrar sorma.</string>
-    <string name="message_insecure_connection">Bağlantı güvenli değil:\n%1$s\nDevam etmek istiyor musunuz?</string>
     <string name="message_certificate_date_invalid">Sertifika tarihi geçersiz</string>
     <string name="message_certificate_expired">Sertifikanın süresi dolmuş</string>
     <string name="message_certificate_domain_mismatch">Sertifika etki alanı, site etki alanıyla eşleşmiyor</string>
@@ -152,7 +148,6 @@
     <string name="folder_custom">Özel</string>
     <string name="untitled">Başlıksız</string>
     <string name="mpl_license">Mozilla Kamu Lisansı v. 2.0</string>
-    <string name="freeware">Ücretsiz</string>
     <string name="android_open_source_project">Android Açık Kaynak Projesi</string>
     <string name="hphosts_ad_server_list">hpHosts Reklam Sunucu Listesi</string>
     <string name="rendering_mode">İşleme modu</string>
@@ -161,8 +156,6 @@
     <string name="name_inverted_grayscale">Ters ve gri tonlamalı</string>
     <string name="name_increase_contrast">Kontrastı arttır</string>
     <string name="name_normal">Normal</string>
-    <string name="library_netcipher">NetCipher</string>
-    <string name="license_gnu">GNU Küçük Genel Kamu Lisansı</string>
     <string name="export_bookmarks">Yer işaretlerini yedekle</string>
     <string name="import_backup">Yer işaretlerini geri yükle</string>
     <string name="bookmark_export_path">Yer işaretlerinin yedeklendiği konum</string>
@@ -179,9 +172,7 @@
     <string name="close_other_tabs">Diğer sekmeleri kapat</string>
     <string name="third_party">Üçüncü taraf çerezleri engelle</string>
     <string name="color_mode">Renk modunu etkinleştir</string>
-    <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
-    <string name="mit_license">MIT Lisansı</string>
     <string name="url_contents">URL kutusu içeriği</string>
     <string name="text_encoding">Metin kodlaması</string>
     <string-array name="url_content_array">
@@ -212,8 +203,6 @@
     <string name="action_delete_all_bookmarks">Tüm yer işaretlerini sil</string>
     <string name="message_open_download_fail">Bu dosya artık mevcut değil</string>
 
-    <string name="faq">S.S.S</string>
-    <string name="faq_description">Sık Sorulan Sorular</string>
 
     <!-- debug strings -->					  
     <string name="debug_title">Hata ayıklama ayarları</string>
@@ -231,7 +220,6 @@
     <string name="dialog_copy_link">Bağlantıyı kopyala</string>
     <string name="dialog_rename_folder">Klasörü yeniden adlandır</string>
     <string name="dialog_remove_folder">Klasörü kaldır</string>
-    <string name="dialog_title_close_browser">Tarayıcıyı kapat</string>
     <string name="dialog_delete_all_downloads">Tüm indirmeleri sil</string>
 
     <!-- Tools dialog -->
@@ -327,8 +315,6 @@
     <string name="history_decoy_mode_48_hours">Son 48 saat</string>
     <string name="history_decoy_mode_4_hours">Son 4 saat</string>
     <string name="history_decoy_mode_all_time">Tüm tarama geçmişi</string>
-    <string name="history_decoy_mode_done">Tuzak geçmişi oluşturuldu</string>
-    <string name="history_decoy_mode_message">Gerçekçi tuzak aramalarıyla değiştirilecek tarama geçmişinin zaman dilimini seçin:</string>
     <string name="history_decoy_mode_start">Yem Modunu Başlat</string>
     <string name="history_decoy_mode_title">Yem Modu başlatılsın mı?</string>
     <string name="incognito_cookies_pie">Gizli mod, her oturumdan sonra sıfırlanan ayrı bir işlemde çalışır. Gizli çerez tercihleri ​​artık normal çerez tercihleri ​​tarafından kontrol ediliyor.</string>
@@ -377,7 +363,6 @@
     <string name="settings_adblock_summary">Özel filtrelerle reklamları, izleyicileri ve sayfa öğelerini engelleyin.</string>
     <string name="settings_advanced_explain">Sekme geri yükleme, açılır pencereler, çerezler, oluşturma, metin kodlama ve URL görüntüleme.</string>
     <string name="settings_cluster_basics">Temel bilgiler</string>
-    <string name="settings_cluster_other">Diğer</string>
     <string name="settings_debug_explain">Yalnızca geliştiricilere yönelik tanılama ve sorun giderme seçenekleri.</string>
     <string name="settings_graphics_summary">Temaları, renkleri, duvar kağıtlarını ve arayüz düzenini özelleştirin.</string>
     <string name="settings_homepage_date_format">Ana sayfa tarih biçimi</string>
@@ -390,9 +375,7 @@
     <string name="settings_homepage_domain_safe_mode">Bu ana sayfada JavaScript, indirmeler, formlar, çerçeveler, dosya erişimi ve açılır pencereler devre dışı bırakıldı.</string>
     <string name="settings_homepage_format_hint">SimpleDateFormat kalıplarını kullanın, örneğin SS:dd veya EEEE, d MMMM yyyy</string>
     <string name="settings_homepage_format_title">%1$s biçimi</string>
-    <string name="settings_homepage_html_import">Statik HTML\'yi içe aktar</string>
     <string name="settings_homepage_html_invalid">HTML dosyası temizlenemedi.</string>
-    <string name="settings_homepage_html_limit">HTML temizlendi. JavaScript, indirmeler, formlar, çerçeveler, uzak kaynaklar ve yürütülebilir içerik kaldırılır. Sınır: 512 KB HTML ve 128 KB CSS.</string>
     <string name="settings_homepage_html_too_large">HTML dosyası 512 KB sınırını aşıyor.</string>
     <string name="settings_homepage_opacity_summary">%1$d%%</string>
     <string name="settings_homepage_opacity_title">Ana sayfa tarih ve saat şeffaflığı</string>
@@ -418,8 +401,6 @@
     <string name="settings_rail_size_small">Küçük</string>
     <string name="settings_rail_size_super_compact">Süper Kompakt</string>
     <string name="settings_search_hint">Arama ayarları</string>
-    <string name="settings_swap_qr_tabs">QR ve Sekme düğmelerini değiştirin</string>
-    <string name="settings_swap_qr_tabs_summary">Tek elle daha kolay erişim için Sekmeler düğmesini QR tarayıcı konumuna getirin.</string>
     <string name="ssl_info_expires_on">Süresi doluyor</string>
     <string name="ssl_info_issued_by">Veren kuruluş</string>
     <string name="ssl_info_issued_on">Yayınlandığı tarih</string>
@@ -434,7 +415,6 @@
     <string name="userscripts_delete_title">%1$s silinsin mi?</string>
     <string name="userscripts_deleted">%1$s silindi</string>
     <string name="userscripts_edit">Kaynağı düzenle</string>
-    <string name="userscripts_edit_title">%1$s\'yi düzenleyin</string>
     <string name="userscripts_enable">Kullanıcı komut dosyalarını etkinleştir</string>
     <string name="userscripts_enabled_summary">Komut dosyaları yalnızca etkinleştirildiğinde ve geçerli sayfayla eşleştirildiğinde çalışır</string>
     <string name="userscripts_explain">Güvenli, ayrıcalığı olmayan tarayıcı kullanıcı komut dosyalarını yükleyin ve kontrol edin</string>
@@ -446,7 +426,6 @@
     <string name="userscripts_installed">Yüklü komut dosyaları</string>
     <string name="userscripts_no_scripts">Kullanıcı komut dosyası yüklü değil</string>
     <string name="userscripts_options">Kullanıcı metni seçenekleri</string>
-    <string name="userscripts_saved">%1$s kaydedildi</string>
    <string name="userscripts_script_summary">Sürüm %1$s · %2$s</string>
     <string name="userscripts_write">Write userscript</string>
     <string name="userscripts_write_summary">Write a userscript or paste one from the clipboard</string>
@@ -461,22 +440,17 @@
     <string name="userscripts_clipboard_empty">No text userscript is available in the clipboard.</string>
     <string name="userscripts_privileged_title">Privileged userscript API requested</string>
     <string name="userscripts_privileged_message">This script requests privileged APIs. It can be saved, but Solipsism only executes scripts using @grant none; GM_* and other native APIs are not available.</string>
-    <string name="virus_total">VirüsToplam</string>
     <string name="virus_total_api_key">VirusTotal API anahtarı</string>
     <string name="virus_total_api_key_configured">Android Anahtar Deposu ile yapılandırıldı ve şifrelendi</string>
     <string name="virus_total_api_key_explanation">Anahtarınız bu cihazda şifrelenir ve yalnızca resmi VirusTotal API\'sine gönderilir. Hiçbir zaman indirmelere veya günlüklere dahil edilmez.</string>
     <string name="virus_total_api_key_hint">Kişisel API anahtarınızı yapıştırın</string>
     <string name="virus_total_api_key_missing">Yapılandırılmadı — yerel tarama anahtar olmadan da çalışıyor</string>
-    <string name="virus_total_api_key_required">VirusTotal API anahtarı gerekli</string>
-    <string name="virus_total_api_key_required_message">Kişisel VirusTotal API anahtarınızı Ayarlar → VirusTotal\'a ekleyin veya indirme isteminde “İndir (Taramayı Atla)” seçeneğini seçin.</string>
     <string name="virus_total_blocked_message">%1$s, %2$d VirusTotal antivirüs motoru/motorları tarafından kötü amaçlı olarak bildirildiği için indirilmedi.</string>
     <string name="virus_total_clean_downloaded">Kötü amaçlı yazılım taraması başarılı oldu; indirme kaydedildi</string>
     <string name="virus_total_cloud_enabled">VirusTotal\'ı ikinci görüş olarak kullanın</string>
     <string name="virus_total_cloud_enabled_summary">Yerel kontrolün ardından API anahtarınızı kullanarak uygun dosyaları sorgulayın veya yükleyin. Varsayılan olarak kapalıdır.</string>
     <string name="virus_total_detection_count">%1$d algılama(lar): %2$s</string>
     <string name="virus_total_download_blocked">Kötü amaçlı yazılım indirme engellendi</string>
-    <string name="virus_total_enabled">İndirilenleri VirusTotal ile tarayın</string>
-    <string name="virus_total_enabled_summary">Varsayılan olarak etkindir. Dosyalar özel olarak hazırlanır ve yalnızca taramayı geçtikten sonra kaydedilir.</string>
     <string name="virus_total_error_api_key">VirusTotal API anahtarı eksik, geçersiz veya bu taramayı gerçekleştirmesine izin verilmiyor.</string>
     <string name="virus_total_error_generic">Dosya doğrulanamadı. İndirilmedi. Ağı kontrol edip tekrar deneyin.</string>
     <string name="virus_total_error_rate_limit">VirusTotal\'ın API istek sınırına ulaşıldı. Bekleyin ve yeniden deneyin veya taramadan açıkça indirin.</string>
@@ -493,7 +467,6 @@
     <string name="virus_total_scan_videos_summary">Büyük yüklemeleri ve kişisel dosyaların açığa çıkmasını azaltmak için varsayılan olarak kapalıdır.</string>
     <string name="virus_total_scanning">Tarama indirmesi</string>
     <string name="virus_total_scanning_file">Kötü Amaçlı Yazılım Tarayıcı %1$s\'yi kontrol ediyor. Geçmediği sürece dosya kaydedilmeyecektir.</string>
-    <string name="virus_total_settings_summary">Uygun indirmeleri kaydetmeden önce tarayın.</string>
     <string name="virus_total_view_report">Raporu görüntüle</string>
     <string name="settings_custom_language_clear">Özel dili temizle</string>
     <string name="settings_custom_language_cleared">Özel dil değişiklikleri temizlendi.</string>
@@ -578,7 +551,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
@@ -626,7 +598,6 @@
     <string name="settings_haptics_preset_pixel">Pixel</string>
     <string name="settings_haptics_preset_samsung">Samsung</string>
     <string name="settings_haptics_preset_accessibility">Accessibility optimized</string>
-    <string name="settings_haptics_apply_preset">Apply preset</string>
     <string name="settings_haptics_import_preset">Import preset file</string>
     <string name="settings_haptics_export_preset">Export current preset</string>
     <string name="settings_haptics_preset_file_error">The preset file is invalid or contains unsupported values.</string>

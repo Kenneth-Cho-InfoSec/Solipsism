@@ -8,7 +8,6 @@ import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.preference.userAgent
 import com.krystelligence.solipsism.userscript.UserScriptRuntime
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Color
 import android.view.View
@@ -112,7 +111,6 @@ class WebViewFactory @Inject constructor(
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     private fun WebView.updateForPreferences(
         userPreferences: UserPreferences,
         isIncognito: Boolean

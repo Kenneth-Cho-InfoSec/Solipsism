@@ -1,6 +1,7 @@
 package com.krystelligence.solipsism.utils
 
 import android.net.Uri
+import androidx.core.net.toUri
 import android.webkit.URLUtil
 import java.io.File
 import java.util.Locale
@@ -31,7 +32,7 @@ object NavigationSecurity {
         trustedInternalRoots: Collection<File> = emptyList()
     ): Boolean {
         val sanitized = sanitizeUserInput(url)
-        val scheme = Uri.parse(sanitized).scheme?.lowercase(Locale.ROOT)
+        val scheme = sanitized.toUri().scheme?.lowercase(Locale.ROOT)
 
         if (scheme in blockedTopLevelSchemes) {
             return false
@@ -49,7 +50,7 @@ object NavigationSecurity {
      */
     fun isTrustedInternalFileUrl(url: String, trustedInternalRoots: Collection<File>): Boolean {
         if (trustedInternalRoots.isEmpty() || !URLUtil.isFileUrl(url)) return false
-        val path = runCatching { Uri.parse(url).path }.getOrNull() ?: return false
+        val path = runCatching { url.toUri().path }.getOrNull() ?: return false
         val target = runCatching { File(path).canonicalFile }.getOrNull() ?: return false
         return trustedInternalRoots.any { rootCandidate ->
             val root = runCatching { rootCandidate.canonicalFile }.getOrNull() ?: return@any false

@@ -2,6 +2,7 @@ package com.krystelligence.solipsism.vault
 
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -102,7 +103,7 @@ class VaultActivity : ThemableSettingsActivity() {
     private fun openEntry(entry: VaultEntry) {
         startActivity(Intent(this, BrowserActivity::class.java).apply {
             action = Intent.ACTION_VIEW
-            data = Uri.parse(entry.url)
+            data = entry.url.toUri()
         })
     }
 

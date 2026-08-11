@@ -1,7 +1,6 @@
 package com.krystelligence.solipsism.virustotal
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -31,9 +30,8 @@ class VirusTotalScanNotification @Inject constructor(
         }
     }
 
-    @SuppressLint("MissingPermission")
     fun showScanning(fileName: String) {
-        if (!canNotify()) return
+        if (!notificationsAllowed()) return
         val notification = NotificationCompat.Builder(application, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_settings_shield)
             .setContentTitle(application.getString(R.string.virus_total_scanning))
@@ -43,12 +41,15 @@ class VirusTotalScanNotification @Inject constructor(
             .setOnlyAlertOnce(true)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .build()
-        runCatching { NotificationManagerCompat.from(application).notify(NOTIFICATION_ID, notification) }
+        try {
+            NotificationManagerCompat.from(application).notify(NOTIFICATION_ID, notification)
+        } catch (_: SecurityException) {
+            // Permission can be revoked between the check and the post.
+        }
     }
 
-    @SuppressLint("MissingPermission")
     fun showBlocked(fileName: String, detections: Int?) {
-        if (!canNotify()) return
+        if (!notificationsAllowed()) return
         val notification = NotificationCompat.Builder(application, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_settings_shield)
             .setContentTitle(application.getString(R.string.virus_total_download_blocked))
@@ -60,17 +61,22 @@ class VirusTotalScanNotification @Inject constructor(
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_ERROR)
             .build()
-        runCatching { NotificationManagerCompat.from(application).notify(NOTIFICATION_ID, notification) }
+        try {
+            NotificationManagerCompat.from(application).notify(NOTIFICATION_ID, notification)
+        } catch (_: SecurityException) {
+            // Permission can be revoked between the check and the post.
+        }
     }
 
     fun hide() {
         notificationManager.cancel(NOTIFICATION_ID)
     }
 
-    private fun canNotify(): Boolean =
+    private fun notificationsAllowed(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-            ContextCompat.checkSelfPermission(application, Manifest.permission.POST_NOTIFICATIONS) ==
-            PackageManager.PERMISSION_GRANTED
+            (ContextCompat.checkSelfPermission(application, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED &&
+                NotificationManagerCompat.from(application).areNotificationsEnabled())
 
     private companion object {
         const val CHANNEL_ID = "virus_total_scans"

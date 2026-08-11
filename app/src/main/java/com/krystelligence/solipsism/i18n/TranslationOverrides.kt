@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Resources
 import android.util.Xml
+import androidx.core.content.edit
 import org.json.JSONObject
 import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
@@ -75,7 +76,7 @@ object TranslationOverrides {
     }
 
     fun clear(context: Context) {
-        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit().clear().apply()
+        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit { clear() }
     }
 
     fun count(context: Context): Int = read(context).size
@@ -98,9 +99,9 @@ object TranslationOverrides {
     private fun save(context: Context, values: Map<String, String>) {
         val strings = JSONObject()
         values.forEach { (name, value) -> strings.put(name, value) }
-        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
-            .putString(JSON_KEY, JSONObject().put(JSON_KEY, strings).toString())
-            .apply()
+        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit {
+            putString(JSON_KEY, JSONObject().put(JSON_KEY, strings).toString())
+        }
     }
 
     private fun readLimited(input: InputStream): ByteArray {

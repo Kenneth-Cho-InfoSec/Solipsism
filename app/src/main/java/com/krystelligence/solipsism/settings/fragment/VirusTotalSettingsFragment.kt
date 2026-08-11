@@ -2,6 +2,7 @@ package com.krystelligence.solipsism.settings.fragment
 
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 import android.os.Bundle
 import android.text.InputType
 import android.text.format.DateUtils
@@ -77,7 +78,7 @@ class VirusTotalSettingsFragment : AbstractSettingsFragment() {
             onClick = ::updateDefinitions
         )
         clickablePreference(DEFINITIONS_SOURCE) {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(DEFINITIONS_SOURCE_URL)))
+            startActivity(Intent(Intent.ACTION_VIEW, DEFINITIONS_SOURCE_URL.toUri()))
         }
         clickablePreference(
             preference = API_KEY,
@@ -85,7 +86,7 @@ class VirusTotalSettingsFragment : AbstractSettingsFragment() {
             onClick = ::showApiKeyDialog
         )
         clickablePreference(PRIVACY) {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(VIRUS_TOTAL_PRIVACY_URL)))
+            startActivity(Intent(Intent.ACTION_VIEW, VIRUS_TOTAL_PRIVACY_URL.toUri()))
         }
         updateCloudControls(userPreferences.virusTotalCloudEnabled)
         refreshDefinitionsSummary()

@@ -6,7 +6,6 @@ import com.krystelligence.solipsism.database.asFolder
 import com.krystelligence.solipsism.database.databaseDelegate
 import com.krystelligence.solipsism.extensions.firstOrNullMap
 import com.krystelligence.solipsism.extensions.useMap
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.ContentValues
 import android.database.Cursor
@@ -25,7 +24,6 @@ import javax.inject.Singleton
  *
  * Created by anthonycr on 5/6/17.
  */
-@SuppressLint("Range")
 @Singleton
 class BookmarkDatabase @Inject constructor(
     application: Application
@@ -250,7 +248,7 @@ class BookmarkDatabase @Inject constructor(
                 "$KEY_FOLDER ASC",
                 null
             )
-            .useMap { it.getString(it.getColumnIndex(KEY_FOLDER)) }
+            .useMap { it.getString(it.getColumnIndexOrThrow(KEY_FOLDER)) }
             .filter { !it.isNullOrEmpty() }
             .map(String::asFolder)
     }
@@ -266,7 +264,7 @@ class BookmarkDatabase @Inject constructor(
             null,
             "$KEY_FOLDER ASC",
             null
-        ).useMap { it.getString(it.getColumnIndex(KEY_FOLDER)) }
+        ).useMap { it.getString(it.getColumnIndexOrThrow(KEY_FOLDER)) }
             .filter { !it.isNullOrEmpty() }
     }
 
@@ -293,10 +291,10 @@ class BookmarkDatabase @Inject constructor(
      * @return a valid item containing all the pertinent information.
      */
     private fun Cursor.bindToBookmarkEntry() = Bookmark.Entry(
-        url = getString(getColumnIndex(KEY_URL)),
-        title = getString(getColumnIndex(KEY_TITLE)),
-        folder = getStringOrNull(getColumnIndex(KEY_FOLDER)).asFolder(),
-        position = getInt(getColumnIndex(KEY_POSITION))
+        url = getString(getColumnIndexOrThrow(KEY_URL)),
+        title = getString(getColumnIndexOrThrow(KEY_TITLE)),
+        folder = getStringOrNull(getColumnIndexOrThrow(KEY_FOLDER)).asFolder(),
+        position = getInt(getColumnIndexOrThrow(KEY_POSITION))
     )
 
     /**

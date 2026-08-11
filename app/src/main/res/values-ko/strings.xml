@@ -10,7 +10,6 @@
     <string name="action_forward">앞으로</string>
     <string name="settings">설정</string>
     <string name="location">위치 접근</string>
-    <string name="agent">사용자 에이전트</string>
     <string name="home">홈페이지</string>
     <string name="fullscreen">전체 화면 모드</string>
     <string name="java">JavaScript 사용</string>
@@ -46,7 +45,6 @@
     <string name="dialog_download">파일을 다운로드할까요? (%1$s)</string>
     <string name="action_cancel">취소</string>
     <string name="title_warning">경고</string>
-    <string name="title_user_agent">사용자 에이전트</string>
     <string name="title_download_location">다운로드 위치</string>
     <string name="title_custom_homepage">임의의 홈페이지</string>
     <string name="action_webpage">웹페이지</string>
@@ -103,7 +101,6 @@
     <string name="folder_custom">임의의 위치</string>
     <string name="untitled">제목 없음</string>
     <string name="mpl_license">Mozilla Public License v. 2.0</string>
-    <string name="freeware">Freeware</string>
     <string name="android_open_source_project">Android Open Source Project</string>
     <string name="hphosts_ad_server_list">hpHosts 광고 서버 목록</string>
     <string name="rendering_mode">렌더링 모드</string>
@@ -112,8 +109,6 @@
     <string name="name_inverted_grayscale">반전된 그레이스케일</string>
     <string name="name_increase_contrast">대비 증가</string>
     <string name="name_normal">보통</string>
-    <string name="library_netcipher">NetCipher</string>
-    <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">즐겨찾기를 백업으로 내보내기</string>
     <string name="import_backup">즐겨찾기를 백업으로부터 가져오기</string>
     <string name="bookmark_export_path">즐겨찾기를 다음으로 내보내기</string>
@@ -128,9 +123,7 @@
     <string name="close_all_tabs">모든 탭 닫기</string>
     <string name="third_party">제3자 쿠키 차단</string>
     <string name="color_mode">색상 모드 사용</string>
-    <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
-    <string name="mit_license">MIT 라이선스</string>
     <string name="url_contents">URL 상자에 표시할 내용</string>
     <string-array name="url_content_array">
         <item >도메인 (기본값)</item>
@@ -164,7 +157,6 @@
     <string name="action_folder">폴더</string>
     <string name="title_rename_folder">폴더 이름 바꾸기</string>
     <string name="dialog_delete_all_downloads">모든 다운로드 삭제</string>
-    <string name="dialog_title_close_browser">브라우저 닫기</string>
     <string name="dialog_copy_link">링크 복사</string>
     <string name="dialog_download_image">그림 다운로드</string>
     <string name="dialog_rename_folder">폴더 이름 바꾸기</string>
@@ -177,7 +169,6 @@
     <string name="dialog_open_new_tab">새 탭에서 열기</string>
     <string name="app_restart">변경 사항을 적용하려면 앱을 다시 시작하세요.</string>
     <string name="debug_title">디버그 설정</string>
-    <string name="faq_description">자주 묻는 질문</string>
     <string name="notification_incognito_running_message">터치해서 열기</string>
     <string name="notification_incognito_running_description">사생활 보호 탭 알림</string>
     <string name="message_open_download_fail">파일이 더 이상 존재하지 않습니다</string>
@@ -198,8 +189,6 @@
     <string name="message_certificate_untrusted">인증서를 신뢰할 수 없습니다</string>
     <string name="title_permission_request">권한 요청</string>
     <string name="message_certificate_domain_mismatch">인증서 도메인과 사이트 도메인이 일치하지 않습니다</string>
-    <string name="ssl_warning_dont_ask_again">이번 세션에서는 다시 묻지 않습니다.</string>
-    <string name="message_insecure_connection">이 사이트는 안전하지 않습니다: %1$s 계속할까요?</string>
     <string name="message_certificate_not_yet_valid">인증서가 아직 유효하지 않습니다</string>
     <string name="message_permission_request">%1$s  다음 권한을 사용하려 합니다:  %2$s</string>
     <string name="action_clear">분명한</string>
@@ -275,13 +264,10 @@
     <string name="donation_prompt_title">유아론 브라우저 지원</string>
     <string name="download_donation_message">개발 지원을 위해 기부하는 것을 고려해 보세요.</string>
     <string name="download_skip_scanning">다운로드(스캔 건너뛰기)</string>
-    <string name="faq">FAQ</string>
     <string name="history_clear_all">모든 기록 지우기</string>
     <string name="history_decoy_mode_48_hours">지난 48시간</string>
     <string name="history_decoy_mode_4_hours">지난 4시간</string>
     <string name="history_decoy_mode_all_time">모든 검색 기록</string>
-    <string name="history_decoy_mode_done">미끼 기록이 생성되었습니다.</string>
-    <string name="history_decoy_mode_message">현실적인 미끼 검색으로 대체할 검색 기록 기간을 선택하세요.</string>
     <string name="history_decoy_mode_start">디코이 모드 시작</string>
     <string name="history_decoy_mode_title">디코이 모드를 시작하시겠습니까?</string>
     <string name="incognito_cookies_pie">시크릿 모드는 각 세션 후에 재설정되는 별도의 프로세스에서 실행됩니다. 시크릿 쿠키 기본 설정은 이제 일반 쿠키 기본 설정에 따라 제어됩니다.</string>
@@ -342,7 +328,6 @@
     <string name="settings_adblock_summary">맞춤 필터를 사용하여 광고, 추적기 및 페이지 요소를 차단하세요.</string>
     <string name="settings_advanced_explain">탭 복원, 팝업, 쿠키, 렌더링, 텍스트 인코딩 및 URL 표시.</string>
     <string name="settings_cluster_basics">기초</string>
-    <string name="settings_cluster_other">다른</string>
     <string name="settings_debug_explain">개발자 전용 진단 및 문제 해결 옵션.</string>
     <string name="settings_graphics_summary">테마, 색상, 배경화면, 인터페이스 레이아웃을 사용자 정의하세요.</string>
     <string name="settings_homepage_date_format">홈페이지 날짜 형식</string>
@@ -355,9 +340,7 @@
     <string name="settings_homepage_domain_safe_mode">이 홈페이지에서는 JavaScript, 다운로드, 양식, 프레임, 파일 액세스 및 팝업 창이 비활성화되어 있습니다.</string>
     <string name="settings_homepage_format_hint">SimpleDateFormat 패턴을 사용하세요(예: HH:mm 또는 EEEE, d MMMM yyyy).</string>
     <string name="settings_homepage_format_title">%1$s 형식</string>
-    <string name="settings_homepage_html_import">정적 HTML 가져오기</string>
     <string name="settings_homepage_html_invalid">HTML 파일을 정리할 수 없습니다.</string>
-    <string name="settings_homepage_html_limit">HTML이 삭제되었습니다. JavaScript, 다운로드, 양식, 프레임, 원격 리소스 및 실행 가능한 콘텐츠가 제거됩니다. 제한: HTML 512KB 및 CSS 128KB.</string>
     <string name="settings_homepage_html_too_large">HTML 파일이 512KB 제한을 초과했습니다.</string>
     <string name="settings_homepage_opacity_summary">%1$d%%</string>
     <string name="settings_homepage_opacity_title">홈페이지 날짜 및 시간 불투명도</string>
@@ -383,8 +366,6 @@
     <string name="settings_rail_size_small">작은</string>
     <string name="settings_rail_size_super_compact">슈퍼 컴팩트</string>
     <string name="settings_search_hint">검색 설정</string>
-    <string name="settings_swap_qr_tabs">QR 및 탭 버튼 교체</string>
-    <string name="settings_swap_qr_tabs_summary">한 손으로 더 쉽게 액세스할 수 있도록 탭 버튼을 QR 스캐너 위치로 이동하세요.</string>
     <string name="ssl_info_expires_on">만료 날짜</string>
     <string name="ssl_info_issued_by">발행자</string>
     <string name="ssl_info_issued_on">발행일</string>
@@ -399,7 +380,6 @@
     <string name="userscripts_delete_title">%1$s을 삭제하시겠습니까?</string>
     <string name="userscripts_deleted">삭제됨 %1$s</string>
     <string name="userscripts_edit">소스 수정</string>
-    <string name="userscripts_edit_title">%1$s 편집</string>
     <string name="userscripts_enable">사용자 스크립트 활성화</string>
     <string name="userscripts_enabled_summary">스크립트는 활성화되어 있고 현재 페이지와 일치하는 경우에만 실행됩니다.</string>
     <string name="userscripts_explain">안전하고 권한이 없는 브라우저 사용자 스크립트 설치 및 제어</string>
@@ -411,7 +391,6 @@
     <string name="userscripts_installed">설치된 스크립트</string>
     <string name="userscripts_no_scripts">사용자 스크립트가 설치되지 않았습니다.</string>
     <string name="userscripts_options">사용자스크립트 옵션</string>
-    <string name="userscripts_saved">저장됨 %1$s</string>
    <string name="userscripts_script_summary">버전 %1$s · %2$s</string>
     <string name="userscripts_write">Write userscript</string>
     <string name="userscripts_write_summary">Write a userscript or paste one from the clipboard</string>
@@ -426,22 +405,17 @@
     <string name="userscripts_clipboard_empty">No text userscript is available in the clipboard.</string>
     <string name="userscripts_privileged_title">Privileged userscript API requested</string>
     <string name="userscripts_privileged_message">This script requests privileged APIs. It can be saved, but Solipsism only executes scripts using @grant none; GM_* and other native APIs are not available.</string>
-    <string name="virus_total">바이러스 총계</string>
     <string name="virus_total_api_key">VirusTotal API 키</string>
     <string name="virus_total_api_key_configured">Android Keystore로 구성 및 암호화됨</string>
     <string name="virus_total_api_key_explanation">귀하의 키는 이 기기에서 암호화되며 공식 VirusTotal API로만 전송됩니다. 다운로드나 로그에는 절대 포함되지 않습니다.</string>
     <string name="virus_total_api_key_hint">개인 API 키를 붙여넣으세요.</string>
     <string name="virus_total_api_key_missing">구성되지 않음 — 로컬 검색은 키 없이도 계속 작동합니다.</string>
-    <string name="virus_total_api_key_required">VirusTotal API 키가 필요합니다.</string>
-    <string name="virus_total_api_key_required_message">설정 → VirusTotal에서 개인 VirusTotal API 키를 추가하거나 다운로드 프롬프트에서 “다운로드(스캔 건너뛰기)”를 선택하세요.</string>
     <string name="virus_total_blocked_message">%1$s was not downloaded because %2$d VirusTotal antivirus engine(s) reported it as malicious.</string>
     <string name="virus_total_clean_downloaded">악성 코드 검사가 통과되었습니다. 다운로드 저장됨</string>
     <string name="virus_total_cloud_enabled">VirusTotal을 2차 소견으로 사용</string>
     <string name="virus_total_cloud_enabled_summary">로컬 확인 후 API 키를 사용하여 적합한 파일을 쿼리하거나 업로드하세요. 기본적으로 꺼져 있습니다.</string>
     <string name="virus_total_detection_count">%1$d 감지: %2$s</string>
     <string name="virus_total_download_blocked">악성 코드 다운로드가 차단됨</string>
-    <string name="virus_total_enabled">VirusTotal로 다운로드 검사</string>
-    <string name="virus_total_enabled_summary">기본적으로 활성화되어 있습니다. 파일은 비공개로 준비되며 스캔을 통과한 후에만 저장됩니다.</string>
     <string name="virus_total_error_api_key">VirusTotal API 키가 누락되었거나 유효하지 않거나 이 검사를 수행하는 것이 허용되지 않습니다.</string>
     <string name="virus_total_error_generic">파일을 확인할 수 없습니다. 다운로드되지 않았습니다. 네트워크를 확인하고 다시 시도하세요.</string>
     <string name="virus_total_error_rate_limit">VirusTotal의 API 요청 제한에 도달했습니다. 기다렸다가 다시 시도하거나 스캔하지 않고 명시적으로 다운로드하세요.</string>
@@ -458,7 +432,6 @@
     <string name="virus_total_scan_videos_summary">개인 파일의 대규모 업로드 및 노출을 줄이기 위해 기본적으로 꺼져 있습니다.</string>
     <string name="virus_total_scanning">스캔 다운로드</string>
     <string name="virus_total_scanning_file">악성 코드 스캐너가 %1$s를 확인 중입니다. 통과하지 않으면 파일이 저장되지 않습니다.</string>
-    <string name="virus_total_settings_summary">저장하기 전에 적합한 다운로드를 스캔하세요.</string>
     <string name="virus_total_view_report">보고서 보기</string>
     <plurals name="notification_incognito_running_title">
         <item quantity="one">%1$d incognito tab open</item>
@@ -550,7 +523,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
@@ -598,7 +570,6 @@
     <string name="settings_haptics_preset_pixel">Pixel</string>
     <string name="settings_haptics_preset_samsung">Samsung</string>
     <string name="settings_haptics_preset_accessibility">Accessibility optimized</string>
-    <string name="settings_haptics_apply_preset">Apply preset</string>
     <string name="settings_haptics_import_preset">Import preset file</string>
     <string name="settings_haptics_export_preset">Export current preset</string>
     <string name="settings_haptics_preset_file_error">The preset file is invalid or contains unsupported values.</string>

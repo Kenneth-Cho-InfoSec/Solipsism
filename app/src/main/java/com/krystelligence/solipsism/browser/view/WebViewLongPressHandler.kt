@@ -1,7 +1,6 @@
 package com.krystelligence.solipsism.browser.view
 
 import com.krystelligence.solipsism.browser.view.targetUrl.LongPress
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Handler
 import android.os.Looper
@@ -65,7 +64,6 @@ class WebViewLongPressHandler @Inject constructor(private val activity: Activity
     private class GestureTriggeringTouchListener(
         private val gestureDetector: GestureDetector
     ) : View.OnTouchListener {
-        @SuppressLint("ClickableViewAccessibility")
         override fun onTouch(v: View, event: MotionEvent): Boolean {
             gestureDetector.onTouchEvent(event)
             return false

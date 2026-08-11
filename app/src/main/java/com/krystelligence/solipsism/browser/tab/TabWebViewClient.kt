@@ -6,16 +6,13 @@ import com.krystelligence.solipsism.adblock.allowlist.AllowListModel
 import com.krystelligence.solipsism.adblock.custom.CosmeticFilterRuntime
 import com.krystelligence.solipsism.adblock.custom.CustomFilterRepository
 import com.krystelligence.solipsism.databinding.DialogAuthRequestBinding
-import com.krystelligence.solipsism.databinding.DialogSslWarningBinding
 import com.krystelligence.solipsism.extensions.resizeAndShow
 import com.krystelligence.solipsism.js.TextReflow
 import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.audio.AudioEffectsRuntime
 import com.krystelligence.solipsism.ssl.SslState
-import com.krystelligence.solipsism.ssl.SslWarningPreferences
 import com.krystelligence.solipsism.userscript.UserScriptRuntime
-import android.annotation.SuppressLint
 import android.app.Application
 import android.graphics.Bitmap
 import android.net.http.SslError
@@ -53,7 +50,6 @@ class TabWebViewClient @AssistedInject constructor(
     private val urlHandler: UrlHandler,
     @Assisted private val headers: Map<String, String>,
     private val userPreferences: UserPreferences,
-    private val sslWarningPreferences: SslWarningPreferences,
     private val textReflow: TextReflow,
     private val userScriptRuntime: UserScriptRuntime,
     private val sitePermissionRuntime: SitePermissionRuntime,
@@ -215,51 +211,13 @@ class TabWebViewClient @AssistedInject constructor(
         }.resizeAndShow()
     }
 
-    @SuppressLint("WebViewClientOnReceivedSslError")
     override fun onReceivedSslError(webView: WebView, handler: SslErrorHandler, error: SslError) {
-        val context = webView.context
-        urlWithSslError = webView.url
-
         sslState = SslState.Invalid(error)
         sslStateObservable.onNext(sslState)
-        sslState = SslState.Invalid(error)
-
-        when (sslWarningPreferences.recallBehaviorForDomain(webView.url)) {
-            SslWarningPreferences.Behavior.PROCEED -> return handler.proceed()
-            SslWarningPreferences.Behavior.CANCEL -> return handler.cancel()
-            null -> Unit
-        }
-
-        val errorCodeMessageCodes = error.getAllSslErrorMessageCodes()
-
-        val stringBuilder = StringBuilder()
-        for (messageCode in errorCodeMessageCodes) {
-            stringBuilder.append(" - ").append(context.getString(messageCode)).append('\n')
-        }
-        val alertMessage =
-            context.getString(R.string.message_insecure_connection, stringBuilder.toString())
-
-        MaterialAlertDialogBuilder(context).apply {
-            val view = DialogSslWarningBinding.inflate(LayoutInflater.from(context))
-            val dontAskAgain = view.checkBoxDontAskAgain
-            setTitle(context.getString(R.string.title_warning))
-            setMessage(alertMessage)
-            setCancelable(true)
-            setView(view.root)
-            setOnCancelListener { handler.cancel() }
-            setPositiveButton(context.getString(R.string.action_yes)) { _, _ ->
-                handler.proceed()
-            }
-            setNegativeButton(context.getString(R.string.action_no)) { _, _ ->
-                if (dontAskAgain.isChecked) {
-                    sslWarningPreferences.rememberBehaviorForDomain(
-                        webView.url.orEmpty(),
-                        SslWarningPreferences.Behavior.CANCEL
-                    )
-                }
-                handler.cancel()
-            }
-        }.resizeAndShow()
+        urlWithSslError = webView.url
+        // Android WebView documentation requires invalid certificates to be cancelled.
+        // Never allow a page with an SSL error to continue or persist an unsafe exception.
+        handler.cancel()
     }
 
     @Deprecated("Deprecated in Java")

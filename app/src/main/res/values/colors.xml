@@ -2,13 +2,8 @@
 <resources>
 
     <color name="black">#ff000000</color>
-    <color name="gray_dark">#222222</color>
-    <color name="white">#ffffff</color>
 
-    <color name="primary_color">#FFFBFE</color>
-    <color name="accent_color">#006A6A</color>
 
-    <color name="secondary_color_settings_dark">#302D33</color>
 
     <color name="transparent">#00000000</color>
 
@@ -73,10 +68,6 @@
     <color name="md3_black_surface_container_high">#1E1E1E</color>
     <color name="md3_black_surface_container_highest">#282828</color>
 
-    <color name="solipsism_paper">#F7F4EE</color>
-    <color name="solipsism_rail">#FCFAF6</color>
-    <color name="solipsism_rail_soft">#E2E0DB</color>
-    <color name="solipsism_rail_pressed">#D3D0C9</color>
     <color name="solipsism_rail_text">#6F7275</color>
 
 </resources>

@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.core.net.toUri
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.ThemableBrowserActivity
 import com.krystelligence.solipsism.DefaultBrowserActivity
@@ -113,7 +114,7 @@ class ScreenshotStudioActivity : ThemableBrowserActivity() {
                 val titleResult = resolveYandexTitle(location)
                 val translatedTitle = RussianEnglishDictionary.get(this@ScreenshotStudioActivity)
                     .translateWords(titleResult)
-                val googleImagesUrl = Uri.parse("https://www.google.com/search").buildUpon()
+                val googleImagesUrl = "https://www.google.com/search".toUri().buildUpon()
                     .appendQueryParameter("q", translatedTitle)
                     .appendQueryParameter("tbm", "isch")
                     .build()

@@ -12,7 +12,6 @@
     <string name="action_forward">進む</string>
     <string name="settings">設定</string>
     <string name="location">位置情報の使用を許可する</string>
-    <string name="agent">ユーザーエージェント</string>
     <string name="home">ホームページ</string>
     <string name="fullscreen">全画面モード</string>
     <string name="java">JavaScript を有効にする</string>
@@ -49,7 +48,6 @@
     <string name="unknown_size">サイズ不明</string>
     <string name="action_cancel">キャンセル</string>
     <string name="title_warning">警告</string>
-    <string name="title_user_agent">ユーザーエージェント</string>
     <string name="title_download_location">ダウンロードフォルダ</string>
     <string name="title_custom_homepage">カスタムホームページ</string>
     <string name="action_webpage">ウェブページ</string>
@@ -89,7 +87,6 @@
     <string name="licenses">オープンソース ライセンス</string>
     <string name="suggestion">検索 :</string>
     <string name="block_ads">広告をブロックする</string>
-    <string name="message_insecure_connection">このサイトへの接続は安全ではありません:\n%1$s\nそれでも続行しますか?</string>
     <string name="message_certificate_date_invalid">証明書の日付が無効です</string>
     <string name="message_certificate_expired">証明書の期限が切れました</string>
     <string name="message_certificate_domain_mismatch">証明書のドメインとサイトのドメインが一致しません</string>
@@ -128,7 +125,6 @@
     <string name="folder_custom">カスタム</string>
     <string name="untitled">タイトルなし</string>
     <string name="mpl_license">Mozilla Public License v. 2.0</string>
-    <string name="freeware">Freeware</string>
     <string name="android_open_source_project">Android Open Source Project</string>
     <string name="hphosts_ad_server_list">hpHosts Ad Server List</string>
     <string name="rendering_mode">レンダリングモード</string>
@@ -137,8 +133,6 @@
     <string name="name_inverted_grayscale">反転グレースケール</string>
     <string name="name_increase_contrast">高コントラスト</string>
     <string name="name_normal">通常</string>
-    <string name="library_netcipher">NetCipher</string>
-    <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="export_bookmarks">ブックマークをエクスポートする</string>
     <string name="import_backup">ブックマークをインポートする</string>
     <string name="bookmark_export_path">ブックマークをエクスポートしました</string>
@@ -155,9 +149,7 @@
     <string name="close_other_tabs">他のタブを閉じる</string>
     <string name="third_party">サードパーティ Cookie を拒否する</string>
     <string name="color_mode">カラーモードを有効にする</string>
-    <string name="snacktory">Snacktory</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
-    <string name="mit_license">MIT License</string>
     <string name="url_contents">URL 欄の表示内容</string>
     <string name="text_encoding">テキストエンコーディング</string>
     <string-array name="url_content_array">
@@ -185,8 +177,6 @@
     <string name="action_delete_all_bookmarks">すべてのブックマークを削除する</string>
     <string name="message_open_download_fail">このファイルは存在しません</string>
 
-    <string name="faq">FAQ</string>
-    <string name="faq_description">よくある質問と回答</string>
 
     <!-- debug strings -->
     <string name="debug_title">デバッグ</string>
@@ -204,7 +194,6 @@
     <string name="dialog_copy_link">リンクをコピーする</string>
     <string name="dialog_rename_folder">フォルダ名を変更する</string>
     <string name="dialog_remove_folder">フォルダを削除する</string>
-    <string name="dialog_title_close_browser">タブの消去</string>
     <string name="dialog_delete_all_downloads">ダウンロードの全削除</string>
     <string name="action_clear">クリア</string>
     <string name="action_donate">寄付する</string>
@@ -282,8 +271,6 @@
     <string name="history_decoy_mode_48_hours">過去 48 時間</string>
     <string name="history_decoy_mode_4_hours">過去 4 時間</string>
     <string name="history_decoy_mode_all_time">すべての閲覧履歴</string>
-    <string name="history_decoy_mode_done">おとり履歴が作成されました</string>
-    <string name="history_decoy_mode_message">現実的なおとり検索に置き換える閲覧履歴の期間を選択します。</string>
     <string name="history_decoy_mode_start">デコイモードを開始する</string>
     <string name="history_decoy_mode_title">デコイモードを開始しますか?</string>
     <string name="incognito_cookies_pie">シークレット モードは、セッションごとにリセットされる別のプロセスで実行されます。シークレット Cookie の設定は、通常の Cookie の設定によって制御されるようになりました。</string>
@@ -349,7 +336,6 @@
     <string name="settings_adblock_summary">カスタム フィルターを使用して、広告、トラッカー、ページ要素をブロックします。</string>
     <string name="settings_advanced_explain">タブの復元、ポップアップ、Cookie、レンダリング、テキスト エンコード、URL 表示。</string>
     <string name="settings_cluster_basics">基本</string>
-    <string name="settings_cluster_other">他の</string>
     <string name="settings_debug_explain">開発者専用の診断およびトラブルシューティングのオプション。</string>
     <string name="settings_graphics_summary">テーマ、色、壁紙、インターフェイスのレイアウトをカスタマイズします。</string>
     <string name="settings_homepage_date_format">ホームページの日付形式</string>
@@ -362,9 +348,7 @@
     <string name="settings_homepage_domain_safe_mode">このホームページでは、JavaScript、ダウンロード、フォーム、フレーム、ファイル アクセス、ポップアップ ウィンドウが無効になっています。</string>
     <string name="settings_homepage_format_hint">SimpleDateFormat パターンを使用します (HH:mm または EEEE、d MMMM yyyy など)。</string>
     <string name="settings_homepage_format_title">%1$s形式</string>
-    <string name="settings_homepage_html_import">静的HTMLをインポートする</string>
     <string name="settings_homepage_html_invalid">HTML ファイルをサニタイズできませんでした。</string>
-    <string name="settings_homepage_html_limit">HTMLはサニタイズされています。 JavaScript、ダウンロード、フォーム、フレーム、リモート リソース、および実行可能コンテンツは削除されます。制限: HTML は 512 KB、CSS は 128 KB。</string>
     <string name="settings_homepage_html_too_large">HTML ファイルが 512 KB の制限を超えています。</string>
     <string name="settings_homepage_opacity_summary">%1$d%%</string>
     <string name="settings_homepage_opacity_title">ホームページの日付と時刻の不透明度</string>
@@ -390,14 +374,11 @@
     <string name="settings_rail_size_small">小さい</string>
     <string name="settings_rail_size_super_compact">超コンパクト</string>
     <string name="settings_search_hint">検索設定</string>
-    <string name="settings_swap_qr_tabs">QR ボタンとタブ ボタンを入れ替える</string>
-    <string name="settings_swap_qr_tabs_summary">片手で簡単にアクセスできるように、タブ ボタンを QR スキャナの位置に移動します。</string>
     <string name="shortcut_message_failed_to_add">申し訳ありませんが、お使いのランチャーはショートカットをサポートしていません。</string>
     <string name="ssl_info_expires_on">有効期限は次のとおりです</string>
     <string name="ssl_info_issued_by">発行者</string>
     <string name="ssl_info_issued_on">発行日</string>
     <string name="ssl_info_issued_to">発行先</string>
-    <string name="ssl_warning_dont_ask_again">このブラウジング セッションについては再度質問しないでください。</string>
     <string name="tab_frozen">凍った…</string>
     <string name="title_file_chooser">ファイルを選択してください</string>
     <string name="title_permission_request">許可リクエスト</string>
@@ -409,7 +390,6 @@
     <string name="userscripts_delete_title">%1$sを削除しますか?</string>
     <string name="userscripts_deleted">%1$s を削除しました</string>
     <string name="userscripts_edit">ソースを編集する</string>
-    <string name="userscripts_edit_title">%1$sを編集</string>
     <string name="userscripts_enable">ユーザースクリプトを有効にする</string>
     <string name="userscripts_enabled_summary">スクリプトは、有効になっていて現在のページに一致する場合にのみ実行されます。</string>
     <string name="userscripts_explain">安全で特権のないブラウザ ユーザー スクリプトをインストールして制御する</string>
@@ -421,7 +401,6 @@
     <string name="userscripts_installed">インストールされたスクリプト</string>
     <string name="userscripts_no_scripts">ユーザースクリプトがインストールされていません</string>
     <string name="userscripts_options">ユーザースクリプトのオプション</string>
-    <string name="userscripts_saved">Saved %1$s</string>
    <string name="userscripts_script_summary">バージョン%1$s・%2$s</string>
     <string name="userscripts_write">Write userscript</string>
     <string name="userscripts_write_summary">Write a userscript or paste one from the clipboard</string>
@@ -436,22 +415,17 @@
     <string name="userscripts_clipboard_empty">No text userscript is available in the clipboard.</string>
     <string name="userscripts_privileged_title">Privileged userscript API requested</string>
     <string name="userscripts_privileged_message">This script requests privileged APIs. It can be saved, but Solipsism only executes scripts using @grant none; GM_* and other native APIs are not available.</string>
-    <string name="virus_total">ウイルス合計</string>
     <string name="virus_total_api_key">VirusTotal API キー</string>
     <string name="virus_total_api_key_configured">Android キーストアで構成および暗号化</string>
     <string name="virus_total_api_key_explanation">キーはこのデバイス上で暗号化され、公式の VirusTotal API にのみ送信されます。ダウンロードやログには決して含まれません。</string>
     <string name="virus_total_api_key_hint">個人の API キーを貼り付けます</string>
     <string name="virus_total_api_key_missing">未構成 — ローカル スキャンはキーなしでも機能します</string>
-    <string name="virus_total_api_key_required">VirusTotal API キーが必要です</string>
-    <string name="virus_total_api_key_required_message">[設定] → [VirusTotal] に個人用の VirusTotal API キーを追加するか、ダウンロード プロンプトで [ダウンロード (スキャンをスキップ)] を選択します。</string>
     <string name="virus_total_blocked_message">%1$s は、%2$d VirusTotal ウイルス対策エンジンが悪意のあるものとして報告したため、ダウンロードされませんでした。</string>
     <string name="virus_total_clean_downloaded">マルウェア スキャンに合格しました。ダウンロード保存済み</string>
     <string name="virus_total_cloud_enabled">VirusTotal をセカンドオピニオンとして使用する</string>
     <string name="virus_total_cloud_enabled_summary">ローカルチェックの後、API キーを使用して対象となるファイルをクエリまたはアップロードします。デフォルトではオフです。</string>
     <string name="virus_total_detection_count">%1$d 検出: %2$s</string>
     <string name="virus_total_download_blocked">マルウェアのダウンロードがブロックされました</string>
-    <string name="virus_total_enabled">VirusTotal でダウンロードをスキャンする</string>
-    <string name="virus_total_enabled_summary">デフォルトで有効になっています。ファイルは非公開でステージングされ、スキャンに合格した後にのみ保存されます。</string>
     <string name="virus_total_error_api_key">VirusTotal API キーが見つからないか、無効であるか、このスキャンの実行が許可されていません。</string>
     <string name="virus_total_error_generic">ファイルを確認できませんでした。ダウンロードされていませんでした。ネットワークを確認して、再試行してください。</string>
     <string name="virus_total_error_rate_limit">VirusTotal の API リクエスト制限に達しました。待って再試行するか、スキャンせずに明示的にダウンロードします。</string>
@@ -468,7 +442,6 @@
     <string name="virus_total_scan_videos_summary">大規模なアップロードと個人ファイルの公開を減らすために、デフォルトではオフになっています。</string>
     <string name="virus_total_scanning">スキャンダウンロード</string>
     <string name="virus_total_scanning_file">マルウェア スキャナーは %1$s をチェックしています。合格しないとファイルは保存されません。</string>
-    <string name="virus_total_settings_summary">対象となるダウンロードを保存する前にスキャンします。</string>
     <string name="virus_total_view_report">レポートを見る</string>
     <string name="webrtc_support">WebRTC サポート</string>
     <plurals name="notification_incognito_running_title">
@@ -558,7 +531,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
@@ -606,7 +578,6 @@
     <string name="settings_haptics_preset_pixel">Pixel</string>
     <string name="settings_haptics_preset_samsung">Samsung</string>
     <string name="settings_haptics_preset_accessibility">Accessibility optimized</string>
-    <string name="settings_haptics_apply_preset">Apply preset</string>
     <string name="settings_haptics_import_preset">Import preset file</string>
     <string name="settings_haptics_export_preset">Export current preset</string>
     <string name="settings_haptics_preset_file_error">The preset file is invalid or contains unsupported values.</string>

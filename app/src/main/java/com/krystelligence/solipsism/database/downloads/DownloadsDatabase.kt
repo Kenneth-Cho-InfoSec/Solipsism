@@ -3,7 +3,6 @@ package com.krystelligence.solipsism.database.downloads
 import com.krystelligence.solipsism.database.databaseDelegate
 import com.krystelligence.solipsism.extensions.firstOrNullMap
 import com.krystelligence.solipsism.extensions.useMap
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.ContentValues
 import android.database.Cursor
@@ -19,7 +18,6 @@ import javax.inject.Singleton
 /**
  * The disk backed download database. See [DownloadsRepository] for function documentation.
  */
-@SuppressLint("Range")
 @Singleton
 class DownloadsDatabase @Inject constructor(
     application: Application
@@ -165,10 +163,10 @@ class DownloadsDatabase @Inject constructor(
      * Binds a [Cursor] to a single [DownloadEntry].
      */
     private fun Cursor.bindToDownloadItem() = DownloadEntry(
-        url = getString(getColumnIndex(KEY_URL)),
-        title = getString(getColumnIndex(KEY_TITLE)),
-        contentSize = getString(getColumnIndex(KEY_SIZE)),
-        isDecoy = getInt(getColumnIndex(KEY_IS_DECOY)) != 0
+        url = getString(getColumnIndexOrThrow(KEY_URL)),
+        title = getString(getColumnIndexOrThrow(KEY_TITLE)),
+        contentSize = getString(getColumnIndexOrThrow(KEY_SIZE)),
+        isDecoy = getInt(getColumnIndexOrThrow(KEY_IS_DECOY)) != 0
     )
 
     companion object {

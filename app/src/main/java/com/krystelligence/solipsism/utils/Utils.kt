@@ -1,6 +1,5 @@
 package com.krystelligence.solipsism.utils
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -17,6 +16,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.scale
+import androidx.core.net.toUri
 import androidx.core.graphics.drawable.IconCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.krystelligence.solipsism.DefaultBrowserActivity
@@ -30,8 +31,9 @@ import java.io.File
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 object Utils {
 
@@ -172,11 +174,11 @@ object Utils {
         return (0xff shl alphaChannel) or (r shl redChannel) or (g shl greenChannel) or b
     }
 
-    @SuppressLint("SimpleDateFormat")
     @JvmStatic
     @Throws(IOException::class)
     fun createImageFile(): File {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val timeStamp = LocalDateTime.now()
+            .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss", Locale.US))
         val imageFileName = "JPEG_${timeStamp}_"
         val storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(imageFileName, ".jpg", storageDir)
@@ -210,7 +212,7 @@ object Utils {
         unsafeFavicon: Bitmap?
     ) {
         val shortcutIntent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(url)
+            data = url.toUri()
             setClass(activity, DefaultBrowserActivity::class.java)
             addCategory(Intent.CATEGORY_BROWSABLE)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -227,7 +229,7 @@ object Utils {
         val favicon = (unsafeFavicon ?: webPageBitmap).let { bitmap ->
             val iconSize = activity.resources.getDimensionPixelSize(android.R.dimen.app_icon_size)
             if (bitmap.width > iconSize || bitmap.height > iconSize) {
-                Bitmap.createScaledBitmap(bitmap, iconSize, iconSize, true)
+                bitmap.scale(iconSize, iconSize)
             } else {
                 bitmap
             }

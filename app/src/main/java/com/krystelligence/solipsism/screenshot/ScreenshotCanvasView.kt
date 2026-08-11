@@ -12,6 +12,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityEvent
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.withTranslation
 import kotlin.math.max
 import kotlin.math.min
 
@@ -91,11 +93,10 @@ class ScreenshotCanvasView @JvmOverloads constructor(
             val left = (width - source.width * imageScale) / 2f
             val top = (height - source.height * imageScale) / 2f
             imageRect.set(left, top, left + source.width * imageScale, top + source.height * imageScale)
-            canvas.save()
-            canvas.translate(left, top)
-            canvas.scale(imageScale, imageScale)
-            canvas.drawBitmap(source, 0f, 0f, imagePaint)
-            canvas.restore()
+            canvas.withTranslation(left, top) {
+                scale(imageScale, imageScale)
+                drawBitmap(source, 0f, 0f, imagePaint)
+            }
         }
         if (!path.isEmpty) {
             strokePaint.color = resolveAccent()
@@ -159,7 +160,7 @@ class ScreenshotCanvasView @JvmOverloads constructor(
         val right = min(source.width, ((bounds.right - imageRect.left) / imageScale).toInt())
         val bottom = min(source.height, ((bounds.bottom - imageRect.top) / imageScale).toInt())
         if (right <= left || bottom <= top) return null
-        val output = Bitmap.createBitmap(right - left, bottom - top, Bitmap.Config.ARGB_8888)
+        val output = createBitmap(right - left, bottom - top, Bitmap.Config.ARGB_8888)
         Canvas(output).apply {
             val mask = Path().apply {
                 addOval(

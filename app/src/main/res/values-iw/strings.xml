@@ -4,7 +4,6 @@
     <string name="app_name">Solipsism Browser</string>
     <string name="settings">הגדרות דפדפן</string>
     <string name="location">מאפשר לאתרים לגשת למיקומך</string>
-    <string name="agent">סוכן משתמש</string>
     <string name="home">דף הבית</string>
     <string name="fullscreen">הפעל מצב מסך מלא</string>
     <string name="java">הפעל JavaScript</string>
@@ -146,7 +145,6 @@
     <string name="dialog_remove_folder">הסר תיקיה</string>
     <string name="dialog_remove_from_history">הסר מההיסטוריה</string>
     <string name="dialog_rename_folder">שנה את שם התיקיה</string>
-    <string name="dialog_title_close_browser">סגור את הדפדפן</string>
     <string name="dialog_title_share">שתף את הדף הזה</string>
     <string name="dialog_toggle_desktop">החלף מצב של סוכן משתמש בשולחן העבודה</string>
     <string name="dialog_tools_title">כלי עמוד</string>
@@ -162,12 +160,9 @@
     <string name="download_sdcard_busy_dlg_title">אחסון USB אינו זמין</string>
     <string name="download_skip_scanning">הורדה (דלג על סריקה)</string>
     <string name="export_bookmarks">ייצא סימניות לגיבוי</string>
-    <string name="faq">שאלות נפוצות</string>
-    <string name="faq_description">שאלות נפוצות</string>
     <string name="folder">שם התיקיה</string>
     <string name="folder_custom">מִנְהָג</string>
     <string name="folder_default">בְּרִירַת מֶחדָל</string>
-    <string name="freeware">תוכנה חופשית</string>
     <string name="fullScreenOption">הסתר את שורת המצב בזמן הגלישה</string>
     <string name="hint_password">סִיסמָה</string>
     <string name="hint_title">כּוֹתֶרֶת</string>
@@ -177,8 +172,6 @@
     <string name="history_decoy_mode_48_hours">48 השעות האחרונות</string>
     <string name="history_decoy_mode_4_hours">4 שעות אחרונות</string>
     <string name="history_decoy_mode_all_time">כל היסטוריית הגלישה</string>
-    <string name="history_decoy_mode_done">נוצרה היסטוריית פיתוי</string>
-    <string name="history_decoy_mode_message">בחר את מסגרת הזמן של היסטוריית הגלישה להחלפה בחיפושי הטעיה מציאותיים:</string>
     <string name="history_decoy_mode_start">התחל את מצב הטעיה</string>
     <string name="history_decoy_mode_title">להפעיל את מצב הטעיה?</string>
     <string name="host">מְאָרֵחַ:</string>
@@ -192,8 +185,6 @@
     <string name="install_orbot">אנא התקן את Orbot כדי לבצע proxy עם Tor.</string>
     <string name="jsoup">jsoup: Java HTML Parser</string>
     <string name="label_realm">הודעת שרת: %s</string>
-    <string name="library_netcipher">NetCipher</string>
-    <string name="license_gnu">GNU Lesser General Public License</string>
     <string name="licenses">רישיונות קוד פתוח</string>
     <string name="light_theme">נושא קליל</string>
     <string name="malware_definitions">עדכן הגדרות תוכנות זדוניות</string>
@@ -228,13 +219,11 @@
     <string name="message_cookies_cleared">קובצי Cookie נוקו</string>
     <string name="message_form_resubmission">האם תרצה לשלוח שוב את הנתונים?</string>
     <string name="message_import">יובאו סימניות</string>
-    <string name="message_insecure_connection">החיבור לאתר זה אינו מאובטח:\n%1$s\n להמשיך בכל זאת?</string>
     <string name="message_link_copied">הקישור הועתק ללוח</string>
     <string name="message_location">\nרוצה להשתמש במיקום שלך</string>
     <string name="message_open_download_fail">הקובץ הזה לא קיים יותר</string>
     <string name="message_permission_request">%1$sZ\nZ\n רוצה להשתמש ב:\n\n%2$s</string>
     <string name="message_web_storage_cleared">אחסון האינטרנט נוקה</string>
-    <string name="mit_license">רישיון MIT</string>
     <string name="mpl_license">Mozilla Public License v. 2.0</string>
     <string name="name_grayscale">גווני אפור</string>
     <string name="name_increase_contrast">הגדל את הניגודיות</string>
@@ -306,7 +295,6 @@
     <string name="settings_advanced_explain">שחזור כרטיסיות, חלונות קופצים, קובצי Cookie, עיבוד, קידוד טקסט והצגת כתובת URL.</string>
     <string name="settings_black_status_bar">שורת מצב שחורה</string>
     <string name="settings_cluster_basics">יסודות</string>
-    <string name="settings_cluster_other">אַחֵר</string>
     <string name="settings_debug_explain">אפשרויות אבחון ופתרון בעיות למפתחים בלבד.</string>
     <string name="settings_display">גרָפִיקָה</string>
     <string name="settings_general">כְּלָלִי</string>
@@ -321,9 +309,7 @@
     <string name="settings_homepage_domain_safe_mode">JavaScript, הורדות, טפסים, מסגרות, גישה לקבצים וחלונות קופצים מושבתים עבור דף הבית הזה.</string>
     <string name="settings_homepage_format_hint">השתמש בתבניות SimpleDateFormat, לדוגמה HH:mm או EEEE, d MMMM yyyy</string>
     <string name="settings_homepage_format_title">פורמט %1$s</string>
-    <string name="settings_homepage_html_import">ייבוא ​​HTML סטטי</string>
     <string name="settings_homepage_html_invalid">לא ניתן היה לחטא את קובץ ה-HTML.</string>
-    <string name="settings_homepage_html_limit">HTML מחוטא. JavaScript, הורדות, טפסים, מסגרות, משאבים מרוחקים ותוכן בר הפעלה מוסרים. מגבלה: 512 KB HTML ו-128 KB CSS.</string>
     <string name="settings_homepage_html_too_large">קובץ ה-HTML חורג מהמגבלה של 512 KB.</string>
     <string name="settings_homepage_opacity_summary">%1$d%%</string>
     <string name="settings_homepage_opacity_title">אטימות תאריך ושעה של עמוד הבית</string>
@@ -350,15 +336,11 @@
     <string name="settings_rail_size_small">קָטָן</string>
     <string name="settings_rail_size_super_compact">סופר קומפקטי</string>
     <string name="settings_search_hint">הגדרות חיפוש</string>
-    <string name="settings_swap_qr_tabs">החלפת לחצני QR ו-Tabs</string>
-    <string name="settings_swap_qr_tabs_summary">הזז את לחצן הכרטיסיות למיקום סורק QR לגישה קלה יותר ביד אחת.</string>
     <string name="shortcut_message_failed_to_add">מצטערים, המפעיל שלך לא תומך בקיצורי דרך.</string>
-    <string name="snacktory">חטיפים</string>
     <string name="ssl_info_expires_on">יפוג בתאריך</string>
     <string name="ssl_info_issued_by">הונפק על ידי</string>
     <string name="ssl_info_issued_on">הונפק בתאריך</string>
     <string name="ssl_info_issued_to">הונפק ל</string>
-    <string name="ssl_warning_dont_ask_again">אל תבקש שוב לסשן גלישה זה.</string>
     <string name="suggestion">חפש</string>
     <string name="tab_frozen">קָפוּא…</string>
     <string name="tabs">כרטיסיות</string>
@@ -377,7 +359,6 @@
     <string name="title_search_engine">מנוע חיפוש</string>
     <string name="title_sign_in">היכנס</string>
     <string name="title_text_size">גודל טקסט</string>
-    <string name="title_user_agent">סוכן משתמש</string>
     <string name="title_warning">אַזהָרָה</string>
     <string name="ublock_origin">מסנני uBlock Origin מובנים</string>
     <string name="ublock_origin_summary">שכבה מסנני רשת תואמי uBlock Origin על גבי חסימת מארחים.</string>
@@ -391,7 +372,6 @@
     <string name="userscripts_delete_title">למחוק את %1$s?</string>
     <string name="userscripts_deleted">נמחק %1$s</string>
     <string name="userscripts_edit">ערוך מקור</string>
-    <string name="userscripts_edit_title">ערוך %1$s</string>
     <string name="userscripts_enable">אפשר כתבי משתמש</string>
     <string name="userscripts_enabled_summary">סקריפטים פועלים רק כאשר הם מופעלים ומותאמים לעמוד הנוכחי</string>
     <string name="userscripts_explain">התקן ושלוט על סקריפטים בטוחים של דפדפן ללא הרשאות משתמש</string>
@@ -403,7 +383,6 @@
     <string name="userscripts_installed">סקריפטים מותקנים</string>
     <string name="userscripts_no_scripts">לא מותקנים כתבי משתמש</string>
     <string name="userscripts_options">אפשרויות Userscript</string>
-    <string name="userscripts_saved">נשמר %1$s</string>
    <string name="userscripts_script_summary">גרסה %1$s · %2$s</string>
     <string name="userscripts_write">Write userscript</string>
     <string name="userscripts_write_summary">Write a userscript or paste one from the clipboard</string>
@@ -419,22 +398,17 @@
     <string name="userscripts_privileged_title">Privileged userscript API requested</string>
     <string name="userscripts_privileged_message">This script requests privileged APIs. It can be saved, but Solipsism only executes scripts using @grant none; GM_* and other native APIs are not available.</string>
     <string name="version">גרסת האפליקציה</string>
-    <string name="virus_total">VirusTotal</string>
     <string name="virus_total_api_key">מפתח API של VirusTotal</string>
     <string name="virus_total_api_key_configured">מוגדר ומוצפן עם Android Keystore</string>
     <string name="virus_total_api_key_explanation">המפתח שלך מוצפן במכשיר זה ונשלח רק ל- API הרשמי של VirusTotal. זה אף פעם לא נכלל בהורדות או ביומנים.</string>
     <string name="virus_total_api_key_hint">הדבק את מפתח ה-API האישי שלך</string>
     <string name="virus_total_api_key_missing">לא מוגדר - סריקה מקומית עדיין פועלת ללא מפתח</string>
-    <string name="virus_total_api_key_required">נדרש מפתח API של VirusTotal</string>
-    <string name="virus_total_api_key_required_message">הוסף את מפתח ה-API האישי של VirusTotal בהגדרות ← VirusTotal, או בחר "הורד (דלג על סריקה)" בהנחיית ההורדה.</string>
     <string name="virus_total_blocked_message">%1$s לא הורד מכיוון שמנועי האנטי-וירוס %2$d VirusTotal דיווחו על כך כזדוניות.</string>
     <string name="virus_total_clean_downloaded">סריקת תוכנות זדוניות עברה; ההורדה נשמרה</string>
     <string name="virus_total_cloud_enabled">השתמש ב-VirusTotal כדעה שנייה</string>
     <string name="virus_total_cloud_enabled_summary">לאחר הבדיקה המקומית, בצע שאילתה או העלה קבצים כשירים באמצעות מפתח ה-API שלך. כבוי כברירת מחדל.</string>
     <string name="virus_total_detection_count">זיהוי %1$d: %2$s</string>
     <string name="virus_total_download_blocked">הורדת תוכנה זדונית נחסמה</string>
-    <string name="virus_total_enabled">סרוק הורדות עם VirusTotal</string>
-    <string name="virus_total_enabled_summary">מופעל כברירת מחדל. הקבצים מבוימים באופן פרטי ונשמרים רק לאחר מעבר הסריקה.</string>
     <string name="virus_total_error_api_key">מפתח ה-API של VirusTotal חסר, אינו חוקי או אינו מורשה לבצע סריקה זו.</string>
     <string name="virus_total_error_generic">לא ניתן היה לאמת את הקובץ. זה לא הורד. בדוק את הרשת ונסה שוב.</string>
     <string name="virus_total_error_rate_limit">הגעת למגבלת בקשות ה-API של VirusTotal. המתן ונסה שוב, או הורד במפורש ללא סריקה.</string>
@@ -451,7 +425,6 @@
     <string name="virus_total_scan_videos_summary">כבוי כברירת מחדל כדי להפחית העלאות גדולות וחשיפה של קבצים אישיים.</string>
     <string name="virus_total_scanning">סורק הורדה</string>
     <string name="virus_total_scanning_file">סורק תוכנות זדוניות בודק את %1$s. הקובץ לא יישמר אלא אם יעבור.</string>
-    <string name="virus_total_settings_summary">סרוק הורדות כשירות לפני שמירתן.</string>
     <string name="virus_total_view_report">הצג דוח</string>
     <string name="webrtc_support">תמיכה ב-WebRTC</string>
     <string name="wideViewPort">השתמש בשדה תצוגה רחב</string>
@@ -551,7 +524,6 @@
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
-    <string name="settings_audio_effects_summary">When off, page audio is not managed by Solipsism</string>
     <string name="settings_audio_preset">Preset</string>
     <string name="settings_audio_custom_eq">Custom EQ</string>
     <string name="settings_audio_preamp">Preamp</string>
@@ -599,7 +571,6 @@
     <string name="settings_haptics_preset_pixel">Pixel</string>
     <string name="settings_haptics_preset_samsung">Samsung</string>
     <string name="settings_haptics_preset_accessibility">Accessibility optimized</string>
-    <string name="settings_haptics_apply_preset">Apply preset</string>
     <string name="settings_haptics_import_preset">Import preset file</string>
     <string name="settings_haptics_export_preset">Export current preset</string>
     <string name="settings_haptics_preset_file_error">The preset file is invalid or contains unsupported values.</string>

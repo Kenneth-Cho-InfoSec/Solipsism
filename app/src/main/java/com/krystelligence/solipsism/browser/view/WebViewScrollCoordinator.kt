@@ -5,7 +5,6 @@ import com.krystelligence.solipsism.databinding.BrowserBottomTabsBinding
 import com.krystelligence.solipsism.interpolator.BezierDecelerateInterpolator
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.utils.Utils
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.view.GestureDetector
 import android.view.Gravity
@@ -223,7 +222,6 @@ class WebViewScrollCoordinator @Inject constructor(
 
         var toggleListener: ToggleListener? = null
 
-        @SuppressLint("ClickableViewAccessibility")
         override fun onTouch(view: View?, arg1: MotionEvent): Boolean {
             if (view == null) return false
 

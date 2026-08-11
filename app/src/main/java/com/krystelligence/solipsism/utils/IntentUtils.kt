@@ -6,6 +6,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
+import androidx.core.net.toUri
 import android.webkit.WebView
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.constant.INTENT_ORIGIN
@@ -36,7 +37,7 @@ class IntentUtils(private val activity: Activity) {
         if (activity.packageManager.resolveActivity(intent, 0) == null) {
             val packageName = intent.`package`
             if (packageName != null) {
-                intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pname:$packageName"))
+                intent = Intent(Intent.ACTION_VIEW, "market://search?q=pname:$packageName".toUri())
                 intent.addCategory(Intent.CATEGORY_BROWSABLE)
                 activity.startActivity(intent)
                 return true

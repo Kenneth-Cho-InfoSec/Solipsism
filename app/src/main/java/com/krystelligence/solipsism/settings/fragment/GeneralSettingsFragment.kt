@@ -23,6 +23,7 @@ import com.krystelligence.solipsism.utils.ThemeUtils
 import com.krystelligence.solipsism.i18n.TranslationOverrides
 import android.app.Activity
 import android.net.Uri
+import androidx.core.net.toUri
 import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
@@ -528,7 +529,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
                 currentHomepage,
                 R.string.action_ok
             ) { url ->
-                val uri = Uri.parse(url.trim())
+                val uri = url.trim().toUri()
                 if ((uri.scheme == "http" || uri.scheme == "https") && !uri.host.isNullOrBlank()) {
                     userPreferences.homepage = uri.toString()
                     userPreferences.homepageSource = HomepageSource.DOMAIN.value

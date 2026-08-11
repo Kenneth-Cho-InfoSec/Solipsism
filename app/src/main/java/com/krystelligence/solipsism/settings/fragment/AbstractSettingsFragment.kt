@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.annotation.SuppressLint
 import androidx.annotation.XmlRes
+import androidx.core.view.isVisible
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -74,7 +75,7 @@ abstract class AbstractSettingsFragment : PreferenceFragmentCompat() {
                 current = mutableListOf()
                 continue
             }
-            if (item is Preference && child.visibility == View.VISIBLE) current += child
+            if (item is Preference && child.isVisible) current += child
         }
         if (current.isNotEmpty()) groups += current
 

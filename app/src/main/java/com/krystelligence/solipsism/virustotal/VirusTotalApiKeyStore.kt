@@ -4,6 +4,7 @@ import android.app.Application
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import androidx.core.content.edit
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -49,20 +50,23 @@ class VirusTotalApiKeyStore @Inject constructor(application: Application) {
         }
         val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, getOrCreateSecretKey())
-        preferences.edit()
-            .putString(
+        preferences.edit {
+            putString(
                 KEY_CIPHERTEXT,
                 Base64.encodeToString(
                     cipher.doFinal(normalized.toByteArray(Charsets.UTF_8)),
                     Base64.NO_WRAP
                 )
             )
-            .putString(KEY_IV, Base64.encodeToString(cipher.iv, Base64.NO_WRAP))
-            .apply()
+            putString(KEY_IV, Base64.encodeToString(cipher.iv, Base64.NO_WRAP))
+        }
     }
 
     fun clear() {
-        preferences.edit().remove(KEY_CIPHERTEXT).remove(KEY_IV).apply()
+        preferences.edit {
+            remove(KEY_CIPHERTEXT)
+            remove(KEY_IV)
+        }
     }
 
     private fun getOrCreateSecretKey(): SecretKey {

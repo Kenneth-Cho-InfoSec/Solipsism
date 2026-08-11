@@ -1,6 +1,5 @@
 package com.krystelligence.solipsism.userscript
 
-import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.webkit.ScriptHandler
 import androidx.webkit.JavaScriptExecutionWorld
@@ -28,7 +27,6 @@ class UserScriptRuntime @Inject constructor(
     private val handlers = mutableMapOf<WebView, MutableList<ScriptHandler>>()
     private val hasNativeDocumentEnd = mutableSetOf<WebView>()
 
-    @SuppressLint("RequiresFeature")
     fun attach(webView: WebView) {
         if (!userPreferences.userscriptsEnabled || incognitoMode || !userPreferences.javaScriptEnabled) return
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
