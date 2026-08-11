@@ -11,6 +11,7 @@ import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.log.Logger
 import com.krystelligence.solipsism.qr.QrShowActivity
 import com.krystelligence.solipsism.settings.activity.SettingsActivity
+import com.krystelligence.solipsism.settings.activity.SettingsNavigation
 import com.krystelligence.solipsism.utils.IntentUtils
 import com.krystelligence.solipsism.utils.Utils
 import android.app.ActivityManager
@@ -34,7 +35,11 @@ class BrowserNavigator @Inject constructor(
 ) : BrowserContract.Navigator {
 
     override fun openSettings() {
-        activity.startActivity(Intent(activity, SettingsActivity::class.java))
+        activity.startActivity(
+            Intent(activity, SettingsActivity::class.java).apply {
+                putExtra(SettingsNavigation.EXTRA_INCOGNITO, incognitoMode)
+            }
+        )
     }
 
     override fun sharePage(url: String, title: String?) {

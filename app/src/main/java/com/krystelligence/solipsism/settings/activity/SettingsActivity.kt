@@ -11,6 +11,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.MenuItem
 import android.widget.EditText
+import androidx.activity.OnBackPressedCallback
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 
@@ -46,6 +47,16 @@ class SettingsActivity : ThemableSettingsActivity(),
                 .replace(R.id.root, RootSettingsFragment())
                 .commit()
         }
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (supportFragmentManager.popBackStackImmediate()) return
+                    returnToBrowser()
+                }
+            }
+        )
     }
 
     override fun onPreferenceStartFragment(
@@ -82,7 +93,19 @@ class SettingsActivity : ThemableSettingsActivity(),
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressedDispatcher.onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun returnToBrowser() {
+        val incognito = intent.getBooleanExtra(
+            SettingsNavigation.EXTRA_INCOGNITO,
+            false
+        )
+        startActivity(SettingsNavigation.createBrowserIntent(this, incognito))
         finish()
-        return true
     }
 }
