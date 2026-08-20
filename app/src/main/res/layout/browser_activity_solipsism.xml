@@ -19,7 +19,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <FrameLayout
+        <FrameLayout
                 android:id="@+id/browser_surface"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

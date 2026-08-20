@@ -56,8 +56,8 @@ object TranslationOverrides {
                         require(!name.isNullOrBlank() && RESOURCE_NAME.matches(name)) { "invalid string name" }
                         require(!parsed.containsKey(name)) { "duplicate string: $name" }
                         require(parsed.size < MAX_STRINGS) { "too many strings" }
-                        val id = context.resources.getIdentifier(name, "string", context.packageName)
-                        require(id != 0) { "unknown string: $name" }
+                        val id = GeneratedStringResources.ids[name]
+                        require(id != null) { "unknown string: $name" }
                         val value = parser.nextText()
                         require(value.length <= MAX_VALUE_LENGTH) { "string is too long: $name" }
                         validatePlaceholders(context.resources.getString(id), value, name)

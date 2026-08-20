@@ -1,3 +1,10 @@
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
+
 plugins {
     id("com.android.application")
     id("com.github.ben-manes.versions")
@@ -13,7 +20,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "6.1.4"
+        versionName = "6.1.5"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -55,7 +62,7 @@ android {
             buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"true\")")
             buildConfigField("String", "RELEASE_SITE_URL", "\"https://kenneth-cho-infosec.github.io/Solipsism/\"")
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 138
+            versionCode = 139
         }
     }
     packaging {
@@ -161,6 +168,59 @@ val mezzanineReaderAliases = mapOf(
     "1744299999" to "279827214",
     "90424053" to "2114551266"
 )
+
+abstract class GenerateTranslationRegistryTask : DefaultTask() {
+    @get:InputFile
+    abstract val sourceStrings: RegularFileProperty
+
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        val names = Regex("<string\\s+name=\"([a-z][a-z0-9_]*)\"")
+            .findAll(sourceStrings.get().asFile.readText())
+            .map { it.groupValues[1] }
+            .distinct()
+            .sorted()
+            .toList()
+        val output = outputDirectory.get().asFile.resolve(
+            "com/krystelligence/solipsism/i18n/GeneratedStringResources.kt"
+        )
+        output.parentFile.mkdirs()
+        output.writeText(buildString {
+            appendLine("package com.krystelligence.solipsism.i18n")
+            appendLine()
+            appendLine("import com.krystelligence.solipsism.R")
+            appendLine()
+            appendLine("internal object GeneratedStringResources {")
+            appendLine("    val ids: Map<String, Int> = mapOf(")
+            names.forEachIndexed { index, name ->
+                val comma = if (index == names.lastIndex) "" else ","
+                appendLine("        \"$name\" to R.string.$name$comma")
+            }
+            appendLine("    )")
+            appendLine("}")
+        })
+    }
+}
+
+val generateTranslationRegistry = tasks.register<GenerateTranslationRegistryTask>("generateTranslationRegistry") {
+    sourceStrings.set(layout.projectDirectory.file("src/main/res/values/strings.xml"))
+    outputDirectory.set(layout.buildDirectory.dir("generated/translationRegistry"))
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.sources.kotlin?.addGeneratedSourceDirectory(generateTranslationRegistry) {
+            it.outputDirectory
+        }
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn(generateTranslationRegistry)
+}
 
 tasks.named("generateMezzanine") {
     doLast {

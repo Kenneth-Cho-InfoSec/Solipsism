@@ -46,7 +46,7 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical" />
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/studio_url_surface"
                 android:layout_width="52dp"
                 android:layout_height="0dp"
@@ -54,8 +54,6 @@
                 android:layout_marginBottom="22dp"
                 android:layout_weight="1"
                 android:background="@drawable/solipsism_address_rail_background"
-                android:gravity="center"
-                android:orientation="vertical"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp">
 
@@ -64,14 +62,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="vertical" />
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/studio_url_label"
                     android:layout_width="170dp"
                     android:layout_height="0dp"
                     android:rotation="90"
-                    android:layout_weight="1"
                     android:background="@drawable/solipsism_url_button_background"
                     android:gravity="center"
                     android:maxLines="1"
@@ -80,15 +80,22 @@
                     android:singleLine="true"
                     android:text="@string/rail_menu_studio_url_placeholder"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="11sp" />
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toTopOf="@id/studio_address_bottom_actions"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/studio_address_top_actions" />
 
                 <LinearLayout
                     android:id="@+id/studio_address_bottom_actions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="vertical" />
-            </LinearLayout>
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
                 android:id="@+id/studio_rail_bottom_actions"
