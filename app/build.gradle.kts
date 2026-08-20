@@ -20,7 +20,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "6.1.5"
+        versionName = "6.1.6"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -62,7 +62,7 @@ android {
             buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"true\")")
             buildConfigField("String", "RELEASE_SITE_URL", "\"https://kenneth-cho-infosec.github.io/Solipsism/\"")
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 139
+            versionCode = 140
         }
     }
     packaging {
