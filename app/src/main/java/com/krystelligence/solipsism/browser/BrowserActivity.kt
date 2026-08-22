@@ -979,7 +979,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             binding.bookmarkBackButton,
             binding.settingsButton,
             binding.verticalUrlText?.parent as? View
-        ).forEach(::applyPhysicalPressFeedback)
+        ).forEach {
+            it.applyPhysicalPressFeedback(
+                pressInterpolator = expressiveEffectsInterpolator,
+                releaseInterpolator = expressiveSpatialInterpolator
+            )
+        }
 
         binding.homeButton.setOnClickListener { presenter.onTabCountViewClick() }
         binding.actionBack.setOnClickListener { presenter.onBackClick() }
@@ -2264,33 +2269,6 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             .start()
     }
 
-    private fun applyPhysicalPressFeedback(view: View) {
-        view.setOnTouchListener { touchedView, event ->
-            when (event.actionMasked) {
-                android.view.MotionEvent.ACTION_DOWN -> touchedView.animate()
-                    .scaleX(0.94f)
-                    .scaleY(0.94f)
-                    .setDuration(PRESS_FEEDBACK_DURATION_MS)
-                    .setInterpolator(expressiveEffectsInterpolator)
-                    .start()
-
-                android.view.MotionEvent.ACTION_UP,
-                android.view.MotionEvent.ACTION_CANCEL -> {
-                    touchedView.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(RELEASE_FEEDBACK_DURATION_MS)
-                        .setInterpolator(expressiveSpatialInterpolator)
-                        .start()
-                    if (event.actionMasked == android.view.MotionEvent.ACTION_UP && touchedView.isClickable) {
-                        touchedView.performClick()
-                    }
-                }
-            }
-            false
-        }
-    }
-
     private fun ImageView.updateVisibilityForDrawable() {
         visibility = if (drawable == null) {
             View.GONE
@@ -2332,6 +2310,4 @@ private const val ADDRESS_OVERLAY_ENTER_DURATION_MS = 360L
 private const val ADDRESS_OVERLAY_EXIT_DURATION_MS = 180L
 private const val ADDRESS_OVERLAY_SHADOW_DELAY_MS = 90L
 private const val ADDRESS_OVERLAY_SHADOW_DURATION_MS = 320L
-private const val PRESS_FEEDBACK_DURATION_MS = 95L
-private const val RELEASE_FEEDBACK_DURATION_MS = 260L
 private const val TTS_CHUNK_LENGTH = 3500
