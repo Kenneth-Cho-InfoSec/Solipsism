@@ -35,6 +35,14 @@ interface IAntaresSession {
     oneway void dispatchTouchEvent(in MotionEvent event);
     /** Performs a primary-pointer click at renderer-local coordinates. */
     oneway void click(float x, float y);
+    /** Commits Unicode text from the host window's Android input method. */
+    oneway void commitText(String text);
+    /** Deletes code points around the current renderer selection. */
+    oneway void deleteSurroundingText(int beforeLength, int afterLength);
+    /** Sends an Android key to the focused renderer control. */
+    oneway void sendKey(int keyCode);
+    /** Notifies the renderer that the host input method was dismissed. */
+    oneway void dismissIme();
     /** Applies a renderer-local one-finger scroll delta. */
     oneway void scroll(int dx, int dy, int x, int y);
     /** Describes the nearest interactive DOM element at renderer-local physical coordinates. */

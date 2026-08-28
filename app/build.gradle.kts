@@ -20,7 +20,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "7.0.0"
+        versionName = "7.0.1"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -68,7 +68,7 @@ android {
                 "\"${providers.gradleProperty("antaresCertSha256").orElse("").get()}\""
             )
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 142
+            versionCode = 143
         }
     }
     packaging {

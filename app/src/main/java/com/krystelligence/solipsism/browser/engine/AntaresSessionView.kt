@@ -6,11 +6,19 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.RemoteException
+import android.text.Editable
+import android.text.InputType
+import android.text.SpannableStringBuilder
 import android.util.Log
+import android.view.KeyEvent
 import android.view.SurfaceControlViewHost
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.MotionEvent
+import android.view.inputmethod.BaseInputConnection
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.RequiresApi
 import com.krystelligence.antares.protocol.IAntaresSession
 import com.krystelligence.antares.protocol.IAntaresSessionCallback
@@ -59,6 +67,8 @@ class AntaresSessionView(
     private var reconnectAttempts = 0
     private var reconnectScheduled = false
     private var needsInputReattach = false
+    private var imeActive = false
+    private val composingText = SpannableStringBuilder()
 
     private val sessionDeathRecipient = IBinder.DeathRecipient {
         onMain { recoverSession("Antares Engine stopped unexpectedly") }
@@ -78,6 +88,8 @@ class AntaresSessionView(
         }
         override fun onHistoryChanged(canGoBack: Boolean, canGoForward: Boolean) =
             onMain { listener.onHistoryChanged(canGoBack, canGoForward) }
+        override fun onImeShow() = onMain(::showHostInputMethod)
+        override fun onImeHide() = onMain { hideHostInputMethod(notifyRenderer = false) }
         override fun onAlert(message: String?) = onMain { listener.onAlert(message.orEmpty()) }
         override fun onMediaRequest(request: Bundle?) = onMain {
             request?.let(listener::onMediaRequest)
@@ -154,6 +166,17 @@ class AntaresSessionView(
         return relayTouchEvent(event)
     }
 
+    override fun onCheckIsTextEditor(): Boolean = imeActive
+
+    override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
+        if (!imeActive || destroyed || !contentVisible || browserChromeOverlayVisible) return null
+        outAttrs.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
+        outAttrs.imeOptions = EditorInfo.IME_ACTION_GO or EditorInfo.IME_FLAG_NO_EXTRACT_UI
+        outAttrs.initialSelStart = 0
+        outAttrs.initialSelEnd = 0
+        return AntaresInputConnection()
+    }
+
     /**
      * Sends a gesture from Solipsism's ordinary view hierarchy to the remote renderer.
      *
@@ -221,7 +244,7 @@ class AntaresSessionView(
     fun setContentVisible(visible: Boolean) {
         contentVisible = visible
         visibility = if (visible) VISIBLE else INVISIBLE
-        if (!visible) clearFocus()
+        if (!visible) hideHostInputMethod(notifyRenderer = true)
         executeOnBinder {
             session?.let { target ->
                 target.setInputEnabled(effectiveInputEnabled())
@@ -243,7 +266,7 @@ class AntaresSessionView(
             // Relinquish host-window focus before the local address editor asks for the IME. The
             // embedded hierarchy otherwise remains a competing IME client and can immediately
             // dismiss the keyboard requested by Solipsism.
-            clearFocus()
+            hideHostInputMethod(notifyRenderer = true)
         }
         if (destroyed) {
             onApplied()
@@ -260,6 +283,7 @@ class AntaresSessionView(
 
     fun destroySession() {
         destroyed = true
+        hideHostInputMethod(notifyRenderer = false)
         mainHandler.removeCallbacksAndMessages(null)
         val oldSession = session
         session = null
@@ -391,6 +415,75 @@ class AntaresSessionView(
     }
 
     private fun effectiveInputEnabled(): Boolean = contentVisible && !browserChromeOverlayVisible
+
+    private fun showHostInputMethod() {
+        if (destroyed || !effectiveInputEnabled()) return
+        imeActive = true
+        requestFocus()
+        val inputMethodManager = context.getSystemService(InputMethodManager::class.java)
+        inputMethodManager?.restartInput(this)
+        post { inputMethodManager?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT) }
+    }
+
+    private fun hideHostInputMethod(notifyRenderer: Boolean) {
+        val wasActive = imeActive
+        imeActive = false
+        composingText.clear()
+        context.getSystemService(InputMethodManager::class.java)?.let { manager ->
+            manager.hideSoftInputFromWindow(windowToken, 0)
+            manager.restartInput(this)
+        }
+        clearFocus()
+        if (notifyRenderer && wasActive) executeOnBinder { session?.dismissIme() }
+    }
+
+    private inner class AntaresInputConnection : BaseInputConnection(this@AntaresSessionView, true) {
+        override fun getEditable(): Editable = composingText
+
+        override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
+            val committed = text?.toString().orEmpty()
+            composingText.clear()
+            if (committed.isNotEmpty()) executeOnBinder { session?.commitText(committed) }
+            return true
+        }
+
+        override fun finishComposingText(): Boolean {
+            val committed = composingText.toString()
+            composingText.clear()
+            if (committed.isNotEmpty()) executeOnBinder { session?.commitText(committed) }
+            return true
+        }
+
+        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
+            if (composingText.isNotEmpty()) {
+                return super.deleteSurroundingText(beforeLength, afterLength)
+            }
+            executeOnBinder {
+                session?.deleteSurroundingText(
+                    beforeLength.coerceAtLeast(0),
+                    afterLength.coerceAtLeast(0),
+                )
+            }
+            return true
+        }
+
+        override fun sendKeyEvent(event: KeyEvent): Boolean {
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                executeOnBinder { session?.sendKey(event.keyCode) }
+            }
+            return true
+        }
+
+        override fun performEditorAction(actionCode: Int): Boolean {
+            executeOnBinder { session?.sendKey(KeyEvent.KEYCODE_ENTER) }
+            return true
+        }
+
+        override fun closeConnection() {
+            composingText.clear()
+            super.closeConnection()
+        }
+    }
 
     /**
      * A tab can be selected once more while a core migration is destroying it.  The UI must not

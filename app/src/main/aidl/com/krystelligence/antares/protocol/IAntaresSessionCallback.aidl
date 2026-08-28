@@ -15,6 +15,9 @@ oneway interface IAntaresSessionCallback {
     void onTitleChanged(String title);
     void onUrlChanged(String url);
     void onHistoryChanged(boolean canGoBack, boolean canGoForward);
+    /** Requests that the host window attach or dismiss its Android input method. */
+    void onImeShow();
+    void onImeHide();
     void onAlert(String message);
     void onMediaRequest(in Bundle request);
     void onElementProbeResult(int requestId, String descriptor);

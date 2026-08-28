@@ -55,7 +55,9 @@ internal object AntaresMediaSourceResolver {
         renewalRequest: String?,
         cookies: String?,
     ): ResolvedMediaSource {
-        if (!renewalRequest.isNullOrBlank()) return resolveRenewal(pageUrl, renewalRequest)
+        if (!renewalRequest.isNullOrBlank()) {
+            return resolveRenewal(pageUrl, renewalRequest, cookies)
+        }
         require(!directSource.isNullOrBlank()) { "The page did not provide a media source." }
         return ResolvedMediaSource(
             url = resolveUrl(pageUrl, directSource),
@@ -63,7 +65,11 @@ internal object AntaresMediaSourceResolver {
         )
     }
 
-    private fun resolveRenewal(pageUrl: String, encodedRequest: String): ResolvedMediaSource {
+    private fun resolveRenewal(
+        pageUrl: String,
+        encodedRequest: String,
+        cookies: String?,
+    ): ResolvedMediaSource {
         val request = runCatching { JSONObject(encodedRequest) }.getOrElse {
             throw IllegalArgumentException("The page provided an invalid media renewal request.", it)
         }
@@ -87,6 +93,7 @@ internal object AntaresMediaSourceResolver {
             connection.setRequestProperty("Origin", originFor(pageUrl))
             connection.setRequestProperty("Referer", pageUrl)
             connection.setRequestProperty("User-Agent", CHROMPATIBILITY_FALLBACK_USER_AGENT)
+            if (!cookies.isNullOrBlank()) connection.setRequestProperty("Cookie", cookies)
             if (method == "POST") {
                 connection.doOutput = true
                 connection.setRequestProperty(
@@ -103,7 +110,7 @@ internal object AntaresMediaSourceResolver {
             val response = connection.inputStream.bufferedReader().use { it.readText() }
             val source = findNetworkUrl(response)
                 ?: throw IllegalArgumentException("The media service did not return a playable URL.")
-            val responseCookies = connection.headerFields
+            val renewedCookies = connection.headerFields
                 .filterKeys { it?.equals("Set-Cookie", ignoreCase = true) == true }
                 .values
                 .flatten()
@@ -113,7 +120,12 @@ internal object AntaresMediaSourceResolver {
                 .takeIf(String::isNotBlank)
             ResolvedMediaSource(
                 url = resolveUrl(requestUrl, source),
-                headers = playbackHeaders(pageUrl, responseCookies),
+                headers = playbackHeaders(
+                    pageUrl,
+                    listOfNotNull(cookies, renewedCookies)
+                        .joinToString("; ")
+                        .takeIf(String::isNotBlank),
+                ),
             )
         } finally {
             connection.disconnect()

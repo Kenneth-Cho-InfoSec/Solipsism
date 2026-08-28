@@ -42,6 +42,7 @@ internal class AntaresMediaPlayerView(
     private val titleBar = LinearLayout(context)
     private var player: ExoPlayer? = null
     private var generation = 0
+    private var automaticRetriesRemaining = MAX_AUTOMATIC_RETRIES
     private var resumeWhenVisible = false
     private var playbackChromeHidden = false
     var onPlaybackActiveChanged: ((Boolean) -> Unit)? = null
@@ -81,6 +82,7 @@ internal class AntaresMediaPlayerView(
         val retry = MaterialButton(context).apply {
             text = "Try again"
             setOnClickListener {
+                automaticRetriesRemaining = MAX_AUTOMATIC_RETRIES
                 resolveAndPlay()
             }
         }
@@ -201,6 +203,13 @@ internal class AntaresMediaPlayerView(
         player?.release()
         player = null
         progress.visibility = View.GONE
+        if (request.renewalRequest != null && automaticRetriesRemaining > 0) {
+            automaticRetriesRemaining -= 1
+            errorPanel.visibility = View.GONE
+            progress.visibility = View.VISIBLE
+            postDelayed(::resolveAndPlay, AUTOMATIC_RETRY_DELAY_MS)
+            return
+        }
         errorText.text = error.message ?: "Unable to play this video."
         errorPanel.visibility = View.VISIBLE
     }
@@ -251,5 +260,7 @@ internal class AntaresMediaPlayerView(
     private companion object {
         const val PREPARE_TIMEOUT_MS = 20_000L
         const val CHROME_FADE_DURATION_MS = 240L
+        const val AUTOMATIC_RETRY_DELAY_MS = 350L
+        const val MAX_AUTOMATIC_RETRIES = 2
     }
 }

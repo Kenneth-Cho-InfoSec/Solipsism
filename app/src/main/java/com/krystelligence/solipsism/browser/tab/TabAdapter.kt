@@ -37,6 +37,7 @@ import androidx.webkit.WebViewFeature
 import org.json.JSONObject
 import org.json.JSONTokener
 import androidx.activity.result.ActivityResult
+import androidx.core.os.BundleCompat
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -90,6 +91,20 @@ class TabAdapter @AssistedInject constructor(
     }
 
     private var latentInitializer: FreezableBundleInitializer? = null
+
+    /**
+     * WebView restores its page title and favicon asynchronously. Keep the last values in the
+     * tab snapshot so the tab switcher is complete immediately after an activity or process
+     * recreation, rather than briefly falling back to an untitled generic tab.
+     */
+    private var restoredTitle: String? = (tabInitializer as? FreezableBundleInitializer)
+        ?.initialTitle
+        ?.takeIf(String::isNotBlank)
+    private var restoredFavicon: Bitmap? = (tabInitializer as? FreezableBundleInitializer)
+        ?.bundle
+        ?.let { bundle ->
+            BundleCompat.getParcelable(bundle, TabStateKeys.ENGINE_FAVICON, Bitmap::class.java)
+        }
 
     private var findInPageQuery: String? = null
     private var toggleDesktop: Boolean = false
@@ -287,11 +302,17 @@ class TabAdapter @AssistedInject constructor(
 
     override fun loadUrl(url: String) {
         latentInitializer = null
+        restoredTitle = null
+        restoredFavicon = null
         setContentKind(TabContentKind.ENGINE)
         webView.loadUrl(url, requestHeaders)
     }
 
     override fun loadFromInitializer(tabInitializer: TabInitializer) {
+        if (tabInitializer !is FreezableBundleInitializer) {
+            restoredTitle = null
+            restoredFavicon = null
+        }
         latentInitializer = null
         setContentKind(tabInitializer.contentKind)
         if (tabInitializer.contentKind == TabContentKind.NATIVE_HOMEPAGE) return
@@ -516,12 +537,20 @@ class TabAdapter @AssistedInject constructor(
         get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
             null
         } else {
-            latentInitializer?.let { iconFreeze }
+            restoredFavicon
+                ?: latentInitializer?.let { iconFreeze }
                 ?: tabWebChromeClient.faviconObservable.value?.value()
         }
 
     override fun faviconChanges(): Observable<Option<Bitmap>> = Observable.merge(
-        tabWebChromeClient.faviconObservable.filter { contentKind == TabContentKind.ENGINE },
+        tabWebChromeClient.faviconObservable
+            .filter { contentKind == TabContentKind.ENGINE }
+            .map { receivedIcon ->
+                receivedIcon.value()?.let { icon ->
+                    restoredFavicon = icon
+                    Option.Some(icon)
+                } ?: Option.fromNullable(restoredFavicon)
+            },
         contentKindSubject.map { kind ->
             if (kind == TabContentKind.NATIVE_HOMEPAGE) Option.None else Option.fromNullable(favicon)
         },
@@ -557,17 +586,21 @@ class TabAdapter @AssistedInject constructor(
         get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
             webView.context.getString(R.string.app_name)
         } else {
-            latentInitializer?.initialTitle ?: webView.title?.takeIf(String::isNotBlank)
-            ?: defaultTabTitle
+            restoredOrWebViewTitle()
         }
 
     override fun titleChanges(): Observable<String> = Observable.merge(
-        tabWebChromeClient.titleObservable.filter { contentKind == TabContentKind.ENGINE },
+        tabWebChromeClient.titleObservable
+            .filter { contentKind == TabContentKind.ENGINE }
+            .map { receivedTitle ->
+                receivedTitle.takeIf(String::isNotBlank)?.also { restoredTitle = it }
+                    ?: restoredOrWebViewTitle()
+            },
         contentKindSubject.map { kind ->
             if (kind == TabContentKind.NATIVE_HOMEPAGE) {
                 webView.context.getString(R.string.app_name)
             } else {
-                webView.title?.takeIf(String::isNotBlank) ?: defaultTabTitle
+                restoredOrWebViewTitle()
             }
         },
     )
@@ -672,8 +705,16 @@ class TabAdapter @AssistedInject constructor(
         ?: Bundle(ClassLoader.getSystemClassLoader()).also(webView::saveState)).apply {
         putString(TabStateKeys.ENGINE_URL, url)
         putString(TabStateKeys.ENGINE_TITLE, title)
+        favicon?.let { putParcelable(TabStateKeys.ENGINE_FAVICON, it) }
+            ?: remove(TabStateKeys.ENGINE_FAVICON)
         putString(TabStateKeys.CONTENT_KIND, contentKind.name)
     }
+
+    private fun restoredOrWebViewTitle(): String =
+        webView.title?.takeIf(String::isNotBlank)
+            ?: restoredTitle
+            ?: latentInitializer?.initialTitle?.takeIf(String::isNotBlank)
+            ?: defaultTabTitle
 
     private fun setContentKind(kind: TabContentKind) {
         if (contentKindSubject.value == kind) {
