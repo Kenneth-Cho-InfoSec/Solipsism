@@ -18,6 +18,23 @@ Latest release: [**Solipsism Browser v6.1.0**](https://github.com/Kenneth-Cho-In
 Application ID: `com.krystelligence.solipsism`<br>
 Developer: **Kenneth-Cho-InfoSec**
 
+## Optional Antares browser core
+
+Solipsism 7.0.0 can use **Antares**, an experimental in-house Servo-derived browser core. Antares
+is distributed as a separate Android package because its native engine is substantially larger
+than Android WebView. Android WebView remains installed as the stable fallback.
+
+To enable Antares:
+
+1. Install the signed Solipsism APK from the [Solipsism releases](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases).
+2. Download and install the matching arm64 **Antares Engine** APK from the [Antares releases](https://github.com/Kenneth-Cho-InfoSec/Antares/releases). Both packages must be installed; Antares cannot be enabled by installing Solipsism alone.
+3. Open Solipsism and choose Antares in the browser-core chooser or Debug Settings. Solipsism verifies the companion package and its signing certificate before binding.
+4. If Antares is unavailable or a site is incompatible, select Android WebView to return to the stable core.
+
+Antares is experimental. Complex sites, including YouTube and Amazon, may have incomplete
+interaction, CAPTCHA or media playback behaviour. Core switching is global and applies to all
+tabs. Do not install Antares APKs from unofficial sources.
+
 [![Latest release](https://img.shields.io/github/v/release/Kenneth-Cho-InfoSec/Solipsism?label=latest%20release)](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest)
 [![F-Droid submission](https://img.shields.io/badge/F--Droid-submission-blue)](https://gitlab.com/Kenneth-Cho-InfoSec/fdroiddata/-/merge_requests/5)
 
