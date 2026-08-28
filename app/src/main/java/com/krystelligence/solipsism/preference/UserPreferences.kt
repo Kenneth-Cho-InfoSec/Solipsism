@@ -21,7 +21,8 @@ import com.krystelligence.solipsism.preference.delegates.longPreference
 import com.krystelligence.solipsism.preference.delegates.nullableStringPreference
 import com.krystelligence.solipsism.preference.delegates.stringPreference
 import com.krystelligence.solipsism.search.SearchEngineProvider
-import com.krystelligence.solipsism.search.engine.GoogleSearch
+import com.krystelligence.solipsism.search.Suggestions
+import com.krystelligence.solipsism.search.engine.DuckSearch
 import com.krystelligence.solipsism.database.bookmark.BookmarkSortOrder
 import com.krystelligence.solipsism.utils.FileUtils
 import android.content.SharedPreferences
@@ -66,7 +67,7 @@ class UserPreferences @Inject constructor(
     /**
      * True if the browser should block ads, false otherwise.
      */
-    var adBlockEnabled by preferences.booleanPreference(BLOCK_ADS, false)
+    var adBlockEnabled by preferences.booleanPreference(BLOCK_ADS, true)
 
     /**
      * True if the built-in uBlock Origin compatible network filters are enabled.
@@ -77,7 +78,7 @@ class UserPreferences @Inject constructor(
     var cosmeticFiltersEnabled by preferences.booleanPreference(COSMETIC_FILTERS, true)
 
     /** True when GIF image resources should be blocked. */
-    var blockGifImagesEnabled by preferences.booleanPreference(BLOCK_GIF_IMAGES, false)
+    var blockGifImagesEnabled by preferences.booleanPreference(BLOCK_GIF_IMAGES, true)
 
     /**
      * True if the browser should block images from being loaded, false otherwise.
@@ -235,12 +236,15 @@ class UserPreferences @Inject constructor(
      *
      * @see SearchEngineProvider
      */
-    var searchChoice by preferences.intPreference(SEARCH, 1)
+    var searchChoice by preferences.intPreference(
+        SEARCH,
+        SearchEngineProvider.DEFAULT_SEARCH_ENGINE_INDEX
+    )
 
     /**
      * The custom URL which should be used for making searches.
      */
-    var searchUrl by preferences.stringPreference(SEARCH_URL, GoogleSearch().queryUrl)
+    var searchUrl by preferences.stringPreference(SEARCH_URL, DuckSearch().queryUrl)
 
     /**
      * True if the browser should attempt to reflow the text on a web page after zooming in or out
@@ -570,7 +574,10 @@ class UserPreferences @Inject constructor(
      *
      * @see SearchEngineProvider
      */
-    var searchSuggestionChoice by preferences.intPreference(SEARCH_SUGGESTIONS, 1)
+    var searchSuggestionChoice by preferences.intPreference(
+        SEARCH_SUGGESTIONS,
+        Suggestions.DUCK.index
+    )
 
     /**
      * The index of the ad blocking hosts file source.

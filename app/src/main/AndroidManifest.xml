@@ -15,7 +15,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
-
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -34,6 +33,7 @@
         android:required="false" />
 
     <queries>
+        <package android:name="com.krystelligence.antares" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="http" />
@@ -71,29 +71,19 @@
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
         <activity
-            android:name="com.krystelligence.solipsism.DefaultBrowserActivity"
-            android:alwaysRetainTaskState="true"
-            android:clearTaskOnLaunch="false"
-            android:colorMode="wideColorGamut"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard"
+            android:name=".browser.engine.BrowserCoreChooserActivity"
             android:exported="true"
-            android:launchMode="singleInstance"
-            android:theme="@style/Theme.LightTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize">
-            <intent-filter tools:ignore="AppLinkUrlError">
+            android:theme="@style/Theme.LightTheme">
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.APP_BROWSER" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data android:mimeType="text/html" />
                 <data android:mimeType="text/plain" />
                 <data android:mimeType="application/xhtml+xml" />
@@ -101,61 +91,38 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data android:scheme="http" />
                 <data android:scheme="https" />
             </intent-filter>
-            <!--
-                  For these schemes where any of these particular MIME types
-                  have been supplied, we are a good candidate.
-            -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:mimeType="text/html" />
-                <data android:mimeType="text/plain" />
-                <data android:mimeType="application/xhtml+xml" />
-                <data android:mimeType="application/vnd.wap.xhtml+xml" />
-            </intent-filter>
-            <!-- For viewing saved web archives. -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:scheme="http" />
                 <data android:scheme="https" />
                 <data android:mimeType="application/x-webarchive-xml" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.WEB_SEARCH" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.WEB_SEARCH" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
                 <action android:name="info.guardianproject.panic.action.TRIGGER" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.krystelligence.solipsism.DefaultBrowserActivity"
+            android:alwaysRetainTaskState="true"
+            android:clearTaskOnLaunch="false"
+            android:colorMode="wideColorGamut"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.LightTheme"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name="com.krystelligence.solipsism.IncognitoBrowserActivity"
             android:alwaysRetainTaskState="true"

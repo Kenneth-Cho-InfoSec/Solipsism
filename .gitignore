@@ -1,5 +1,12 @@
 # Android Studio
 *.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+.env
+!.env.example
 .DS_Store
 /local.properties
 /.idea/workspace.xml

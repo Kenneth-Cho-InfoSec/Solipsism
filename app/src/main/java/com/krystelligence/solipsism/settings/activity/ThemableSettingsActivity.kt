@@ -28,9 +28,10 @@ abstract class ThemableSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         injector.inject(this)
         themeId = userPreferences.useTheme
+        val effectiveTheme = themeId.effective(this)
 
         // set the theme
-        when (themeId) {
+        when (effectiveTheme) {
             AppTheme.LIGHT -> {
                 setTheme(R.style.Theme_SettingsTheme)
                 window.setBackgroundDrawable(ThemeUtils.getPrimaryColor(this).toDrawable())
@@ -45,10 +46,12 @@ abstract class ThemableSettingsActivity : AppCompatActivity() {
                 setTheme(R.style.Theme_SettingsTheme_Black)
                 window.setBackgroundDrawable(ThemeUtils.getPrimaryColorDark(this).toDrawable())
             }
+
+            AppTheme.SYSTEM -> error("System theme must be resolved before applying it")
         }
         theme.applyStyle(
             AccentPalette.overlayFor(
-                themeId,
+                effectiveTheme,
                 userPreferences.accentPalette,
                 userPreferences.matchSystemAccent
             ),

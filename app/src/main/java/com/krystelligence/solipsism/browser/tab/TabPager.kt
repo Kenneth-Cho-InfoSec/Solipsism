@@ -5,6 +5,7 @@ import com.krystelligence.solipsism.browser.view.WebViewLongPressHandler
 import com.krystelligence.solipsism.browser.view.WebViewScrollCoordinator
 import com.krystelligence.solipsism.browser.view.targetUrl.LongPress
 import android.view.ViewGroup
+import android.view.View
 import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.core.view.children
@@ -25,7 +26,7 @@ class TabPager @Inject constructor(
     private val webViewLongPressHandler: WebViewLongPressHandler
 ) {
 
-    private val webViews: MutableMap<Int, Lazy<WebView>> = mutableMapOf()
+    private val tabViews: MutableMap<Int, Lazy<View>> = mutableMapOf()
     private var transitionCurrentId: Int? = null
     private var transitionTargetId: Int? = null
 
@@ -35,26 +36,27 @@ class TabPager @Inject constructor(
      * Select the tab with the provided [id] to be displayed by the pager.
      */
     fun selectTab(id: Int) {
-        container.removeWebViews(excludeId = id)
-        val webView = webViews[id]!!.value
-        if (webView.parent != container) {
+        container.removeTabViews(excludeId = id)
+        val tabView = tabViews[id]!!.value
+        if (tabView.parent != container) {
             container.addView(
-                webView,
+                tabView,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         }
 
-        webViewScrollCoordinator.configure(webView)
-        webViewLongPressHandler.configure(webView, onLongClick = {
-            longPressListener?.invoke(id, it)
-        })
+        if (tabView is TabContentHost) {
+            tabView.setEngineAttachedListener { configureEngineView(id, it) }
+        } else {
+            configureEngineView(id, tabView)
+        }
     }
 
     fun previewVerticalTabSwitch(currentId: Int, targetId: Int, direction: Int, progress: Float) {
         if (currentId == targetId) return
-        val current = webViews[currentId]?.value ?: return
-        val target = webViews[targetId]?.value ?: return
+        val current = tabViews[currentId]?.value ?: return
+        val target = tabViews[targetId]?.value ?: return
         val distance = container.height.takeIf { it > 0 }?.toFloat() ?: current.height.toFloat()
         if (distance <= 0f) return
 
@@ -76,8 +78,8 @@ class TabPager @Inject constructor(
     }
 
     fun commitVerticalTabSwitch(targetId: Int, direction: Int, onComplete: () -> Unit) {
-        val current = transitionCurrentId?.let(webViews::get)?.value
-        val target = transitionTargetId?.let(webViews::get)?.value ?: webViews[targetId]?.value
+        val current = transitionCurrentId?.let(tabViews::get)?.value
+        val target = transitionTargetId?.let(tabViews::get)?.value ?: tabViews[targetId]?.value
         val distance = container.height.takeIf { it > 0 }?.toFloat() ?: target?.height?.toFloat() ?: 0f
         val signedDirection = direction.sign()
 
@@ -110,8 +112,8 @@ class TabPager @Inject constructor(
     }
 
     fun cancelVerticalTabSwitch() {
-        val current = transitionCurrentId?.let(webViews::get)?.value
-        val target = transitionTargetId?.let(webViews::get)?.value
+        val current = transitionCurrentId?.let(tabViews::get)?.value
+        val target = transitionTargetId?.let(tabViews::get)?.value
         current?.animate()?.cancel()
         target?.animate()?.cancel()
         current?.animate()
@@ -132,14 +134,33 @@ class TabPager @Inject constructor(
      * Clear the container of the [WebView] currently shown.
      */
     fun clearTab() {
-        container.removeWebViews()
+        container.removeTabViews()
     }
 
     /**
      * Add a [WebView] to the list of views shown by this pager.
      */
-    fun addTab(id: Int, webView: Lazy<WebView>) {
-        webViews[id] = webView
+    fun addTab(id: Int, tabView: Lazy<View>) {
+        tabViews[id] = tabView
+    }
+
+    fun removeTab(id: Int) {
+        tabViews.remove(id)?.takeIf { it.isInitialized() }?.value?.let { view ->
+            container.removeView(view)
+            (view as? TabContentHost)?.dispose()
+        }
+    }
+
+    fun replaceTabs(replacements: Map<Int, Lazy<View>>) {
+        resetTransitionViews()
+        tabViews.values
+            .filter(Lazy<View>::isInitialized)
+            .map(Lazy<View>::value)
+            .filterIsInstance<TabContentHost>()
+            .forEach(TabContentHost::dispose)
+        container.removeAllViews()
+        tabViews.clear()
+        tabViews.putAll(replacements)
     }
 
     /**
@@ -149,15 +170,17 @@ class TabPager @Inject constructor(
      * estimate in the UI.
      */
     fun estimatedMemoryForTab(id: Int): String {
-        val webView = webViews[id]?.takeIf { it.isInitialized() }?.value
-        val processShareKb = (Debug.getPss() / webViews.size.coerceAtLeast(1)).coerceAtLeast(0L)
-        val renderedSurfaceKb = webView?.let {
+        val registeredView = tabViews[id]?.takeIf { it.isInitialized() }?.value
+        val tabView = (registeredView as? TabContentHost)?.currentEngineView() ?: registeredView
+        val processShareKb = (Debug.getPss() / tabViews.size.coerceAtLeast(1)).coerceAtLeast(0L)
+        val renderedSurfaceKb = tabView?.let {
             val width = max(it.width, it.resources.displayMetrics.widthPixels)
             val height = max(it.height, it.resources.displayMetrics.heightPixels)
-            val contentHeight = min(
-                (it.contentHeight * it.scale).toLong(),
-                MAX_ESTIMATED_CONTENT_HEIGHT_PX
-            )
+            val contentHeight = if (it is WebView) {
+                min((it.contentHeight * it.scale).toLong(), MAX_ESTIMATED_CONTENT_HEIGHT_PX)
+            } else {
+                height.toLong()
+            }
             max(width.toLong() * height, width.toLong() * contentHeight) * 4L / 1024L
         } ?: 0L
         val estimateMb = max(processShareKb, renderedSurfaceKb) / 1024.0
@@ -181,17 +204,25 @@ class TabPager @Inject constructor(
         webViewScrollCoordinator.closeBottomTabDrawer()
     }
 
-    private fun FrameLayout.removeWebViews(excludeId: Int = -1) {
+    private fun FrameLayout.removeTabViews(excludeId: Int = -1) {
+        val excludedView = tabViews[excludeId]?.takeIf { it.isInitialized() }?.value
         children
-            .filterIsInstance<WebView>()
-            .filter { it.id != excludeId }
+            .filter { it !== excludedView }
             .forEach(container::removeView)
     }
 
-    private fun ensureInContainer(webView: WebView) {
-        if (webView.parent != container) {
+    private fun configureEngineView(id: Int, view: View) {
+        if (view !is WebView) return
+        webViewScrollCoordinator.configure(view)
+        webViewLongPressHandler.configure(view, onLongClick = {
+            longPressListener?.invoke(id, it)
+        })
+    }
+
+    private fun ensureInContainer(tabView: View) {
+        if (tabView.parent != container) {
             container.addView(
-                webView,
+                tabView,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
@@ -199,7 +230,7 @@ class TabPager @Inject constructor(
     }
 
     private fun resetTransitionViews() {
-        container.children.filterIsInstance<WebView>().forEach {
+        container.children.forEach {
             it.animate().cancel()
             it.translationY = 0f
             it.alpha = 1f
@@ -207,7 +238,7 @@ class TabPager @Inject constructor(
         transitionTargetId?.let { targetId ->
             transitionCurrentId?.let { currentId ->
                 if (targetId != currentId) {
-                    webViews[targetId]?.value?.let(container::removeView)
+                    tabViews[targetId]?.value?.let(container::removeView)
                 }
             }
         }

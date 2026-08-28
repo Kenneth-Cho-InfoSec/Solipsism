@@ -14,9 +14,14 @@ class HomeCleanup @Inject constructor(
 
     override suspend fun execute() {
         withContext(Dispatchers.IO) {
-            application.filesDir.listFiles()
-                ?.filter { it.endsWith(HomePageFactory.FILENAME) }
-                ?.forEach(File::delete)
+            listOf(
+                File(application.filesDir, LEGACY_HOMEPAGE_FILENAME),
+                File(File(application.filesDir, "generated-html"), LEGACY_HOMEPAGE_FILENAME),
+            ).forEach(File::delete)
         }
+    }
+
+    private companion object {
+        const val LEGACY_HOMEPAGE_FILENAME = "homepage.html"
     }
 }

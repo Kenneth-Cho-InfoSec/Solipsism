@@ -13,8 +13,30 @@ const val MOBILE_USER_AGENT =
 /** A mobile Chromium identity for foldable-aware responsive sites. */
 const val FOLDING_USER_AGENT =
     "Mozilla/5.0 (Linux; Android 14; Pixel Fold Build/UQ1A.240205.002) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.81 Mobile Safari/537.36"
-const val CHROMPATIBILITY_USER_AGENT =
-    "Mozilla/5.0 (Linux; Android 15; Pixel 9 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.7922.71 Mobile Safari/537.36"
+const val CHROMPATIBILITY_FALLBACK_USER_AGENT =
+    "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36"
+
+private val CHROMIUM_FULL_VERSION = Regex("(?:Chrome|Chromium)/(\\d+(?:\\.\\d+){0,3})")
+
+data class ChromiumVersion(val major: String, val full: String)
+
+fun chromiumVersion(providerUserAgent: String): ChromiumVersion? {
+    val full = CHROMIUM_FULL_VERSION.find(providerUserAgent)?.groupValues?.getOrNull(1)
+        ?: return null
+    return ChromiumVersion(major = full.substringBefore('.'), full = full)
+}
+
+/**
+ * Builds the reduced Android identity used by the matching Chrome generation instead of claiming
+ * a permanently hard-coded future browser version. Android System WebView and Chrome normally
+ * update together, so the installed provider's major version is the most reliable local source.
+ */
+fun chromeCompatibilityUserAgent(providerUserAgent: String): String {
+    val major = chromiumVersion(providerUserAgent)?.major
+        ?: return providerUserAgent.ifBlank { CHROMPATIBILITY_FALLBACK_USER_AGENT }
+    return "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/$major.0.0.0 Mobile Safari/537.36"
+}
 
 // URL Schemes
 const val HTTP = "http://"
@@ -27,6 +49,8 @@ const val FOLDER = "folder://"
 const val SCHEME_HOMEPAGE = "${ABOUT}home"
 const val SCHEME_BLANK = "${ABOUT}blank"
 const val SCHEME_BOOKMARKS = "${ABOUT}bookmarks"
+/** Stable display/state sentinel for the generated homepage hosted by the Antares process. */
+const val SCHEME_ANTARES_HOMEPAGE = "solipsism://offline-home"
 
 const val UTF8 = "UTF-8"
 

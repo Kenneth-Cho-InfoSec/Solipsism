@@ -102,11 +102,14 @@ class TabWebViewClient @AssistedInject constructor(
     private var zoomScale: Float = 0.0F
     private var urlWithSslError: String? = null
 
-    private fun shouldBlockRequest(pageUrl: String, requestUrl: String) =
-        !allowListModel.isUrlAllowedAds(pageUrl) &&
+    private fun shouldBlockRequest(pageUrl: String, requestUrl: String): Boolean {
+        val shouldBlockAd = userPreferences.adBlockEnabled &&
+            !allowListModel.isUrlAllowedAds(pageUrl) &&
             (adBlocker.isAd(requestUrl, pageUrl) ||
-                customFilterRepository.shouldBlockNetwork(requestUrl) ||
-                (userPreferences.blockGifImagesEnabled && requestUrl.isGifResource()))
+                customFilterRepository.shouldBlockNetwork(requestUrl))
+        val shouldBlockGif = userPreferences.blockGifImagesEnabled && requestUrl.isGifResource()
+        return shouldBlockAd || shouldBlockGif
+    }
 
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)

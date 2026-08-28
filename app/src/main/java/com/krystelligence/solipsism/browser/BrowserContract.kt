@@ -3,6 +3,7 @@ package com.krystelligence.solipsism.browser
 import com.krystelligence.solipsism.browser.download.PendingDownload
 import com.krystelligence.solipsism.browser.tab.TabInitializer
 import com.krystelligence.solipsism.browser.tab.TabModel
+import com.krystelligence.solipsism.browser.engine.BrowserCore
 import com.krystelligence.solipsism.browser.tab.TabViewState
 import com.krystelligence.solipsism.browser.view.targetUrl.LongPress
 import com.krystelligence.solipsism.database.Bookmark
@@ -92,6 +93,8 @@ interface BrowserContract {
 
         /** Read the current page text using the Android system Text to Speech service. */
         fun speakPageText(text: String)
+
+        fun showBrowserCoreSwitchFailed()
 
         /**
          * Show the options menu for long pressing a link in the web page.
@@ -257,6 +260,9 @@ interface BrowserContract {
          * Clean all permanent stored content.
          */
         fun clean()
+
+        /** Replace every open tab with an equivalent tab backed by [core]. */
+        fun switchCore(core: BrowserCore): Completable
 
         /**
          * The current open tabs.

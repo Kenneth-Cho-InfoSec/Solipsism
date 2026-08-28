@@ -682,7 +682,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
                     2 -> Suggestions.BAIDU
                     3 -> Suggestions.NAVER
                     4 -> Suggestions.NONE
-                    else -> Suggestions.GOOGLE
+                    else -> Suggestions.DUCK
                 }
                 userPreferences.searchSuggestionChoice = suggestionsProvider.index
                 summaryUpdater.updateSummary(searchSuggestionChoiceToTitle(suggestionsProvider))

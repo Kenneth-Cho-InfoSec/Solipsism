@@ -997,6 +997,7 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             AppTheme.LIGHT -> R.string.light_theme
             AppTheme.DARK -> R.string.dark_theme
             AppTheme.BLACK -> R.string.black_theme
+            AppTheme.SYSTEM -> R.string.system_theme
         }
     )
 

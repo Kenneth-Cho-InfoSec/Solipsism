@@ -52,7 +52,7 @@ class SearchEngineProvider @Inject constructor(
             2 -> DuckSuggestionsModel(okHttpClient, requestFactory, application, logger)
             3 -> BaiduSuggestionsModel(okHttpClient, requestFactory, application, logger)
             4 -> NaverSuggestionsModel(okHttpClient, requestFactory, application, logger)
-            else -> GoogleSuggestionsModel(okHttpClient, requestFactory, application, logger)
+            else -> DuckSuggestionsModel(okHttpClient, requestFactory, application, logger)
         }
 
     /**
@@ -72,7 +72,7 @@ class SearchEngineProvider @Inject constructor(
             9 -> BaiduSearch()
             10 -> YandexSearch()
             11 -> NaverSearch()
-            else -> GoogleSearch()
+            else -> DuckSearch()
         }
 
     /**
@@ -112,5 +112,10 @@ class SearchEngineProvider @Inject constructor(
         YandexSearch(),
         NaverSearch()
     )
+
+    companion object {
+        /** The persisted search-engine index used when no choice has been made. */
+        const val DEFAULT_SEARCH_ENGINE_INDEX = 7
+    }
 
 }

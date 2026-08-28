@@ -61,6 +61,10 @@ import com.krystelligence.solipsism.extensions.tint
 import com.krystelligence.solipsism.qr.QrScannerActivity
 import com.krystelligence.solipsism.vault.VaultActivity
 import com.krystelligence.solipsism.screenshot.ScreenshotStudioActivity
+import com.krystelligence.solipsism.browser.engine.BrowserCore
+import com.krystelligence.solipsism.browser.engine.BrowserCoreChooserActivity
+import com.krystelligence.solipsism.browser.engine.BrowserCoreSwitchRequest
+import com.krystelligence.solipsism.browser.engine.AntaresMediaPlayerView
 import com.krystelligence.solipsism.search.SuggestionsAdapter
 import com.krystelligence.solipsism.ssl.SslCertificateInfo
 import com.krystelligence.solipsism.ssl.createSslDrawableForState
@@ -68,10 +72,14 @@ import com.krystelligence.solipsism.ssl.showSslDialog as showSslCertificateDialo
 import com.krystelligence.solipsism.utils.ProxyUtils
 import com.krystelligence.solipsism.utils.value
 import android.content.Intent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Outline
+import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
@@ -93,10 +101,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.view.animation.PathInterpolator
 import android.widget.AdapterView
+import androidx.core.content.ContextCompat
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -108,11 +116,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
 import androidx.appcompat.app.AlertDialog
+import androidx.annotation.OptIn
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.content.edit
 import androidx.core.net.toUri
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -149,13 +162,25 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private var customViewOriginalOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     private var customViewHidSystemUi = false
     private var immersiveFullscreen = false
-    private var previousSystemUiVisibility = 0
     private var browserMenuPopup: PopupWindow? = null
     private var bookmarkQuery = ""
     private var currentBookmarks: List<Bookmark> = emptyList()
     private var urlRailTransition: BrowserPresenter.UrlBarTabTransition? = null
     private var railHapticActive = false
     private var railHapticLastMovementAt = 0L
+    private var browserCoreReceiverRegistered = false
+    private var addressOverlayOpen = false
+    private var addressOverlayGeneration = 0
+    private var browserChromeGestureActive = false
+
+    private val browserCoreSwitchReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val core = BrowserCore.fromPreference(
+                intent?.getStringExtra(BrowserCoreSwitchRequest.EXTRA_CORE)
+            )
+            presenter.onBrowserCoreSelected(core)
+        }
+    }
 
     private var menuItemShare: MenuItem? = null
     private var menuItemCopyLink: MenuItem? = null
@@ -363,7 +388,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private fun setImmersiveFullscreen(enabled: Boolean) {
         immersiveFullscreen = enabled
         if (::systemBarsController.isInitialized) {
-            systemBarsController.setImmersiveHidden(enabled)
+            systemBarsController.setImmersiveHidden(enabled || customViewHidSystemUi)
         }
         if (::binding.isInitialized && ::uiConfiguration.isInitialized &&
             uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM
@@ -867,6 +892,14 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
             if (uiConfiguration.tabConfiguration == TabConfiguration.DRAWER_SIDE || uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
                 binding.drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+                    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                        if (drawerView == binding.tabDrawer) {
+                            presenter.onTabDrawerMoved(slideOffset > 0f)
+                        } else if (drawerView == binding.bookmarkDrawer) {
+                            presenter.onBookmarkDrawerMoved(slideOffset > 0f)
+                        }
+                    }
+
                     override fun onDrawerOpened(drawerView: View) {
                         if (drawerView == binding.tabDrawer) {
                             presenter.onTabDrawerMoved(true)
@@ -904,6 +937,13 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         })
 
         presenter.onViewAttached(BrowserStateAdapter(this))
+        ContextCompat.registerReceiver(
+            this,
+            browserCoreSwitchReceiver,
+            IntentFilter(BrowserCoreSwitchRequest.ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+        browserCoreReceiverRegistered = true
         maybeShowFirstRunDonationDialog()
         window.decorView.post {
             lifecycleScope.launch {
@@ -941,10 +981,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.search.addTextChangedListener(StyleRemovingTextWatcher())
         binding.search.setOnFocusChangeListener { _, hasFocus ->
             presenter.onSearchFocusChanged(hasFocus)
-            binding.search.selectAll()
             if (hasFocus) {
-                showAddressOverlay()
-            } else {
+                binding.search.selectAll()
+                if (!addressOverlayOpen) showAddressOverlay()
+            } else if (addressOverlayOpen) {
                 hideAddressOverlay()
             }
         }
@@ -986,7 +1026,36 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             )
         }
 
-        binding.homeButton.setOnClickListener { presenter.onTabCountViewClick() }
+        binding.homeButton.setOnClickListener {
+            if (uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
+                toggleTabDrawerDirectly()
+            } else {
+                presenter.onTabCountViewClick(
+                    drawerIsOpen = binding.drawerLayout.isDrawerOpen(binding.tabDrawer)
+                )
+            }
+        }
+        if (uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
+            // DrawerLayout's edge swipe begins on ACTION_DOWN and remains reliable even while an
+            // embedded Antares hierarchy owns page focus. Mirror that path for the rail button:
+            // invoke the same DrawerLayout operation immediately instead of waiting for Android's
+            // focus-sensitive ACTION_UP click synthesis. performClick preserves accessibility and
+            // keyboard activation through the normal click listener above.
+            binding.homeButton.setOnTouchListener { view, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        view.isPressed = true
+                        view.performClick()
+                        true
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        view.isPressed = false
+                        true
+                    }
+                    else -> true
+                }
+            }
+        }
         binding.actionBack.setOnClickListener { presenter.onBackClick() }
         binding.actionForward.setOnClickListener { presenter.onForwardClick() }
         binding.actionHome.setOnClickListener { presenter.onHomeClick() }
@@ -1038,11 +1107,44 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         super.onNewIntent(intent)
     }
 
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (::binding.isInitialized && event.actionMasked == MotionEvent.ACTION_DOWN &&
+            event.isInside(binding.toolbarLayout)
+        ) {
+            browserChromeGestureActive = true
+            // Release embedded Antares input before dispatching the rail gesture. Persistent
+            // chrome such as the address editor, drawer or overflow menu keeps it released after
+            // ACTION_UP through the presenter's combined state calculation.
+            presenter.onBrowserChromeGestureMoved(true)
+        }
+
+        val handled = super.dispatchTouchEvent(event)
+        if (browserChromeGestureActive &&
+            (event.actionMasked == MotionEvent.ACTION_UP ||
+                event.actionMasked == MotionEvent.ACTION_CANCEL)
+        ) {
+            browserChromeGestureActive = false
+            presenter.onBrowserChromeGestureMoved(false)
+        }
+        return handled
+    }
+
+    private fun MotionEvent.isInside(view: View): Boolean {
+        if (!view.isShown) return false
+        val bounds = Rect()
+        return view.getGlobalVisibleRect(bounds) && bounds.contains(rawX.toInt(), rawY.toInt())
+    }
+
     override fun onDestroy() {
+        if (browserCoreReceiverRegistered) {
+            unregisterReceiver(browserCoreSwitchReceiver)
+            browserCoreReceiverRegistered = false
+        }
         stopContinuousRailHaptic()
         textToSpeech?.stop()
         textToSpeech?.shutdown()
         textToSpeech = null
+        browserMenuPopup?.dismiss()
         super.onDestroy()
         presenter.onViewDetached()
     }
@@ -1111,6 +1213,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             R.id.action_copy -> presenter.onMenuClick(MenuSelection.COPY_LINK)
             R.id.action_bookmarks -> presenter.onMenuClick(MenuSelection.BOOKMARKS)
             R.id.action_settings -> presenter.onMenuClick(MenuSelection.SETTINGS)
+            R.id.action_browser_core -> openBrowserCoreChooser()
             R.id.action_add_to_homescreen -> presenter.onMenuClick(MenuSelection.ADD_TO_HOME)
             R.id.action_add_bookmark -> presenter.onMenuClick(MenuSelection.ADD_BOOKMARK)
         }
@@ -1131,6 +1234,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     private fun showBrowserOverflowMenu() {
         browserMenuPopup?.dismiss()
+        presenter.onBrowserMenuMoved(true)
         val menuView = buildBrowserOverflowMenuView()
         val popupWidth = resources.displayMetrics.widthPixels
             .coerceAtMost(BROWSER_MENU_MAX_WIDTH_DP.dp + (BROWSER_MENU_SCREEN_MARGIN_DP * 2).dp) -
@@ -1145,6 +1249,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             elevation = 18.dp.toFloat()
             isOutsideTouchable = true
             setAnimationStyle(android.R.style.Animation_Dialog)
+            setOnDismissListener {
+                presenter.onBrowserMenuMoved(false)
+                if (browserMenuPopup === this) browserMenuPopup = null
+            }
         }
 
         val location = IntArray(2)
@@ -1201,16 +1309,46 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             container.addView(createMenuDivider())
         }
 
+        var browserCoreAdded = false
         layout.visibleOverflowActions
             .filter(::railActionAvailable)
             .forEach { action ->
+                if (action == RailActionId.FEELING_LUCKY) {
+                    container.addBrowserCoreMenuRow()
+                    browserCoreAdded = true
+                }
                 container.addView(createActionMenuRow(railActionIcon(action), railActionContentDescription(action)) {
                     browserMenuPopup?.dismiss()
                     runConfiguredRailAction(action)
                 })
             }
 
+        // Feeling Lucky can be moved out of the overflow menu in Rail & Menu Studio. Keep the
+        // core chooser available in that case, but otherwise place it exactly above that action.
+        if (!browserCoreAdded) {
+            container.addView(createMenuDivider())
+            container.addBrowserCoreMenuRow()
+        }
+
         return container
+    }
+
+    private fun LinearLayout.addBrowserCoreMenuRow() {
+        addView(
+            createActionMenuRow(
+                R.drawable.ic_settings_globe,
+                getString(R.string.browser_core_menu_shortcut),
+                ::openBrowserCoreChooser
+            )
+        )
+    }
+
+    private fun openBrowserCoreChooser() {
+        browserMenuPopup?.dismiss()
+        startActivity(
+            Intent(this, BrowserCoreChooserActivity::class.java)
+                .putExtra(BrowserCoreChooserActivity.EXTRA_MANAGE_ONLY, true)
+        )
     }
 
     private fun createQuickActionButton(action: RailActionId): ImageButton =
@@ -1334,6 +1472,17 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.drawerLayout.closeDrawer(binding.tabDrawer)
     }
 
+    private fun toggleTabDrawerDirectly() {
+        if (binding.drawerLayout.isDrawerOpen(binding.tabDrawer)) {
+            binding.drawerLayout.closeDrawer(binding.tabDrawer, true)
+        } else {
+            // Set the persistent chrome state before the opening animation begins. The drawer's
+            // own callbacks keep this state in sync from this point, exactly as with an edge swipe.
+            presenter.onTabDrawerMoved(true)
+            binding.drawerLayout.openDrawer(binding.tabDrawer, true)
+        }
+    }
+
     /**
      * @see BrowserContract.View.showToolbar
      */
@@ -1425,6 +1574,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     override fun showScreenshotCaptureFailed() {
         snackbar(R.string.screenshot_failed)
+    }
+
+    override fun showBrowserCoreSwitchFailed() {
+        snackbar(R.string.antares_switch_failed)
     }
 
     override fun openVault() {
@@ -1566,6 +1719,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     /**
      * @see BrowserContract.View.showCustomView
      */
+    @OptIn(markerClass = [UnstableApi::class])
     override fun showCustomView(view: View) {
         customView?.let(binding.root::removeView)
         customView = view
@@ -1581,31 +1735,34 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.uiLayout.isVisible = false
         binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         view.requestLayout()
-        customViewHidSystemUi = true
-        previousSystemUiVisibility = window.decorView.systemUiVisibility
-        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        window.decorView.systemUiVisibility = previousSystemUiVisibility or
-            View.SYSTEM_UI_FLAG_FULLSCREEN or
-            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        if (view is AntaresMediaPlayerView) {
+            // Media3 starts with controls visible. Once playback actually begins the player asks
+            // us to enter immersive mode; pausing restores the title and system bars.
+            view.onPlaybackActiveChanged = ::setCustomViewPlaybackActive
+            setCustomViewPlaybackActive(false)
+        } else {
+            setCustomViewPlaybackActive(true)
+        }
     }
 
     /**
      * @see BrowserContract.View.hideCustomView
      */
+    @OptIn(markerClass = [UnstableApi::class])
     override fun hideCustomView() {
+        (customView as? AntaresMediaPlayerView)?.onPlaybackActiveChanged = null
+        setCustomViewPlaybackActive(false)
         customView?.let(binding.root::removeView)
         customView = null
         binding.uiLayout.isVisible = true
         binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         requestedOrientation = customViewOriginalOrientation
-        if (customViewHidSystemUi) {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            window.decorView.systemUiVisibility = previousSystemUiVisibility
-            customViewHidSystemUi = false
+    }
+
+    private fun setCustomViewPlaybackActive(active: Boolean) {
+        customViewHidSystemUi = active
+        if (::systemBarsController.isInitialized) {
+            systemBarsController.setImmersiveHidden(immersiveFullscreen || active)
         }
     }
 
@@ -1625,16 +1782,37 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         var downY = 0f
         var downX = 0f
         var dragProgress = 0f
+        var gestureMoved = false
+        var pendingTapView: View? = null
+        var fallbackPerformedClick = false
+        val interruptedTapFallback = Runnable {
+            val target = pendingTapView ?: return@Runnable
+            pendingTapView = null
+            fallbackPerformedClick = true
+            target.performClick()
+        }
+        fun cancelInterruptedTapFallback() {
+            mainHandler.removeCallbacks(interruptedTapFallback)
+            pendingTapView = null
+        }
         val listener = View.OnTouchListener { view, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    cancelInterruptedTapFallback()
                     downY = event.rawY
                     downX = event.rawX
                     dragProgress = 0f
+                    gestureMoved = false
+                    fallbackPerformedClick = false
+                    pendingTapView = view
+                    mainHandler.postDelayed(
+                        interruptedTapFallback,
+                        URL_RAIL_INTERRUPTED_TAP_FALLBACK_MS,
+                    )
                     urlRailTransition = null
                     tabPager.cancelVerticalTabSwitch()
-                    view.animate().cancel()
-                    view.animate()
+                    rail.animate().cancel()
+                    rail.animate()
                         .scaleX(0.96f)
                         .scaleY(0.96f)
                         .setDuration(120L)
@@ -1649,6 +1827,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                     if (abs(dy) > URL_RAIL_DRAG_START_DP.dp &&
                         abs(dy) > abs(dx) * 1.15f
                     ) {
+                        gestureMoved = true
+                        cancelInterruptedTapFallback()
                         val direction = if (dy < 0f) 1 else -1
                         val transition = urlRailTransition
                             ?.takeIf { it.direction == direction }
@@ -1672,7 +1852,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                 MotionEvent.ACTION_UP -> {
                     val dy = event.rawY - downY
                     val dx = event.rawX - downX
-                    view.animate()
+                    cancelInterruptedTapFallback()
+                    rail.animate()
                         .scaleX(1f)
                         .scaleY(1f)
                         .setDuration(180L)
@@ -1681,7 +1862,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                     val transition = urlRailTransition
                     if (transition != null && dragProgress >= URL_RAIL_COMMIT_PROGRESS) {
                         stopContinuousRailHaptic()
-                        animateUrlRailTabSwitch(view, transition.direction)
+                        animateUrlRailTabSwitch(rail, transition.direction)
                         fadePixelHaptic()
                         tabPager.commitVerticalTabSwitch(
                             targetId = transition.targetId,
@@ -1696,7 +1877,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                         val quickTransition = presenter.previewUrlBarSwipeTab(direction)
                         if (quickTransition != null) {
                             stopContinuousRailHaptic()
-                            animateUrlRailTabSwitch(view, direction)
+                            animateUrlRailTabSwitch(rail, direction)
                             fadePixelHaptic()
                             tabPager.previewVerticalTabSwitch(
                                 currentId = quickTransition.currentId,
@@ -1713,8 +1894,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                         }
                     } else {
                         tabPager.cancelVerticalTabSwitch()
-                        view.performClick()
-                        showAddressOverlay()
+                        if (!fallbackPerformedClick) view.performClick()
                     }
                     urlRailTransition = null
                     true
@@ -1722,9 +1902,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
                 MotionEvent.ACTION_CANCEL -> {
                     stopContinuousRailHaptic()
+                    // A remote SurfaceControl input transfer can cancel a stationary host tap.
+                    // Leave its short fallback armed. A genuine drag already cancelled it above.
+                    if (gestureMoved) cancelInterruptedTapFallback()
                     tabPager.cancelVerticalTabSwitch()
                     urlRailTransition = null
-                    view.animate()
+                    rail.animate()
                         .scaleX(1f)
                         .scaleY(1f)
                         .setDuration(150L)
@@ -1737,6 +1920,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             }
         }
         rail.setOnTouchListener(listener)
+        binding.verticalUrlText?.setOnTouchListener(listener)
     }
 
     private fun animateUrlRailTabSwitch(view: View, direction: Int) {
@@ -1945,12 +2129,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     private fun maybeShowFirstRunDonationDialog() {
-        val preferences = getSharedPreferences(DONATION_PREFERENCES, MODE_PRIVATE)
-        if (preferences.getBoolean(DONATION_PROMPT_SHOWN, false) || isIncognito()) {
+        val preferences = getSharedPreferences(DonationPromptPreferences.FILE_NAME, MODE_PRIVATE)
+        if (preferences.getBoolean(DonationPromptPreferences.KEY_SHOWN, false) || isIncognito()) {
             return
         }
 
-        preferences.edit { putBoolean(DONATION_PROMPT_SHOWN, true) }
+        preferences.edit { putBoolean(DonationPromptPreferences.KEY_SHOWN, true) }
         mainHandler.post {
             MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.donation_prompt_title)
@@ -2201,6 +2385,15 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     private fun showAddressOverlay() {
         val overlay = binding.addressOverlay ?: return
+        if (addressOverlayOpen && overlay.isVisible) {
+            val generation = ++addressOverlayGeneration
+            presenter.onAddressOverlayMoved(true) {
+                requestAddressEditorFocus(generation, overlay)
+            }
+            return
+        }
+        addressOverlayOpen = true
+        val generation = ++addressOverlayGeneration
         val searchContainer = binding.searchContainer
         val editUrl = presenter.currentUrlForEditing()
         overlay.animate().cancel()
@@ -2214,7 +2407,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             searchContainer.translationZ = 0f
             overlay.isVisible = true
         }
-        if (editUrl.isNotBlank() && binding.search.text.toString() != editUrl) {
+        if (binding.search.text.toString() != editUrl) {
             binding.search.setText(editUrl)
             binding.search.setSelection(editUrl.length)
         }
@@ -2235,13 +2428,69 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
                 searchContainer.elevation = 18.dp.toFloat()
             }
             .start()
-        binding.search.requestFocus()
-        inputMethodManager.showSoftInput(binding.search, InputMethodManager.SHOW_IMPLICIT)
+        // Antares acknowledges that its remote main thread has relinquished input before the
+        // local editor becomes the IME client. WebView tabs acknowledge immediately.
+        presenter.onAddressOverlayMoved(true) {
+            requestAddressEditorFocus(generation, overlay)
+        }
+    }
+
+    private fun requestAddressEditorFocus(generation: Int, overlay: View, attempt: Int = 0) {
+        binding.search.post {
+            if (!addressOverlayOpen || generation != addressOverlayGeneration ||
+                !overlay.isVisible
+            ) {
+                return@post
+            }
+            val search = binding.search
+            if (!search.hasFocus() && !search.requestFocus()) {
+                scheduleAddressEditorImeRetry(generation, overlay, attempt)
+                return@post
+            }
+            if (!search.isAttachedToWindow || !search.hasWindowFocus()) {
+                scheduleAddressEditorImeRetry(generation, overlay, attempt)
+                return@post
+            }
+
+            // The editor can gain View focus before Android finishes moving the active input
+            // connection away from Antares' remote SurfaceControl hierarchy. Request through both
+            // supported APIs, then verify the IME inset and retry briefly if system_server has not
+            // accepted the new editor yet. Flags are deliberately zero: SHOW_IMPLICIT is deprecated
+            // on Android 17 and is weaker than this explicit user-initiated request.
+            WindowCompat.getInsetsController(window, search)
+                .show(WindowInsetsCompat.Type.ime())
+            inputMethodManager.showSoftInput(search, 0)
+            val imeVisible = ViewCompat.getRootWindowInsets(search)
+                ?.isVisible(WindowInsetsCompat.Type.ime()) == true
+            if (!imeVisible) {
+                scheduleAddressEditorImeRetry(generation, overlay, attempt)
+            }
+        }
+    }
+
+    private fun scheduleAddressEditorImeRetry(generation: Int, overlay: View, attempt: Int) {
+        if (attempt >= ADDRESS_EDITOR_IME_MAX_RETRIES) return
+        mainHandler.postDelayed(
+            {
+                requestAddressEditorFocus(
+                    generation = generation,
+                    overlay = overlay,
+                    attempt = attempt + 1,
+                )
+            },
+            ADDRESS_EDITOR_IME_RETRY_DELAY_MS,
+        )
     }
 
     private fun hideAddressOverlay() {
         val overlay = binding.addressOverlay ?: return
+        if (!addressOverlayOpen && !overlay.isVisible) return
+        addressOverlayOpen = false
+        val generation = ++addressOverlayGeneration
         val searchContainer = binding.searchContainer
+        binding.search.clearFocus()
+        WindowCompat.getInsetsController(window, binding.search)
+            .hide(WindowInsetsCompat.Type.ime())
         overlay.animate().cancel()
         searchContainer.animate().cancel()
         searchContainer.animate()
@@ -2260,13 +2509,28 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             .setDuration(ADDRESS_OVERLAY_EXIT_DURATION_MS)
             .setInterpolator(expressiveEffectsInterpolator)
             .withEndAction {
-                overlay.isVisible = false
-                overlay.translationY = 0f
-                overlay.scaleX = 1f
-                overlay.scaleY = 1f
-                searchContainer.translationZ = 0f
+                finishAddressOverlayHide(generation)
             }
             .start()
+        // ViewPropertyAnimator end actions are skipped when an animation is cancelled. Keep the
+        // input state correct even if a lifecycle or a second chrome action interrupts the fade.
+        mainHandler.postDelayed(
+            { finishAddressOverlayHide(generation) },
+            ADDRESS_OVERLAY_EXIT_DURATION_MS + ADDRESS_OVERLAY_HIDE_FALLBACK_DELAY_MS,
+        )
+    }
+
+    private fun finishAddressOverlayHide(generation: Int) {
+        if (addressOverlayOpen || generation != addressOverlayGeneration) return
+        val overlay = binding.addressOverlay ?: return
+        overlay.animate().cancel()
+        overlay.isVisible = false
+        overlay.translationY = 0f
+        overlay.scaleX = 1f
+        overlay.scaleY = 1f
+        binding.searchContainer.translationZ = 0f
+        binding.searchContainer.elevation = 0f
+        presenter.onAddressOverlayMoved(false)
     }
 
     private fun ImageView.updateVisibilityForDrawable() {
@@ -2297,17 +2561,19 @@ private const val FIND_BAR_RAIL_GAP_DP = 14
 private const val URL_RAIL_DRAG_START_DP = 8
 private const val URL_RAIL_SWIPE_THRESHOLD_DP = 34
 private const val URL_RAIL_COMMIT_PROGRESS = 0.42f
+private const val URL_RAIL_INTERRUPTED_TAP_FALLBACK_MS = 220L
 private const val RAIL_HAPTIC_MAX_DURATION_MS = 10_000L
 private const val RAIL_HAPTIC_IDLE_TIMEOUT_MS = 140L
 private const val SCREENSHOT_ANIMATION_DURATION_MS = 650L
 private const val SCREENSHOT_SHRINK_SCALE = 0.70f
 private const val BROWSER_MENU_MAX_WIDTH_DP = 258
 private const val BROWSER_MENU_SCREEN_MARGIN_DP = 14
-private const val DONATION_PREFERENCES = "solipsism_donation"
-private const val DONATION_PROMPT_SHOWN = "donationPromptShown"
 private const val KO_FI_URL = "https://ko-fi.com/kennethchoinfosec"
 private const val ADDRESS_OVERLAY_ENTER_DURATION_MS = 360L
 private const val ADDRESS_OVERLAY_EXIT_DURATION_MS = 180L
+private const val ADDRESS_OVERLAY_HIDE_FALLBACK_DELAY_MS = 50L
 private const val ADDRESS_OVERLAY_SHADOW_DELAY_MS = 90L
 private const val ADDRESS_OVERLAY_SHADOW_DURATION_MS = 320L
+private const val ADDRESS_EDITOR_IME_RETRY_DELAY_MS = 120L
+private const val ADDRESS_EDITOR_IME_MAX_RETRIES = 6
 private const val TTS_CHUNK_LENGTH = 3500

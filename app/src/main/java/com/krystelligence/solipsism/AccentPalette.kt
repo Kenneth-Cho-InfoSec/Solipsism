@@ -23,6 +23,7 @@ enum class AccentPalette(
         AppTheme.LIGHT -> lightOverlay
         AppTheme.DARK -> darkOverlay
         AppTheme.BLACK -> blackOverlay
+        AppTheme.SYSTEM -> lightOverlay
     }
 
     companion object {
@@ -34,6 +35,7 @@ enum class AccentPalette(
                     AppTheme.LIGHT -> R.style.ThemeOverlay_Solipsism_Accent_System_Light
                     AppTheme.DARK -> R.style.ThemeOverlay_Solipsism_Accent_System_Dark
                     AppTheme.BLACK -> R.style.ThemeOverlay_Solipsism_Accent_System_Black
+                    AppTheme.SYSTEM -> R.style.ThemeOverlay_Solipsism_Accent_System_Light
                 }
             }
             return fromValue(paletteValue).overlayFor(theme)

@@ -23,6 +23,15 @@ class DeveloperPreferences @Inject constructor(
         false
     )
 
+    /**
+     * Runs an off-screen WebView beside Antares so debug builds can compare the semantic target
+     * under a tap before forwarding it to the experimental engine.
+     */
+    var antaresCoordinateBridgeEnabled by preferences.booleanPreference(
+        ANTARES_COORDINATE_BRIDGE,
+        false,
+    )
+
     var checkedForTor by preferences.booleanPreference(INITIAL_CHECK_FOR_TOR, false)
 
     // var checkedForI2P by preferences.booleanPreference(INITIAL_CHECK_FOR_I2P, false)
@@ -30,5 +39,6 @@ class DeveloperPreferences @Inject constructor(
 
 private const val LEAK_CANARY = "leakCanary"
 private const val EXPERIMENTAL_RAIL_LAYOUTS = "experimentalRailLayouts"
+private const val ANTARES_COORDINATE_BRIDGE = "antaresCoordinateBridge"
 private const val INITIAL_CHECK_FOR_TOR = "checkForTor"
 // private const val INITIAL_CHECK_FOR_I2P = "checkForI2P"

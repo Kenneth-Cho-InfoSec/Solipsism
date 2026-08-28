@@ -17,6 +17,12 @@ import io.reactivex.rxjava3.core.Observable
  */
 interface TabModel {
 
+    /** The kind of content currently presented by this tab. */
+    val contentKind: TabContentKind
+
+    /** Emits whenever this tab moves between the native homepage and its browser engine. */
+    fun contentKindChanges(): Observable<TabContentKind>
+
     /**
      * The tab identifier.
      */
@@ -76,6 +82,9 @@ interface TabModel {
 
     /** Apply the currently selected global user-agent preference to this tab. */
     fun applyUserAgentPreference()
+
+    /** Apply the current global ad and GIF blocking policy to this tab's engine. */
+    fun applyContentBlockingPreferences()
 
     /**
      * Reload the page the browser is currently showing.
@@ -256,6 +265,25 @@ interface TabModel {
      * background tabs from consuming disproportionate amounts of resources when they are unused.
      */
     var isForeground: Boolean
+
+    /**
+     * Notify an embedded engine that browser chrome is being drawn over the page. Normal WebView
+     * tabs do not need special handling; remote SurfaceControlViewHost tabs use this to keep
+     * drawers above their interactive surface.
+     */
+    fun setBrowserChromeOverlayVisible(visible: Boolean, onApplied: () -> Unit = {}) = onApplied()
+
+    /**
+     * Controls whether the browser engine is attached, foregrounded and eligible for input.
+     * This is separate from temporary browser chrome such as the address editor and drawers.
+     */
+    fun setContentVisible(visible: Boolean) = Unit
+
+    /**
+     * Called after the browser activity becomes interactive again. Remote engines can use this to
+     * finish or repair a surface attachment that was deferred while Settings covered the browser.
+     */
+    fun onHostResumed() = Unit
 
     val hasFocus: Boolean
 

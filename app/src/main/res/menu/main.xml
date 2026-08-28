@@ -58,6 +58,10 @@
         android:icon="@drawable/ic_action_star"
         android:title="@string/action_add_bookmark"/>
     <item
+        android:id="@+id/action_browser_core"
+        android:icon="@drawable/ic_settings_globe"
+        android:title="@string/browser_core_menu_shortcut"/>
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_settings"
         android:title="@string/settings"/>

@@ -1,5 +1,6 @@
 package com.krystelligence.solipsism.browser.tab
 
+import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.browser.di.DiskScheduler
 import com.krystelligence.solipsism.adblock.custom.ElementPickerController
 import com.krystelligence.solipsism.browser.di.MainScheduler
@@ -8,6 +9,8 @@ import com.krystelligence.solipsism.browser.image.IconFreeze
 import com.krystelligence.solipsism.browser.view.setCompositeOnFocusChangeListener
 import com.krystelligence.solipsism.browser.view.setCompositeTouchListener
 import com.krystelligence.solipsism.constant.DESKTOP_USER_AGENT
+import com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
+import com.krystelligence.solipsism.constant.chromiumVersion
 import com.krystelligence.solipsism.ids.ViewIdGenerator
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.html.homepage.HomepageSource
@@ -20,6 +23,7 @@ import com.krystelligence.solipsism.utils.value
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -27,10 +31,12 @@ import android.webkit.WebView
 import android.webkit.JavascriptInterface
 import android.util.Log
 import androidx.core.graphics.createBitmap
+import androidx.webkit.UserAgentMetadata
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import org.json.JSONObject
 import org.json.JSONTokener
 import androidx.activity.result.ActivityResult
-import androidx.core.graphics.createBitmap
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -63,6 +69,14 @@ class TabAdapter @AssistedInject constructor(
     private val elementPickerController: ElementPickerController,
 ) : TabModel {
 
+    private val contentKindSubject = BehaviorSubject.createDefault(tabInitializer.contentKind)
+    private var engineContentVisible = tabInitializer.contentKind == TabContentKind.ENGINE
+
+    override val contentKind: TabContentKind
+        get() = requireNotNull(contentKindSubject.value)
+
+    override fun contentKindChanges(): Observable<TabContentKind> = contentKindSubject.hide()
+
     @AssistedFactory
     interface Factory {
 
@@ -80,13 +94,15 @@ class TabAdapter @AssistedInject constructor(
     private var findInPageQuery: String? = null
     private var toggleDesktop: Boolean = false
     private var javaScriptStateToRestore: Boolean? = null
+    private var defaultUserAgentMetadata: UserAgentMetadata? = null
+    private var capturedDefaultUserAgentMetadata = false
     private val downloadsSubject = PublishSubject.create<PendingDownload>()
     private val focusObservable = BehaviorSubject.createDefault(false)
 
     private var previewGeneratedTime = System.currentTimeMillis()
 
-    override val id: Int = if (tabInitializer is FreezableBundleInitializer) {
-        latentInitializer = tabInitializer
+    override val id: Int = if (tabInitializer is IdentifiedTabInitializer) {
+        latentInitializer = tabInitializer as? FreezableBundleInitializer
         val frozenId = tabInitializer.id.takeIf { it != -1 } ?: viewIdGenerator.generateViewId()
         viewIdGenerator.claimViewId(frozenId)
         frozenId
@@ -258,7 +274,10 @@ class TabAdapter @AssistedInject constructor(
     }
 
     init {
-        if (tabInitializer !is FreezableBundleInitializer) {
+        applyWebViewUserAgentPreference()
+        if (tabInitializer !is FreezableBundleInitializer &&
+            tabInitializer.contentKind == TabContentKind.ENGINE
+        ) {
             loadFromInitializer(tabInitializer)
         }
     }
@@ -267,48 +286,116 @@ class TabAdapter @AssistedInject constructor(
     private val previewPathSingle = previewModel.previewForId(id).cache()
 
     override fun loadUrl(url: String) {
+        latentInitializer = null
+        setContentKind(TabContentKind.ENGINE)
         webView.loadUrl(url, requestHeaders)
     }
 
     override fun loadFromInitializer(tabInitializer: TabInitializer) {
+        latentInitializer = null
+        setContentKind(tabInitializer.contentKind)
+        if (tabInitializer.contentKind == TabContentKind.NATIVE_HOMEPAGE) return
         tabInitializer.initialize(webView, requestHeaders)
     }
 
     override fun goBack() {
-        webView.goBack()
+        if (contentKind == TabContentKind.ENGINE) webView.goBack()
     }
 
-    override fun canGoBack(): Boolean = webView.canGoBack()
+    override fun canGoBack(): Boolean = contentKind == TabContentKind.ENGINE && webView.canGoBack()
 
-    override fun canGoBackChanges(): Observable<Boolean> = tabWebViewClient.goBackObservable.hide()
+    override fun canGoBackChanges(): Observable<Boolean> = Observable.merge(
+        tabWebViewClient.goBackObservable.filter { contentKind == TabContentKind.ENGINE },
+        contentKindSubject.map { kind -> kind == TabContentKind.ENGINE && webView.canGoBack() },
+    )
 
     override fun goForward() {
-        webView.goForward()
+        if (contentKind == TabContentKind.ENGINE) webView.goForward()
     }
 
-    override fun canGoForward(): Boolean = webView.canGoForward()
+    override fun canGoForward(): Boolean = contentKind == TabContentKind.ENGINE && webView.canGoForward()
 
-    override fun canGoForwardChanges(): Observable<Boolean> =
-        tabWebViewClient.goForwardObservable.hide()
+    override fun canGoForwardChanges(): Observable<Boolean> = Observable.merge(
+        tabWebViewClient.goForwardObservable.filter { contentKind == TabContentKind.ENGINE },
+        contentKindSubject.map { kind -> kind == TabContentKind.ENGINE && webView.canGoForward() },
+    )
 
     override fun toggleDesktopAgent() {
         if (!toggleDesktop) {
             webView.settings.userAgentString = DESKTOP_USER_AGENT
+            restoreDefaultUserAgentMetadata()
         } else {
-            webView.settings.userAgentString = userPreferences.userAgent(defaultUserAgent)
-
+            applyWebViewUserAgentPreference()
         }
 
         toggleDesktop = !toggleDesktop
     }
 
     override fun applyUserAgentPreference() {
-        webView.settings.userAgentString = userPreferences.userAgent(defaultUserAgent)
+        applyWebViewUserAgentPreference()
         toggleDesktop = false
     }
 
+    private fun applyWebViewUserAgentPreference() {
+        val settings = webView.settings
+        captureDefaultUserAgentMetadata(settings)
+        settings.userAgentString = userPreferences.userAgent(defaultUserAgent)
+        if (userPreferences.userAgentChoice == 1 && userPreferences.chrompatibilityModeEnabled) {
+            val version = chromiumVersion(defaultUserAgent)
+                ?: return restoreDefaultUserAgentMetadata()
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
+                WebSettingsCompat.setUserAgentMetadata(
+                    settings,
+                    UserAgentMetadata.Builder()
+                        .setBrandVersionList(
+                            listOf(
+                                chromeBrand("Not:A-Brand", "99", "99.0.0.0"),
+                                chromeBrand("Google Chrome", version.major, version.full),
+                                chromeBrand("Chromium", version.major, version.full),
+                            )
+                        )
+                        .setFullVersion(version.full)
+                        .setPlatform("Android")
+                        .setMobile(true)
+                        .build(),
+                )
+            }
+        } else {
+            restoreDefaultUserAgentMetadata()
+        }
+    }
+
+    private fun captureDefaultUserAgentMetadata(settings: android.webkit.WebSettings) {
+        if (capturedDefaultUserAgentMetadata) return
+        capturedDefaultUserAgentMetadata = true
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
+            defaultUserAgentMetadata = WebSettingsCompat.getUserAgentMetadata(settings)
+        }
+    }
+
+    private fun restoreDefaultUserAgentMetadata() {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) return
+        defaultUserAgentMetadata?.let { WebSettingsCompat.setUserAgentMetadata(webView.settings, it) }
+    }
+
+    private fun chromeBrand(
+        brand: String,
+        major: String,
+        full: String,
+    ): UserAgentMetadata.BrandVersion = UserAgentMetadata.BrandVersion.Builder()
+        .setBrand(brand)
+        .setMajorVersion(major)
+        .setFullVersion(full)
+        .build()
+
+    override fun applyContentBlockingPreferences() = Unit
+
     override fun reload() {
-        webView.reload()
+        if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
+            contentKindSubject.onNext(TabContentKind.NATIVE_HOMEPAGE)
+        } else {
+            webView.reload()
+        }
     }
 
     override fun reloadWithJavaScriptDisabled() {
@@ -389,9 +476,18 @@ class TabAdapter @AssistedInject constructor(
     }
 
     override val preview: Pair<String?, Long>
-        get() = previewPath to previewGeneratedTime
+        get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
+            null to previewGeneratedTime
+        } else {
+            previewPath to previewGeneratedTime
+        }
 
-    override fun previewChanges(): Observable<Pair<String?, Long>> =
+    override fun previewChanges(): Observable<Pair<String?, Long>> = Observable.merge(
+        enginePreviewChanges().filter { contentKind == TabContentKind.ENGINE },
+        contentKindSubject.map { preview },
+    )
+
+    private fun enginePreviewChanges(): Observable<Pair<String?, Long>> =
         tabWebViewClient.finishedObservable
             .debounce(100, TimeUnit.MILLISECONDS)
             .observeOn(mainScheduler)
@@ -417,29 +513,67 @@ class TabAdapter @AssistedInject constructor(
         get() = findInPageQuery
 
     override val favicon: Bitmap?
-        get() = latentInitializer?.let { iconFreeze }
-            ?: tabWebChromeClient.faviconObservable.value?.value()
+        get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
+            null
+        } else {
+            latentInitializer?.let { iconFreeze }
+                ?: tabWebChromeClient.faviconObservable.value?.value()
+        }
 
-    override fun faviconChanges(): Observable<Option<Bitmap>> = tabWebChromeClient.faviconObservable
+    override fun faviconChanges(): Observable<Option<Bitmap>> = Observable.merge(
+        tabWebChromeClient.faviconObservable.filter { contentKind == TabContentKind.ENGINE },
+        contentKindSubject.map { kind ->
+            if (kind == TabContentKind.NATIVE_HOMEPAGE) Option.None else Option.fromNullable(favicon)
+        },
+    )
 
     override val themeColor: Int
-        get() = requireNotNull(tabWebChromeClient.colorChangeObservable.value)
+        get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
+            Color.TRANSPARENT
+        } else {
+            requireNotNull(tabWebChromeClient.colorChangeObservable.value)
+        }
 
-    override fun themeColorChanges(): Observable<Int> = tabWebChromeClient.colorChangeObservable
+    override fun themeColorChanges(): Observable<Int> = Observable.merge(
+        tabWebChromeClient.colorChangeObservable.filter { contentKind == TabContentKind.ENGINE },
+        contentKindSubject.map { themeColor },
+    )
 
     override val url: String
-        get() = webView.url.orEmpty()
+        get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
+            SCHEME_HOMEPAGE
+        } else {
+            webView.url.orEmpty()
+        }
 
-    override fun urlChanges(): Observable<String> = tabWebViewClient.urlObservable.hide()
+    override fun urlChanges(): Observable<String> = Observable.merge(
+        tabWebViewClient.urlObservable.filter { contentKind == TabContentKind.ENGINE },
+        contentKindSubject.map { kind ->
+            if (kind == TabContentKind.NATIVE_HOMEPAGE) SCHEME_HOMEPAGE else webView.url.orEmpty()
+        },
+    )
 
     override val title: String
-        get() = latentInitializer?.initialTitle ?: webView.title?.takeIf(String::isNotBlank)
-        ?: defaultTabTitle
+        get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
+            webView.context.getString(R.string.app_name)
+        } else {
+            latentInitializer?.initialTitle ?: webView.title?.takeIf(String::isNotBlank)
+            ?: defaultTabTitle
+        }
 
-    override fun titleChanges(): Observable<String> = tabWebChromeClient.titleObservable.hide()
+    override fun titleChanges(): Observable<String> = Observable.merge(
+        tabWebChromeClient.titleObservable.filter { contentKind == TabContentKind.ENGINE },
+        contentKindSubject.map { kind ->
+            if (kind == TabContentKind.NATIVE_HOMEPAGE) {
+                webView.context.getString(R.string.app_name)
+            } else {
+                webView.title?.takeIf(String::isNotBlank) ?: defaultTabTitle
+            }
+        },
+    )
 
     override val sslCertificateInfo: SslCertificateInfo?
-        get() = webView.certificate?.let {
+        get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) null else webView.certificate?.let {
             SslCertificateInfo(
                 issuedByCommonName = it.issuedBy.cName,
                 issuedToCommonName = it.issuedTo.cName,
@@ -451,14 +585,24 @@ class TabAdapter @AssistedInject constructor(
         }
 
     override val sslState: SslState
-        get() = tabWebViewClient.sslState
+        get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
+            SslState.None
+        } else {
+            tabWebViewClient.sslState
+        }
 
-    override fun sslChanges(): Observable<SslState> = tabWebViewClient.sslStateObservable.hide()
+    override fun sslChanges(): Observable<SslState> = Observable.merge(
+        tabWebViewClient.sslStateObservable.filter { contentKind == TabContentKind.ENGINE },
+        contentKindSubject.map { sslState },
+    )
 
     override val loadingProgress: Int
-        get() = webView.progress
+        get() = if (contentKind == TabContentKind.NATIVE_HOMEPAGE) 100 else webView.progress
 
-    override fun loadingProgress(): Observable<Int> = tabWebChromeClient.progressObservable.hide()
+    override fun loadingProgress(): Observable<Int> = Observable.merge(
+        tabWebChromeClient.progressObservable.filter { contentKind == TabContentKind.ENGINE },
+        contentKindSubject.map { kind -> if (kind == TabContentKind.NATIVE_HOMEPAGE) 100 else webView.progress },
+    )
 
     override fun downloadRequests(): Observable<PendingDownload> = downloadsSubject.hide()
 
@@ -488,15 +632,26 @@ class TabAdapter @AssistedInject constructor(
     override var isForeground: Boolean = false
         set(value) {
             field = value
-            if (field) {
+            if (field && engineContentVisible) {
                 webView.onResume()
                 webView.settings.offscreenPreRaster = true
                 latentInitializer?.let(::loadFromInitializer)
                 latentInitializer = null
             } else {
+                webView.onPause()
                 webView.settings.offscreenPreRaster = false
             }
         }
+
+    override fun setContentVisible(visible: Boolean) {
+        engineContentVisible = visible
+        webView.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+        if (visible && isForeground) {
+            webView.onResume()
+        } else {
+            webView.onPause()
+        }
+    }
 
     override val hasFocus: Boolean
         get() = webView.hasFocus()
@@ -513,8 +668,21 @@ class TabAdapter @AssistedInject constructor(
         webView.destroy()
     }
 
-    override fun freeze(): Bundle = latentInitializer?.bundle
-        ?: Bundle(ClassLoader.getSystemClassLoader()).also(webView::saveState)
+    override fun freeze(): Bundle = (latentInitializer?.bundle
+        ?: Bundle(ClassLoader.getSystemClassLoader()).also(webView::saveState)).apply {
+        putString(TabStateKeys.ENGINE_URL, url)
+        putString(TabStateKeys.ENGINE_TITLE, title)
+        putString(TabStateKeys.CONTENT_KIND, contentKind.name)
+    }
+
+    private fun setContentKind(kind: TabContentKind) {
+        if (contentKindSubject.value == kind) {
+            if (kind == TabContentKind.NATIVE_HOMEPAGE) contentKindSubject.onNext(kind)
+            return
+        }
+        if (kind == TabContentKind.NATIVE_HOMEPAGE) setContentVisible(false)
+        contentKindSubject.onNext(kind)
+    }
 
     private fun renderViewToBitmap(
         view: View,

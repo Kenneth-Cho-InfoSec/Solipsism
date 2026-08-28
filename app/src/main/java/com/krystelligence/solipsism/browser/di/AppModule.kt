@@ -13,7 +13,6 @@ import com.krystelligence.solipsism.html.bookmark.BookmarkPageReader
 import com.krystelligence.solipsism.html.download.DownloadCleanup
 import com.krystelligence.solipsism.html.history.HistoryCleanup
 import com.krystelligence.solipsism.html.homepage.HomeCleanup
-import com.krystelligence.solipsism.html.homepage.HomePageReader
 import com.krystelligence.solipsism.js.InvertPage
 import com.krystelligence.solipsism.js.TextReflow
 import com.krystelligence.solipsism.js.ThemeColor
@@ -213,9 +212,6 @@ class AppModule {
 
     @Provides
     fun providesListPageReader(): ListPageReader = mezzanine()
-
-    @Provides
-    fun providesHomePageReader(): HomePageReader = mezzanine()
 
     @Provides
     fun providesBookmarkPageReader(): BookmarkPageReader = mezzanine()

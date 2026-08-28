@@ -57,18 +57,20 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
         solipsismRailSize = userPreferences.solipsismRailSize
         solipsismRailOnLeft = userPreferences.solipsismRailOnLeft
         solipsismRailPosition = activeSolipsismRailPosition()
+        val effectiveTheme = userPreferences.useTheme.effective(this)
 
         // set the theme
         setTheme(
-            provideThemeOverride() ?: when (userPreferences.useTheme) {
+            provideThemeOverride() ?: when (effectiveTheme) {
                 AppTheme.LIGHT -> R.style.Theme_LightTheme
                 AppTheme.DARK -> R.style.Theme_DarkTheme
                 AppTheme.BLACK -> R.style.Theme_BlackTheme
+                AppTheme.SYSTEM -> error("System theme must be resolved before applying it")
             }
         )
         theme.applyStyle(
             AccentPalette.overlayFor(
-                userPreferences.useTheme,
+                effectiveTheme,
                 userPreferences.accentPalette,
                 userPreferences.matchSystemAccent
             ),

@@ -15,17 +15,19 @@ object ThemeApplication {
         val appTheme = AppTheme.entries.firstOrNull {
             it.value == preferences.getInt(THEME, AppTheme.LIGHT.value)
         } ?: AppTheme.LIGHT
+        val effectiveTheme = appTheme.effective(activity)
 
         activity.setTheme(
-            when (appTheme) {
+            when (effectiveTheme) {
                 AppTheme.LIGHT -> R.style.Theme_LightTheme
                 AppTheme.DARK -> R.style.Theme_DarkTheme
                 AppTheme.BLACK -> R.style.Theme_BlackTheme
+                AppTheme.SYSTEM -> error("System theme must be resolved before applying it")
             }
         )
         activity.theme.applyStyle(
             AccentPalette.overlayFor(
-                appTheme,
+                effectiveTheme,
                 preferences.getInt(ACCENT_PALETTE, AccentPalette.TEAL.ordinal),
                 preferences.getBoolean(MATCH_SYSTEM_ACCENT, false)
             ),

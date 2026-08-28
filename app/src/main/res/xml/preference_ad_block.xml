@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/settings_advanced">
         <SwitchPreferenceCompat
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:icon="@drawable/ic_settings_shield"
             android:key="cb_block_ads"
             android:title="@string/block_ads"/>
@@ -19,7 +19,7 @@
             android:summary="@string/cosmetic_filters_summary"
             android:title="@string/cosmetic_filters"/>
         <SwitchPreferenceCompat
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:icon="@drawable/ic_settings_text"
             android:key="cb_block_gif"
             android:summary="@string/block_gif_summary"

@@ -20,7 +20,7 @@ enum class Suggestions(val index: Int) {
                 2 -> DUCK
                 3 -> BAIDU
                 4 -> NAVER
-                else -> GOOGLE
+                else -> DUCK
             }
         }
     }

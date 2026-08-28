@@ -10,7 +10,6 @@ import com.krystelligence.solipsism.html.HtmlPageFactory
 import com.krystelligence.solipsism.html.bookmark.BookmarkPageFactory
 import com.krystelligence.solipsism.html.download.DownloadPageFactory
 import com.krystelligence.solipsism.html.history.HistoryPageFactory
-import com.krystelligence.solipsism.html.homepage.HomePageFactory
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.utils.NavigationSecurity
@@ -37,6 +36,10 @@ import javax.inject.Inject
  */
 interface TabInitializer {
 
+    /** The presentation surface required by this initializer. */
+    val contentKind: TabContentKind
+        get() = TabContentKind.ENGINE
+
     /**
      * Initialize the [WebView] instance held by the tab. If a url is loaded, the
      * provided [headers] should be used to load the url.
@@ -45,10 +48,15 @@ interface TabInitializer {
 
 }
 
+/** Initializers carrying a stable tab identity across engine reconstruction. */
+interface IdentifiedTabInitializer {
+    val id: Int
+}
+
 /**
  * An initializer that loads a [url].
  */
-class UrlInitializer(private val url: String) : TabInitializer {
+class UrlInitializer(val url: String) : TabInitializer {
 
     override fun initialize(webView: WebView, headers: Map<String, String>) {
         webView.loadUrl(url, headers)
@@ -62,13 +70,39 @@ class UrlInitializer(private val url: String) : TabInitializer {
 @Reusable
 class HomePageInitializer @Inject constructor(
     private val userPreferences: UserPreferences,
-    private val startPageInitializer: StartPageInitializer,
     private val bookmarkPageInitializer: BookmarkPageInitializer,
     private val staticHomepageInitializer: StaticHomepageInitializer,
     private val restrictedDomainHomepageInitializer: RestrictedDomainHomepageInitializer
 ) : TabInitializer {
 
+    override val contentKind: TabContentKind
+        get() = when (HomepageSource.fromValue(userPreferences.homepageSource)) {
+            HomepageSource.BUILT_IN -> if (userPreferences.homepage == SCHEME_HOMEPAGE) {
+                TabContentKind.NATIVE_HOMEPAGE
+            } else {
+                TabContentKind.ENGINE
+            }
+            HomepageSource.STATIC_HTML -> if (userPreferences.homepageHtmlPath
+                    ?.let(::File)
+                    ?.takeIf(File::isFile)
+                    ?.takeIf { runCatching { it.length() in 1..MAX_STATIC_HOMEPAGE_BYTES }.getOrDefault(false) }
+                    != null
+            ) {
+                TabContentKind.ENGINE
+            } else {
+                TabContentKind.NATIVE_HOMEPAGE
+            }
+            HomepageSource.DOMAIN -> if (
+                URLUtil.isHttpUrl(userPreferences.homepage) || URLUtil.isHttpsUrl(userPreferences.homepage)
+            ) {
+                TabContentKind.ENGINE
+            } else {
+                TabContentKind.NATIVE_HOMEPAGE
+            }
+        }
+
     override fun initialize(webView: WebView, headers: Map<String, String>) {
+        if (contentKind == TabContentKind.NATIVE_HOMEPAGE) return
         if (HomepageSource.fromValue(userPreferences.homepageSource) == HomepageSource.STATIC_HTML) {
             staticHomepageInitializer.initialize(webView, headers)
             return
@@ -81,10 +115,14 @@ class HomePageInitializer @Inject constructor(
         val homepage = userPreferences.homepage
 
         when (homepage) {
-            SCHEME_HOMEPAGE -> startPageInitializer
+            SCHEME_HOMEPAGE -> NoOpInitializer()
             SCHEME_BOOKMARKS -> bookmarkPageInitializer
             else -> UrlInitializer(homepage)
         }.initialize(webView, headers)
+    }
+
+    private companion object {
+        const val MAX_STATIC_HOMEPAGE_BYTES = 512L * 1024L
     }
 
 }
@@ -93,14 +131,12 @@ class HomePageInitializer @Inject constructor(
 @Reusable
 class StaticHomepageInitializer @Inject constructor(
     private val userPreferences: UserPreferences,
-    private val startPageInitializer: StartPageInitializer
 ) : TabInitializer {
 
     override fun initialize(webView: WebView, headers: Map<String, String>) {
         val path = userPreferences.homepageHtmlPath?.let(::File)
         val html = path?.takeIf(File::isFile)?.readText()
         if (html.isNullOrBlank()) {
-            startPageInitializer.initialize(webView, headers)
             return
         }
 
@@ -128,13 +164,11 @@ class StaticHomepageInitializer @Inject constructor(
 @Reusable
 class RestrictedDomainHomepageInitializer @Inject constructor(
     private val userPreferences: UserPreferences,
-    private val startPageInitializer: StartPageInitializer
 ) : TabInitializer {
 
     override fun initialize(webView: WebView, headers: Map<String, String>) {
         val homepage = userPreferences.homepage
         if (!URLUtil.isHttpUrl(homepage) && !URLUtil.isHttpsUrl(homepage)) {
-            startPageInitializer.initialize(webView, headers)
             return
         }
         webView.settings.apply {
@@ -156,39 +190,11 @@ class RestrictedDomainHomepageInitializer @Inject constructor(
  * homepage shortcut preference.
  */
 @Reusable
-class VisualHomePageInitializer @Inject constructor(
-    private val startPageInitializer: StartPageInitializer
-) : TabInitializer {
+class VisualHomePageInitializer @Inject constructor() : TabInitializer {
 
-    override fun initialize(webView: WebView, headers: Map<String, String>) {
-        startPageInitializer.initialize(webView, headers)
-    }
+    override val contentKind: TabContentKind = TabContentKind.NATIVE_HOMEPAGE
 
-}
-
-/**
- * An initializer that displays the start page.
- */
-@Reusable
-class StartPageInitializer @Inject constructor(
-    private val application: Application,
-    homePageFactory: HomePageFactory,
-    @DiskScheduler diskScheduler: Scheduler,
-    @MainScheduler foregroundScheduler: Scheduler
-) : HtmlPageFactoryInitializer(homePageFactory, diskScheduler, foregroundScheduler) {
-
-    override fun initialize(webView: WebView, headers: Map<String, String>) {
-        webView.settings.apply {
-            // Built-in pages are generated inside app-private storage. Keep the exception narrow:
-            // file-to-file and universal access stay disabled, and UrlHandler resets this flag
-            // before any non-generated top-level navigation.
-            allowFileAccess = true
-            allowContentAccess = false
-            allowFileAccessFromFileURLs = false
-            allowUniversalAccessFromFileURLs = false
-        }
-        super.initialize(webView, headers)
-    }
+    override fun initialize(webView: WebView, headers: Map<String, String>) = Unit
 }
 
 /**
@@ -270,7 +276,12 @@ class ResultMessageInitializer(private val resultMessage: Message) : TabInitiali
 /**
  * An initializer that restores the [WebView] state using the [bundle].
  */
-open class BundleInitializer(private val bundle: Bundle) : TabInitializer {
+open class BundleInitializer(open val bundle: Bundle) : TabInitializer {
+
+    override val contentKind: TabContentKind
+        get() = bundle.getString(TabStateKeys.CONTENT_KIND)
+            ?.let { runCatching { TabContentKind.valueOf(it) }.getOrNull() }
+            ?: TabContentKind.ENGINE
 
     override fun initialize(webView: WebView, headers: Map<String, String>) {
         webView.restoreState(bundle)
@@ -283,10 +294,21 @@ open class BundleInitializer(private val bundle: Bundle) : TabInitializer {
  * should be initially set on the tab.
  */
 class FreezableBundleInitializer(
-    val bundle: Bundle,
+    override val bundle: Bundle,
     val initialTitle: String,
-    val id: Int
-) : BundleInitializer(bundle)
+    override val id: Int
+) : BundleInitializer(bundle), IdentifiedTabInitializer
+
+/** Minimal, engine-neutral state used during an intentional global core switch. */
+class EngineMigrationInitializer(
+    val url: String,
+    val title: String,
+    override val contentKind: TabContentKind = TabContentKind.ENGINE,
+) : TabInitializer {
+    override fun initialize(webView: WebView, headers: Map<String, String>) {
+        webView.loadUrl(url, headers)
+    }
+}
 
 /**
  * An initializer that does not load anything into the [WebView].

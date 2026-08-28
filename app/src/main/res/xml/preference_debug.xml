@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/debug_title">
+        <Preference
+            android:icon="@drawable/ic_settings_globe"
+            android:key="browser_core"
+            android:title="@string/debug_browser_core" />
         <SwitchPreferenceCompat
             android:defaultValue="false"
             android:icon="@drawable/ic_settings_debug"
             android:key="experimental_rail_layouts"
             android:summary="@string/debug_experimental_rail_layouts_summary"
             android:title="@string/debug_experimental_rail_layouts" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_globe"
+            android:key="antares_coordinate_bridge"
+            android:summary="@string/debug_antares_coordinate_bridge_summary"
+            android:title="@string/debug_antares_coordinate_bridge" />
         <SwitchPreferenceCompat
             android:defaultValue="false"
             android:icon="@drawable/ic_settings_debug"

@@ -20,13 +20,14 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "6.1.7"
+        versionName = "7.0.0"
         vectorDrawables.useSupportLibrary = true
     }
 
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        aidl = true
     }
 
     buildTypes {
@@ -61,8 +62,13 @@ android {
             dimension = "capabilities"
             buildConfigField("boolean", "FULL_VERSION", "Boolean.parseBoolean(\"true\")")
             buildConfigField("String", "RELEASE_SITE_URL", "\"https://kenneth-cho-infosec.github.io/Solipsism/\"")
+            buildConfigField(
+                "String",
+                "ANTARES_CERT_SHA256",
+                "\"${providers.gradleProperty("antaresCertSha256").orElse("").get()}\""
+            )
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 141
+            versionCode = 142
         }
     }
     packaging {
@@ -84,6 +90,7 @@ dependencies {
     val datastore = "1.2.1"
     val coil = "3.4.0"
     val cameraX = "1.6.1"
+    val media3 = "1.11.0"
 
     implementation("androidx.activity:activity:1.13.0")
     implementation("androidx.annotation:annotation:1.10.0")
@@ -103,6 +110,8 @@ dependencies {
     implementation("androidx.drawerlayout:drawerlayout:1.2.0")
     implementation("androidx.fragment:fragment:1.8.9")
     implementation("androidx.lifecycle:lifecycle-common:2.11.0")
+    implementation("androidx.media3:media3-exoplayer:$media3")
+    implementation("androidx.media3:media3-ui:$media3")
     implementation("androidx.palette:palette:1.0.0")
     implementation("androidx.preference:preference:1.2.1")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
@@ -150,7 +159,6 @@ mezzanine {
     files = files(
         "src/main/html/list.html",
         "src/main/html/bookmarks.html",
-        "src/main/html/homepage.html",
         "src/main/js/InvertPage.js",
         "src/main/js/TextReflow.js",
         "src/main/js/ThemeColor.js"

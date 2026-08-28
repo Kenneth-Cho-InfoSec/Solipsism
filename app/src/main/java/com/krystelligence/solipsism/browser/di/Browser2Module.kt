@@ -2,9 +2,7 @@ package com.krystelligence.solipsism.browser.di
 
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.adblock.AdBlocker
-import com.krystelligence.solipsism.adblock.BloomFilterAdBlocker
-import com.krystelligence.solipsism.adblock.CompositeAdBlocker
-import com.krystelligence.solipsism.adblock.NoOpAdBlocker
+import com.krystelligence.solipsism.adblock.PreferenceAwareAdBlocker
 import com.krystelligence.solipsism.browser.BrowserContract
 import com.krystelligence.solipsism.browser.data.CookieAdministrator
 import com.krystelligence.solipsism.browser.data.DefaultCookieAdministrator
@@ -16,6 +14,7 @@ import com.krystelligence.solipsism.browser.notification.DefaultTabCountNotifier
 import com.krystelligence.solipsism.browser.notification.IncognitoTabCountNotifier
 import com.krystelligence.solipsism.browser.notification.TabCountNotifier
 import com.krystelligence.solipsism.browser.search.IntentExtractor
+import com.krystelligence.solipsism.browser.engine.OnboardingStarterTabs
 import com.krystelligence.solipsism.browser.tab.DefaultUserAgent
 import com.krystelligence.solipsism.browser.tab.bundle.BundleStore
 import com.krystelligence.solipsism.browser.tab.bundle.DefaultBundleStore
@@ -24,8 +23,8 @@ import com.krystelligence.solipsism.browser.ui.BookmarkConfiguration
 import com.krystelligence.solipsism.browser.ui.TabConfiguration
 import com.krystelligence.solipsism.browser.ui.UiConfiguration
 import com.krystelligence.solipsism.extensions.drawable
-import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.utils.IntentUtils
+import com.krystelligence.solipsism.utils.NavigationSecurity
 import android.app.Activity
 import android.app.Application
 import android.content.Intent
@@ -34,7 +33,6 @@ import android.webkit.WebSettings
 import androidx.core.graphics.drawable.toBitmap
 import dagger.Module
 import dagger.Provides
-import javax.inject.Provider
 
 /**
  * Constructs dependencies for the browser scope.
@@ -44,28 +42,25 @@ class Browser2Module {
 
     @Provides
     fun providesAdBlocker(
-        userPreferences: UserPreferences,
-        bloomFilterAdBlocker: Provider<BloomFilterAdBlocker>,
-        compositeAdBlocker: Provider<CompositeAdBlocker>,
-        noOpAdBlocker: NoOpAdBlocker
-    ): AdBlocker = if (userPreferences.adBlockEnabled) {
-        if (userPreferences.uBlockOriginEnabled) {
-            compositeAdBlocker.get()
-        } else {
-            bloomFilterAdBlocker.get()
-        }
-    } else {
-        noOpAdBlocker
-    }
+        preferenceAwareAdBlocker: PreferenceAwareAdBlocker,
+    ): AdBlocker = preferenceAwareAdBlocker
 
-    // TODO: dont force cast
     @Provides
-    @InitialUrl
-    fun providesInitialUrl(
+    @InitialUrls
+    fun providesInitialUrls(
         @InitialIntent initialIntent: Intent?,
-        intentExtractor: IntentExtractor
-    ): String? =
-        (intentExtractor.extractUrlFromIntent(initialIntent) as? BrowserContract.Action.LoadUrl)?.url
+        intentExtractor: IntentExtractor,
+    ): List<String> {
+        val starterUrls = initialIntent
+            ?.getStringArrayListExtra(OnboardingStarterTabs.EXTRA_URLS)
+            ?.mapNotNull(NavigationSecurity::sanitizeUserInput)
+            ?.filter(NavigationSecurity::isAllowedFromExternalIntent)
+            .orEmpty()
+        if (starterUrls.isNotEmpty()) return starterUrls
+        return listOfNotNull(
+            (intentExtractor.extractUrlFromIntent(initialIntent) as? BrowserContract.Action.LoadUrl)?.url,
+        )
+    }
 
     // TODO: auto inject intent utils
     @Provides

@@ -58,7 +58,7 @@ interface Browser2Component {
 annotation class InitialIntent
 
 @Qualifier
-annotation class InitialUrl
+annotation class InitialUrls
 
 @Qualifier
 annotation class IncognitoMode

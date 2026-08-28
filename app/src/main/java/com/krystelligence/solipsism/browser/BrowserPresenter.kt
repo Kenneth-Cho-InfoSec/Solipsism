@@ -9,6 +9,8 @@ import com.krystelligence.solipsism.browser.di.IncognitoMode
 import com.krystelligence.solipsism.browser.di.MainScheduler
 import com.krystelligence.solipsism.browser.di.SuggestionsClient
 import com.krystelligence.solipsism.browser.download.PendingDownload
+import com.krystelligence.solipsism.browser.engine.BrowserCore
+import com.krystelligence.solipsism.browser.engine.BrowserCorePreferences
 import com.krystelligence.solipsism.browser.history.HistoryRecord
 import com.krystelligence.solipsism.browser.history.DecoyTimeframe
 import com.krystelligence.solipsism.browser.keys.KeyCombo
@@ -107,11 +109,14 @@ class BrowserPresenter @Inject constructor(
     private val hapticFeedback: HapticFeedbackController,
     private val logger: Logger,
     private val userPreferences: UserPreferences,
+    private val browserCorePreferences: BrowserCorePreferences,
     @SuggestionsClient private val okHttpClient: Single<OkHttpClient>,
     @IncognitoMode private val incognitoMode: Boolean
 ) {
 
     private var view: BrowserContract.View? = null
+    private var appliedUserAgentSettings = currentUserAgentSettings()
+    private var appliedContentBlockingSettings = currentContentBlockingSettings()
     var viewState: BrowserViewState = BrowserViewState(
         displayUrl = "",
         isRefresh = true,
@@ -132,10 +137,15 @@ class BrowserPresenter @Inject constructor(
     private var currentFolder: Bookmark.Folder = Bookmark.Folder.Root
     private var isTabDrawerOpen = false
     private var isBookmarkDrawerOpen = false
+    private var isAddressOverlayOpen = false
+    private var isBrowserMenuOpen = false
+    private var isBrowserChromeGestureActive = false
     private var isSearchViewFocused = false
     private var bookmarksNeedRefresh = false
     private var pendingAction: BrowserContract.Action.LoadUrl? = null
     private var isCustomViewShowing = false
+    private var viewIsResumed = false
+    private var pendingBrowserCoreSwitch: BrowserCore? = null
 
     private val compositeDisposable = CompositeDisposable()
     private val allTabsDisposable = CompositeDisposable()
@@ -181,6 +191,7 @@ class BrowserPresenter @Inject constructor(
      * Call when the view is detached from the presenter.
      */
     fun onViewDetached() {
+        viewIsResumed = false
         view = null
 
         compositeDisposable.dispose()
@@ -191,6 +202,7 @@ class BrowserPresenter @Inject constructor(
      * Call when the view is hidden (i.e. the browser is sent to the background).
      */
     fun onViewHidden() {
+        viewIsResumed = false
         bookmarksNeedRefresh = true
         model.markAllNonEphemeral()
         model.freeze()
@@ -202,6 +214,24 @@ class BrowserPresenter @Inject constructor(
      * the drawer and generated HTML must be queried/generated again before they are displayed.
      */
     fun onViewResumed() {
+        viewIsResumed = true
+        pendingBrowserCoreSwitch?.let { core ->
+            pendingBrowserCoreSwitch = null
+            switchBrowserCore(core)
+        }
+        currentTab?.onHostResumed()
+        val currentAgentSettings = currentUserAgentSettings()
+        if (currentAgentSettings != appliedUserAgentSettings) {
+            appliedUserAgentSettings = currentAgentSettings
+            model.tabsList.forEach(TabModel::applyUserAgentPreference)
+            currentTab?.reload()
+        }
+        val currentContentBlockingSettings = currentContentBlockingSettings()
+        if (currentContentBlockingSettings != appliedContentBlockingSettings) {
+            appliedContentBlockingSettings = currentContentBlockingSettings
+            model.tabsList.forEach(TabModel::applyContentBlockingPreferences)
+            currentTab?.reload()
+        }
         if (!bookmarksNeedRefresh) return
         bookmarksNeedRefresh = false
 
@@ -248,9 +278,16 @@ class BrowserPresenter @Inject constructor(
             view?.closeTabDrawer()
             return
         }
+        if (isCustomViewShowing) {
+            view?.hideCustomView()
+            currentTab?.hideCustomView()
+            isCustomViewShowing = false
+            updateBrowserChromeOverlayVisibility()
+        }
         currentTab?.isForeground = false
         currentTab = tabModel
         currentTab?.isForeground = true
+        updateBrowserChromeOverlayVisibility()
 
         view?.clearSearchFocus()
 
@@ -350,8 +387,9 @@ class BrowserPresenter @Inject constructor(
         tabDisposable += tab.showCustomViewRequests()
             .subscribeOn(mainScheduler)
             .subscribeBy {
-                view?.showCustomView(it)
                 isCustomViewShowing = true
+                updateBrowserChromeOverlayVisibility()
+                view?.showCustomView(it)
             }
 
         tabDisposable += tab.hideCustomViewRequests()
@@ -359,6 +397,7 @@ class BrowserPresenter @Inject constructor(
             .subscribeBy {
                 view?.hideCustomView()
                 isCustomViewShowing = false
+                updateBrowserChromeOverlayVisibility()
             }
 
         tabDisposable += tab.hasFocusChanges()
@@ -452,17 +491,17 @@ class BrowserPresenter @Inject constructor(
                 navigator.sharePage(url = it, title = currentTab?.title)
             }
 
-            MenuSelection.HISTORY -> createNewTabAndSelect(
-                historyPageInitializer,
-                shouldSelect = true
-            )
+            MenuSelection.HISTORY -> {
+                createNewTabAndSelect(historyPageInitializer, shouldSelect = true)
+            }
 
-            MenuSelection.DOWNLOADS -> createNewTabAndSelect(
-                downloadPageInitializer,
-                shouldSelect = true
-            )
+            MenuSelection.DOWNLOADS -> {
+                createNewTabAndSelect(downloadPageInitializer, shouldSelect = true)
+            }
 
-            MenuSelection.FIND -> view?.showFindInPageDialog()
+            MenuSelection.FIND -> {
+                view?.showFindInPageDialog()
+            }
             MenuSelection.COPY_LINK -> currentTab?.url?.takeIf { !it.isSpecialUrl() }
                 ?.let(navigator::copyPageLink)
 
@@ -654,6 +693,7 @@ class BrowserPresenter @Inject constructor(
      */
     fun onTabDrawerMoved(isOpen: Boolean) {
         isTabDrawerOpen = isOpen
+        updateBrowserChromeOverlayVisibility()
     }
 
     /**
@@ -663,6 +703,43 @@ class BrowserPresenter @Inject constructor(
      */
     fun onBookmarkDrawerMoved(isOpen: Boolean) {
         isBookmarkDrawerOpen = isOpen
+        updateBrowserChromeOverlayVisibility()
+    }
+
+    /**
+     * Call when the expanded horizontal address bar is shown or hidden.
+     *
+     * Antares renders into a remote SurfaceView. That surface normally needs to be above the host
+     * window to receive input, but must temporarily move below Solipsism chrome that overlaps the
+     * page. Keep the address overlay in the same state calculation as both drawers so one overlay
+     * closing cannot accidentally cover another overlay that remains open.
+     */
+    fun onAddressOverlayMoved(isOpen: Boolean, onApplied: () -> Unit = {}) {
+        isAddressOverlayOpen = isOpen
+        updateBrowserChromeOverlayVisibility(onApplied)
+    }
+
+    fun onBrowserMenuMoved(isOpen: Boolean) {
+        isBrowserMenuOpen = isOpen
+        updateBrowserChromeOverlayVisibility()
+    }
+
+    fun onBrowserChromeGestureMoved(isActive: Boolean) {
+        isBrowserChromeGestureActive = isActive
+        updateBrowserChromeOverlayVisibility()
+    }
+
+    private fun updateBrowserChromeOverlayVisibility(onApplied: () -> Unit = {}) {
+        val tab = currentTab
+        if (tab == null) {
+            onApplied()
+            return
+        }
+        tab.setBrowserChromeOverlayVisible(
+            visible = isTabDrawerOpen || isBookmarkDrawerOpen || isAddressOverlayOpen ||
+                isBrowserMenuOpen || isBrowserChromeGestureActive || isCustomViewShowing,
+            onApplied = onApplied,
+        )
     }
 
     /**
@@ -674,6 +751,8 @@ class BrowserPresenter @Inject constructor(
             isCustomViewShowing -> {
                 view?.hideCustomView()
                 currentTab?.hideCustomView()
+                isCustomViewShowing = false
+                updateBrowserChromeOverlayVisibility()
             }
 
             isTabDrawerOpen -> view?.closeTabDrawer()
@@ -999,6 +1078,7 @@ class BrowserPresenter @Inject constructor(
             view?.showCustomUserAgentDialog(userPreferences.userAgentString)
             return
         }
+        appliedUserAgentSettings = currentUserAgentSettings()
         currentTab?.applyUserAgentPreference()
         currentTab?.reload()
     }
@@ -1008,9 +1088,33 @@ class BrowserPresenter @Inject constructor(
         if (custom.isEmpty()) return
         userPreferences.userAgentString = custom
         userPreferences.userAgentChoice = 4
+        appliedUserAgentSettings = currentUserAgentSettings()
         currentTab?.applyUserAgentPreference()
         currentTab?.reload()
     }
+
+    private fun currentUserAgentSettings(): String = buildString {
+        append(userPreferences.userAgentChoice)
+        append('|')
+        append(userPreferences.chrompatibilityModeEnabled)
+        append('|')
+        append(userPreferences.userAgentString)
+    }
+
+    private fun currentContentBlockingSettings(): ContentBlockingSettings =
+        ContentBlockingSettings(
+            blockAds = userPreferences.adBlockEnabled,
+            blockGifs = userPreferences.blockGifImagesEnabled,
+            uBlockOrigin = userPreferences.uBlockOriginEnabled,
+            cosmeticFilters = userPreferences.cosmeticFiltersEnabled,
+        )
+
+    private data class ContentBlockingSettings(
+        val blockAds: Boolean,
+        val blockGifs: Boolean,
+        val uBlockOrigin: Boolean,
+        val cosmeticFilters: Boolean,
+    )
 
     fun onPickElement() {
         currentTab?.pickElement()
@@ -1225,6 +1329,43 @@ class BrowserPresenter @Inject constructor(
         captureScreenshot(attempt = 0)
     }
 
+    fun onBrowserCoreSelected(core: BrowserCore) {
+        if (!viewIsResumed) {
+            // Debug Settings and the chooser are separate activities. Constructing and selecting
+            // remote SurfaceViews while the browser window is covered races its surface/input
+            // lifecycle and can leave the migrated tab black until another relaunch.
+            pendingBrowserCoreSwitch = core
+            return
+        }
+        switchBrowserCore(core)
+    }
+
+    /** True when browser chrome must be presented above Antares' remote SurfaceView window. */
+    fun isUsingAntaresCore(): Boolean = browserCorePreferences.selectedCore == BrowserCore.ANTARES
+
+    private fun switchBrowserCore(core: BrowserCore) {
+        val selectedIndex = currentTab?.let(model.tabsList::indexOf)?.takeIf { it >= 0 }
+        compositeDisposable += model.switchCore(core)
+            .observeOn(mainScheduler)
+            .subscribeBy(
+                onComplete = {
+                    val tab = selectedIndex?.let(model.tabsList::getOrNull) ?: model.tabsList.firstOrNull()
+                    tab?.let {
+                        selectTab(model.selectTab(it.id))
+                        it.onHostResumed()
+                    }
+                },
+                onError = { error ->
+                    android.util.Log.e(
+                        "BrowserCoreSwitch",
+                        "Unable to switch browser core to $core",
+                        error,
+                    )
+                    view?.showBrowserCoreSwitchFailed()
+                },
+            )
+    }
+
     private fun captureScreenshot(attempt: Int) {
         currentTab?.captureVisiblePage()?.let { bitmap ->
             view?.showScreenshot(bitmap)
@@ -1379,12 +1520,12 @@ class BrowserPresenter @Inject constructor(
      * Call when the user clicks on the tab count button (or home button in desktop mode, or
      * incognito icon in incognito mode).
      */
-    fun onTabCountViewClick() {
+    fun onTabCountViewClick(drawerIsOpen: Boolean? = null) {
         if (uiConfiguration.tabConfiguration == TabConfiguration.DRAWER_SIDE) {
             view?.openTabDrawer()
         } else if (uiConfiguration.tabConfiguration == TabConfiguration.DRAWER_BOTTOM ||
             uiConfiguration.tabConfiguration == TabConfiguration.SOLIPSISM) {
-            if (isTabDrawerOpen) {
+            if (drawerIsOpen ?: isTabDrawerOpen) {
                 view?.closeTabDrawer()
             } else {
                 view?.openTabDrawer()

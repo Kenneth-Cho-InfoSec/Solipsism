@@ -18,10 +18,11 @@
 package com.krystelligence.solipsism.utils
 
 import com.krystelligence.solipsism.constant.FILE
+import com.krystelligence.solipsism.constant.SCHEME_ANTARES_HOMEPAGE
+import com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
 import com.krystelligence.solipsism.html.bookmark.BookmarkPageFactory
 import com.krystelligence.solipsism.html.download.DownloadPageFactory
 import com.krystelligence.solipsism.html.history.HistoryPageFactory
-import com.krystelligence.solipsism.html.homepage.HomePageFactory
 import android.util.Patterns
 import android.webkit.URLUtil
 import java.util.Locale
@@ -76,12 +77,14 @@ fun String?.isFileUrl(): Boolean = this != null && this.startsWith(FILE)
  * Returns whether the given url is the bookmarks/history page or a normal website
  */
 fun String?.isSpecialUrl(): Boolean =
-    this != null
-        && this.startsWith(FILE)
-        && (this.endsWith(BookmarkPageFactory.FILENAME)
-        || this.endsWith(DownloadPageFactory.FILENAME)
-        || this.endsWith(HistoryPageFactory.FILENAME)
-        || this.endsWith(HomePageFactory.FILENAME))
+    this == SCHEME_HOMEPAGE ||
+        this == SCHEME_ANTARES_HOMEPAGE ||
+        (this != null
+            && this.startsWith(FILE)
+            && (this.endsWith(BookmarkPageFactory.FILENAME)
+            || this.endsWith(DownloadPageFactory.FILENAME)
+            || this.endsWith(HistoryPageFactory.FILENAME)
+            || this.endsWith(LEGACY_HOMEPAGE_FILENAME)))
 
 /**
  * Determines if the url is a url for the bookmark page.
@@ -113,7 +116,11 @@ fun String?.isHistoryUrl(): Boolean =
  * @return true if the url is a start page url, false otherwise.
  */
 fun String?.isStartPageUrl(): Boolean =
-    this != null && this.startsWith(FILE) && this.endsWith(HomePageFactory.FILENAME)
+    this == SCHEME_HOMEPAGE ||
+        this == SCHEME_ANTARES_HOMEPAGE ||
+        (this != null && this.startsWith(FILE) && this.endsWith(LEGACY_HOMEPAGE_FILENAME))
+
+private const val LEGACY_HOMEPAGE_FILENAME = "homepage.html"
 
 private val ACCEPTED_URI_SCHEMA =
     Pattern.compile("(?i)((?:http|https|file)://|(?:about):|(?:.*:.*@))(.*)")

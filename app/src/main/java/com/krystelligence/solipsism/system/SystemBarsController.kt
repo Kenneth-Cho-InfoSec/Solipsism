@@ -44,13 +44,19 @@ class SystemBarsController(
         val controller = insetsController
         controller.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        if (immersiveHidden) {
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+        } else {
+            controller.show(WindowInsetsCompat.Type.navigationBars())
+        }
         if (userPreferences.hideStatusBarEnabled || immersiveHidden) {
             controller.hide(WindowInsetsCompat.Type.statusBars())
         } else {
             controller.show(WindowInsetsCompat.Type.statusBars())
         }
         controller.isAppearanceLightStatusBars =
-            userPreferences.useTheme == AppTheme.LIGHT && !userPreferences.useBlackStatusBar
+            userPreferences.useTheme.effective(activity) == AppTheme.LIGHT &&
+            !userPreferences.useBlackStatusBar
         protectionView.setBackgroundColor(protectionColour())
         ViewCompat.requestApplyInsets(protectionView)
     }
