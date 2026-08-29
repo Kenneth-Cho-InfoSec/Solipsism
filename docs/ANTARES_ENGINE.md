@@ -74,9 +74,9 @@ export ANDROID_NDK_ROOT="$ANDROID_HOME/ndk/28.2.13676358"
 Build ARM64 for a physical Android 13+ device by replacing the target with
 `aarch64-linux-android`.
 
-## F-Droid packaging
+## Distribution
 
-Solipsism and Antares use separate F-Droid metadata entries and source builds. Solipsism never
-downloads or executes an engine binary itself. The user explicitly installs Antares through the
-F-Droid client or website, which keeps installation, update, signature, and removal behaviour in
-the package manager.
+Solipsism and Antares use separate source builds. Solipsism never downloads or executes an engine
+binary itself. Users download Antares from the
+[Antares GitHub releases](https://github.com/Kenneth-Cho-InfoSec/Antares/releases), which keeps
+installation, update, signature, and removal behaviour explicit and verifiable.

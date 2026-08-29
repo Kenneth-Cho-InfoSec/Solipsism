@@ -3,11 +3,15 @@ package com.krystelligence.solipsism.browser.engine
 internal object AntaresProtocol {
     const val PACKAGE_NAME = "com.krystelligence.antares"
     const val SERVICE_ACTION = "com.krystelligence.antares.BIND_ENGINE"
-    const val VERSION = 13
+    const val VERSION = 14
+    const val MIN_COMPATIBLE_VERSION = 12
     const val MIN_ANDROID_API = 33
     const val KEY_INITIAL_URL = "initial_url"
     const val KEY_EXPERIMENTAL = "experimental"
     const val KEY_USER_AGENT = "user_agent"
+    const val KEY_THEME = "theme"
+    const val THEME_LIGHT = 0
+    const val THEME_DARK = 1
     const val KEY_SURFACE_PACKAGE = "surface_package"
     const val KEY_ERROR = "error"
     const val KEY_HOST_TOKEN = "host_token"

@@ -688,9 +688,9 @@
     <string name="browser_core_antares_description">Experimental in-house core\nMaximum de-Googling</string>
     <string name="browser_core_webview">Android WebView</string>
     <string name="browser_core_webview_description">Stable and recommended</string>
-    <string name="browser_core_privacy_note">Antares is installed separately from F-Droid and runs in a separate app process. It remains experimental, and some Solipsism features are still being implemented for it.</string>
+    <string name="browser_core_privacy_note">Antares is downloaded separately from GitHub and runs in a separate app process. It remains experimental, and some Solipsism features are still being implemented for it.</string>
     <string name="browser_core_continue">Continue</string>
-    <string name="browser_core_install_antares">Install Antares from F-Droid</string>
+    <string name="browser_core_install_antares">Download Antares from GitHub</string>
     <string name="browser_core_antares_ready">Installed and trusted · %1$s</string>
     <string name="browser_core_antares_not_installed">Not installed · Not trusted</string>
     <string name="browser_core_antares_not_trusted">Installed · Signature not trusted</string>
@@ -698,6 +698,10 @@
     <string name="browser_core_antares_unavailable">Antares Engine is unavailable.</string>
     <string name="browser_core_menu_shortcut">Browser core</string>
     <string name="browser_core_antares_duckduckgo_message">Antares uses DuckDuckGo for maximum de-Googling.</string>
+    <string name="browser_core_update_antares_title">Antares Engine update available</string>
+    <string name="browser_core_update_antares_message">You are using Antares %1$s. It remains trusted and compatible, but newer releases include important fixes. Update Antares from GitHub when convenient.</string>
+    <string name="browser_core_update_antares_later">Continue</string>
+    <string name="browser_core_update_antares_download">Update from GitHub</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_finish">Finish setup</string>
     <string name="onboarding_appearance_title">Make it yours</string>

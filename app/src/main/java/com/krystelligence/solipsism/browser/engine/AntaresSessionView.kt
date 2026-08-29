@@ -31,6 +31,7 @@ class AntaresSessionView(
     private val connection: AntaresEngineConnection,
     initialUrl: String,
     initialUserAgent: String,
+    initialTheme: Int,
     private val contentBlockingPolicy: AntaresContentBlockingPolicy,
     initialBlockAds: Boolean,
     initialBlockGifs: Boolean,
@@ -55,6 +56,7 @@ class AntaresSessionView(
     }
     private var pendingUrl = initialUrl
     @Volatile private var userAgent = initialUserAgent
+    @Volatile private var contentTheme = initialTheme
     @Volatile private var blockAds = initialBlockAds
     @Volatile private var blockGifs = initialBlockGifs
     @Volatile private var session: IAntaresSession? = null
@@ -230,6 +232,11 @@ class AntaresSessionView(
         executeOnBinder { session?.setUserAgent(value) }
     }
 
+    fun setTheme(value: Int) {
+        contentTheme = value
+        executeOnBinder { session?.setTheme(value) }
+    }
+
     fun setContentBlocking(blockAds: Boolean, blockGifs: Boolean) {
         this.blockAds = blockAds
         this.blockGifs = blockGifs
@@ -314,6 +321,7 @@ class AntaresSessionView(
                             Bundle().apply {
                                 putString(AntaresProtocol.KEY_INITIAL_URL, pendingUrl)
                                 putString(AntaresProtocol.KEY_USER_AGENT, userAgent)
+                                putInt(AntaresProtocol.KEY_THEME, contentTheme)
                                 putBoolean(AntaresProtocol.KEY_EXPERIMENTAL, true)
                             },
                             callback,
@@ -322,6 +330,7 @@ class AntaresSessionView(
                             session = it
                         }
                         applyContentBlocking(currentSession)
+                        currentSession.setTheme(contentTheme)
                         val result = currentSession.attachSurface(
                             display.displayId,
                             hostConfiguration,
@@ -397,6 +406,7 @@ class AntaresSessionView(
                 ) ?: error("Antares returned no retained surface")
             }.onSuccess { surfacePackage ->
                 runCatching { currentSession.setInputEnabled(effectiveInputEnabled()) }
+                runCatching { currentSession.setTheme(contentTheme) }
                 runCatching { currentSession.setForeground(foreground && contentVisible) }
                 onMain {
                     if (destroyed || !surfaceReady) return@onMain

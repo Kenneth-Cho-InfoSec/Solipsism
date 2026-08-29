@@ -19,6 +19,7 @@ import com.krystelligence.solipsism.browser.engine.AntaresContentBlockingPolicy
 import com.krystelligence.solipsism.browser.engine.AntaresCoordinateBridge
 import com.krystelligence.solipsism.browser.engine.AntaresMediaPlayerView
 import com.krystelligence.solipsism.browser.engine.AntaresSessionView
+import com.krystelligence.solipsism.browser.engine.toAntaresTheme
 import com.krystelligence.solipsism.browser.engine.BrowserMediaRequest
 import com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
 import com.krystelligence.solipsism.constant.SCHEME_ANTARES_HOMEPAGE
@@ -87,6 +88,7 @@ class AntaresTabAdapter private constructor(
         connection = connection,
         initialUrl = initialUrlResolver.engineInitialUrl(tabInitializer),
         initialUserAgent = userPreferences.antaresUserAgent(providerUserAgent),
+        initialTheme = userPreferences.useTheme.toAntaresTheme(initialUrlResolver.context),
         contentBlockingPolicy = contentBlockingPolicy,
         initialBlockAds = userPreferences.adBlockEnabled,
         initialBlockGifs = userPreferences.blockGifImagesEnabled,
@@ -208,6 +210,9 @@ class AntaresTabAdapter private constructor(
             blockAds = userPreferences.adBlockEnabled,
             blockGifs = userPreferences.blockGifImagesEnabled,
         )
+    }
+    override fun applyThemePreference() {
+        contentView.setTheme(userPreferences.useTheme.toAntaresTheme(contentView.context))
     }
     override fun reload() {
         if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {

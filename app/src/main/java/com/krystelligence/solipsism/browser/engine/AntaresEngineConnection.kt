@@ -38,8 +38,8 @@ class AntaresEngineConnection @Inject constructor(context: Context) {
             val candidate = IAntaresEngine.Stub.asInterface(binder)
             val result = runCatching {
                 requireNotNull(binder) { "Antares returned no Binder" }
-                require(candidate.protocolVersion == AntaresProtocol.VERSION) {
-                    "Antares protocol ${candidate.protocolVersion} is incompatible with ${AntaresProtocol.VERSION}"
+                require(candidate.protocolVersion in AntaresProtocol.MIN_COMPATIBLE_VERSION..AntaresProtocol.VERSION) {
+                    "Antares protocol ${candidate.protocolVersion} is incompatible with ${AntaresProtocol.MIN_COMPATIBLE_VERSION}-${AntaresProtocol.VERSION}"
                 }
                 binder.linkToDeath(deathRecipient, 0)
                 synchronized(stateLock) {

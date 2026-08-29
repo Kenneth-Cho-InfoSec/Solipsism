@@ -411,6 +411,9 @@ class TabAdapter @AssistedInject constructor(
 
     override fun applyContentBlockingPreferences() = Unit
 
+    // Android WebView derives prefers-color-scheme from this activity's resolved theme.
+    override fun applyThemePreference() = Unit
+
     override fun reload() {
         if (contentKind == TabContentKind.NATIVE_HOMEPAGE) {
             contentKindSubject.onNext(TabContentKind.NATIVE_HOMEPAGE)

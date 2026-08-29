@@ -69,12 +69,28 @@ class AntaresEnginePackage(private val context: Context) {
             context.packageName,
             PackageManager.PackageInfoFlags.of(PackageManager.GET_SIGNING_CERTIFICATES.toLong()),
         ).signingInfo?.apkContentsSigners.orEmpty().map { it.toByteArray() }
-        val trustedDigests = if (BuildConfig.DEBUG) {
-            pinned + ownCertificates.map(::sha256)
-        } else {
-            pinned
-        }
+        val legacy = BuildConfig.ANTARES_LEGACY_CERT_SHA256
+            .split(',')
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .map { it.replace(":", "").uppercase() }
+        val trustedDigests = (pinned + legacy + if (BuildConfig.DEBUG) {
+            ownCertificates.map(::sha256)
+        } else emptyList()).toSet()
         return certificates.any { sha256(it) in trustedDigests }
+    }
+
+    /** Older Antares packages remain usable, but should be updated for current fixes. */
+    fun updateRecommended(versionName: String?): Boolean {
+        val parts = versionName
+            ?.split('.')
+            ?.mapNotNull { it.toIntOrNull() }
+            ?.let { (it + listOf(0, 0, 0)).take(3) }
+            ?: return true
+        val current = listOf(0, 1, 2)
+        return parts.zip(current).firstOrNull { (installed, latest) -> installed != latest }
+            ?.let { it.first < it.second }
+            ?: false
     }
 
     private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")

@@ -86,6 +86,9 @@ interface TabModel {
     /** Apply the current global ad and GIF blocking policy to this tab's engine. */
     fun applyContentBlockingPreferences()
 
+    /** Apply the current app theme as the page's preferred CSS colour scheme. */
+    fun applyThemePreference()
+
     /**
      * Reload the page the browser is currently showing.
      */

@@ -1,5 +1,7 @@
 package com.krystelligence.solipsism.browser
 
+import android.app.Application
+
 import com.krystelligence.solipsism.adblock.allowlist.AllowListModel
 import com.krystelligence.solipsism.browser.data.CookieAdministrator
 import com.krystelligence.solipsism.browser.di.Browser2Scope
@@ -11,6 +13,7 @@ import com.krystelligence.solipsism.browser.di.SuggestionsClient
 import com.krystelligence.solipsism.browser.download.PendingDownload
 import com.krystelligence.solipsism.browser.engine.BrowserCore
 import com.krystelligence.solipsism.browser.engine.BrowserCorePreferences
+import com.krystelligence.solipsism.browser.engine.toAntaresTheme
 import com.krystelligence.solipsism.browser.history.HistoryRecord
 import com.krystelligence.solipsism.browser.history.DecoyTimeframe
 import com.krystelligence.solipsism.browser.keys.KeyCombo
@@ -110,6 +113,7 @@ class BrowserPresenter @Inject constructor(
     private val logger: Logger,
     private val userPreferences: UserPreferences,
     private val browserCorePreferences: BrowserCorePreferences,
+    private val application: Application,
     @SuggestionsClient private val okHttpClient: Single<OkHttpClient>,
     @IncognitoMode private val incognitoMode: Boolean
 ) {
@@ -117,6 +121,7 @@ class BrowserPresenter @Inject constructor(
     private var view: BrowserContract.View? = null
     private var appliedUserAgentSettings = currentUserAgentSettings()
     private var appliedContentBlockingSettings = currentContentBlockingSettings()
+    private var appliedContentTheme = currentContentTheme()
     var viewState: BrowserViewState = BrowserViewState(
         displayUrl = "",
         isRefresh = true,
@@ -231,6 +236,11 @@ class BrowserPresenter @Inject constructor(
             appliedContentBlockingSettings = currentContentBlockingSettings
             model.tabsList.forEach(TabModel::applyContentBlockingPreferences)
             currentTab?.reload()
+        }
+        val contentTheme = currentContentTheme()
+        if (contentTheme != appliedContentTheme) {
+            appliedContentTheme = contentTheme
+            model.tabsList.forEach(TabModel::applyThemePreference)
         }
         if (!bookmarksNeedRefresh) return
         bookmarksNeedRefresh = false
@@ -1108,6 +1118,9 @@ class BrowserPresenter @Inject constructor(
             uBlockOrigin = userPreferences.uBlockOriginEnabled,
             cosmeticFilters = userPreferences.cosmeticFiltersEnabled,
         )
+
+    private fun currentContentTheme(): Int =
+        userPreferences.useTheme.toAntaresTheme(application)
 
     private data class ContentBlockingSettings(
         val blockAds: Boolean,

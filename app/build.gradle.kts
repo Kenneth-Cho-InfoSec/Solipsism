@@ -17,10 +17,25 @@ plugins {
 android {
     compileSdk = 36
 
+    // Release signing is supplied by the private build environment. Keeping the
+    // keystore path and credentials outside source control prevents accidental
+    // disclosure while ensuring companion Antares and Solipsism builds share an
+    // identity for certificate pinning.
+    val releaseKeystorePath = providers.environmentVariable("KEYSTORE").orNull
+    val releaseKeystorePassword = providers.environmentVariable("STORE_PASSWORD").orNull
+    val releaseKeyAlias = providers.environmentVariable("ALIAS").orNull
+    val releaseKeyPassword = providers.environmentVariable("KEY_PASSWORD").orNull
+    val hasReleaseSigning = listOf(
+        releaseKeystorePath,
+        releaseKeystorePassword,
+        releaseKeyAlias,
+        releaseKeyPassword,
+    ).all { !it.isNullOrBlank() }
+
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "7.0.1"
+        versionName = "7.0.2"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -48,6 +63,15 @@ android {
             enableUnitTestCoverage = false
             enableAndroidTestCoverage = false
 
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.create("release") {
+                    storeFile = file(releaseKeystorePath!!)
+                    storePassword = releaseKeystorePassword
+                    keyAlias = releaseKeyAlias
+                    keyPassword = releaseKeyPassword
+                }
+            }
+
             ndk {
                 abiFilters.add("arm64-v8a")
                 abiFilters.add("armeabi-v7a")
@@ -67,8 +91,17 @@ android {
                 "ANTARES_CERT_SHA256",
                 "\"${providers.gradleProperty("antaresCertSha256").orElse("").get()}\""
             )
+            // 0.1.1 was published with the original public debug certificate. Keep this
+            // compatibility pin so existing installs can update Solipsism before updating
+            // Antares. It is intentionally limited to the known certificate, never any
+            // certificate supplied by the installed package.
+            buildConfigField(
+                "String",
+                "ANTARES_LEGACY_CERT_SHA256",
+                "\"480BED986E48910C5A028C60A207E85535AE00832AECDAEFA5C1BC2D68D80EEF\""
+            )
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 143
+            versionCode = 144
         }
     }
     packaging {
