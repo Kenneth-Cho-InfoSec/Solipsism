@@ -14,6 +14,7 @@ import com.krystelligence.solipsism.extensions.toast
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.search.SearchEngineProvider
+import com.krystelligence.solipsism.search.SearchEngineDisplayNames
 import com.krystelligence.solipsism.search.Suggestions
 import com.krystelligence.solipsism.search.engine.BaseSearchEngine
 import com.krystelligence.solipsism.search.engine.CustomSearch
@@ -544,7 +545,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         return if (baseSearchEngine is CustomSearch) {
             baseSearchEngine.queryUrl
         } else {
-            getString(baseSearchEngine.titleRes)
+            SearchEngineDisplayNames.get(requireContext(), baseSearchEngine.titleRes)
         }
     }
 
@@ -606,7 +607,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
     }
 
     private fun convertSearchEngineToString(searchEngines: List<BaseSearchEngine>): Array<CharSequence> =
-        searchEngines.map { getString(it.titleRes) }.toTypedArray()
+        searchEngines.map { SearchEngineDisplayNames.get(requireContext(), it.titleRes) }.toTypedArray()
 
     private fun showSearchProviderDialog(summaryUpdater: SummaryUpdater) {
         BrowserDialog.showCustomDialog(activity) {
@@ -657,10 +658,10 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
     private fun searchSuggestionChoiceToTitle(choice: Suggestions): String =
         when (choice) {
             Suggestions.NONE -> getString(R.string.search_suggestions_off)
-            Suggestions.GOOGLE -> getString(R.string.powered_by_google)
-            Suggestions.DUCK -> getString(R.string.powered_by_duck)
-            Suggestions.BAIDU -> getString(R.string.powered_by_baidu)
-            Suggestions.NAVER -> getString(R.string.powered_by_naver)
+            Suggestions.GOOGLE -> "Google"
+            Suggestions.DUCK -> "DuckDuckGo"
+            Suggestions.BAIDU -> "Baidu"
+            Suggestions.NAVER -> "Naver"
         }
 
     private fun showSearchSuggestionsDialog(summaryUpdater: SummaryUpdater) {
@@ -695,10 +696,8 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
         val values = buildList {
             add(SolipsismRailPosition.RIGHT to getString(R.string.settings_rail_position_right))
             add(SolipsismRailPosition.LEFT to getString(R.string.settings_rail_position_left))
-            if (developerPreferences.experimentalRailLayoutsEnabled) {
-                add(SolipsismRailPosition.TOP to getString(R.string.settings_rail_position_top_unoptimized))
-                add(SolipsismRailPosition.BOTTOM to getString(R.string.settings_rail_position_bottom_unoptimized))
-            }
+            add(SolipsismRailPosition.TOP to getString(R.string.settings_rail_position_top))
+            add(SolipsismRailPosition.BOTTOM to getString(R.string.settings_rail_position_bottom))
         }
         lateinit var positionDialog: AlertDialog
         positionDialog = MaterialAlertDialogBuilder(requireActivity()).apply {
@@ -708,12 +707,7 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
                 values.indexOfFirst { it.first == currentRailPosition() }
             ) { _, which ->
                 val selected = values[which].first
-                if (selected.isExperimental) {
-                    positionDialog.dismiss()
-                    showExperimentalRailWarning { saveRailPosition(selected, summaryUpdater) }
-                } else {
-                    saveRailPosition(selected, summaryUpdater)
-                }
+                saveRailPosition(selected, summaryUpdater)
             }
             setPositiveButton(R.string.action_ok, null)
         }.create()
@@ -735,7 +729,9 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
             userPreferences.solipsismRailOnLeft = position == SolipsismRailPosition.LEFT
         }
         summaryUpdater.updateSummary(position.toRailPositionDisplayString())
-        if (position.isExperimental) requireActivity().finish()
+        if (position == SolipsismRailPosition.TOP || position == SolipsismRailPosition.BOTTOM) {
+            requireActivity().finish()
+        }
     }
 
     private fun currentRailPosition(): SolipsismRailPosition {
@@ -748,8 +744,8 @@ class GeneralSettingsFragment : AbstractSettingsFragment() {
     private fun SolipsismRailPosition.toRailPositionDisplayString(): String = getString(
         when (this) {
             SolipsismRailPosition.LEFT -> R.string.settings_rail_position_left
-            SolipsismRailPosition.TOP -> R.string.settings_rail_position_top_unoptimized
-            SolipsismRailPosition.BOTTOM -> R.string.settings_rail_position_bottom_unoptimized
+            SolipsismRailPosition.TOP -> R.string.settings_rail_position_top
+            SolipsismRailPosition.BOTTOM -> R.string.settings_rail_position_bottom
             SolipsismRailPosition.RIGHT -> R.string.settings_rail_position_right
         }
     )

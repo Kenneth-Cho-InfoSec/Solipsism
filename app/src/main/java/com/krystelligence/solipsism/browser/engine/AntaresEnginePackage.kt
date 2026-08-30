@@ -47,7 +47,7 @@ class AntaresEnginePackage(private val context: Context) {
         if (packageInfo == null) {
             return Status(false, true, false, null, "Antares Engine is not installed")
         }
-        val trusted = isTrusted(packageInfo.signingInfo?.apkContentsSigners.orEmpty().map { it.toByteArray() })
+        val trusted = isTrusted(packageInfo.signingInfo)
         val reason = when {
             !trusted -> "The installed Antares Engine signature is not trusted by this build"
             else -> null
@@ -58,7 +58,12 @@ class AntaresEnginePackage(private val context: Context) {
     fun serviceIntent(): Intent = Intent(AntaresProtocol.SERVICE_ACTION).setPackage(AntaresProtocol.PACKAGE_NAME)
 
     @RequiresApi(AntaresProtocol.MIN_ANDROID_API)
-    private fun isTrusted(certificates: List<ByteArray>): Boolean {
+    private fun isTrusted(signingInfo: android.content.pm.SigningInfo?): Boolean {
+        val certificates = signingInfo?.let { info ->
+            (info.apkContentsSigners.asList() + info.signingCertificateHistory.orEmpty().toList())
+                .distinctBy { it.toByteArray().contentToString() }
+                .map { it.toByteArray() }
+        }.orEmpty()
         val pinned = BuildConfig.ANTARES_CERT_SHA256
             .split(',')
             .map(String::trim)
@@ -68,7 +73,11 @@ class AntaresEnginePackage(private val context: Context) {
         val ownCertificates = context.packageManager.getPackageInfo(
             context.packageName,
             PackageManager.PackageInfoFlags.of(PackageManager.GET_SIGNING_CERTIFICATES.toLong()),
-        ).signingInfo?.apkContentsSigners.orEmpty().map { it.toByteArray() }
+        ).signingInfo?.let { info ->
+            (info.apkContentsSigners.asList() + info.signingCertificateHistory.orEmpty().toList())
+                .distinctBy { it.toByteArray().contentToString() }
+                .map { it.toByteArray() }
+        }.orEmpty()
         val legacy = BuildConfig.ANTARES_LEGACY_CERT_SHA256
             .split(',')
             .map(String::trim)

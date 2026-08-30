@@ -39,6 +39,7 @@ import com.krystelligence.solipsism.browser.DonationPromptPreferences
 import com.krystelligence.solipsism.device.ScreenSize
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.search.SearchEngineProvider
+import com.krystelligence.solipsism.search.SearchEngineDisplayNames
 import com.krystelligence.solipsism.search.Suggestions
 import com.krystelligence.solipsism.search.engine.DuckSearch
 
@@ -443,17 +444,17 @@ class BrowserCoreChooserActivity : AppCompatActivity() {
     }
 
     private fun searchChoices(): List<SearchChoice> = listOf(
-        SearchChoice(7, getString(R.string.onboarding_search_duckduckgo)),
-        SearchChoice(1, getString(R.string.search_engine_google)),
-        SearchChoice(2, getString(R.string.search_engine_ask)),
-        SearchChoice(3, getString(R.string.search_engine_bing)),
-        SearchChoice(4, getString(R.string.search_engine_yahoo)),
-        SearchChoice(5, getString(R.string.search_engine_startpage)),
-        SearchChoice(6, getString(R.string.search_engine_startpage_mobile)),
-        SearchChoice(8, getString(R.string.search_engine_duckduckgo_lite)),
-        SearchChoice(9, getString(R.string.search_engine_baidu)),
-        SearchChoice(10, getString(R.string.search_engine_yandex)),
-        SearchChoice(11, getString(R.string.search_engine_naver))
+        SearchChoice(7, "DuckDuckGo (Recommended)"),
+        SearchChoice(1, SearchEngineDisplayNames.get(this, R.string.search_engine_google)),
+        SearchChoice(2, SearchEngineDisplayNames.get(this, R.string.search_engine_ask)),
+        SearchChoice(3, SearchEngineDisplayNames.get(this, R.string.search_engine_bing)),
+        SearchChoice(4, SearchEngineDisplayNames.get(this, R.string.search_engine_yahoo)),
+        SearchChoice(5, SearchEngineDisplayNames.get(this, R.string.search_engine_startpage)),
+        SearchChoice(6, SearchEngineDisplayNames.get(this, R.string.search_engine_startpage_mobile)),
+        SearchChoice(8, SearchEngineDisplayNames.get(this, R.string.search_engine_duckduckgo_lite)),
+        SearchChoice(9, SearchEngineDisplayNames.get(this, R.string.search_engine_baidu)),
+        SearchChoice(10, SearchEngineDisplayNames.get(this, R.string.search_engine_yandex)),
+        SearchChoice(11, SearchEngineDisplayNames.get(this, R.string.search_engine_naver))
     )
 
     private fun themeChoices(): List<ThemeChoice> = listOf(

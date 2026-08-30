@@ -399,14 +399,14 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     private fun applyHorizontalSolipsismRailPreferences(railHeight: Int, superCompact: Boolean) {
-        // Horizontal rails are intentionally compact so the full action set can coexist with
-        // the address controls on narrow phones.
-        val buttonSize = when {
-            userPreferences.largeAccessibilityTargetsEnabled -> 48.dp
-            superCompact -> 28.dp
-            else -> 32.dp
-        }
-        val iconPadding = if (superCompact) 5.dp else 8.dp
+        // Horizontal rails use one adaptive row. Every action keeps a 48dp touch target while
+        // the address field expands into the space left between the action groups.
+        val buttonSize = 48.dp
+        // Keep the 48dp interactive surface, but use the smaller visual glyph size of the
+        // overflow action so horizontal rails do not look crowded. Vertical rails retain their
+        // existing icon sizing in the side-rail code path.
+        val iconPadding = 12.dp
+        val railBinding = binding as? SolipsismRailViewDelegate ?: return
         binding.toolbarLayout.updateLayoutParams<FrameLayout.LayoutParams> {
             width = ViewGroup.LayoutParams.MATCH_PARENT
             height = railHeight
@@ -448,7 +448,43 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             orientation = LinearLayout.HORIZONTAL
             setPaddingRelative(8.dp, 0, 8.dp, 0)
         }
-        binding.railNav?.orientation = LinearLayout.HORIZONTAL
+        railBinding.railTopActions.apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
+                width = ViewGroup.LayoutParams.WRAP_CONTENT
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+                startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                endToStart = R.id.address_rail
+                topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                bottomToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+            }
+        }
+        railBinding.addressTopActions.apply {
+            orientation = LinearLayout.HORIZONTAL
+            updateLayoutParams<LinearLayout.LayoutParams> {
+                width = ViewGroup.LayoutParams.WRAP_CONTENT
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+        }
+        railBinding.addressBottomActions.apply {
+            orientation = LinearLayout.HORIZONTAL
+            updateLayoutParams<LinearLayout.LayoutParams> {
+                width = ViewGroup.LayoutParams.WRAP_CONTENT
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+        }
+        railBinding.railNav.apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+        railBinding.railBottomActions.apply {
+            orientation = LinearLayout.HORIZONTAL
+            updateLayoutParams<LinearLayout.LayoutParams> {
+                width = ViewGroup.LayoutParams.WRAP_CONTENT
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+        }
         listOfNotNull(
             binding.settingsButton,
             binding.searchRefresh,
@@ -482,13 +518,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         val parentId = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
         val addressRail = binding.addressRail ?: return
         val railNav = binding.railNav ?: return
-        val tabsInAddress = binding.homeButton.parent === addressRail
-
+        val railBinding = binding as? SolipsismRailViewDelegate ?: return
         addressRail.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
             width = 0
-            height = (railHeight * 0.8f).roundToInt().coerceAtLeast(1)
+            height = ViewGroup.LayoutParams.MATCH_PARENT
             startToStart = -1
-            startToEnd = if (tabsInAddress) R.id.search_refresh else R.id.home_button
+            startToEnd = R.id.rail_top_actions
             endToEnd = -1
             endToStart = R.id.rail_nav
             topToTop = parentId
@@ -500,26 +535,29 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             marginStart = 8.dp
             marginEnd = 8.dp
         }
-        railNav.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
+        railBinding.railTopActions.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
             width = ViewGroup.LayoutParams.WRAP_CONTENT
             height = ViewGroup.LayoutParams.MATCH_PARENT
-            startToStart = -1
+            startToStart = parentId
+            endToStart = R.id.address_rail
             startToEnd = -1
-            endToEnd = parentId
+            endToEnd = -1
             topToTop = parentId
             bottomToBottom = parentId
             topMargin = 0
             bottomMargin = 0
         }
-        binding.homeButton.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
-            if (!tabsInAddress) {
-                startToStart = parentId
-                startToEnd = -1
-                endToEnd = -1
-                endToStart = -1
-                topToTop = parentId
-                bottomToBottom = parentId
-            }
+        railNav.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
+            width = ViewGroup.LayoutParams.WRAP_CONTENT
+            height = ViewGroup.LayoutParams.MATCH_PARENT
+            startToStart = -1
+            startToEnd = R.id.address_rail
+            endToEnd = parentId
+            topToTop = parentId
+            bottomToBottom = parentId
+            topMargin = 0
+            bottomMargin = 0
+            marginStart = 8.dp
         }
         listOf(
             binding.actionBack,
@@ -584,13 +622,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         }
     }
 
-    /**
-     * Renders the user-owned side-rail arrangement. The pre-existing physical controls are moved
-     * instead of recreated so their browser state, long presses, and accessibility wiring remain
-     * intact. Experimental horizontal rails deliberately retain their established layout.
-     */
+    /** Renders the user-owned action arrangement without recreating controls or listeners. */
     private fun applyQrAndTabsButtonPositions() {
-        if (activeSolipsismRailPosition().isExperimental) return
         renderRailMenuLayout()
     }
 
@@ -642,7 +675,9 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         val size = binding.actionBack.layoutParams.width.takeIf { it > 0 } ?: 42.dp
         return LinearLayout.LayoutParams(size, size).apply {
             gravity = Gravity.CENTER
-            bottomMargin = 6.dp
+            // Vertical rails use a small downward rhythm; horizontal rails must remain visually
+            // centred in the row, matching the overflow button's alignment.
+            bottomMargin = if (activeSolipsismRailPosition().isExperimental) 0 else 6.dp
         }
     }
 
@@ -1108,14 +1143,20 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        if (::binding.isInitialized && event.actionMasked == MotionEvent.ACTION_DOWN &&
-            event.isInside(binding.toolbarLayout)
-        ) {
+        if (::binding.isInitialized && event.actionMasked == MotionEvent.ACTION_DOWN) {
+            // The homepage is a native surface, so it does not provide the WebView's usual
+            // focus-loss path. Dismiss the expanded address editor when the user taps anywhere
+            // outside it, including homepage shortcuts and rail actions.
+            if (addressOverlayOpen && !event.isInside(binding.addressOverlay ?: binding.toolbarLayout)) {
+                hideAddressOverlay()
+            }
+            if (event.isInside(binding.toolbarLayout)) {
             browserChromeGestureActive = true
             // Release embedded Antares input before dispatching the rail gesture. Persistent
             // chrome such as the address editor, drawer or overflow menu keeps it released after
             // ACTION_UP through the presenter's combined state calculation.
             presenter.onBrowserChromeGestureMoved(true)
+            }
         }
 
         val handled = super.dispatchTouchEvent(event)

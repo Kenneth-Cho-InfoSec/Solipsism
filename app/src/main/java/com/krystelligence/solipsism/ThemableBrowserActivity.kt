@@ -149,13 +149,7 @@ abstract class ThemableBrowserActivity : AppCompatActivity() {
     }
 
     protected fun activeSolipsismRailPosition(): SolipsismRailPosition =
-        userPreferences.solipsismRailPosition.takeUnless {
-            it.isExperimental && !developerPreferences.experimentalRailLayoutsEnabled
-        } ?: if (userPreferences.solipsismRailOnLeft) {
-            SolipsismRailPosition.LEFT
-        } else {
-            SolipsismRailPosition.RIGHT
-        }
+        userPreferences.solipsismRailPosition
 
     protected fun restart() {
         finish()

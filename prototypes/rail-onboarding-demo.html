@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solipsism rail setup prototype</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f9f7ff;
+      --surface: #efedf5;
+      --surface-high: #e5e2ec;
+      --outline: #79747e;
+      --text: #1d1b20;
+      --muted: #625f67;
+      --primary: #6750a4;
+      --on-primary: #fff;
+      --rail: #25232b;
+      --phone: #111016;
+      --content: #292631;
+      --motion: cubic-bezier(.2, .8, .2, 1);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#15131a; --surface:#211f26; --surface-high:#2b2931; --outline:#938f99; --text:#e8e1e9; --muted:#cac4cc; --primary:#d0bcff; --on-primary:#36275d; }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100svh; height:100svh; overflow:hidden; display:grid; place-items:center; background:var(--bg); color:var(--text); font:16px/1.4 system-ui, sans-serif; }
+    .shell { width:min(1180px, 100%); height:100%; padding:clamp(16px, 4vh, 42px) clamp(18px, 4vw, 56px); display:grid; grid-template-columns:minmax(250px, 320px) minmax(240px, 1fr); gap:clamp(18px, 5vw, 72px); align-items:center; }
+    .copy { display:flex; flex-direction:column; gap:18px; align-self:start; }
+    .eyebrow { margin:0; color:var(--primary); font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:.78rem; }
+    h1 { margin:0; font-size:clamp(2rem, 5vw, 3rem); line-height:1.05; letter-spacing:-.04em; }
+    .intro { margin:0; color:var(--muted); }
+    .choices { display:grid; gap:8px; width:min(280px, 100%); margin-top:6px; }
+    .choice { display:flex; align-items:center; gap:11px; width:100%; min-height:52px; padding:8px 12px; border:1px solid var(--outline); border-radius:16px; background:transparent; color:inherit; cursor:pointer; text-align:left; transition:background .2s var(--motion), border-color .2s var(--motion), transform .2s var(--motion); }
+    .choice:hover { transform:translateY(-1px); }
+    .choice[aria-checked=true] { border-color:var(--primary); background:color-mix(in srgb, var(--primary) 14%, transparent); }
+    .choice-icon { display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--surface-high); color:var(--text); font-weight:700; }
+    .choice[aria-checked=true] .choice-icon { background:var(--primary); color:var(--on-primary); }
+    .choice strong { display:block; }
+    .choice small { display:none; }
+    .actions { display:flex; gap:12px; margin-top:4px; }
+    button.action { min-height:48px; padding:0 22px; border:0; border-radius:24px; font:inherit; font-weight:700; cursor:pointer; }
+    .primary { background:var(--primary); color:var(--on-primary); }
+    .secondary { background:var(--surface-high); color:var(--text); }
+    .stage { display:grid; place-items:start end; min-height:0; height:100%; align-self:start; padding-top:clamp(120px, 15vh, 170px); }
+    .phone { position:relative; width:min(190px, 22vw); max-height:calc(100svh - 32px); aspect-ratio:9/19.5; border:7px solid #38353e; border-radius:26px; background:var(--phone); overflow:hidden; box-shadow:0 18px 52px #0005; }
+    .screen { position:absolute; inset:0; display:flex; flex-direction:column; padding:18px 12px 14px; background:linear-gradient(145deg, var(--phone), var(--content)); }
+    .status { height:18px; display:flex; justify-content:space-between; font-size:9px; color:#fff; opacity:.8; }
+    .web-content { flex:1; display:grid; place-items:center; color:#fff; opacity:.9; transition:padding .55s var(--motion); }
+    .web-content span { padding:16px 20px; border:1px solid #fff4; border-radius:16px; font-size:12px; text-align:center; }
+    .rail { position:absolute; z-index:2; display:flex; align-items:center; justify-content:space-evenly; gap:6px; padding:8px; background:var(--rail); color:#fff; transition:all .55s var(--motion); }
+    .rail i { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:#ffffff1c; font-style:normal; font-size:12px; }
+    .rail.left, .rail.right { top:0; bottom:0; width:48px; flex-direction:column; }
+    .rail.left { left:0; } .rail.right { right:0; }
+    .rail.top, .rail.bottom { left:0; right:0; height:52px; flex-direction:row; }
+    .rail.top { top:0; } .rail.bottom { bottom:0; }
+    .rail-label { position:absolute; z-index:3; left:50%; top:50%; transform:translate(-50%,-50%); padding:7px 13px; border-radius:20px; background:#0009; color:#fff; font-size:11px; pointer-events:none; transition:all .35s var(--motion); }
+    @media (max-width:480px) {
+      body { overflow:auto; height:auto; min-height:100svh; }
+      .shell { height:auto; min-height:100svh; grid-template-columns:1fr; padding-top:26px; }
+      .copy { display:contents; }
+      .eyebrow { order:1; }
+      h1 { order:2; }
+      .intro { order:3; }
+      .stage { order:4; height:auto; min-height:330px; padding-top:0; place-items:center; }
+      .choices { order:5; }
+      .actions { order:6; }
+      .phone { width:180px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { transition-duration:.01ms !important; animation-duration:.01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="copy" aria-labelledby="title">
+      <p class="eyebrow">Make it yours</p>
+      <h1 id="title">Choose your navigation rail</h1>
+      <p class="intro">Try each position in the preview. You can change this later in Appearance settings.</p>
+      <div class="choices" role="radiogroup" aria-label="Navigation rail position">
+        <button class="choice" role="radio" aria-checked="false" data-position="left"><span class="choice-icon">←</span><span><strong>Left</strong><small>Recommended for one-handed use</small></span></button>
+        <button class="choice" role="radio" aria-checked="true" data-position="right"><span class="choice-icon">→</span><span><strong>Right</strong><small>Keep controls near your thumb</small></span></button>
+        <button class="choice" role="radio" aria-checked="false" data-position="top"><span class="choice-icon">↑</span><span><strong>Top</strong><small>Controls across the top edge</small></span></button>
+        <button class="choice" role="radio" aria-checked="false" data-position="bottom"><span class="choice-icon">↓</span><span><strong>Bottom</strong><small>Controls across the bottom edge</small></span></button>
+      </div>
+      <div class="actions"><button class="action secondary" type="button">Back</button><button class="action primary" type="button">Continue</button></div>
+    </section>
+    <section class="stage" aria-label="Interactive rail preview">
+      <div class="phone">
+        <div class="screen"><div class="status"><span>9:41</span><span>● ● ▰</span></div><div class="web-content"><span>Web page stays<br>the primary surface</span></div><div class="rail right" aria-hidden="true"><i>▣</i><i>↻</i><i>⌂</i><i>⋮</i></div><div class="rail-label">Right rail</div></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const rail = document.querySelector('.rail');
+    const label = document.querySelector('.rail-label');
+    const buttons = [...document.querySelectorAll('.choice')];
+    function select(position) {
+      rail.className = `rail ${position}`;
+      label.textContent = `${position[0].toUpperCase()}${position.slice(1)} rail`;
+      buttons.forEach(button => button.setAttribute('aria-checked', String(button.dataset.position === position)));
+    }
+    buttons.forEach(button => button.addEventListener('click', () => select(button.dataset.position)));
+    document.addEventListener('keydown', event => {
+      if (!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key)) return;
+      const current = buttons.findIndex(button => button.getAttribute('aria-checked') === 'true');
+      const next = (current + (event.key === 'ArrowUp' || event.key === 'ArrowLeft' ? -1 : 1) + buttons.length) % buttons.length;
+      buttons[next].focus(); select(buttons[next].dataset.position); event.preventDefault();
+    });
+  </script>
+</body>
+</html>

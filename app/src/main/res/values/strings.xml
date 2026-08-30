@@ -681,7 +681,7 @@
 
     <string name="permission_description_storage">Storage permission is required to download files to your device.</string>
     <string name="debug_experimental_rail_layouts">Enable experimental top/bottom rail layouts</string>
-    <string name="debug_experimental_rail_layouts_summary">Expose unoptimized rail placements in Appearance settings</string>
+    <string name="debug_experimental_rail_layouts_summary">Enable additional rail placements in Appearance settings</string>
     <string name="browser_core_title">Choose your browser core</string>
     <string name="browser_core_explanation">Solipsism can use Android WebView or the experimental Antares engine. This choice applies to every tab and can be changed later from the three-dot menu or Debug Settings.</string>
     <string name="browser_core_antares">Antares</string>
@@ -710,7 +710,7 @@
     <string name="onboarding_rail_summary">Place the controls where they are most comfortable to reach.</string>
     <string name="onboarding_rail_left">Left</string>
     <string name="onboarding_rail_right">Right (Recommended)</string>
-    <string name="onboarding_rail_experimental_note">Top and bottom layouts are currently unoptimized and may not work perfectly on every screen.</string>
+    <string name="onboarding_rail_experimental_note">Top and bottom layouts adapt to your screen and remain available in Appearance settings.</string>
     <string name="onboarding_search_title">Choose your search engine</string>
     <string name="onboarding_search_summary">DuckDuckGo is the recommended default. Other providers remain available.</string>
     <string name="onboarding_search_duckduckgo">DuckDuckGo (Recommended)</string>
@@ -722,6 +722,8 @@
     <string name="file_upload">File upload</string>
     <string name="settings_rail_position_top_unoptimized">Top (Unoptimized)</string>
     <string name="settings_rail_position_bottom_unoptimized">Bottom (Unoptimized)</string>
+    <string name="settings_rail_position_top">Top</string>
+    <string name="settings_rail_position_bottom">Bottom</string>
     <string name="settings_audio">Audio</string>
     <string name="settings_audio_summary">Presets, custom EQ, and playback processing</string>
     <string name="settings_audio_effects">Custom audio effects</string>
@@ -759,7 +761,7 @@
     <string name="audio_preset_podcast">Podcast</string>
     <string name="audio_preset_night">Night listening</string>
     <string name="settings_rail_experimental_title">Experimental rail layout</string>
-    <string name="settings_rail_experimental_message">The purpose of Solipsism Browser is its side rail interface. Top and bottom rail layouts are experimental and unoptimized. Some features may be missing, behave incorrectly, or contain bugs that are not currently priority support. Continue only if you understand and accept this limitation.</string>
+    <string name="settings_rail_experimental_message">Top and bottom rail layouts are supported alternatives to the side rail. The layout adapts to the available screen space.</string>
     <string name="settings_rail_experimental_continue">Continue</string>
     <string name="settings_haptics_interactions">Interaction haptics</string>
     <string name="settings_haptics_interactions_summary">Feedback for tabs, bookmarks, QR scans, downloads, and other completed actions.</string>
