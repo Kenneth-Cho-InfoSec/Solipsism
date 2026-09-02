@@ -105,19 +105,6 @@ class AntaresEnginePackage(private val context: Context) {
         return certificates.any { sha256(it) in trustedDigests }
     }
 
-    /** Older Antares packages remain usable, but should be updated for current fixes. */
-    fun updateRecommended(versionName: String?): Boolean {
-        val parts = versionName
-            ?.split('.')
-            ?.mapNotNull { it.toIntOrNull() }
-            ?.let { (it + listOf(0, 0, 0)).take(3) }
-            ?: return true
-        val current = listOf(0, 1, 2)
-        return parts.zip(current).firstOrNull { (installed, latest) -> installed != latest }
-            ?.let { it.first < it.second }
-            ?: false
-    }
-
     private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes)
         .joinToString("") { "%02X".format(it) }

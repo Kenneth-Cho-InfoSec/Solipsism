@@ -27,7 +27,6 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.materialswitch.MaterialSwitch
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.krystelligence.solipsism.AccentPalette
 import com.krystelligence.solipsism.AppTheme
@@ -72,7 +71,7 @@ class BrowserCoreChooserActivity : AppCompatActivity() {
         launchBrowserAfterChoice = !intent.getBooleanExtra(EXTRA_MANAGE_ONLY, false)
 
         if (launchBrowserAfterChoice && preferences.onboardingComplete && selectionIsUsable()) {
-            maybeWarnLegacyAntares { launchBrowser() }
+            launchBrowser()
             return
         }
 
@@ -387,25 +386,6 @@ class BrowserCoreChooserActivity : AppCompatActivity() {
                 "https://github.com/Kenneth-Cho-InfoSec/Antares/releases".toUri(),
             ).addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT),
         )
-    }
-
-    private fun maybeWarnLegacyAntares(continueAction: () -> Unit) {
-        if (preferences.selectedCore != BrowserCore.ANTARES) {
-            continueAction()
-            return
-        }
-        val status = enginePackage.status()
-        if (!status.usable || !enginePackage.updateRecommended(status.versionName)) {
-            continueAction()
-            return
-        }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.browser_core_update_antares_title)
-            .setMessage(getString(R.string.browser_core_update_antares_message, status.versionName.orEmpty()))
-            .setNegativeButton(R.string.browser_core_update_antares_later) { _, _ -> continueAction() }
-            .setPositiveButton(R.string.browser_core_update_antares_download) { _, _ -> openAntaresListing() }
-            .setOnCancelListener { continueAction() }
-            .show()
     }
 
     private fun launchBrowser(starterUrls: ArrayList<String>? = null) {

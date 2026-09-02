@@ -706,10 +706,6 @@
     <string name="browser_core_antares_unavailable">Antares Engine is unavailable.</string>
     <string name="browser_core_menu_shortcut">Browser core</string>
     <string name="browser_core_antares_duckduckgo_message">Antares uses DuckDuckGo for maximum de-Googling.</string>
-    <string name="browser_core_update_antares_title">Antares Engine update available</string>
-    <string name="browser_core_update_antares_message">You are using Antares %1$s. It remains trusted and compatible, but newer releases include important fixes. Update Antares from GitHub when convenient.</string>
-    <string name="browser_core_update_antares_later">Continue</string>
-    <string name="browser_core_update_antares_download">Update from GitHub</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_finish">Finish setup</string>
     <string name="onboarding_appearance_title">Make it yours</string>
