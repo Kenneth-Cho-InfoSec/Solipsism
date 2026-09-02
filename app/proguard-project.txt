@@ -78,6 +78,16 @@
 -keep class com.krystelligence.solipsism.js.TextReflow { *; }
 -keep class com.krystelligence.solipsism.js.ThemeColor { *; }
 
+# Servo invokes these callbacks by JNI method name from the embedded native renderer.
+# Keep both the wrapper and callback members stable in minified release builds.
+-keep class org.servo.servoview.JNIServo { *; }
+-keep class org.servo.servoview.JNIServo$* { *; }
+-keep class org.servo.servoview.Servo { *; }
+-keep class org.servo.servoview.Servo$* { *; }
+-keep class org.servo.servoview.ServoView { *; }
+-keep class org.servo.servoview.ServoView$* { *; }
+-keep class com.krystelligence.solipsism.browser.engine.AntaresSessionView { *; }
+
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);

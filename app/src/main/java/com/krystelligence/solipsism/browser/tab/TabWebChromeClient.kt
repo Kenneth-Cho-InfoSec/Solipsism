@@ -206,12 +206,21 @@ class TabWebChromeClient @Inject constructor(
         this.filePathCallback = null
 
         this.filePathCallback = filePathCallback
-        fileChooserParams.createIntent().apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        }.let(fileChooserObservable::onNext)
-        return true
+        return runCatching {
+            fileChooserParams.createIntent().apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                putExtra(
+                    Intent.EXTRA_ALLOW_MULTIPLE,
+                    fileChooserParams.mode == FileChooserParams.MODE_OPEN_MULTIPLE
+                )
+            }.let(fileChooserObservable::onNext)
+            true
+        }.getOrElse {
+            this.filePathCallback?.onReceiveValue(null)
+            this.filePathCallback = null
+            false
+        }
     }
 
     override fun onShowCustomView(view: View, callback: CustomViewCallback) {
@@ -332,7 +341,10 @@ class TabWebChromeClient @Inject constructor(
                         }
                     }.resizeAndShow()
                 } else {
-                    //TODO show message and/or turn off setting
+                    // Android denied the runtime permission. Complete the web request explicitly
+                    // so Chromium does not leave a pending geolocation callback behind.
+                    hapticFeedback.warning(HapticFeedbackController.Category.PERMISSIONS)
+                    callback.invoke(origin, false, remember)
                 }
             }
     }

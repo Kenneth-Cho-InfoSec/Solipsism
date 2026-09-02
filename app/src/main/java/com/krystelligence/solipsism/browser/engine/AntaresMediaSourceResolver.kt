@@ -1,6 +1,7 @@
 package com.krystelligence.solipsism.browser.engine
 
 import android.net.Uri
+import androidx.media3.common.MimeTypes
 import com.krystelligence.solipsism.constant.CHROMPATIBILITY_FALLBACK_USER_AGENT
 import org.json.JSONObject
 import java.net.HttpURLConnection
@@ -39,6 +40,7 @@ internal data class BrowserMediaRequest(
 internal data class ResolvedMediaSource(
     val url: String,
     val headers: Map<String, String>,
+    val mimeType: String?,
 )
 
 internal object AntaresMediaSourceResolver {
@@ -59,9 +61,12 @@ internal object AntaresMediaSourceResolver {
             return resolveRenewal(pageUrl, renewalRequest, cookies)
         }
         require(!directSource.isNullOrBlank()) { "The page did not provide a media source." }
+        val resolvedUrl = resolveUrl(pageUrl, directSource)
+        val headers = playbackHeaders(pageUrl, cookies)
         return ResolvedMediaSource(
-            url = resolveUrl(pageUrl, directSource),
-            headers = playbackHeaders(pageUrl, cookies),
+            url = resolvedUrl,
+            headers = headers,
+            mimeType = resolveAdaptiveMimeType(resolvedUrl, headers),
         )
     }
 
@@ -118,14 +123,17 @@ internal object AntaresMediaSourceResolver {
                 .filter(String::isNotBlank)
                 .joinToString("; ")
                 .takeIf(String::isNotBlank)
-            ResolvedMediaSource(
-                url = resolveUrl(requestUrl, source),
-                headers = playbackHeaders(
+            val resolvedUrl = resolveUrl(requestUrl, source)
+            val headers = playbackHeaders(
                     pageUrl,
                     listOfNotNull(cookies, renewedCookies)
                         .joinToString("; ")
                         .takeIf(String::isNotBlank),
-                ),
+                )
+            ResolvedMediaSource(
+                url = resolvedUrl,
+                headers = headers,
+                mimeType = resolveAdaptiveMimeType(resolvedUrl, headers),
             )
         } finally {
             connection.disconnect()
@@ -136,6 +144,67 @@ internal object AntaresMediaSourceResolver {
         val parsed = runCatching { JSONObject(response) }.getOrNull()
         if (parsed != null) return findNetworkUrl(parsed)
         return NETWORK_URL.find(response)?.value
+    }
+
+    /**
+     * Media3 chooses an adaptive media source before it opens the URI. Signed playlist URLs often
+     * have no file extension, so use a small range request to classify only otherwise-ambiguous
+     * sources. The response body is never retained.
+     */
+    private fun resolveAdaptiveMimeType(
+        sourceUrl: String,
+        headers: Map<String, String>,
+    ): String? {
+        inferAdaptiveMimeType(sourceUrl, null, null)?.let { return it }
+
+        val connection = URL(sourceUrl).openConnection() as HttpURLConnection
+        return try {
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 10_000
+            connection.readTimeout = 10_000
+            connection.instanceFollowRedirects = true
+            connection.setRequestProperty("Range", "bytes=0-${MEDIA_PROBE_BYTES - 1}")
+            connection.setRequestProperty("Accept-Encoding", "identity")
+            headers.forEach(connection::setRequestProperty)
+            if (connection.responseCode !in 200..299) return null
+
+            val prefix = connection.inputStream.use { input ->
+                val buffer = ByteArray(MEDIA_PROBE_BYTES)
+                var count = 0
+                while (count < buffer.size) {
+                    val read = input.read(buffer, count, buffer.size - count)
+                    if (read <= 0) break
+                    count += read
+                }
+                String(buffer, 0, count, StandardCharsets.UTF_8)
+            }
+            inferAdaptiveMimeType(
+                connection.url.toString(),
+                connection.contentType,
+                prefix,
+            )
+        } catch (_: Exception) {
+            null
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    internal fun inferAdaptiveMimeType(
+        sourceUrl: String,
+        contentType: String?,
+        contentPrefix: String?,
+    ): String? {
+        val path = Uri.parse(sourceUrl).path.orEmpty().lowercase()
+        val type = contentType?.substringBefore(';')?.trim()?.lowercase()
+        val prefix = contentPrefix
+            ?.trimStart { it.isWhitespace() || it == '\uFEFF' }
+            .orEmpty()
+        return when {
+            path.endsWith(".m3u8") || type in HLS_CONTENT_TYPES ||
+                prefix.startsWith("#EXTM3U", ignoreCase = true) -> MimeTypes.APPLICATION_M3U8
+            else -> null
+        }
     }
 
     private fun findNetworkUrl(value: Any?): String? = when (value) {
@@ -169,5 +238,13 @@ internal object AntaresMediaSourceResolver {
     private fun originFor(pageUrl: String): String = Uri.parse(pageUrl).let { "${it.scheme}://${it.host}" }
 
     private const val MAX_RENEWAL_BODY_BYTES = 32 * 1024
+    private const val MEDIA_PROBE_BYTES = 16 * 1024
+    private val HLS_CONTENT_TYPES = setOf(
+        "application/mpegurl",
+        "application/vnd.apple.mpegurl",
+        "application/x-mpegurl",
+        "audio/mpegurl",
+        "audio/x-mpegurl",
+    )
     private val NETWORK_URL = Regex("(?:https?:)?//[^\\s\\\"'<>]+", RegexOption.IGNORE_CASE)
 }

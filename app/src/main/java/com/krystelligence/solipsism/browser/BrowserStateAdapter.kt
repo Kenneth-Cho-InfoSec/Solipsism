@@ -97,6 +97,10 @@ class BrowserStateAdapter(private val browserActivity: BrowserActivity) : Browse
         browserActivity.showFindInPageDialog()
     }
 
+    override fun focusAddressBar() {
+        browserActivity.focusAddressBar()
+    }
+
     override fun speakPageText(text: String) {
         browserActivity.speakPageText(text)
     }

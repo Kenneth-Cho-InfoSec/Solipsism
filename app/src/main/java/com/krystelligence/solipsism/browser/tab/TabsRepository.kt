@@ -10,7 +10,6 @@ import com.krystelligence.solipsism.browser.tab.bundle.BundleStore
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.browser.engine.BrowserCore
 import com.krystelligence.solipsism.browser.engine.BrowserCorePreferences
-import com.krystelligence.solipsism.browser.engine.AntaresEngineConnection
 import com.krystelligence.solipsism.utils.isFileUrl
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
@@ -35,7 +34,6 @@ class TabsRepository @Inject constructor(
     private val recentTabModel: RecentTabModel,
     private val tabFactory: TabFactory,
     private val antaresTabAdapterFactory: AntaresTabAdapter.Factory,
-    private val antaresEngineConnection: AntaresEngineConnection,
     private val browserCorePreferences: BrowserCorePreferences,
     private val userPreferences: UserPreferences,
     private val homePageInitializer: HomePageInitializer,
@@ -198,12 +196,7 @@ class TabsRepository @Inject constructor(
             val previousTabs = tabsList
             val selectedIndex = selectedTab?.let(previousTabs::indexOf)?.takeIf { it >= 0 }
             val prepared = mutableListOf<ConstructedTab>()
-            val engineReady = if (core == BrowserCore.ANTARES) {
-                antaresEngineConnection.verify()
-            } else {
-                Completable.complete()
-            }
-            engineReady.andThen(Observable.fromIterable(previousTabs)
+            Observable.fromIterable(previousTabs)
                 .concatMapSingle { oldTab ->
                     constructTabForCore(
                         migrationInitializer(oldTab, core),
@@ -226,17 +219,13 @@ class TabsRepository @Inject constructor(
                             it.isForeground = true
                         }
                         previousTabs.forEach(TabModel::destroy)
-                        if (core == BrowserCore.WEBVIEW) {
-                            antaresEngineConnection.disconnect()
-                        }
                         tabsListObservable.onNext(tabsList)
                     }
                 }
                 .doOnError {
                     prepared.forEach { it.model.destroy() }
                 }
-            )
-        }
+            }
         .subscribeOn(mainScheduler)
 
     private fun List<TabModel>.forId(id: Int): TabModel = requireNotNull(find { it.id == id })

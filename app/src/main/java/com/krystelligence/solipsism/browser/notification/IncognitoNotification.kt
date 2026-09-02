@@ -46,9 +46,8 @@ class IncognitoNotification @Inject constructor(
         require(number > 0)
         val incognitoIntent = IncognitoBrowserActivity.intent(activity)
 
-        // TODO: Fix incognito notification
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PendingIntent.FLAG_MUTABLE
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE
         } else {
             0
         }

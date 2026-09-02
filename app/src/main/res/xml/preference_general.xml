@@ -40,11 +40,6 @@
             android:icon="@drawable/ic_settings_text"
             android:key="agent"
             android:title="@string/display_as"/>
-        <Preference
-            android:icon="@drawable/ic_action_forward"
-            android:key="rail_position"
-            android:title="@string/settings_rail_position"
-            android:summary="@string/settings_rail_position_summary" />
         <SwitchPreferenceCompat
             android:defaultValue="true"
             android:icon="@drawable/ic_settings_globe"

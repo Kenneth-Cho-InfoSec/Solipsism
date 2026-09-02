@@ -14,7 +14,6 @@ import androidx.activity.result.ActivityResult
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.media3.common.util.UnstableApi
 import com.krystelligence.solipsism.browser.download.PendingDownload
-import com.krystelligence.solipsism.browser.engine.AntaresEngineConnection
 import com.krystelligence.solipsism.browser.engine.AntaresContentBlockingPolicy
 import com.krystelligence.solipsism.browser.engine.AntaresCoordinateBridge
 import com.krystelligence.solipsism.browser.engine.AntaresMediaPlayerView
@@ -48,7 +47,6 @@ class AntaresTabAdapter private constructor(
     private val userPreferences: UserPreferences,
     private val developerPreferences: DeveloperPreferences,
     private val contentBlockingPolicy: AntaresContentBlockingPolicy,
-    connection: AntaresEngineConnection,
 ) : TabModel, AntaresSessionView.Listener {
     private val contentKindSubject = BehaviorSubject.createDefault(
         initialUrlResolver.contentKind(tabInitializer),
@@ -85,7 +83,6 @@ class AntaresTabAdapter private constructor(
 
     val contentView: AntaresSessionView = AntaresSessionView(
         context = initialUrlResolver.context,
-        connection = connection,
         initialUrl = initialUrlResolver.engineInitialUrl(tabInitializer),
         initialUserAgent = userPreferences.antaresUserAgent(providerUserAgent),
         initialTheme = userPreferences.useTheme.toAntaresTheme(initialUrlResolver.context),
@@ -260,6 +257,9 @@ class AntaresTabAdapter private constructor(
             field = value
             coordinateBridge?.setForeground(value)
             contentView.setForeground(value)
+            if (value && contentKind == TabContentKind.ENGINE) {
+                contentView.activateForTab(currentUrl)
+            }
         }
 
     override fun setBrowserChromeOverlayVisible(visible: Boolean, onApplied: () -> Unit) {
@@ -373,7 +373,6 @@ class AntaresTabAdapter private constructor(
         private val userPreferences: UserPreferences,
         private val developerPreferences: DeveloperPreferences,
         private val contentBlockingPolicy: AntaresContentBlockingPolicy,
-        private val connection: AntaresEngineConnection,
     ) {
         fun create(initializer: TabInitializer, tabType: TabModel.Type): AntaresTabAdapter =
             AntaresTabAdapter(
@@ -385,7 +384,6 @@ class AntaresTabAdapter private constructor(
                 userPreferences,
                 developerPreferences,
                 contentBlockingPolicy,
-                connection,
             )
     }
 }

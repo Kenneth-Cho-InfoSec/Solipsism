@@ -1,5 +1,6 @@
 package com.krystelligence.solipsism.browser.engine
 
+import androidx.media3.common.MimeTypes
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Test
@@ -52,5 +53,49 @@ class AntaresMediaSourceResolverTest {
         )
 
         assertThat(source).isEqualTo("//media.example/signed-stream?token=abc")
+    }
+
+    @Test
+    fun `recognises an HLS source from its standard extension`() {
+        val mimeType = AntaresMediaSourceResolver.inferAdaptiveMimeType(
+            sourceUrl = "https://media.example/stream/master.m3u8?token=abc",
+            contentType = null,
+            contentPrefix = null,
+        )
+
+        assertThat(mimeType).isEqualTo(MimeTypes.APPLICATION_M3U8)
+    }
+
+    @Test
+    fun `recognises a signed HLS source from its response type`() {
+        val mimeType = AntaresMediaSourceResolver.inferAdaptiveMimeType(
+            sourceUrl = "https://media.example/signed-stream?token=abc",
+            contentType = "application/vnd.apple.mpegurl; charset=utf-8",
+            contentPrefix = null,
+        )
+
+        assertThat(mimeType).isEqualTo(MimeTypes.APPLICATION_M3U8)
+    }
+
+    @Test
+    fun `recognises a signed HLS source from its playlist header`() {
+        val mimeType = AntaresMediaSourceResolver.inferAdaptiveMimeType(
+            sourceUrl = "https://media.example/signed-stream?token=abc",
+            contentType = "application/octet-stream",
+            contentPrefix = "\uFEFF#EXTM3U\n#EXT-X-VERSION:3",
+        )
+
+        assertThat(mimeType).isEqualTo(MimeTypes.APPLICATION_M3U8)
+    }
+
+    @Test
+    fun `does not force progressive media into the HLS source factory`() {
+        val mimeType = AntaresMediaSourceResolver.inferAdaptiveMimeType(
+            sourceUrl = "https://media.example/signed-video?token=abc",
+            contentType = "video/mp4",
+            contentPrefix = "binary content",
+        )
+
+        assertThat(mimeType).isNull()
     }
 }

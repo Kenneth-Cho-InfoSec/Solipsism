@@ -63,6 +63,12 @@ class AntaresContentBlockingPolicy @Inject constructor(
         return ParcelFileDescriptor.open(policyFile, ParcelFileDescriptor.MODE_READ_ONLY)
     }
 
+    /** Returns the current policy snapshot for the in-process renderer. */
+    fun readText(): String =
+        ParcelFileDescriptor.AutoCloseInputStream(openFileDescriptor()).bufferedReader().use {
+            it.readText()
+        }
+
     private companion object {
         const val POLICY_FILE_NAME = "network-policy.txt"
         const val HOSTS_ASSET = "hosts.txt"

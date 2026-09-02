@@ -99,6 +99,11 @@
             android:title="@string/settings_homepage_datetime_opacity" />
         <Preference
             android:icon="@drawable/ic_action_desktop"
+            android:key="rail_position"
+            android:title="@string/settings_rail_position"
+            android:summary="@string/settings_rail_position_summary" />
+        <Preference
+            android:icon="@drawable/ic_action_desktop"
             android:key="rail_size"
             android:title="@string/settings_rail_size" />
         <Preference

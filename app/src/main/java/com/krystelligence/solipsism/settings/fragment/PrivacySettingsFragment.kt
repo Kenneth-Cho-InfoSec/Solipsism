@@ -13,6 +13,7 @@ import com.krystelligence.solipsism.dialog.DialogItem
 import com.krystelligence.solipsism.extensions.snackbar
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.utils.WebUtils
+import com.krystelligence.solipsism.utils.Utils
 import android.os.Bundle
 import android.webkit.WebView
 import io.reactivex.rxjava3.core.Completable
@@ -145,14 +146,17 @@ class PrivacySettingsFragment : AbstractSettingsFragment() {
         requireActivity().snackbar(R.string.message_cache_cleared)
     }
 
-    private fun clearHistory(): Completable = Completable.fromAction {
-        val activity = activity
-        if (activity != null) {
-            // TODO: 6/9/17 clearHistory is not synchronous
-            WebUtils.clearHistory(activity, historyRepository, databaseScheduler)
-        } else {
-            throw RuntimeException("Activity was null in clearHistory")
-        }
+    private fun clearHistory(): Completable {
+        val currentActivity = activity ?: return Completable.error(
+            IllegalStateException("Activity was null in clearHistory")
+        )
+        return historyRepository.deleteHistory().andThen(Completable.fromAction {
+            // Complete only after stored history and WebView form/auth data are cleared.
+            val webViewDatabase = android.webkit.WebViewDatabase.getInstance(currentActivity)
+            webViewDatabase.clearFormData()
+            webViewDatabase.clearHttpAuthUsernamePassword()
+            Utils.trimCache(currentActivity)
+        })
     }
 
     private fun clearCookies(): Completable = Completable.fromAction {

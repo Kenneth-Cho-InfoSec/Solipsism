@@ -14,6 +14,8 @@ import com.krystelligence.solipsism.utils.CustomFontManager
 import com.krystelligence.solipsism.preference.UserPreferences
 import com.krystelligence.solipsism.audio.AudioPreset
 import com.krystelligence.solipsism.browser.ui.RailUtilityAction
+import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
+import com.krystelligence.solipsism.preference.DeveloperPreferences
 import com.krystelligence.solipsism.browser.ui.RailMenuStudioActivity
 import com.krystelligence.solipsism.html.homepage.HomepageSource
 import com.krystelligence.solipsism.html.homepage.StaticHomepageSanitizer
@@ -47,9 +49,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
 
-class DisplaySettingsFragment : AbstractSettingsFragment() {
+open class DisplaySettingsFragment : AbstractSettingsFragment() {
 
     @Inject internal lateinit var userPreferences: UserPreferences
+    @Inject internal lateinit var developerPreferences: DeveloperPreferences
     private var wallpaperSummaryUpdater: SummaryUpdater? = null
     private val wallpaperPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::copyHomepageWallpaper)
@@ -156,6 +159,12 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
             onCheckChange = { enabled -> dateTimeControls.forEach { it.isEnabled = enabled } }
         )
         dateTimeControls.forEach { it.isEnabled = userPreferences.homepageDateTimeEnabled }
+
+        clickableDynamicPreference(
+            preference = SETTINGS_RAIL_POSITION,
+            summary = currentRailPosition().toRailPositionDisplayString(),
+            onClick = ::showRailPositionPicker
+        )
 
         clickableDynamicPreference(
             preference = SETTINGS_RAIL_SIZE,
@@ -1042,6 +1051,50 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
 
     }
 
+    private fun showRailPositionPicker(summaryUpdater: SummaryUpdater) {
+        val values = listOf(
+            SolipsismRailPosition.RIGHT to getString(R.string.settings_rail_position_right),
+            SolipsismRailPosition.LEFT to getString(R.string.settings_rail_position_left),
+            SolipsismRailPosition.TOP to getString(R.string.settings_rail_position_top),
+            SolipsismRailPosition.BOTTOM to getString(R.string.settings_rail_position_bottom)
+        )
+        MaterialAlertDialogBuilder(requireActivity())
+            .setTitle(R.string.settings_rail_position)
+            .setSingleChoiceItems(
+                values.map { it.second }.toTypedArray(),
+                values.indexOfFirst { it.first == currentRailPosition() }
+            ) { dialog, which ->
+                val position = values[which].first
+                userPreferences.solipsismRailPosition = position
+                if (position == SolipsismRailPosition.LEFT || position == SolipsismRailPosition.RIGHT) {
+                    userPreferences.solipsismRailOnLeft = position == SolipsismRailPosition.LEFT
+                }
+                summaryUpdater.updateSummary(position.toRailPositionDisplayString())
+                if (position == SolipsismRailPosition.TOP || position == SolipsismRailPosition.BOTTOM) {
+                    requireActivity().finish()
+                }
+                dialog.dismiss()
+            }
+            .setPositiveButton(R.string.action_ok, null)
+            .show()
+    }
+
+    private fun currentRailPosition(): SolipsismRailPosition {
+        val stored = userPreferences.solipsismRailPosition
+        return if (stored.isExperimental && !developerPreferences.experimentalRailLayoutsEnabled) {
+            if (userPreferences.solipsismRailOnLeft) SolipsismRailPosition.LEFT else SolipsismRailPosition.RIGHT
+        } else stored
+    }
+
+    private fun SolipsismRailPosition.toRailPositionDisplayString(): String = getString(
+        when (this) {
+            SolipsismRailPosition.LEFT -> R.string.settings_rail_position_left
+            SolipsismRailPosition.TOP -> R.string.settings_rail_position_top
+            SolipsismRailPosition.BOTTOM -> R.string.settings_rail_position_bottom
+            SolipsismRailPosition.RIGHT -> R.string.settings_rail_position_right
+        }
+    )
+
     companion object {
 
         private const val SETTINGS_HIDESTATUSBAR = "fullScreenOption"
@@ -1066,6 +1119,7 @@ class DisplaySettingsFragment : AbstractSettingsFragment() {
         private const val SETTINGS_HOMEPAGE_TIME_FORMAT = "homepage_time_format"
         private const val SETTINGS_HOMEPAGE_DATE_FORMAT = "homepage_date_format"
         private const val SETTINGS_HOMEPAGE_DATETIME_OPACITY = "homepage_datetime_opacity"
+        private const val SETTINGS_RAIL_POSITION = "rail_position"
         private const val SETTINGS_RAIL_SIZE = "rail_size"
         private const val SETTINGS_RAIL_UTILITY_ACTION = "rail_utility_action"
         private const val SETTINGS_RAIL_MENU_STUDIO = "rail_menu_studio"

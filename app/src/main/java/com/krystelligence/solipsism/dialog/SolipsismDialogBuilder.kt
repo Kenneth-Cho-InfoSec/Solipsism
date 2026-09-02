@@ -60,17 +60,16 @@ class SolipsismDialogBuilder @Inject constructor() {
      *
      * @param activity used to show the dialog
      */
-    // TODO allow individual downloads to be deleted.
     fun showLongPressedDialogForDownloadUrl(
         activity: Activity,
         onClick: (BrowserContract.DownloadOptionEvent) -> Unit
     ) = BrowserDialog.show(
         activity, R.string.action_downloads,
-        DialogItem(title = R.string.dialog_delete_all_downloads) {
-            onClick(BrowserContract.DownloadOptionEvent.DELETE_ALL)
+        DialogItem(title = R.string.dialog_delete_download) {
+            onClick(BrowserContract.DownloadOptionEvent.DELETE)
         },
         DialogItem(title = R.string.dialog_delete_all_downloads) {
-            onClick(BrowserContract.DownloadOptionEvent.DELETE)
+            onClick(BrowserContract.DownloadOptionEvent.DELETE_ALL)
         }
     )
 

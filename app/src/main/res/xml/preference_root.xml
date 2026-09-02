@@ -5,8 +5,24 @@
     <PreferenceCategory android:title="@string/settings_cluster_basics">
         <Preference
             app:icon="@drawable/ic_action_settings"
-            app:fragment="com.krystelligence.solipsism.settings.fragment.GeneralSettingsFragment"
-            app:title="@string/settings_general" />
+            app:fragment="com.krystelligence.solipsism.settings.fragment.BrowsingSettingsFragment"
+            app:summary="@string/settings_browsing_summary"
+            app:title="Browsing" />
+        <Preference
+            app:icon="@drawable/ic_action_home"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.HomepageSettingsFragment"
+            app:summary="@string/settings_homepage_summary"
+            app:title="Homepage" />
+        <Preference
+            app:icon="@drawable/ic_settings_download"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.DownloadSettingsFragment"
+            app:summary="@string/settings_downloads_summary"
+            app:title="Downloads" />
+        <Preference
+            app:icon="@drawable/ic_action_settings"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.NavigationSettingsFragment"
+            app:summary="@string/settings_navigation_summary"
+            app:title="Navigation" />
         <Preference
             app:icon="@drawable/ic_settings_globe"
             app:fragment="com.krystelligence.solipsism.settings.fragment.AdvancedSettingsFragment"
@@ -32,9 +48,14 @@
     <PreferenceCategory android:title="@string/settings_cluster_experience">
         <Preference
             app:icon="@drawable/ic_action_desktop"
-            app:fragment="com.krystelligence.solipsism.settings.fragment.DisplaySettingsFragment"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.GraphicsSettingsFragment"
             app:summary="@string/settings_graphics_summary"
-            app:title="@string/settings_display" />
+            app:title="Graphics" />
+        <Preference
+            app:icon="@drawable/ic_action_desktop"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.FullscreenSettingsFragment"
+            app:summary="@string/settings_fullscreen_summary"
+            app:title="Fullscreen and display" />
         <Preference
             app:icon="@drawable/ic_settings_audio"
             app:fragment="com.krystelligence.solipsism.settings.fragment.AudioSettingsFragment"
@@ -76,6 +97,11 @@
             app:fragment="com.krystelligence.solipsism.settings.fragment.AboutSettingsFragment"
             app:summary="@string/settings_about_explain"
             app:title="@string/settings_about" />
+        <Preference
+            app:icon="@drawable/ic_settings_info"
+            app:fragment="com.krystelligence.solipsism.settings.fragment.LicensesSettingsFragment"
+            app:summary="@string/settings_licenses_summary"
+            app:title="@string/licenses" />
         <Preference
             app:icon="@drawable/ic_settings_debug"
             app:fragment="com.krystelligence.solipsism.settings.fragment.DebugSettingsFragment"

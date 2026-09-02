@@ -37,6 +37,8 @@ class TabContentHost private constructor(
 
     fun currentEngineView(): View? = engineView.takeIf(Lazy<View>::isInitialized)?.value
 
+    fun isShowingNativeHomepage(): Boolean = tab.contentKind == TabContentKind.NATIVE_HOMEPAGE
+
     fun refreshHomepage() = homepageView?.refresh()
 
     fun dispose() {

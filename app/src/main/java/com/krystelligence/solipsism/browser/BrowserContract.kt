@@ -200,6 +200,9 @@ interface BrowserContract {
          */
         fun clearSearchFocus()
 
+        /** Focuses the address editor and requests the on-screen keyboard. */
+        fun focusAddressBar()
+
         /**
          * Launch the QR scanner.
          */

@@ -20,6 +20,17 @@ class AntaresEnginePackage(private val context: Context) {
     }
 
     fun status(): Status {
+        // In the merged distribution the renderer is packaged in Solipsism itself.
+        // Keep the status API so older chooser/settings code remains source-compatible.
+        if (nativeRendererAvailable()) {
+            return Status(
+                installed = true,
+                platformSupported = true,
+                trusted = true,
+                versionName = "embedded",
+                reason = null,
+            )
+        }
         if (Build.VERSION.SDK_INT < AntaresProtocol.MIN_ANDROID_API ||
             Build.SUPPORTED_64_BIT_ABIS.none { it == "arm64-v8a" || it == "x86_64" }
         ) {
@@ -33,6 +44,11 @@ class AntaresEnginePackage(private val context: Context) {
         }
         return statusOnSupportedPlatform()
     }
+
+    private fun nativeRendererAvailable(): Boolean = runCatching {
+        System.loadLibrary("c++_shared")
+        System.loadLibrary("servoshell")
+    }.isSuccess
 
     @RequiresApi(AntaresProtocol.MIN_ANDROID_API)
     private fun statusOnSupportedPlatform(): Status {

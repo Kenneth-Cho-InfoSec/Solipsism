@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/licenses">
+        <Preference android:icon="@drawable/ic_settings_info" android:title="@string/app_name" android:summary="@string/mpl_license">
+            <intent android:action="android.intent.action.VIEW" android:data="https://www.mozilla.org/MPL/2.0/" />
+        </Preference>
+        <Preference android:icon="@drawable/ic_settings_info" android:title="AndroidX Activity, Annotation, AppCompat, Core and Fragment" android:summary="Activity 1.13.0; Annotation 1.10.0; AppCompat 1.7.1; Core/Core-KTX 1.18.0; Fragment 1.8.9 • Apache-2.0" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="AndroidX CameraX, ConstraintLayout, CoordinatorLayout and DrawerLayout" android:summary="CameraX 1.6.1; ConstraintLayout 2.2.2; CoordinatorLayout 1.3.0; DrawerLayout 1.2.0 • Apache-2.0" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="AndroidX DataStore, Lifecycle, Media3, Palette, Preference, RecyclerView and WebKit" android:summary="DataStore 1.2.1; Lifecycle 2.11.0; Media3 1.11.0; Palette 1.0.0; Preference 1.2.1; RecyclerView 1.4.0; WebKit 1.16.0 • Apache-2.0" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="Material Components, Dagger, Guava and javax.inject" android:summary="Material 1.14.0; Dagger 2.60.1; Guava 33.6.0-android; javax.inject 1 • Apache-2.0" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="Mezzanine, ZXing, PermissionX, OkHttp and Okio" android:summary="Mezzanine 2.3.0; ZXing 3.5.4; PermissionX 1.8.1; OkHttp 5.4.0; Okio 3.18.1 • Apache-2.0" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="Coil image loading" android:summary="Coil, Coil Core and Coil Network OkHttp 3.4.0 • Apache-2.0" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="Kotlin and Kotlin Coroutines" android:summary="Kotlin standard library 2.3.21; kotlinx-coroutines-core 1.11.0 • Apache-2.0" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="RxJava" android:summary="RxJava 3.1.12; RxAndroid 3.0.2; RxKotlin 3.0.1 • Apache-2.0" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="Jsoup" android:summary="Jsoup 1.23.1 • MIT" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="JSpecify and Reactive Streams" android:summary="JSpecify 1.0.1 • Apache-2.0; Reactive Streams 1.0.4 • MIT-0" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="Java annotation API (compile-time only)" android:summary="jsr250-api 1.0 • CDDL-1.1 / GPL-2.0 with Classpath Exception" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="Russian-English dictionary data" android:summary="enru-dict • MIT; licence notice bundled in assets/dictionaries/LICENSE" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="hpHosts and uBlock-compatible filter data" android:summary="Bundled data retains its upstream attribution and terms; see the source files in app/src/main/assets." android:selectable="false" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="LeakCanary (debug builds only)" android:summary="LeakCanary 2.14 • Apache-2.0" android:selectable="false" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Licence texts and source">
+        <Preference android:title="Licence texts and source code" android:summary="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE" android:selectable="false" />
+        <Preference android:title="Apache License 2.0" android:summary="https://www.apache.org/licenses/LICENSE-2.0">
+            <intent android:action="android.intent.action.VIEW" android:data="https://www.apache.org/licenses/LICENSE-2.0" />
+        </Preference>
+        <Preference android:title="MIT License" android:summary="https://opensource.org/license/mit">
+            <intent android:action="android.intent.action.VIEW" android:data="https://opensource.org/license/mit" />
+        </Preference>
+        <Preference android:title="MIT-0 License" android:summary="https://spdx.org/licenses/MIT-0.html">
+            <intent android:action="android.intent.action.VIEW" android:data="https://spdx.org/licenses/MIT-0.html" />
+        </Preference>
+        <Preference android:title="CDDL-1.1 and GPL Classpath Exception" android:summary="https://glassfish.org/public/CDDL+GPL.html">
+            <intent android:action="android.intent.action.VIEW" android:data="https://glassfish.org/public/CDDL+GPL.html" />
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

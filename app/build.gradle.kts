@@ -35,7 +35,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "7.0.3"
+        versionName = "8.0.0"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -57,8 +57,8 @@ android {
 
         named("release") {
             multiDexEnabled = false
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             setProguardFiles(listOf("proguard-project.txt"))
             enableUnitTestCoverage = false
             enableAndroidTestCoverage = false
@@ -101,12 +101,22 @@ android {
                 "\"480BED986E48910C5A028C60A207E85535AE00832AECDAEFA5C1BC2D68D80EEF\""
             )
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 145
+            versionCode = 147
         }
     }
     packaging {
+        jniLibs {
+            // Compress native libraries in the APK. Android extracts them at install time.
+            useLegacyPackaging = true
+        }
         resources {
-            excludes += listOf(".readme")
+            excludes += listOf(
+                ".readme",
+                "**/*.prof",
+                "**/*.profraw",
+                "**/*.so.dbg",
+                "**/symbols/**",
+            )
         }
     }
     lint {
@@ -144,6 +154,7 @@ dependencies {
     implementation("androidx.fragment:fragment:1.8.9")
     implementation("androidx.lifecycle:lifecycle-common:2.11.0")
     implementation("androidx.media3:media3-exoplayer:$media3")
+    implementation("androidx.media3:media3-exoplayer-hls:$media3")
     implementation("androidx.media3:media3-ui:$media3")
     implementation("androidx.palette:palette:1.0.0")
     implementation("androidx.preference:preference:1.2.1")

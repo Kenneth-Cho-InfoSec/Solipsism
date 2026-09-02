@@ -232,8 +232,16 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private val fileChooserLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
+        fileChooserInProgress = false
         presenter.onFileChooserResult(result)
     }
+
+    /**
+     * A WebView can temporarily place Binder or file-descriptor objects in its saved state while
+     * an upload picker owns the foreground. Persisting that transient state is both unnecessary
+     * and unsupported by [android.os.Parcel.marshall], so keep the last valid snapshot instead.
+     */
+    private var fileChooserInProgress = false
 
     private fun applySolipsismRailPreferences() {
         configureSearchRefreshOrUtilityButton()
@@ -1193,7 +1201,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun onPause() {
         stopContinuousRailHaptic()
         super.onPause()
-        presenter.onViewHidden()
+        presenter.onViewHidden(persistTabs = !fileChooserInProgress)
     }
 
     override fun onResume() {
@@ -1753,8 +1761,17 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun showFileChooser(intent: Intent) {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        fileChooserLauncher.launch(Intent.createChooser(intent, getString(R.string.title_file_chooser)))
+        fileChooserInProgress = true
+        runCatching {
+            fileChooserLauncher.launch(
+                Intent.createChooser(intent, getString(R.string.title_file_chooser))
+            )
+        }.onFailure {
+            fileChooserInProgress = false
+            presenter.onFileChooserResult(
+                androidx.activity.result.ActivityResult(RESULT_CANCELED, null)
+            )
+        }
     }
 
     /**
@@ -1812,6 +1829,11 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
      */
     override fun clearSearchFocus() {
         binding.search.clearFocus()
+    }
+
+    /** Opens the address overlay and transfers focus to its editor. */
+    override fun focusAddressBar() {
+        showAddressOverlay()
     }
 
     override fun launchQrScanner() {

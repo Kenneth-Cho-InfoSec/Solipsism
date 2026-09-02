@@ -122,6 +122,7 @@ class BrowserPresenter @Inject constructor(
     private var appliedUserAgentSettings = currentUserAgentSettings()
     private var appliedContentBlockingSettings = currentContentBlockingSettings()
     private var appliedContentTheme = currentContentTheme()
+    private var pendingFileChooserTab: TabModel? = null
     var viewState: BrowserViewState = BrowserViewState(
         displayUrl = "",
         isRefresh = true,
@@ -206,11 +207,13 @@ class BrowserPresenter @Inject constructor(
     /**
      * Call when the view is hidden (i.e. the browser is sent to the background).
      */
-    fun onViewHidden() {
+    fun onViewHidden(persistTabs: Boolean = true) {
         viewIsResumed = false
         bookmarksNeedRefresh = true
         model.markAllNonEphemeral()
-        model.freeze()
+        if (persistTabs) {
+            model.freeze()
+        }
     }
 
     /**
@@ -392,7 +395,12 @@ class BrowserPresenter @Inject constructor(
 
         tabDisposable += tab.fileChooserRequests()
             .subscribeOn(mainScheduler)
-            .subscribeBy { view?.showFileChooser(it) }
+            .subscribeBy { intent ->
+                view?.let { browserView ->
+                    pendingFileChooserTab = tab
+                    browserView.showFileChooser(intent)
+                }
+            }
 
         tabDisposable += tab.showCustomViewRequests()
             .subscribeOn(mainScheduler)
@@ -596,9 +604,9 @@ class BrowserPresenter @Inject constructor(
             KeyCombo.CTRL_W -> onTabClose(tabListState.indexOfCurrentTab())
             KeyCombo.CTRL_Q -> view?.showCloseBrowserDialog(tabListState.indexOfCurrentTab())
             KeyCombo.CTRL_R -> onRefreshOrStopClick()
-            KeyCombo.CTRL_TAB -> TODO()
-            KeyCombo.CTRL_SHIFT_TAB -> TODO()
-            KeyCombo.SEARCH -> TODO()
+            KeyCombo.CTRL_TAB -> cycleTab(forward = true)
+            KeyCombo.CTRL_SHIFT_TAB -> cycleTab(forward = false)
+            KeyCombo.SEARCH -> view?.focusAddressBar()
             KeyCombo.ALT_0 -> onTabClick(0.coerceAtMost(tabListState.size - 1))
             KeyCombo.ALT_1 -> onTabClick(1.coerceAtMost(tabListState.size - 1))
             KeyCombo.ALT_2 -> onTabClick(2.coerceAtMost(tabListState.size - 1))
@@ -618,6 +626,13 @@ class BrowserPresenter @Inject constructor(
     fun onTabClick(index: Int) {
         hapticFeedback.tap(HapticFeedbackController.Category.TABS)
         selectTab(model.selectTab(tabListState[index].id))
+    }
+
+    private fun cycleTab(forward: Boolean) {
+        if (tabListState.isEmpty()) return
+        val current = tabListState.indexOfCurrentTab().takeIf { it >= 0 } ?: 0
+        val offset = if (forward) 1 else -1
+        onTabClick((current + offset).floorMod(tabListState.size))
     }
 
     fun currentUrlForEditing(): String =
@@ -1425,7 +1440,7 @@ class BrowserPresenter @Inject constructor(
     ) {
         when (option) {
             BrowserContract.DownloadOptionEvent.DELETE ->
-                compositeDisposable += downloadsRepository.deleteAllDownloads()
+                compositeDisposable += downloadsRepository.deleteDownload(download.url)
                     .subscribeOn(databaseScheduler)
                     .observeOn(mainScheduler)
                     .subscribeBy {
@@ -1435,7 +1450,7 @@ class BrowserPresenter @Inject constructor(
                     }
 
             BrowserContract.DownloadOptionEvent.DELETE_ALL ->
-                compositeDisposable += downloadsRepository.deleteDownload(download.url)
+                compositeDisposable += downloadsRepository.deleteAllDownloads()
                     .subscribeOn(databaseScheduler)
                     .observeOn(mainScheduler)
                     .subscribeBy {
@@ -1731,7 +1746,9 @@ class BrowserPresenter @Inject constructor(
      * Call when the user has selected a file from the file chooser to upload.
      */
     fun onFileChooserResult(activityResult: ActivityResult) {
-        currentTab?.handleFileChooserResult(activityResult)
+        val requestOwner = pendingFileChooserTab ?: currentTab
+        pendingFileChooserTab = null
+        requestOwner?.handleFileChooserResult(activityResult)
     }
 
     /**

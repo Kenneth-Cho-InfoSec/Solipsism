@@ -1,24 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--suppress AndroidElementNotAllowed -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
     <PreferenceCategory android:title="@string/settings_about">
-        <Preference
-            android:icon="@drawable/ic_settings_globe"
-            android:summary="@string/url_twitter"
-            android:title="@string/action_follow_me">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://ko-fi.com/kennethchoinfosec">
-                <extra
-                    android:name="SOURCE"
-                    android:value="SELF" />
-            </intent>
-        </Preference>
-        <Preference
-            android:icon="@drawable/ic_settings_info"
-            android:key="pref_version"
-            android:title="@string/version" />
+        <com.krystelligence.solipsism.settings.preference.AboutHeaderPreference
+            android:key="about_header" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_updates">
         <SwitchPreferenceCompat
             android:defaultValue="true"
             android:icon="@drawable/ic_history"
@@ -31,87 +17,5 @@
             android:key="update_notifications_enabled"
             android:title="@string/update_notifications_enabled"
             android:summary="@string/update_notifications_enabled_summary" />
-        <Preference
-            android:icon="@drawable/ic_settings_info"
-            android:selectable="false"
-            android:summary="@string/developer_name"
-            android:title="@string/developer" />
-    </PreferenceCategory>
-    <PreferenceCategory android:title="@string/licenses">
-        <Preference
-            android:icon="@drawable/ic_settings_info"
-            android:summary="@string/mpl_license"
-            android:title="@string/app_name">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="http://www.mozilla.org/MPL/2.0/">
-                <extra
-                    android:name="SOURCE"
-                    android:value="SELF" />
-            </intent>
-        </Preference>
-        <Preference
-            android:icon="@drawable/ic_settings_info"
-            android:summary="@string/apache"
-            android:title="@string/android_open_source_project">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://source.android.com/docs/setup/about/licenses">
-                <extra
-                    android:name="SOURCE"
-                    android:value="SELF" />
-            </intent>
-        </Preference>
-        <Preference
-            android:icon="@drawable/ic_settings_info"
-            android:summary="@string/hphosts_attribution"
-            android:title="@string/hphosts_ad_server_list">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/app/src/main/assets/hosts.txt">
-                <extra
-                    android:name="SOURCE"
-                    android:value="SELF" />
-            </intent>
-        </Preference>
-        <Preference
-            android:icon="@drawable/ic_settings_info"
-            android:summary="@string/jsoup_license_version"
-            android:title="@string/jsoup">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://jsoup.org/license">
-                <extra
-                    android:name="SOURCE"
-                    android:value="SELF" />
-            </intent>
-        </Preference>
-        <Preference android:icon="@drawable/ic_settings_info" android:title="AndroidX libraries" android:summary="Activity 1.13.0; Annotation 1.10.0; AppCompat 1.7.1; ConstraintLayout 2.2.1; CoordinatorLayout 1.3.0; Core 1.18.0; DataStore 1.2.1; DrawerLayout 1.2.0; Fragment 1.8.9; Lifecycle 2.10.0; Palette 1.0.0; Preference 1.2.1; RecyclerView 1.4.0; WebKit 1.16.0 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="CameraX" android:summary="1.6.0 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="Material Components" android:summary="1.14.0-beta01 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="Dagger" android:summary="2.59.2 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="Guava" android:summary="32.0.1-android • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="Mezzanine" android:summary="2.3.0 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="ZXing core" android:summary="3.5.3 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="PermissionX" android:summary="1.8.1 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="OkHttp" android:summary="5.3.2 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="Okio" android:summary="3.17.0 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="Coil" android:summary="3.4.0 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="RxJava / RxAndroid / RxKotlin" android:summary="3.1.12 / 3.0.2 / 3.0.1 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="Kotlin standard library" android:summary="2.3.21 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="Kotlin Coroutines" android:summary="1.10.2 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="JSpecify" android:summary="1.0.0 • Apache-2.0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="Reactive Streams" android:summary="1.0.4 • MIT-0" android:selectable="false" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="javax.inject" android:summary="1 • Apache-2.0" android:selectable="false" />
-        <Preference android:title="Licence texts and source" android:summary="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE" android:selectable="false" />
-        <Preference android:title="Apache License 2.0 text" android:summary="https://www.apache.org/licenses/LICENSE-2.0">
-            <intent android:action="android.intent.action.VIEW" android:data="https://www.apache.org/licenses/LICENSE-2.0" />
-        </Preference>
-        <Preference android:title="MIT License text" android:summary="https://opensource.org/license/mit">
-            <intent android:action="android.intent.action.VIEW" android:data="https://opensource.org/license/mit" />
-        </Preference>
-        <Preference android:title="MIT-0 License text" android:summary="https://spdx.org/licenses/MIT-0.html">
-            <intent android:action="android.intent.action.VIEW" android:data="https://spdx.org/licenses/MIT-0.html" />
-        </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

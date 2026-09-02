@@ -9,6 +9,7 @@ import android.view.View
 import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.core.view.children
+import org.servo.servoview.ServoView
 import kotlin.math.max
 import kotlin.math.min
 import java.util.Locale
@@ -27,6 +28,8 @@ class TabPager @Inject constructor(
 ) {
 
     private val tabViews: MutableMap<Int, Lazy<View>> = mutableMapOf()
+    /** Servo owns one process-wide renderer and must keep one host surface attached. */
+    private var persistentAntaresHost: TabContentHost? = null
     private var transitionCurrentId: Int? = null
     private var transitionTargetId: Int? = null
 
@@ -36,8 +39,19 @@ class TabPager @Inject constructor(
      * Select the tab with the provided [id] to be displayed by the pager.
      */
     fun selectTab(id: Int) {
+        val selected = tabViews[id]!!.value
+        val selectedHost = selected as? TabContentHost
+        if (selectedHost?.isAntaresHost() == true) {
+            if (selectedHost.isShowingNativeHomepage()) {
+                selectAntaresHomepage(selectedHost)
+                return
+            }
+            selectAntaresTab(id, selectedHost)
+            return
+        }
+        persistentAntaresHost = null
         container.removeTabViews(excludeId = id)
-        val tabView = tabViews[id]!!.value
+        val tabView = selected
         if (tabView.parent != container) {
             container.addView(
                 tabView,
@@ -146,6 +160,7 @@ class TabPager @Inject constructor(
 
     fun removeTab(id: Int) {
         tabViews.remove(id)?.takeIf { it.isInitialized() }?.value?.let { view ->
+            if (view === persistentAntaresHost) persistentAntaresHost = null
             container.removeView(view)
             (view as? TabContentHost)?.dispose()
         }
@@ -153,6 +168,7 @@ class TabPager @Inject constructor(
 
     fun replaceTabs(replacements: Map<Int, Lazy<View>>) {
         resetTransitionViews()
+        persistentAntaresHost = null
         tabViews.values
             .filter(Lazy<View>::isInitialized)
             .map(Lazy<View>::value)
@@ -208,7 +224,13 @@ class TabPager @Inject constructor(
         val excludedView = tabViews[excludeId]?.takeIf { it.isInitialized() }?.value
         children
             .filter { it !== excludedView }
-            .forEach(container::removeView)
+            .forEach { view ->
+                // SurfaceView-backed engines own a compositor surface outside the normal view
+                // hierarchy. Hide it before removal so the previous tab cannot remain visually
+                // stuck above the newly selected shared renderer surface.
+                (view as? TabContentHost)?.currentEngineView()?.visibility = View.INVISIBLE
+                container.removeView(view)
+            }
     }
 
     private fun configureEngineView(id: Int, view: View) {
@@ -218,6 +240,59 @@ class TabPager @Inject constructor(
             longPressListener?.invoke(id, it)
         })
     }
+
+    private fun selectAntaresTab(id: Int, selectedHost: TabContentHost) {
+        val persistent = persistentAntaresHost ?: selectedHost.also {
+            persistentAntaresHost = it
+        }
+        // Keep the original TabContentHost and its SurfaceView attached. Removing it causes
+        // Servo's browsing context to close; the selected logical tab is routed through the
+        // shared renderer by AntaresSessionView.activateForTab().
+        container.children
+            .filter { it !== persistent }
+            .forEach(container::removeView)
+        if (persistent.parent !== container) {
+            container.addView(
+                persistent,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+        }
+        persistent.currentEngineView()?.let { configureEngineView(id, it) }
+    }
+
+    /**
+     * Displays Antares' native new-tab page without tearing down the one process-wide renderer.
+     * The opaque native host sits above the persistent SurfaceView. Selecting an engine tab later
+     * removes this overlay and immediately reveals the same live renderer surface.
+     */
+    private fun selectAntaresHomepage(selectedHost: TabContentHost) {
+        val persistent = persistentAntaresHost
+        container.children
+            .filter { it !== persistent && it !== selectedHost }
+            .forEach(container::removeView)
+        if (persistent != null && persistent.parent !== container) {
+            container.addView(
+                persistent,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+        }
+        if (selectedHost.parent !== container) {
+            container.addView(
+                selectedHost,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+        }
+        selectedHost.bringToFront()
+    }
+
+    private fun TabContentHost.isAntaresHost(): Boolean =
+        currentEngineView()?.let { view ->
+            view === this || view is ServoView ||
+                (view is ViewGroup && view.children.any { child -> child is ServoView })
+        } == true
 
     private fun ensureInContainer(tabView: View) {
         if (tabView.parent != container) {

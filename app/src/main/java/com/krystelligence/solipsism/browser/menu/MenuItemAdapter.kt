@@ -14,7 +14,7 @@ class MenuItemAdapter @Inject constructor() {
      */
     fun adaptMenuItem(menuItem: MenuItem): MenuSelection? {
         return when (menuItem.itemId) {
-            android.R.id.home -> TODO()
+            android.R.id.home -> MenuSelection.BACK
             R.id.action_back -> MenuSelection.BACK
             R.id.action_forward -> MenuSelection.FORWARD
             R.id.action_add_to_homescreen -> MenuSelection.ADD_TO_HOME

@@ -29,21 +29,37 @@ object FileUtils {
         Completable.fromAction {
             val outputFile = File(app.filesDir, name)
             val temporaryFile = File(app.filesDir, "$name.tmp")
+            val parcel = Parcel.obtain()
+            val serialized = try {
+                parcel.writeBundle(bundle)
+                if (parcel.hasFileDescriptors()) {
+                    Log.w(TAG, "Skipping bundle snapshot containing file descriptors")
+                    null
+                } else {
+                    parcel.marshall()
+                }
+            } catch (error: RuntimeException) {
+                // WebView state may temporarily contain Binder objects or file descriptors, for
+                // example while a system file chooser is open. A failed snapshot must never take
+                // down the browser; the previous valid snapshot remains available instead.
+                Log.w(TAG, "Skipping bundle snapshot that cannot be serialized", error)
+                null
+            } finally {
+                parcel.recycle()
+            } ?: return@fromAction
+
             var outputStream: FileOutputStream? = null
             try {
                 outputStream = FileOutputStream(temporaryFile)
-                val parcel = Parcel.obtain()
-                parcel.writeBundle(bundle)
-                outputStream.write(parcel.marshall())
+                outputStream.write(serialized)
                 outputStream.flush()
-                parcel.recycle()
                 outputStream.close()
                 outputStream = null
                 if (!temporaryFile.renameTo(outputFile)) {
                     throw IOException("Unable to replace bundle snapshot")
                 }
             } catch (e: IOException) {
-                Log.e(TAG, "Unable to write bundle to storage")
+                Log.e(TAG, "Unable to write bundle to storage", e)
             } finally {
                 Utils.close(outputStream)
                 if (temporaryFile.exists()) temporaryFile.delete()
@@ -69,9 +85,10 @@ object FileUtils {
     fun readBundleFromStorage(app: Application, name: String): Bundle? {
         val inputFile = File(app.filesDir, name)
         var inputStream: FileInputStream? = null
+        var parcel: Parcel? = null
         try {
             inputStream = FileInputStream(inputFile)
-            val parcel = Parcel.obtain()
+            parcel = Parcel.obtain()
             val data = ByteArray(inputStream.channel.size().toInt())
 
             inputStream.read(data, 0, data.size)
@@ -79,13 +96,15 @@ object FileUtils {
             parcel.setDataPosition(0)
             val out = parcel.readBundle(ClassLoader.getSystemClassLoader())
             out?.putAll(out)
-            parcel.recycle()
             return out
         } catch (_: FileNotFoundException) {
             Log.e(TAG, "Unable to read bundle from storage")
         } catch (e: IOException) {
             Log.e(TAG, "Unable to read bundle from storage", e)
+        } catch (e: RuntimeException) {
+            Log.e(TAG, "Unable to deserialize bundle from storage", e)
         } finally {
+            parcel?.recycle()
             Utils.close(inputStream)
         }
         return null

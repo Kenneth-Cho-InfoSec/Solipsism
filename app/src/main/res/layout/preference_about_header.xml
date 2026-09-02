@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/material_grid_margin"
+    android:layout_marginEnd="@dimen/material_grid_margin"
+    android:layout_marginBottom="@dimen/material_grid_margin"
+    android:orientation="horizontal"
+    android:paddingBottom="0dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="190dp"
+        android:layout_marginEnd="6dp"
+        android:layout_weight="1"
+        android:background="@drawable/preference_group_item_background_single"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/solipsism_about_logo" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/version"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+        <TextView
+            android:id="@+id/about_version_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="190dp"
+        android:layout_marginStart="6dp"
+        android:layout_weight="1"
+        android:background="@drawable/preference_group_item_background_single"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:contentDescription="@string/developer"
+            android:src="@drawable/kenneth_logo" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/developer"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+        <TextView
+            android:id="@+id/about_developer_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+    </LinearLayout>
+</LinearLayout>

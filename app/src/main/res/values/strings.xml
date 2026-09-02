@@ -357,7 +357,15 @@
     <string name="cookie_manager_url_prompt">Enter an HTTP or HTTPS URL whose visible cookies you want to manage.</string>
     <string name="cookie_manager_invalid_url">Enter a valid HTTP or HTTPS URL.</string>
     <string name="settings_about">About</string>
+    <string name="settings_updates">Updates</string>
     <string name="settings_about_explain">Details about version, author and license.</string>
+    <string name="settings_browsing_summary">Language, scripts, colours, user agent, compatibility, and search behaviour.</string>
+    <string name="settings_homepage_summary">Homepage source, layout, wallpaper, and date and time display.</string>
+    <string name="settings_downloads_summary">Download location, image conversion, and external download managers.</string>
+    <string name="settings_navigation_summary">Navigation rail position and one-handed browsing controls.</string>
+    <string name="settings_fullscreen_summary">Fullscreen behaviour, status bar, and rail visibility.</string>
+    <string name="settings_rail_summary">Rail utility action and Rail &amp; Menu Studio customisation.</string>
+    <string name="settings_licenses_summary">Third-party components, versions, licences, and source links.</string>
     <string name="release_notes_enabled">Show release notes after updates</string>
     <string name="release_notes_enabled_summary">Show the notes for the version you have just installed.</string>
     <string name="update_notifications_enabled">Notify me about newer versions</string>
@@ -688,7 +696,7 @@
     <string name="browser_core_antares_description">Experimental in-house core\nMaximum de-Googling</string>
     <string name="browser_core_webview">Android WebView</string>
     <string name="browser_core_webview_description">Stable and recommended</string>
-    <string name="browser_core_privacy_note">Antares is downloaded separately from GitHub and runs in a separate app process. It remains experimental, and some Solipsism features are still being implemented for it.</string>
+    <string name="browser_core_privacy_note">Antares is bundled in this build and runs in-process. It remains experimental, and some Solipsism features are still being implemented for it.</string>
     <string name="browser_core_continue">Continue</string>
     <string name="browser_core_install_antares">Download Antares from GitHub</string>
     <string name="browser_core_antares_ready">Installed and trusted · %1$s</string>

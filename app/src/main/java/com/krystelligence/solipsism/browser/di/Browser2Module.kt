@@ -62,7 +62,7 @@ class Browser2Module {
         )
     }
 
-    // TODO: auto inject intent utils
+    // Construct the activity-scoped helper here so URL handling shares the browser activity.
     @Provides
     fun providesIntentUtils(activity: Activity): IntentUtils = IntentUtils(activity)
 

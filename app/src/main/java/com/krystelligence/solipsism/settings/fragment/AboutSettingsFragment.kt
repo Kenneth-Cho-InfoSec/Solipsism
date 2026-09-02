@@ -3,7 +3,6 @@
  */
 package com.krystelligence.solipsism.settings.fragment
 
-import com.krystelligence.solipsism.BuildConfig
 import com.krystelligence.solipsism.R
 import android.os.Bundle
 import com.krystelligence.solipsism.browser.di.injector
@@ -19,11 +18,6 @@ class AboutSettingsFragment : AbstractSettingsFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
         injector.inject(this)
-        clickablePreference(
-            preference = SETTINGS_VERSION,
-            summary = BuildConfig.VERSION_NAME,
-            onClick = { }
-        )
         togglePreference(
             preference = RELEASE_NOTES_ENABLED,
             isChecked = userPreferences.releaseNotesEnabled,
@@ -37,7 +31,6 @@ class AboutSettingsFragment : AbstractSettingsFragment() {
     }
 
     companion object {
-        private const val SETTINGS_VERSION = "pref_version"
         private const val RELEASE_NOTES_ENABLED = "release_notes_enabled"
         private const val UPDATE_NOTIFICATIONS_ENABLED = "update_notifications_enabled"
     }

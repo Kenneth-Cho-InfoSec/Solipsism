@@ -3,6 +3,7 @@ package com.krystelligence.solipsism.browser.engine
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +44,7 @@ internal class AntaresMediaPlayerView(
     private var player: ExoPlayer? = null
     private var generation = 0
     private var automaticRetriesRemaining = MAX_AUTOMATIC_RETRIES
+    private var directFallbackAttempted = false
     private var resumeWhenVisible = false
     private var playbackChromeHidden = false
     var onPlaybackActiveChanged: ((Boolean) -> Unit)? = null
@@ -140,7 +142,7 @@ internal class AntaresMediaPlayerView(
         resolveAndPlay()
     }
 
-    private fun resolveAndPlay() {
+    private fun resolveAndPlay(useRenewal: Boolean = true) {
         val currentGeneration = ++generation
         progress.visibility = View.VISIBLE
         errorPanel.visibility = View.GONE
@@ -150,7 +152,7 @@ internal class AntaresMediaPlayerView(
                     AntaresMediaSourceResolver.resolve(
                         request.pageUrl,
                         request.directSource,
-                        request.renewalRequest,
+                        request.renewalRequest.takeIf { useRenewal },
                         request.cookies,
                     )
                 }
@@ -188,7 +190,11 @@ internal class AntaresMediaPlayerView(
                 updatePlaybackChrome(isPlaying)
             }
         })
-        newPlayer.setMediaItem(MediaItem.fromUri(source.url))
+        val mediaItem = MediaItem.Builder()
+            .setUri(source.url)
+            .apply { source.mimeType?.let(::setMimeType) }
+            .build()
+        newPlayer.setMediaItem(mediaItem)
         newPlayer.prepare()
         newPlayer.playWhenReady = true
         postDelayed({
@@ -199,10 +205,18 @@ internal class AntaresMediaPlayerView(
     }
 
     private fun handleFailure(error: Throwable) {
+        Log.e(TAG, "Android media playback failed", error)
         updatePlaybackChrome(false)
         player?.release()
         player = null
         progress.visibility = View.GONE
+        if (!directFallbackAttempted && request.directSource != null && request.renewalRequest != null) {
+            directFallbackAttempted = true
+            errorPanel.visibility = View.GONE
+            progress.visibility = View.VISIBLE
+            resolveAndPlay(useRenewal = false)
+            return
+        }
         if (request.renewalRequest != null && automaticRetriesRemaining > 0) {
             automaticRetriesRemaining -= 1
             errorPanel.visibility = View.GONE
@@ -258,6 +272,7 @@ internal class AntaresMediaPlayerView(
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     private companion object {
+        const val TAG = "AntaresMediaPlayer"
         const val PREPARE_TIMEOUT_MS = 20_000L
         const val CHROME_FADE_DURATION_MS = 240L
         const val AUTOMATIC_RETRY_DELAY_MS = 350L
