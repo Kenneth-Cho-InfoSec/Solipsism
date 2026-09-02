@@ -14,20 +14,22 @@
 
 Solipsism Browser is a privacy-focused Android WebView browser built around a rail-first, one-handed interface. Navigation, tabs, search, QR scanning, refresh, bookmarks, and browser tools live in a compact rail on the left or right, leaving the webpage as the main surface.
 
-Latest release: [**Solipsism Browser v6.1.0**](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest)<br>
+Latest release: [**Solipsism Browser v8.0.0**](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest)<br>
 Application ID: `com.krystelligence.solipsism`<br>
 Developer: **Kenneth-Cho-InfoSec**
 
 ## Optional Antares browser core
 
-Solipsism 7.0.0 can use **Antares**, an experimental in-house Servo-derived browser core. Antares
-is distributed as a separate Android package because its native engine is substantially larger
-than Android WebView. Android WebView remains installed as the stable fallback.
+Solipsism 8.0.0 provides a unified browser experience with Android WebView as its stable core and
+**Antares 0.2.0** as an experimental in-house Servo-derived core. The Solipsism source tree contains
+the host integration, protocol, and native JNI support, while Antares is also published as a separate
+signed ARM64 companion package so the engine can be updated and tested independently. Android WebView
+remains the stable fallback.
 
 To enable Antares:
 
 1. Install the signed Solipsism APK from the [Solipsism releases](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases).
-2. Download and install the matching arm64 **Antares Engine** APK from the [Antares releases](https://github.com/Kenneth-Cho-InfoSec/Antares/releases). Both packages must be installed; Antares cannot be enabled by installing Solipsism alone.
+2. Download and install the matching ARM64 **Antares Engine** APK from the [Antares releases](https://github.com/Kenneth-Cho-InfoSec/Antares/releases). Both packages are required when selecting the companion core; Antares cannot be enabled by installing Solipsism alone.
 3. Open Solipsism and choose Antares in the browser-core chooser or Debug Settings. Solipsism verifies the companion package and its signing certificate before binding.
 4. If Antares is unavailable or a site is incompatible, select Android WebView to return to the stable core.
 
@@ -38,7 +40,7 @@ tabs. Do not install Antares APKs from unofficial sources.
 [![Latest release](https://img.shields.io/github/v/release/Kenneth-Cho-InfoSec/Solipsism?label=latest%20release)](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest)
 [![F-Droid submission](https://img.shields.io/badge/F--Droid-submission-blue)](https://gitlab.com/Kenneth-Cho-InfoSec/fdroiddata/-/merge_requests/5)
 
-Solipsism is loosely based on the open-source [Lightning Browser](https://github.com/anthonycr/Lightning-Browser). It should be understood as a continuation fork: the original project provided an early foundation, while Solipsism has been extensively modernised, secured, redesigned, and customised for current Android WebView, privacy, accessibility, and one-handed browsing needs.
+Solipsism is loosely based on the open-source [Lightning Browser](https://github.com/anthonycr/Lightning-Browser). It is a continuation fork: the original project provided an early foundation, while Solipsism has been extensively modernised, secured, redesigned, and customised for current Android WebView, privacy, accessibility, one-handed browsing, and optional Antares rendering.
 
 ## Why Solipsism?
 
