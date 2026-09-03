@@ -27,7 +27,6 @@ internal class JNIServo {
         size: Size,
         density: Float,
         logStr: String?,
-        enableLogs: Boolean,
         experimentalMode: Boolean,
         userAgent: String,
         darkTheme: Boolean,

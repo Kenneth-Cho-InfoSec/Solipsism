@@ -46,6 +46,7 @@ class TabContentHost private constructor(
         homepageView?.dispose()
         removeAllViews()
         homepageView = null
+        engineAttachedListener = null
     }
 
     private fun render(kind: TabContentKind) {

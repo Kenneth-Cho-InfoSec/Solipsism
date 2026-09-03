@@ -56,8 +56,11 @@ class TabsRepository @Inject constructor(
         }
         val tab = tabsList.forId(id)
         recentTabModel.addClosedTab(tab.freeze())
-        tab.destroy()
+        // Detach the tab view before destroying it. WebView.destroy() must run after the
+        // view leaves its parent, otherwise the native surface and compositor resources leak
+        // and tab memory is retained after close.
         tabPager.removeTab(id)
+        tab.destroy()
         tabsList = tabsList - tab
     }.doOnComplete {
         tabsListObservable.onNext(tabsList)

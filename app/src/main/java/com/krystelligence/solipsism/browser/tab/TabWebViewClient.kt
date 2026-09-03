@@ -91,6 +91,8 @@ class TabWebViewClient @AssistedInject constructor(
      */
     val finishedObservable = PublishSubject.create<Unit>()
 
+    private var consecutiveRendererDeaths = 0
+
     /**
      * The current SSL state of the page.
      */
@@ -128,11 +130,23 @@ class TabWebViewClient @AssistedInject constructor(
 
     override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
         logger.log(TAG, "WebView renderer exited: didCrash=${detail.didCrash()}")
+        // The WebView is left with a dead renderer and will stay frozen on a stale (or black)
+        // surface unless reloaded. Recover by reloading, which spawns a fresh renderer and
+        // repaints. Bound rapid retries so a poison page cannot loop crash-reload forever.
+        // The existing onPageStarted/onPageFinished callbacks keep loading UI consistent.
+        consecutiveRendererDeaths++
+        if (consecutiveRendererDeaths <= MAX_RENDERER_RECOVERY_ATTEMPTS) {
+            view.post { view.reload() }
+        } else {
+            logger.log(TAG, "Renderer died repeatedly; giving up automatic recovery")
+        }
         return true
     }
 
     override fun onPageFinished(view: WebView, url: String) {
         super.onPageFinished(view, url)
+        // A clean load resets the renderer-death backoff.
+        consecutiveRendererDeaths = 0
         ViewportZoomOverride.applyIfEnabled(view, userPreferences.allowZoomOnRestrictedPages)
         userScriptRuntime.injectAfterPageFinished(view, url)
         cosmeticFilterRuntime.injectAfterPageFinished(view, url)
@@ -294,6 +308,8 @@ class TabWebViewClient @AssistedInject constructor(
 
     companion object {
         private const val TAG = "TabWebViewClient"
+        /** Max automatic reloads after rapid renderer deaths before giving up. */
+        private const val MAX_RENDERER_RECOVERY_ATTEMPTS = 3
 
         private val emptyResponseByteArray: ByteArray = byteArrayOf()
 

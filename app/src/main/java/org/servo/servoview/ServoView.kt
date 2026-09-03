@@ -302,7 +302,6 @@ open class ServoView : SurfaceView, Servo.RunCallback, Choreographer.FrameCallba
                     size,
                     servoView.resources.displayMetrics.density,
                     servoLog,
-                    true,
                     servoView.experimentalMode,
                     servoView.userAgent,
                     servoView.darkTheme,

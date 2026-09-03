@@ -20,7 +20,17 @@ class RecentTabModel @Inject constructor() {
 
     /**
      * Add the [savedBundle] to the queue. The next call to [lastClosed] will return this [Bundle].
+     * Capped so long sessions cannot accumulate unbounded closed-tab state.
      */
-    fun addClosedTab(savedBundle: Bundle) = bundleStack.add(savedBundle)
+    fun addClosedTab(savedBundle: Bundle) {
+        bundleStack.add(savedBundle)
+        while (bundleStack.size > MAX_CLOSED_TABS) {
+            bundleStack.removeAt(0)
+        }
+    }
+
+    private companion object {
+        private const val MAX_CLOSED_TABS = 10
+    }
 
 }
