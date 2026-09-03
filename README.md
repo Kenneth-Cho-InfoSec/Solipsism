@@ -21,7 +21,7 @@ Developer: **Kenneth-Cho-InfoSec**
 ## Optional Antares browser core
 
 Solipsism 8.0.0 provides a unified browser experience with Android WebView as its stable core and
-**Antares 0.2.0** as an experimental in-house Servo-derived core. The Solipsism source tree contains
+**Antares 0.2.1** as an experimental in-house Servo-derived core. The Solipsism source tree contains
 the host integration, protocol, and native JNI support, while Antares is also published as a separate
 signed ARM64 companion package so the engine can be updated and tested independently. Android WebView
 remains the stable fallback.

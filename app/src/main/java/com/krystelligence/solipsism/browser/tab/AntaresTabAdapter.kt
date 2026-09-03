@@ -5,9 +5,12 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Choreographer
 import android.view.MotionEvent
+import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
+import android.view.animation.DecelerateInterpolator
 import android.webkit.WebSettings
 import android.widget.FrameLayout
 import androidx.activity.result.ActivityResult
@@ -36,6 +39,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 /** Adapts one remote Antares session to Solipsism's existing engine-neutral tab contract. */
 class AntaresTabAdapter private constructor(
@@ -406,26 +410,52 @@ private class AntaresInputRouter(
     private var lastY = 0f
     private var scrolling = false
     private var multiTouch = false
+    // Distance the finger dragged (in scroll-offset pixels). On lift, momentum continues for
+    // 2x-3x this distance depending on release speed, with deceleration.
+    private var dragDistanceX = 0f
+    private var dragDistanceY = 0f
+    private var velocityTracker: VelocityTracker? = null
+    private var flingTotalX = 0f
+    private var flingTotalY = 0f
+    private var flingAppliedX = 0
+    private var flingAppliedY = 0
+    private var flingStartNanos = 0L
+    private var flingDurationNanos = 1L
+    private var flingAnchorX = 0
+    private var flingAnchorY = 0
+    private var flingRunning = false
+    private val flingInterpolator = DecelerateInterpolator(2f)
+    private val flingFrameCallback = Choreographer.FrameCallback { onFlingFrame(it) }
 
     fun onTouch(event: MotionEvent): Boolean = when (event.actionMasked) {
         MotionEvent.ACTION_DOWN -> {
+            cancelFling()
             clear()
             downEvent = MotionEvent.obtain(event)
             lastX = event.x
             lastY = event.y
+            if (velocityTracker == null) {
+                velocityTracker = VelocityTracker.obtain()
+            } else {
+                velocityTracker?.clear()
+            }
+            velocityTracker?.addMovement(event)
             true
         }
 
         MotionEvent.ACTION_POINTER_DOWN -> {
+            cancelFling()
             beginMultiTouch(event)
             true
         }
 
         MotionEvent.ACTION_MOVE -> {
             if (multiTouch || event.pointerCount > 1) {
+                cancelFling()
                 beginMultiTouch(event)
                 sessionView.relayTouchEvent(event)
             } else {
+                velocityTracker?.addMovement(event)
                 scrollIfNeeded(event)
             }
             true
@@ -439,16 +469,29 @@ private class AntaresInputRouter(
         MotionEvent.ACTION_UP -> {
             when {
                 multiTouch -> sessionView.relayTouchEvent(event)
-                scrolling -> Unit
+                scrolling -> {
+                    velocityTracker?.addMovement(event)
+                    // Slow, deliberate drags (over 0.8s) stay exactly where lifted;
+                    // only quicker gestures earn momentum.
+                    val dragDurationMs = event.eventTime - (downEvent?.eventTime ?: event.eventTime)
+                    if (dragDurationMs <= MAX_DRAG_DURATION_FOR_MOMENTUM_MS) {
+                        startMomentumFling(event.x, event.y)
+                    }
+                }
                 else -> coordinateBridge?.verifyTap(event.x, event.y)
                     ?: sessionView.click(event.x, event.y)
             }
+            velocityTracker?.recycle()
+            velocityTracker = null
             clear()
             true
         }
 
         MotionEvent.ACTION_CANCEL -> {
+            cancelFling()
             if (multiTouch) sessionView.relayTouchEvent(event)
+            velocityTracker?.recycle()
+            velocityTracker = null
             clear()
             true
         }
@@ -469,18 +512,84 @@ private class AntaresInputRouter(
         val totalY = event.y - lastY
         if (!scrolling && totalX * totalX + totalY * totalY < touchSlop * touchSlop) return
         scrolling = true
+        val dx = (lastX - event.x).toInt()
+        val dy = (lastY - event.y).toInt()
+        dragDistanceX += dx
+        dragDistanceY += dy
         sessionView.scroll(
-            dx = (lastX - event.x).toInt(),
-            dy = (lastY - event.y).toInt(),
+            dx = dx,
+            dy = dy,
             x = event.x.toInt(),
             y = event.y.toInt(),
         )
         coordinateBridge?.scrollBy(
-            dx = (lastX - event.x).toInt(),
-            dy = (lastY - event.y).toInt(),
+            dx = dx,
+            dy = dy,
         )
         lastX = event.x
         lastY = event.y
+    }
+
+    /**
+     * Momentum: after the finger lifts, continue scrolling 2x-3x the dragged distance with
+     * deceleration until stopping. Faster releases glide farther (up to 3x); gentle releases
+     * glide 2x. Driven at display vsync so it stays smooth.
+     */
+    private fun startMomentumFling(x: Float, y: Float) {
+        cancelFling()
+        val tracker = velocityTracker
+        tracker?.computeCurrentVelocity(1000)
+        val speed = kotlin.math.hypot(
+            tracker?.xVelocity ?: 0f,
+            tracker?.yVelocity ?: 0f,
+        )
+        val viewConfig = ViewConfiguration.get(sessionView.context)
+        val minSpeed = viewConfig.scaledMinimumFlingVelocity.toFloat()
+        // Reaches 3x at fast flicks; gentle lifts stay near 2x.
+        val fastSpeed = (viewConfig.scaledMaximumFlingVelocity.toFloat() * 0.5f)
+            .coerceAtLeast(minSpeed * 4f)
+        val speedFraction = ((speed - minSpeed) / (fastSpeed - minSpeed)).coerceIn(0f, 1f)
+        val multiplier = MOMENTUM_MIN_MULTIPLIER +
+            speedFraction * (MOMENTUM_MAX_MULTIPLIER - MOMENTUM_MIN_MULTIPLIER)
+        flingTotalX = dragDistanceX * multiplier
+        flingTotalY = dragDistanceY * multiplier
+        val distance = kotlin.math.hypot(flingTotalX, flingTotalY)
+        if (distance < MIN_MOMENTUM_DISTANCE_PX) return
+        flingAnchorX = x.toInt()
+        flingAnchorY = y.toInt()
+        flingAppliedX = 0
+        flingAppliedY = 0
+        flingStartNanos = System.nanoTime()
+        // Longer drags get a longer glide; clamped so short flicks stay snappy.
+        val durationMs = (150L + (distance * 0.35f).toLong()).coerceIn(200L, 650L)
+        flingDurationNanos = durationMs * 1_000_000L
+        flingRunning = true
+        Choreographer.getInstance().postFrameCallback(flingFrameCallback)
+    }
+
+    private fun onFlingFrame(nowNanos: Long) {
+        if (!flingRunning) return
+        val t = ((nowNanos - flingStartNanos).toFloat() / flingDurationNanos).coerceIn(0f, 1f)
+        val targetX = (flingTotalX * flingInterpolator.getInterpolation(t)).roundToInt()
+        val targetY = (flingTotalY * flingInterpolator.getInterpolation(t)).roundToInt()
+        val dx = targetX - flingAppliedX
+        val dy = targetY - flingAppliedY
+        flingAppliedX = targetX
+        flingAppliedY = targetY
+        if (dx != 0 || dy != 0) {
+            sessionView.scroll(dx, dy, flingAnchorX, flingAnchorY)
+            coordinateBridge?.scrollBy(dx, dy)
+        }
+        if (t >= 1f) {
+            flingRunning = false
+            return
+        }
+        Choreographer.getInstance().postFrameCallback(flingFrameCallback)
+    }
+
+    private fun cancelFling() {
+        flingRunning = false
+        Choreographer.getInstance().removeFrameCallback(flingFrameCallback)
     }
 
     private fun clear() {
@@ -488,6 +597,19 @@ private class AntaresInputRouter(
         downEvent = null
         scrolling = false
         multiTouch = false
+        dragDistanceX = 0f
+        dragDistanceY = 0f
+    }
+
+    private companion object {
+        /** Gentle lifts glide 2x the finger-dragged distance. */
+        private const val MOMENTUM_MIN_MULTIPLIER = 2f
+        /** Fast flicks glide up to 3x the finger-dragged distance. */
+        private const val MOMENTUM_MAX_MULTIPLIER = 3f
+        /** Ignore tiny drags so taps and micro-adjustments never fling. */
+        private const val MIN_MOMENTUM_DISTANCE_PX = 24f
+        /** Drags lasting longer than this earn no momentum; content stays where lifted. */
+        private const val MAX_DRAG_DURATION_FOR_MOMENTUM_MS = 800L
     }
 }
 

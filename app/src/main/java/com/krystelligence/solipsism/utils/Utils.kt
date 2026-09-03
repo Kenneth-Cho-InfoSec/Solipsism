@@ -20,8 +20,8 @@ import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import androidx.core.graphics.drawable.IconCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.krystelligence.solipsism.DefaultBrowserActivity
 import com.krystelligence.solipsism.R
+import com.krystelligence.solipsism.browser.engine.BrowserCoreChooserActivity
 import com.krystelligence.solipsism.constant.HTTPS
 import com.krystelligence.solipsism.database.HistoryEntry
 import com.krystelligence.solipsism.dialog.BrowserDialog
@@ -213,7 +213,9 @@ object Utils {
     ) {
         val shortcutIntent = Intent(Intent.ACTION_VIEW).apply {
             data = url.toUri()
-            setClass(activity, DefaultBrowserActivity::class.java)
+            // The pinned shortcut must target the MAIN/LAUNCHER activity, otherwise
+            // ShortcutManager throws IllegalStateException on requestPinShortcut.
+            setClass(activity, BrowserCoreChooserActivity::class.java)
             addCategory(Intent.CATEGORY_BROWSABLE)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
@@ -240,7 +242,7 @@ object Utils {
                 activity,
                 "browser-shortcut-${url.hashCode()}"
             )
-                .setActivity(ComponentName(activity, DefaultBrowserActivity::class.java))
+                .setActivity(ComponentName(activity, BrowserCoreChooserActivity::class.java))
                 .setIntent(shortcutIntent)
                 .setIcon(IconCompat.createWithBitmap(favicon))
                 .setShortLabel(title.take(MAX_SHORTCUT_LABEL_LENGTH).ifBlank {
@@ -249,13 +251,30 @@ object Utils {
                 .setLongLabel(title)
                 .build()
 
-            if (ShortcutManagerCompat.requestPinShortcut(activity, pinShortcutInfo, null)) {
+            if (tryRequestPinShortcut(activity, pinShortcutInfo)) {
                 activity.snackbar(R.string.message_added_to_homescreen)
             } else {
                 activity.snackbar(R.string.shortcut_message_failed_to_add)
             }
         } else {
             activity.snackbar(R.string.shortcut_message_failed_to_add)
+        }
+    }
+
+    /**
+     * Requests that the launcher pin a shortcut, degrading gracefully if the system rejects it
+     * (for example when the active user or profile does not allow pinned shortcuts) instead of
+     * throwing and crashing the application.
+     */
+    private fun tryRequestPinShortcut(
+        activity: Activity,
+        shortcut: ShortcutInfoCompat,
+    ): Boolean {
+        return try {
+            ShortcutManagerCompat.requestPinShortcut(activity, shortcut, null)
+        } catch (throwable: Throwable) {
+            Log.w(TAG, "Unable to pin shortcut", throwable)
+            false
         }
     }
 

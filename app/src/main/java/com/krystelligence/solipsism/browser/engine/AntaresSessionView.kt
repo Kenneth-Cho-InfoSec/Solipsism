@@ -3,7 +3,13 @@ package com.krystelligence.solipsism.browser.engine
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.MotionEvent
+import android.view.inputmethod.BaseInputConnection
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.getSystemService
 import org.servo.servoview.Servo
 import org.servo.servoview.ServoView
 
@@ -83,9 +89,31 @@ class AntaresSessionView(
     override fun onHistoryChanged(canGoBack: Boolean, canGoForward: Boolean) =
         listener.onHistoryChanged(canGoBack, canGoForward)
 
-    override fun onImeShow() = Unit
+    override fun onImeShow() {
+        // The engine reports that a page text field gained focus. This view owns the input
+        // method (see setHostManagedInputMethod), so explicitly request focus and raise the
+        // soft keyboard. Previously these callbacks were no-ops, which left page inputs
+        // unfocusable with no keyboard on DuckDuckGo, Gemini and similar sites.
+        if (!isFocused) requestFocus()
+        context.getSystemService<InputMethodManager>()
+            ?.showSoftInput(this, 0)
+    }
 
-    override fun onImeHide() = Unit
+    override fun onImeHide() {
+        context.getSystemService<InputMethodManager>()
+            ?.hideSoftInputFromWindow(windowToken, 0)
+    }
+
+    override fun onCheckIsTextEditor(): Boolean = true
+
+    override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection =
+        AntaresInputConnection(this, true).apply {
+            outAttrs.actionLabel = null
+            outAttrs.inputType = EditorInfo.TYPE_CLASS_TEXT or
+                EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+            outAttrs.imeOptions = EditorInfo.IME_ACTION_DONE or
+                EditorInfo.IME_FLAG_NO_FULLSCREEN
+        }
 
     override fun onMediaSessionMetadata(title: String, artist: String, album: String) = Unit
 
@@ -157,5 +185,53 @@ class AntaresSessionView(
         private const val CSS_BRIDGE_INSTALL_DELAY_MS = 600L
         @Volatile
         private var rendererReady = false
+    }
+}
+
+/**
+ * Forwards Android soft-keyboard edits to the embedded Antares renderer. The engine exposes a
+ * deliberately narrow text protocol ([ServoView.commitText] for insertions plus raw key events),
+ * so composing text is committed directly and deletions are delivered as backspace keys.
+ */
+private class AntaresInputConnection(
+    private val sessionView: AntaresSessionView,
+    fullEditor: Boolean,
+) : BaseInputConnection(sessionView, fullEditor) {
+
+    override fun commitText(text: CharSequence, newCursorPosition: Int): Boolean {
+        if (text.isNotEmpty()) sessionView.commitText(text.toString())
+        return true
+    }
+
+    override fun setComposingText(text: CharSequence, newCursorPosition: Int): Boolean =
+        commitText(text, newCursorPosition)
+
+    override fun finishComposingText(): Boolean = true
+
+    override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
+        repeat(beforeLength.coerceAtLeast(0)) {
+            sessionView.sendKey(KeyEvent.KEYCODE_DEL)
+        }
+        return true
+    }
+
+    override fun sendKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN) {
+            sessionView.sendKey(event.keyCode)
+        }
+        return true
+    }
+
+    override fun performEditorAction(editorAction: Int): Boolean {
+        if (editorAction == EditorInfo.IME_ACTION_DONE ||
+            editorAction == EditorInfo.IME_ACTION_GO ||
+            editorAction == EditorInfo.IME_ACTION_SEARCH ||
+            editorAction == EditorInfo.IME_ACTION_SEND
+        ) {
+            sessionView.context.getSystemService<InputMethodManager>()
+                ?.hideSoftInputFromWindow(sessionView.windowToken, 0)
+            return true
+        }
+        return super.performEditorAction(editorAction)
     }
 }
