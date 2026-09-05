@@ -668,13 +668,15 @@ class TabAdapter @AssistedInject constructor(
     override var isForeground: Boolean = false
         set(value) {
             field = value
+            // Never pause background tabs. WebView.onPause halts the compositor, and if a
+            // later resume is skipped by a gate mismatch the surface sticks black permanently
+            // on return from background. Only toggle preraster, as proven since 6.1.7.
             if (field && engineContentVisible) {
                 webView.onResume()
                 webView.settings.offscreenPreRaster = true
                 latentInitializer?.let(::loadFromInitializer)
                 latentInitializer = null
             } else {
-                webView.onPause()
                 webView.settings.offscreenPreRaster = false
             }
         }
@@ -682,10 +684,10 @@ class TabAdapter @AssistedInject constructor(
     override fun setContentVisible(visible: Boolean) {
         engineContentVisible = visible
         webView.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+        // Invisible views stop compositing on their own; pausing here risks the same
+        // stuck-paused black surface, so only resume when becoming visible in foreground.
         if (visible && isForeground) {
             webView.onResume()
-        } else {
-            webView.onPause()
         }
     }
 
