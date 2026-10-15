@@ -16,7 +16,7 @@
         <Preference android:icon="@drawable/ic_settings_info" android:title="JSpecify and Reactive Streams" android:summary="JSpecify 1.0.1 • Apache-2.0; Reactive Streams 1.0.4 • MIT-0" />
         <Preference android:icon="@drawable/ic_settings_info" android:title="Java annotation API (compile-time only)" android:summary="jsr250-api 1.0 • CDDL-1.1 / GPL-2.0 with Classpath Exception" />
         <Preference android:icon="@drawable/ic_settings_info" android:title="Russian-English dictionary data" android:summary="enru-dict • MIT; licence notice bundled in assets/dictionaries/LICENSE" />
-        <Preference android:icon="@drawable/ic_settings_info" android:title="hpHosts and uBlock-compatible filter data" android:summary="Bundled data retains its upstream attribution and terms; see the source files in app/src/main/assets." android:selectable="false" />
+        <Preference android:icon="@drawable/ic_settings_info" android:title="StevenBlack hosts and uBlock-compatible filter data" android:summary="Bundled data retains its upstream attribution and terms; see the source files in app/src/main/assets." android:selectable="false" />
         <Preference android:icon="@drawable/ic_settings_info" android:title="LeakCanary (debug builds only)" android:summary="LeakCanary 2.14 • Apache-2.0" android:selectable="false" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Licence texts and source">

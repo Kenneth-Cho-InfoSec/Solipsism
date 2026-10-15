@@ -1,8 +1,10 @@
 package com.krystelligence.solipsism.adblock
 
 import android.app.Application
+import com.krystelligence.solipsism.adblock.snapshot.AdblockSnapshotManager
 import com.krystelligence.solipsism.log.Logger
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 import java.net.URI
 import java.net.URISyntaxException
@@ -14,21 +16,42 @@ import javax.inject.Singleton
  *
  * This intentionally implements the WebView-safe network-blocking subset. Full uBlock Origin is a
  * browser extension runtime, while this app blocks WebView requests through shouldInterceptRequest.
+ *
+ * Network filters load from the downloaded snapshot when present, falling back
+ * to the bundled asset; the snapshot file's modification time is rechecked on
+ * every lookup so refreshes apply without an app restart.
  */
 @Singleton
 class UBlockOriginAdBlocker @Inject constructor(
     private val application: Application,
+    private val snapshotManager: AdblockSnapshotManager,
     private val logger: Logger
 ) : AdBlocker {
 
-    private val filterList: UBlockOriginFilterList by lazy(::loadFilterList)
+    @Volatile private var filterList: UBlockOriginFilterList? = null
+    @Volatile private var loadedSnapshotModified: Long = -1L
+    private val loadLock = Any()
 
-    override fun isAd(url: String): Boolean = filterList.shouldBlock(url)
+    override fun isAd(url: String): Boolean = currentFilterList().shouldBlock(url)
 
     override fun isAd(url: String, pageUrl: String): Boolean =
-        filterList.shouldBlock(url) || UBlockOriginYoutubeRules.shouldBlock(pageUrl, url)
+        currentFilterList().shouldBlock(url) || UBlockOriginYoutubeRules.shouldBlock(pageUrl, url)
 
-    private fun loadFilterList(): UBlockOriginFilterList {
+    private fun currentFilterList(): UBlockOriginFilterList {
+        val snapshot = snapshotManager.snapshotUboFile()
+        val snapshotModified = snapshot?.lastModified() ?: -1L
+        filterList?.takeIf { snapshotModified == loadedSnapshotModified }?.let { return it }
+        synchronized(loadLock) {
+            filterList?.takeIf { snapshotModified == loadedSnapshotModified }?.let { return it }
+            val loaded = snapshot?.takeIf(File::isFile)?.let(::loadSnapshotFilterList)
+                ?: loadAssetFilterList()
+            filterList = loaded
+            loadedSnapshotModified = snapshotModified
+            return loaded
+        }
+    }
+
+    private fun loadAssetFilterList(): UBlockOriginFilterList {
         return try {
             application.assets.open(FILTER_ASSET).use { inputStream ->
                 BufferedReader(InputStreamReader(inputStream)).useLines { lines ->
@@ -38,6 +61,17 @@ class UBlockOriginAdBlocker @Inject constructor(
         } catch (exception: Exception) {
             logger.log(TAG, "Unable to load built-in uBlock Origin filters", exception)
             UBlockOriginFilterList(emptyList(), emptyList())
+        }
+    }
+
+    private fun loadSnapshotFilterList(file: File): UBlockOriginFilterList {
+        return try {
+            file.bufferedReader().useLines { lines ->
+                UBlockOriginFilterList.parse(lines)
+            }
+        } catch (exception: Exception) {
+            logger.log(TAG, "Unable to load snapshot uBlock Origin filters", exception)
+            loadAssetFilterList()
         }
     }
 
@@ -105,6 +139,9 @@ class UBlockOriginFilterList(
     private val exceptionRules: List<UBlockOriginRule>
 ) {
 
+    /** Total network rules held (block + exception), for snapshot validation. */
+    val ruleCount: Int get() = blockRules.size + exceptionRules.size
+
     fun shouldBlock(url: String): Boolean {
         val host = url.host() ?: return false
         if (exceptionRules.any { it.matches(url, host) }) {
@@ -170,6 +207,13 @@ sealed class UBlockOriginRule {
         fun from(input: String): UBlockOriginRule? {
             val rule = input.substringBefore('$').trim()
             if (rule.isBlank()) {
+                return null
+            }
+            // A rule reduced to bare wildcards (e.g. `*` left over from
+            // `@@*$ghide,domain=...`) would match every URL. This subset engine
+            // cannot scope rules by their options, so dropping the rule is the
+            // only safe choice; keeping it would neuter the whole list.
+            if (rule.trimStart('|').all { it == '*' || it == '^' }) {
                 return null
             }
 

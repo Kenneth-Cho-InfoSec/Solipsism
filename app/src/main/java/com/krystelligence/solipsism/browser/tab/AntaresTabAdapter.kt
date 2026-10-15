@@ -20,6 +20,7 @@ import com.krystelligence.solipsism.browser.download.PendingDownload
 import org.json.JSONObject
 import com.krystelligence.solipsism.browser.engine.AntaresContentBlockingPolicy
 import com.krystelligence.solipsism.browser.engine.AntaresCoordinateBridge
+import com.krystelligence.solipsism.browser.engine.BrowserCorePreferences
 import com.krystelligence.solipsism.browser.engine.AntaresMediaPlayerView
 import com.krystelligence.solipsism.browser.engine.AntaresSessionView
 import com.krystelligence.solipsism.browser.engine.toAntaresTheme
@@ -376,6 +377,7 @@ class AntaresTabAdapter private constructor(
         loadingTracker.started()
     }
     override fun onLoadEnded() {
+        BrowserCorePreferences(initialUrlResolver.context).disarmAntaresCrashGuard()
         if (contentKind == TabContentKind.NATIVE_HOMEPAGE) return
         loadingTracker.complete()
     }

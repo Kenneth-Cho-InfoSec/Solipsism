@@ -21,6 +21,7 @@ import com.krystelligence.solipsism.database.downloads.DownloadEntry
 import com.krystelligence.solipsism.database.downloads.DownloadsRepository
 import com.krystelligence.solipsism.dialog.BrowserDialog.setDialogSize
 import com.krystelligence.solipsism.download.DownloadHandler
+import com.krystelligence.solipsism.utils.openUrlInOwnBrowser
 import com.krystelligence.solipsism.download.DownloadFilenameResolver
 import com.krystelligence.solipsism.download.DownloadMetadataResolver
 import com.krystelligence.solipsism.extensions.snackbar
@@ -224,7 +225,7 @@ class DownloadPermissionsHelper @Inject constructor(
                 }
             }
             .setNeutralButton(R.string.action_donate) { _, _ ->
-                activity.startActivity(Intent(Intent.ACTION_VIEW, KO_FI_URL.toUri()))
+                activity.openUrlInOwnBrowser(KO_FI_URL)
             }
         if (scanEligible) {
             builder.setNegativeButton(R.string.download_skip_scanning) { _, _ -> directDownload() }
@@ -427,11 +428,8 @@ class DownloadPermissionsHelper @Inject constructor(
             .setPositiveButton(R.string.action_ok, null)
         if (result.source == VirusTotalDownloadResult.DetectionSource.VIRUS_TOTAL) {
             builder.setNeutralButton(R.string.virus_total_view_report) { _, _ ->
-                activity.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        "https://www.virustotal.com/gui/file/${result.sha256}".toUri()
-                    )
+                activity.openUrlInOwnBrowser(
+                    "https://www.virustotal.com/gui/file/${result.sha256}"
                 )
             }
         }

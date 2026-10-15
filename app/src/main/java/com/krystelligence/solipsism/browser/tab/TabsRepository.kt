@@ -165,13 +165,21 @@ class TabsRepository @Inject constructor(
             .observeOn(mainScheduler)
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapSingle { createTabUnsafe(it, tabType = TabModel.Type.NORMAL) }
-            .concatWith(
+            .toList()
+            .flatMapObservable { restored ->
+                // Skip launch URLs that were already restored. The task's base
+                // intent survives process death (sticky external VIEW intent),
+                // so without this every restart re-adds the same tabs and the
+                // count grows on each resume/wake (#50).
+                val restoredUrls = restored.mapTo(mutableSetOf()) { it.url }
                 Observable.fromIterable(initialUrls)
+                    .filter { url -> restoredUrls.add(url) }
                     .map { url ->
                         if (url.isFileUrl()) permissionInitializerFactory.create(url) else UrlInitializer(url)
                     }
-                    .flatMapSingle { createTabUnsafe(it, tabType = TabModel.Type.EPHEMERAL) },
-            )
+                    .flatMapSingle { createTabUnsafe(it, tabType = TabModel.Type.EPHEMERAL) }
+                    .startWithIterable(restored)
+            }
             .toList()
             .filter(List<TabModel>::isNotEmpty)
             .doAfterTerminate {

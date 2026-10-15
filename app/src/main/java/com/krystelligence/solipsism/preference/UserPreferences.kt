@@ -10,7 +10,6 @@ import com.krystelligence.solipsism.browser.ui.SolipsismRailPosition
 import com.krystelligence.solipsism.audio.AudioPreset
 import com.krystelligence.solipsism.browser.view.RenderingMode
 import com.krystelligence.solipsism.constant.DEFAULT_ENCODING
-import com.krystelligence.solipsism.constant.SCHEME_BOOKMARKS
 import com.krystelligence.solipsism.constant.SCHEME_HOMEPAGE
 import com.krystelligence.solipsism.device.ScreenSize
 import com.krystelligence.solipsism.html.homepage.HomepageSource
@@ -79,6 +78,19 @@ class UserPreferences @Inject constructor(
 
     /** True when GIF image resources should be blocked. */
     var blockGifImagesEnabled by preferences.booleanPreference(BLOCK_GIF_IMAGES, true)
+
+    /**
+     * Periodically refresh the built-in adblock snapshots (hosts + uBO network
+     * filters) from their upstream sources, mirroring the malware definitions
+     * auto-update. Stale snapshots keep serving until a refresh succeeds.
+     */
+    var filterListsAutoUpdate by preferences.booleanPreference(FILTER_LISTS_AUTO_UPDATE, true)
+
+    /** Only refresh filter snapshots on unmetered networks. Manual refresh always runs. */
+    var filterListsWifiOnly by preferences.booleanPreference(FILTER_LISTS_WIFI_ONLY, true)
+
+    /** Days between automatic filter snapshot refreshes. */
+    var filterListsUpdateIntervalDays by preferences.intPreference(FILTER_LISTS_UPDATE_INTERVAL_DAYS, 7)
 
     /**
      * True if the browser should block images from being loaded, false otherwise.
@@ -598,9 +610,9 @@ class UserPreferences @Inject constructor(
     var hostsRemoteFile by preferences.nullableStringPreference(HOSTS_REMOTE_FILE)
 
     init {
-        if (homepage == SCHEME_BOOKMARKS) {
-            homepage = SCHEME_HOMEPAGE
-        }
+        // NOTE: a bookmarks homepage (SCHEME_BOOKMARKS) is a supported choice
+        // offered in settings and rendered by HomePageInitializer via
+        // BookmarkPageInitializer — do not migrate it away here (#55).
         if (HomepageSource.fromValue(homepageSource) == HomepageSource.BUILT_IN &&
             (homepage.startsWith("http://") || homepage.startsWith("https://"))
         ) {
@@ -614,6 +626,9 @@ private const val BLOCK_ADS = "AdBlock"
 private const val UBLOCK_ORIGIN = "uBlockOrigin"
 private const val COSMETIC_FILTERS = "cosmeticFilters"
 private const val BLOCK_GIF_IMAGES = "blockGifImages"
+private const val FILTER_LISTS_AUTO_UPDATE = "filterListsAutoUpdate"
+private const val FILTER_LISTS_WIFI_ONLY = "filterListsWifiOnly"
+private const val FILTER_LISTS_UPDATE_INTERVAL_DAYS = "filterListsUpdateIntervalDays"
 private const val BLOCK_IMAGES = "blockimages"
 private const val CLEAR_CACHE_EXIT = "cache"
 private const val COOKIES = "cookies"

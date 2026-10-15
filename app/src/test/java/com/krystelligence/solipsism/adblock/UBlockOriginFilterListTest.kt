@@ -47,6 +47,20 @@ class UBlockOriginFilterListTest {
     }
 
     @Test
+    fun `match-all exception rules are ignored`() {
+        val filterList = UBlockOriginFilterList.parse(
+            sequenceOf(
+                "||ads.example.com^",
+                "@@*\$ghide,domain=example.com",
+                "@@*\$media,domain=example.org"
+            )
+        )
+
+        assertThat(filterList.shouldBlock("https://ads.example.com/banner.js")).isTrue()
+        assertThat(filterList.shouldBlock("https://example.com/banner.js")).isFalse()
+    }
+
+    @Test
     fun `youtube rules block youtube ad telemetry and pagead requests`() {
         val pageUrl = "https://www.youtube.com/watch?v=test"
 

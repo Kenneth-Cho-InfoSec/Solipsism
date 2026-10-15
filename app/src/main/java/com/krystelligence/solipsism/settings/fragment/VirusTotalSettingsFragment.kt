@@ -12,6 +12,7 @@ import androidx.preference.Preference
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.krystelligence.solipsism.extensions.setViewWithDialogMargins
 import com.krystelligence.solipsism.R
+import com.krystelligence.solipsism.utils.openUrlInOwnBrowser
 import com.krystelligence.solipsism.browser.di.MainScheduler
 import com.krystelligence.solipsism.browser.di.NetworkScheduler
 import com.krystelligence.solipsism.browser.di.injector
@@ -78,7 +79,7 @@ class VirusTotalSettingsFragment : AbstractSettingsFragment() {
             onClick = ::updateDefinitions
         )
         clickablePreference(DEFINITIONS_SOURCE) {
-            startActivity(Intent(Intent.ACTION_VIEW, DEFINITIONS_SOURCE_URL.toUri()))
+            requireContext().openUrlInOwnBrowser(DEFINITIONS_SOURCE_URL)
         }
         clickablePreference(
             preference = API_KEY,
@@ -86,7 +87,7 @@ class VirusTotalSettingsFragment : AbstractSettingsFragment() {
             onClick = ::showApiKeyDialog
         )
         clickablePreference(PRIVACY) {
-            startActivity(Intent(Intent.ACTION_VIEW, VIRUS_TOTAL_PRIVACY_URL.toUri()))
+            requireContext().openUrlInOwnBrowser(VIRUS_TOTAL_PRIVACY_URL)
         }
         updateCloudControls(userPreferences.virusTotalCloudEnabled)
         refreshDefinitionsSummary()

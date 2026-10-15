@@ -51,6 +51,7 @@ class HostsFileParser @Inject constructor(
             lineBuilder.inlineReplace(LOCAL_IP_V4, EMPTY)
             lineBuilder.inlineReplace(LOCAL_IP_V4_ALT, EMPTY)
             lineBuilder.inlineReplace(LOCAL_IP_V6, EMPTY)
+            lineBuilder.inlineReplace(LOCAL_BROADCAST, EMPTY)
             lineBuilder.inlineReplaceChar(TAB_CHAR, SPACE_CHAR)
 
             val comment = lineBuilder.indexOfChar(COMMENT_CHAR)
@@ -62,7 +63,7 @@ class HostsFileParser @Inject constructor(
 
             lineBuilder.inlineTrim()
 
-            if (lineBuilder.isNotEmpty() && !lineBuilder.stringEquals(LOCALHOST)) {
+            if (lineBuilder.isNotEmpty() && !isNonRoutable(lineBuilder)) {
                 while (lineBuilder.containsChar(SPACE_CHAR)) {
                     val space = lineBuilder.indexOfChar(SPACE_CHAR)
                     val partial = lineBuilder.substringToBuilder(0, space)
@@ -70,12 +71,16 @@ class HostsFileParser @Inject constructor(
 
                     val partialLine = partial.toString()
 
-                    // Add string to list
-                    parsedList.add(Host(partialLine))
+                    // Skip non-routable leftovers such as bare localhost entries
+                    // that can trail link-local lines.
+                    if (partialLine.isNotEmpty() && !isNonRoutable(partial)) {
+                        // Add string to list
+                        parsedList.add(Host(partialLine))
+                    }
                     lineBuilder.inlineReplace(partialLine, EMPTY)
                     lineBuilder.inlineTrim()
                 }
-                if (lineBuilder.isNotEmpty()) {
+                if (lineBuilder.isNotEmpty() && !isNonRoutable(lineBuilder)) {
                     // Add string to list.
                     parsedList.add(Host(lineBuilder.toString()))
                 }
@@ -83,13 +88,33 @@ class HostsFileParser @Inject constructor(
         }
     }
 
+    /**
+     * Returns true for hostnames that are never real remote ad/tracking hosts:
+     * loopback aliases and other non-routable local names. Blocking these would
+     * either be dead weight in the filter or, in the case of localhost, risk
+     * breaking local navigations.
+     */
+    private fun isNonRoutable(host: StringBuilder): Boolean =
+        host.stringEquals(LOCALHOST) ||
+            host.stringEquals(LOCALHOST_LOCALDOMAIN) ||
+            host.stringEquals(BROADCASTHOST) ||
+            host.stringEquals(LOCAL_NAME) ||
+            host.containsChar(COLON_CHAR) ||
+            host.containsChar(PERCENT_CHAR)
+
     companion object {
         private const val TAG = "HostsFileParser"
 
         private const val LOCAL_IP_V4 = "127.0.0.1"
         private const val LOCAL_IP_V4_ALT = "0.0.0.0"
         private const val LOCAL_IP_V6 = "::1"
+        private const val LOCAL_BROADCAST = "255.255.255.255"
         private const val LOCALHOST = "localhost"
+        private const val LOCALHOST_LOCALDOMAIN = "localhost.localdomain"
+        private const val BROADCASTHOST = "broadcasthost"
+        private const val LOCAL_NAME = "local"
+        private const val COLON_CHAR = ':'
+        private const val PERCENT_CHAR = '%'
         private const val COMMENT_CHAR = '#'
         private const val TAB_CHAR = '\t'
         private const val SPACE_CHAR = ' '

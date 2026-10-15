@@ -147,14 +147,19 @@ class SuggestionsAdapter(
 
     override fun getFilter(): Filter = searchFilter
 
+    /** Emits the current filtered rows for the inline suggestion list. */
+    var onFilteredListChanged: ((List<WebPage>) -> Unit)? = null
+
     private fun publishResults(list: List<WebPage>?) {
         if (list == null) {
             notifyDataSetChanged()
+            onFilteredListChanged?.invoke(filteredList)
             return
         }
         if (list != filteredList) {
             filteredList = list
             notifyDataSetChanged()
+            onFilteredListChanged?.invoke(list)
         }
     }
 

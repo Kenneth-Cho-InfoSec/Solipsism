@@ -8,6 +8,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.krystelligence.solipsism.BuildConfig
 import com.krystelligence.solipsism.R
+import com.krystelligence.solipsism.utils.openUrlInOwnBrowser
 
 class AboutHeaderPreference @JvmOverloads constructor(
     context: Context,
@@ -31,6 +32,6 @@ class AboutHeaderPreference @JvmOverloads constructor(
     }
 
     override fun onClick() {
-        context.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://ko-fi.com/kennethchoinfosec")))
+        context.openUrlInOwnBrowser("https://ko-fi.com/kennethchoinfosec")
     }
 }

@@ -68,12 +68,15 @@ import com.krystelligence.solipsism.screenshot.ScreenshotStudioActivity
 import com.krystelligence.solipsism.browser.engine.BrowserCore
 import com.krystelligence.solipsism.browser.engine.BrowserCoreChooserActivity
 import com.krystelligence.solipsism.browser.engine.BrowserCoreSwitchRequest
+import com.krystelligence.solipsism.browser.engine.OnboardingStarterTabs
 import com.krystelligence.solipsism.browser.engine.AntaresMediaPlayerView
 import com.krystelligence.solipsism.search.SuggestionsAdapter
+import com.krystelligence.solipsism.search.SearchSuggestionsRecyclerAdapter
 import com.krystelligence.solipsism.ssl.SslCertificateInfo
 import com.krystelligence.solipsism.ssl.createSslDrawableForState
 import com.krystelligence.solipsism.ssl.showSslDialog as showSslCertificateDialog
 import com.krystelligence.solipsism.utils.ProxyUtils
+import com.krystelligence.solipsism.utils.openUrlInOwnBrowser
 import com.krystelligence.solipsism.utils.value
 import android.content.Intent
 import android.content.BroadcastReceiver
@@ -105,6 +108,10 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.ViewOutlineProvider
 import android.view.inputmethod.InputMethodManager
 import android.view.animation.PathInterpolator
@@ -131,6 +138,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
+import androidx.webkit.WebViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -190,6 +198,8 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private var railHapticLastMovementAt = 0L
     private var browserCoreReceiverRegistered = false
     private var addressOverlayOpen = false
+    private var inlineSuggestionsView: RecyclerView? = null
+    private var suggestionsHeightAnimator: ValueAnimator? = null
     private var addressOverlayGeneration = 0
     private var browserChromeGestureActive = false
 
@@ -1026,6 +1036,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // A broken system WebView provider crashes the app on first use (#48).
+        // Fail early with guidance instead of an obscure native stack.
+        if (!ensureWebViewProvider()) return
+
         val tabConfiguration = TabConfiguration.SOLIPSISM
         val bottomTabsBinding = if (tabConfiguration == TabConfiguration.DRAWER_BOTTOM) {
             BrowserBottomTabsBinding.inflate(layoutInflater)
@@ -1195,6 +1209,29 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             inputMethodManager.hideSoftInputFromWindow(binding.root.windowToken, 0)
         }
         binding.search.setAdapter(suggestionsAdapter)
+        inlineSuggestionsView =
+            binding.root.findViewById<RecyclerView>(R.id.search_suggestions)?.apply {                layoutManager = LinearLayoutManager(this@BrowserActivity)
+                adapter = SearchSuggestionsRecyclerAdapter(
+                    onItemClick = { page ->
+                        binding.search.clearFocus()
+                        hideAddressOverlay()
+                        presenter.onSearchSuggestionClicked(page)
+                        inputMethodManager.hideSoftInputFromWindow(binding.root.windowToken, 0)
+                    },
+                    onInsertClick = { page ->
+                        if (page is SearchSuggestion) {
+                            binding.search.setText(page.title)
+                            binding.search.setSelection(page.title.length)
+                        } else {
+                            binding.search.setText(page.url)
+                            binding.search.setSelection(page.url.length)
+                        }
+                    }
+                )
+                itemAnimator = null
+            }
+        binding.search.inlineSuggestionsEnabled = inlineSuggestionsView != null
+        suggestionsAdapter.onFilteredListChanged = ::updateInlineSuggestions
         val searchListener = SearchListener(
             onConfirm = {
                 presenter.onSearch(binding.search.text.toString())
@@ -1205,6 +1242,15 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         binding.search.setOnEditorActionListener(searchListener)
         binding.search.setOnKeyListener(searchListener)
         binding.search.addTextChangedListener(StyleRemovingTextWatcher())
+        // The suggestion stream filters out empty queries, so collapsing on
+        // clear has to be triggered here explicitly.
+        binding.search.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (s.isNullOrEmpty()) updateInlineSuggestions(emptyList())
+            }
+        })
         binding.search.setOnFocusChangeListener { _, hasFocus ->
             presenter.onSearchFocusChanged(hasFocus)
             if (hasFocus) {
@@ -1411,7 +1457,13 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     private fun handleUrlIntent(intent: Intent) {
         if (intent === lastHandledIntent) return
         lastHandledIntent = intent
-        intentExtractor.extractUrlFromIntent(intent)?.let(presenter::onNewAction)
+        val action = intentExtractor.extractUrlFromIntent(intent) ?: return
+        // Spend the launch URL in-memory so rotation/config changes cannot
+        // replay it. (Process death still redelivers the task's base intent;
+        // TabsRepository.initializeTabs dedupes those against restored tabs.)
+        intent.data = null
+        intent.removeExtra(OnboardingStarterTabs.EXTRA_URLS)
+        presenter.onNewAction(action)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -1596,6 +1648,28 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
             Intent(this, BrowserCoreChooserActivity::class.java)
                 .putExtra(BrowserCoreChooserActivity.EXTRA_MANAGE_ONLY, true)
         )
+    }
+
+    /**
+     * Verifies a system WebView provider is available before inflating any tab
+     * content. Returns false (after showing guidance) when pages cannot render.
+     */
+    private fun ensureWebViewProvider(): Boolean {
+        val provider = runCatching {
+            WebViewCompat.getCurrentWebViewPackage(this)?.packageName
+        }.getOrNull()
+        if (!provider.isNullOrBlank()) return true
+        android.app.AlertDialog.Builder(this)
+            .setTitle(R.string.webview_provider_missing_title)
+            .setMessage(R.string.webview_provider_missing_message)
+            .setCancelable(false)
+            .setPositiveButton(R.string.webview_provider_open_settings) { _, _ ->
+                runCatching { startActivity(Intent(android.provider.Settings.ACTION_SETTINGS)) }
+                finish()
+            }
+            .setNegativeButton(R.string.action_cancel) { _, _ -> finish() }
+            .show()
+        return false
     }
 
     private fun createQuickActionButton(action: RailActionId): ImageButton =
@@ -1840,6 +1914,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
 
     override fun showBrowserCoreSwitchFailed() {
         snackbar(R.string.antares_switch_failed)
+    }
+
+    override fun showAntaresCrashFallback() {
+        snackbar(R.string.antares_crash_fallback)
     }
 
     override fun openVault() {
@@ -2532,7 +2610,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     private fun openDonationPage() {
-        startActivity(Intent(Intent.ACTION_VIEW, KO_FI_URL.toUri()))
+        openUrlInOwnBrowser(KO_FI_URL)
     }
 
     override fun showHistoryOptionsDialog(historyEntry: HistoryEntry) {
@@ -2854,8 +2932,88 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         }
     }
 
-    private fun scheduleAddressEditorImeRetry(generation: Int, overlay: View, attempt: Int) {
-        if (attempt >= ADDRESS_EDITOR_IME_MAX_RETRIES) return
+    /**
+     * Renders filtered rows in the inline list that is part of the search
+     * card. The card grows downward with an animated height change while its
+     * top/left/right margins stay fixed.
+     */
+    private fun updateInlineSuggestions(pages: List<WebPage>) {
+        val listView = inlineSuggestionsView ?: return
+        val adapter = listView.adapter as? SearchSuggestionsRecyclerAdapter
+        if (pages.isEmpty()) {
+            // Collapse back to the pre-expanded pill.
+            adapter?.playEnterAnimation = false
+            if (listView.visibility == View.VISIBLE) {
+                animateSuggestionsHeight(listView, 0) { listView.visibility = View.GONE }
+            } else {
+                listView.visibility = View.GONE
+            }
+        } else {
+            adapter?.items = pages
+            if (listView.visibility != View.VISIBLE) {
+                expandInlineSuggestions(listView, adapter)
+            }
+        }
+    }
+
+    private fun expandInlineSuggestions(
+        listView: RecyclerView,
+        adapter: SearchSuggestionsRecyclerAdapter?
+    ) {
+        // Expand once; content swaps while open reflow without animation so
+        // rapid emissions don't restart (and hide) the animation.
+        // Start from an explicit zero height: if the view became visible
+        // first it would already lay out full-size and the animation
+        // would have nowhere to go.
+        adapter?.playEnterAnimation = true
+        listView.layoutParams = listView.layoutParams.apply { height = 0 }
+        listView.visibility = View.VISIBLE
+        // Measure after layout so the new rows are included; measuring
+        // synchronously here would use the pre-update (stale) height.
+        listView.post {
+            listView.measure(
+                View.MeasureSpec.makeMeasureSpec(
+                    (listView.parent as View).width,
+                    View.MeasureSpec.EXACTLY
+                ),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            animateSuggestionsHeight(listView, minOf(listView.measuredHeight, 330.dp)) {
+                listView.layoutParams = listView.layoutParams.apply {
+                    height = ViewGroup.LayoutParams.WRAP_CONTENT
+                }
+            }
+            // Stop replaying the enter stagger once the opening wave is done;
+            // later rebinds (scroll, refresh) must not re-animate.
+            listView.postDelayed({ adapter?.playEnterAnimation = false }, 700)
+        }
+    }
+
+    private fun animateSuggestionsHeight(
+        listView: RecyclerView,
+        toHeight: Int,
+        onEnd: (() -> Unit)? = null
+    ) {
+        suggestionsHeightAnimator?.cancel()
+        val fromHeight = if (listView.visibility == View.VISIBLE) listView.height else 0
+        suggestionsHeightAnimator = ValueAnimator.ofInt(fromHeight, toHeight).apply {
+            duration = 360
+            interpolator = AccelerateDecelerateInterpolator()
+            addUpdateListener {
+                listView.layoutParams = listView.layoutParams.apply {
+                    height = it.animatedValue as Int
+                }
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    onEnd?.invoke()
+                }
+            })
+            start()
+        }
+    }
+
+    private fun scheduleAddressEditorImeRetry(generation: Int, overlay: View, attempt: Int) {        if (attempt >= ADDRESS_EDITOR_IME_MAX_RETRIES) return
         mainHandler.postDelayed(
             {
                 requestAddressEditorFocus(
@@ -2869,6 +3027,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     }
 
     private fun hideAddressOverlay() {
+        inlineSuggestionsView?.let {
+            suggestionsHeightAnimator?.cancel()
+            it.visibility = View.GONE
+        }
         val overlay = binding.addressOverlay ?: return
         if (!addressOverlayOpen && !overlay.isVisible) return
         addressOverlayOpen = false

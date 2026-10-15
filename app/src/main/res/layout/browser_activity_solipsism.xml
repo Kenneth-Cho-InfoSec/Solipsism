@@ -49,7 +49,7 @@
                 <FrameLayout
                     android:id="@+id/address_overlay"
                     android:layout_width="match_parent"
-                    android:layout_height="72dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:layout_marginStart="@dimen/chrome_outer_margin"
                     android:layout_marginTop="@dimen/chrome_outer_margin"
@@ -62,7 +62,8 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/search_container"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="72dp"
                         android:background="@drawable/search_background_expressive"
                         android:clipChildren="false"
                         android:clipToPadding="false"
@@ -72,7 +73,7 @@
                         <ImageView
                             android:id="@+id/search_ssl_status"
                             android:layout_width="@dimen/browser_icon_button_size"
-                            android:layout_height="match_parent"
+                            android:layout_height="72dp"
                             android:background="@drawable/solipsism_blend_button_background"
                             android:contentDescription="@string/action_site_info"
                             android:padding="8dp"
@@ -84,7 +85,7 @@
                         <com.krystelligence.solipsism.search.SearchView
                             android:id="@+id/search"
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="72dp"
                             android:background="@null"
                             android:completionThreshold="1"
                             android:dropDownAnchor="@+id/address_overlay"
@@ -102,16 +103,16 @@
                             android:textColorHint="?attr/autoCompleteUrlColor"
                             android:textCursorDrawable="@null"
                             android:textSize="16sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/search_qr"
                             app:layout_constraintStart_toEndOf="@+id/search_ssl_status"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_goneMarginStart="12dp" />
+                            app:layout_goneMarginStart="14dp" />
 
                         <ImageView
                             android:id="@+id/search_qr"
                             android:layout_width="@dimen/browser_icon_button_size"
-                            android:layout_height="match_parent"
+                            android:layout_height="72dp"
+                            android:layout_marginEnd="6dp"
                             android:background="@drawable/solipsism_blend_button_background"
                             android:clickable="true"
                             android:contentDescription="@string/action_scan_qr"
@@ -121,6 +122,22 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_action_qr_code"
                             app:tint="?attr/iconColor" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/search_suggestions"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:clipToPadding="false"
+                            android:maxHeight="330dp"
+                            android:nestedScrollingEnabled="false"
+                            android:paddingBottom="8dp"
+                            android:visibility="gone"
+                            app:layout_constrainedHeight="true"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/search"
+                            app:layout_constraintVertical_bias="0.0" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </FrameLayout>
 

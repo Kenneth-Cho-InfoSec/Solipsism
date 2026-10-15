@@ -109,6 +109,10 @@ class BrowserStateAdapter(private val browserActivity: BrowserActivity) : Browse
         browserActivity.showBrowserCoreSwitchFailed()
     }
 
+    override fun showAntaresCrashFallback() {
+        browserActivity.showAntaresCrashFallback()
+    }
+
     override fun showLinkLongPressDialog(longPress: LongPress) {
         browserActivity.showLinkLongPressDialog(longPress)
     }

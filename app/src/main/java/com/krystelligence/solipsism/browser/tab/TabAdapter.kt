@@ -152,6 +152,11 @@ class TabAdapter @AssistedInject constructor(
     private val webView: WebView
         get() = webViewLazy.value.apply {
             elementPickerController.attach(this)
+            // The tab's WebViewClient must be attached: without it, taps and
+            // redirects bypass shouldOverrideUrlLoading/shouldInterceptRequest,
+            // so links escape to the external browser and ad blocking never runs.
+            // With it, links replace the current tab inside Solipsism.
+            webViewClient = tabWebViewClient
             webChromeClient = tabWebChromeClient
             setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
                 if (isRestrictedHomepageDownload()) {

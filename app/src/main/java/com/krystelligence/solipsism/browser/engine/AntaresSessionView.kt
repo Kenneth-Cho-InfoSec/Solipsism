@@ -64,6 +64,8 @@ class AntaresSessionView(
     )
 
     init {
+        // A native crash below leaves this set so the next launch falls back (#49).
+        BrowserCorePreferences(context).armAntaresCrashGuard()
         setClient(this)
         setServoArgs(null, null, true)
         setHostManagedInputMethod(true)

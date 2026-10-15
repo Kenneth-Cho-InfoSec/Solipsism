@@ -174,6 +174,13 @@ class BrowserPresenter @Inject constructor(
 
         cookieAdministrator.adjustCookieSettings()
 
+        // A native Antares crash kills the process before any Java callback
+        // runs. If the previous launch died while starting Antares, fall back
+        // to WebView once instead of crash-looping (#49).
+        if (browserCorePreferences.consumePendingAntaresCrash()) {
+            this.view?.showAntaresCrashFallback()
+        }
+
         currentFolder = Bookmark.Folder.Root
         compositeDisposable += bookmarkRepository.bookmarksAndFolders(folder = Bookmark.Folder.Root)
             .subscribeOn(databaseScheduler)

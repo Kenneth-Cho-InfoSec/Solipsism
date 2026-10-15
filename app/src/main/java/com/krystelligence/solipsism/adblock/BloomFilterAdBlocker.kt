@@ -3,6 +3,7 @@ package com.krystelligence.solipsism.adblock
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.adblock.source.HostsDataSourceProvider
 import com.krystelligence.solipsism.adblock.source.HostsResult
+import com.krystelligence.solipsism.adblock.snapshot.AdblockSnapshotManager
 import com.krystelligence.solipsism.adblock.util.BloomFilter
 import com.krystelligence.solipsism.adblock.util.DefaultBloomFilter
 import com.krystelligence.solipsism.adblock.util.DelegatingBloomFilter
@@ -45,6 +46,7 @@ import javax.inject.Singleton
 class BloomFilterAdBlocker @Inject constructor(
     private val logger: Logger,
     private val hostsDataSourceProvider: HostsDataSourceProvider,
+    private val snapshotManager: AdblockSnapshotManager,
     private val hostsRepository: HostsRepository,
     private val hostsPreferenceStore: HostsPreferenceStore,
     private val application: Application,
@@ -65,14 +67,25 @@ class BloomFilterAdBlocker @Inject constructor(
     private val loadHostsFlow = MutableStateFlow(true)
 
     init {
+        // Fill or refresh snapshots in the background without delaying the
+        // first populate; a successful change triggers repopulate below.
+        appCoroutineScope.launch(coroutineDispatchers.io) {
+            if (snapshotManager.refresh(force = false)) {
+                populateAdBlockerFromDataSource(true)
+            }
+        }
         loadHostsFlow
             .buffer(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
             .map { forceRefresh ->
+                // Refresh filter snapshots first so blocking data stays current
+                // without app updates; failures keep serving the previous data.
+                val snapshotsChanged = snapshotManager.refreshIfStale()
                 val storedBloomFilter = objectStore.retrieve()
                 val hostsDataSource = hostsDataSourceProvider.createHostsDataSource()
                 val hostsDataSourceIdentifier = hostsDataSource.identifier()
-                // Force a new hosts request if the hosts are out of date or if the repo has no hosts.
-                if (!forceRefresh &&
+                // Force a new hosts request if the hosts are out of date, the
+                // snapshot changed under us, or if the repo has no hosts.
+                if (!forceRefresh && !snapshotsChanged &&
                     storedBloomFilter != null &&
                     hostsRepository.hasHosts() &&
                     hostsPreferenceStore.identity.get() == hostsDataSourceIdentifier

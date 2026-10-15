@@ -14,6 +14,18 @@
             android:title="@string/ublock_origin"/>
         <SwitchPreferenceCompat
             android:defaultValue="true"
+            android:icon="@drawable/ic_action_refresh"
+            android:key="cb_filter_auto_update"
+            android:summary="@string/filter_lists_auto_update_summary"
+            android:title="@string/filter_lists_auto_update"/>
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_action_refresh"
+            android:key="cb_filter_wifi_only"
+            android:summary="@string/filter_lists_wifi_only_summary"
+            android:title="@string/filter_lists_wifi_only"/>
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
             android:icon="@drawable/ic_settings_text"
             android:key="cb_cosmetic_filters"
             android:summary="@string/cosmetic_filters_summary"

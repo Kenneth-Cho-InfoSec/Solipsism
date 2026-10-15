@@ -9,6 +9,7 @@ import com.krystelligence.solipsism.adblock.lists.FilterListEntry
 import com.krystelligence.solipsism.adblock.lists.FilterListKind
 import com.krystelligence.solipsism.adblock.lists.RemoteFilterListManager
 import com.krystelligence.solipsism.adblock.source.HostsSourceType
+import com.krystelligence.solipsism.adblock.snapshot.AdblockSnapshotManager
 import com.krystelligence.solipsism.adblock.source.selectedHostsSource
 import com.krystelligence.solipsism.adblock.source.toPreferenceIndex
 import com.krystelligence.solipsism.browser.di.DiskScheduler
@@ -58,6 +59,7 @@ class AdBlockSettingsFragment : AbstractSettingsFragment() {
     @Inject internal lateinit var bloomFilterAdBlocker: BloomFilterAdBlocker
     @Inject internal lateinit var customFilterRepository: CustomFilterRepository
     @Inject internal lateinit var filterListManager: RemoteFilterListManager
+    @Inject internal lateinit var snapshotManager: AdblockSnapshotManager
 
     private var recentSummaryUpdater: SummaryUpdater? = null
     private val compositeDisposable = CompositeDisposable()
@@ -79,6 +81,18 @@ class AdBlockSettingsFragment : AbstractSettingsFragment() {
             preference = "cb_ublock_origin",
             isChecked = userPreferences.uBlockOriginEnabled,
             onCheckChange = { userPreferences.uBlockOriginEnabled = it }
+        )
+
+        togglePreference(
+            preference = "cb_filter_auto_update",
+            isChecked = userPreferences.filterListsAutoUpdate,
+            onCheckChange = { userPreferences.filterListsAutoUpdate = it }
+        )
+
+        togglePreference(
+            preference = "cb_filter_wifi_only",
+            isChecked = userPreferences.filterListsWifiOnly,
+            onCheckChange = { userPreferences.filterListsWifiOnly = it }
         )
 
         togglePreference(
@@ -114,19 +128,54 @@ class AdBlockSettingsFragment : AbstractSettingsFragment() {
 
         forceRefreshHostsPreference = clickableDynamicPreference(
             preference = "preference_hosts_refresh_force",
-            isEnabled = isRefreshHostsEnabled(),
+            isEnabled = true,
+            summary = snapshotSummary(),
             onClick = {
-                bloomFilterAdBlocker.populateAdBlockerFromDataSource(forceRefresh = true)
+                forceRefreshHostsPreference?.isEnabled = false
+                snapshotManager.refreshAsync(force = true) { changed ->
+                    forceRefreshHostsPreference?.isEnabled = true
+                    forceRefreshHostsPreference?.summary = snapshotSummary()
+                    activity?.toast(
+                        when {
+                            changed -> R.string.filter_snapshot_refresh_done
+                            snapshotManager.status().let { it.hostsPresent || it.uboPresent } ->
+                                R.string.filter_snapshot_refresh_uptodate
+                            else -> R.string.filter_snapshot_refresh_failed
+                        }
+                    )
+                    bloomFilterAdBlocker.populateAdBlockerFromDataSource(forceRefresh = true)
+                }
             }
         )
     }
 
     private fun updateRefreshHostsEnabledStatus() {
-        forceRefreshHostsPreference?.isEnabled = isRefreshHostsEnabled()
+        forceRefreshHostsPreference?.isEnabled = true
+        forceRefreshHostsPreference?.summary = snapshotSummary()
     }
 
-    private fun isRefreshHostsEnabled() =
-        userPreferences.selectedHostsSource() is HostsSourceType.Remote
+    private fun snapshotSummary(): String {
+        val status = snapshotManager.status()
+        return if (!status.hostsPresent && !status.uboPresent) {
+            getString(R.string.filter_snapshot_bundled)
+        } else {
+            val updatedAt = maxOf(status.hostsUpdatedAt, status.uboUpdatedAt)
+            val date = android.text.format.DateUtils.getRelativeTimeSpanString(
+                updatedAt,
+                System.currentTimeMillis(),
+                android.text.format.DateUtils.DAY_IN_MILLIS
+            )
+            getString(
+                R.string.filter_snapshot_status,
+                getString(
+                    R.string.filter_snapshot_updated,
+                    date,
+                    status.hostsCount,
+                    status.uboRuleCount
+                )
+            )
+        }
+    }
 
     @Deprecated("Deprecated in Java")
     override fun onDestroy() {
@@ -279,11 +328,57 @@ class AdBlockSettingsFragment : AbstractSettingsFragment() {
             .setTitle(R.string.filter_lists)
             .setViewWithDialogMargins(scroller)
             .setPositiveButton(android.R.string.ok, null)
-            .setNeutralButton(R.string.filter_list_add_list) { _, _ ->
+            .setNeutralButton(R.string.filter_list_suggested) { _, _ ->
+                showSuggestedFilterLists { showFilterListsManager() }
+            }
+            .setNegativeButton(R.string.filter_list_add_list) { _, _ ->
                 showAddFilterListUrl { showFilterListsManager() }
             }
             .show()
         rebuild()
+    }
+
+    /**
+     * One-tap suggested subscriptions so users get curated blocking without
+     * pasting URLs. Downloads go through the same validation as manual adds.
+     */
+    private fun showSuggestedFilterLists(onAdded: () -> Unit) {
+        val presets = listOf(
+            R.string.filter_preset_easylist to SUGGESTED_EASYLIST_URL,
+            R.string.filter_preset_easyprivacy to SUGGESTED_EASYPRIVACY_URL,
+            R.string.filter_preset_stevenblack to SUGGESTED_STEVENBLACK_URL,
+            R.string.filter_preset_adaway to SUGGESTED_ADAWAY_URL
+        )
+        BrowserDialog.showListChoices(
+            requireActivity(),
+            R.string.filter_list_suggested_title,
+            *presets.map { (nameRes, url) ->
+                DialogItem(
+                    title = nameRes,
+                    isConditionMet = filterListManager.lists().none { it.url == url },
+                    onClick = {
+                        filterListManager.addList(url) { result ->
+                            activity?.toast(
+                                when (result) {
+                                    is AddListResult.Added ->
+                                        if (result.kind == FilterListKind.ABP) {
+                                            R.string.filter_list_added_abp
+                                        } else {
+                                            R.string.filter_list_added_hosts
+                                        }
+                                    AddListResult.Duplicate -> R.string.filter_list_duplicate
+                                    AddListResult.InvalidUrl,
+                                    AddListResult.DownloadFailed -> R.string.problem_download
+                                    AddListResult.UnrecognizedFormat ->
+                                        R.string.filter_list_unrecognized
+                                }
+                            )
+                            if (result is AddListResult.Added) onAdded()
+                        }
+                    }
+                )
+            }.toTypedArray()
+        )
     }
 
     private fun filterListRow(entry: FilterListEntry, onChanged: () -> Unit): LinearLayout {
@@ -460,5 +555,11 @@ class AdBlockSettingsFragment : AbstractSettingsFragment() {
         private const val FILE_REQUEST_CODE = 100
         private const val AD_HOSTS_FILE = "local_hosts.txt"
         private const val TEXT_MIME_TYPE = "text/*"
+
+        private const val SUGGESTED_EASYLIST_URL = "https://easylist.to/easylist/easylist.txt"
+        private const val SUGGESTED_EASYPRIVACY_URL = "https://easylist.to/easyprivacy/easyprivacy.txt"
+        private const val SUGGESTED_STEVENBLACK_URL =
+            "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
+        private const val SUGGESTED_ADAWAY_URL = "https://adaway.org/hosts.txt"
     }
 }

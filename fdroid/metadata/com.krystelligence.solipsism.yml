@@ -11,6 +11,14 @@ AutoName: Solipsism Browser
 RepoType: git
 Repo: https://github.com/Kenneth-Cho-InfoSec/Solipsism.git
 
+# The bundled Antares native libraries are prebuilt binaries whose sources live
+# in the separate Antares repository (see docs/ANTARES_ENGINE.md "Local builds"
+# for the NDK r29 source build). F-Droid parcels ship WebView-only: the
+# prebuilts are scanned-deleted and the engine is picked up separately as the
+# signed Antares companion package when installed.
+scandelete:
+  - app/src/main/jniLibs
+
 Builds:
   - versionName: 5.1.9
     versionCode: 117
@@ -40,7 +48,14 @@ Builds:
     gradle:
       - solipsismBrowser
 
+  - versionName: 9.3.0
+    versionCode: 159
+    commit: 0c23db475bbe
+    subdir: app
+    gradle:
+      - solipsismBrowser
+
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 5.2.2
-CurrentVersionCode: 122
+CurrentVersion: 9.3.0
+CurrentVersionCode: 159

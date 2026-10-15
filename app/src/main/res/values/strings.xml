@@ -198,6 +198,19 @@
     <string name="block_ad_source">Hosts file source</string>
     <string name="block_ad_remote_refresh_frequency_description">For remote hosts file</string>
     <string name="block_ad_refresh_now">Refresh hosts now</string>
+    <string name="filter_lists_auto_update">Auto-update filter lists</string>
+    <string name="filter_lists_auto_update_summary">Refresh built-in hosts and network filters in the background</string>
+    <string name="filter_lists_wifi_only">Update on unmetered networks only</string>
+    <string name="filter_lists_wifi_only_summary">Skip automatic refreshes on metered connections</string>
+    <string name="filter_snapshot_status">Snapshot: %1$s</string>
+    <string name="filter_snapshot_updated">Updated %1$s · %2$d hosts · %3$d network rules</string>
+    <string name="filter_snapshot_bundled">Bundled lists (never updated)</string>
+    <string name="filter_snapshot_refresh_done">Filter lists updated</string>
+    <string name="filter_snapshot_refresh_uptodate">Filter lists are already up to date</string>
+    <string name="filter_snapshot_refresh_failed">Filter list update failed; keeping current lists</string>
+    <string name="webview_provider_missing_title">System WebView unavailable</string>
+    <string name="webview_provider_missing_message">Solipsism needs a working Android System WebView to display pages. If pages crash or you were asked to uninstall WebView updates, update Android System WebView from your app store or system settings, then reopen Solipsism.</string>
+    <string name="webview_provider_open_settings">Open settings</string>
 
     <string name="block_ads_upsell_source">Upgrade to Solipsism Plus to choose</string>
 
@@ -712,6 +725,12 @@
     <string name="filter_list_added_hosts">Hosts list added and enabled</string>
     <string name="filter_list_added_abp">Adblock list imported and enabled</string>
     <string name="filter_list_duplicate">This filter list is already added</string>
+    <string name="filter_list_suggested">Suggested lists</string>
+    <string name="filter_list_suggested_title">Add a suggested filter list</string>
+    <string name="filter_preset_easylist">EasyList (ads)</string>
+    <string name="filter_preset_easyprivacy">EasyPrivacy (trackers)</string>
+    <string name="filter_preset_stevenblack">StevenBlack hosts (ads + malware)</string>
+    <string name="filter_preset_adaway">AdAway hosts (mobile ads)</string>
     <string name="filter_list_unrecognized">Not a recognizable filter list</string>
     <string name="filter_list_removed">Filter list removed</string>
     <string name="filter_list_refreshed">Filter list refreshed</string>
@@ -772,6 +791,7 @@
     <string name="debug_browser_core_summary_webview">Android WebView is active</string>
     <string name="debug_browser_core_summary_antares">Antares is active globally</string>
     <string name="antares_switch_failed">Could not switch browser cores. Your existing tabs were kept.</string>
+    <string name="antares_crash_fallback">Antares failed to start, so Solipsism switched back to WebView.</string>
     <string name="file_upload">File upload</string>
     <string name="settings_rail_position_top_unoptimized">Top (Unoptimized)</string>
     <string name="settings_rail_position_bottom_unoptimized">Bottom (Unoptimized)</string>

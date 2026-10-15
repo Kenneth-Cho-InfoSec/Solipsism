@@ -22,6 +22,17 @@ class SearchView @JvmOverloads constructor(
     private var isBeingClicked: Boolean = false
     private var timePressedNs: Long = 0
 
+    /**
+     * When true, filtered rows render in the inline list that is part of the
+     * same search card, so the framework dropdown popup stays hidden.
+     */
+    var inlineSuggestionsEnabled: Boolean = false
+
+    override fun showDropDown() {
+        if (inlineSuggestionsEnabled) return
+        super.showDropDown()
+    }
+
     init {
         setSelectAllOnFocus(true)
     }

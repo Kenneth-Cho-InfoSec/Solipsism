@@ -47,6 +47,7 @@ import com.krystelligence.solipsism.search.SearchEngineDisplayNames
 import com.krystelligence.solipsism.search.Suggestions
 import com.krystelligence.solipsism.search.engine.DuckSearch
 import com.krystelligence.solipsism.utils.NavigationSecurity
+import com.krystelligence.solipsism.utils.openUrlInOwnBrowser
 
 /** First-run setup flow and settings entry point for the global browser-core choice. */
 class BrowserCoreChooserActivity : AppCompatActivity() {
@@ -415,12 +416,7 @@ class BrowserCoreChooserActivity : AppCompatActivity() {
     }
 
     private fun openAntaresListing() {
-        startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                "https://github.com/Kenneth-Cho-InfoSec/Antares/releases".toUri(),
-            ).addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT),
-        )
+        openUrlInOwnBrowser("https://github.com/Kenneth-Cho-InfoSec/Antares/releases")
     }
 
     private fun launchBrowser(starterUrls: ArrayList<String>? = null) {

@@ -44,4 +44,25 @@ class HostsFileParserTest {
             Host("comment.close.by.com")
         )
     }
+
+    @Test
+    fun `non-routable names are skipped`() {
+        val testInput = """
+            255.255.255.255 broadcasthost
+            127.0.0.1 localhost.localdomain
+            127.0.0.1 local
+            fe80::1%lo0 localhost
+            0.0.0.0 ads.example.com localhost
+            0.0.0.0 track.example.org
+            """
+
+        val inputStreamReader = InputStreamReader(testInput.trimIndent().byteInputStream())
+        val hostsFileParser = HostsFileParser(NoOpLogger())
+        val mutableList = hostsFileParser.parseInput(inputStreamReader)
+
+        assertThat(mutableList).containsExactly(
+            Host("ads.example.com"),
+            Host("track.example.org")
+        )
+    }
 }

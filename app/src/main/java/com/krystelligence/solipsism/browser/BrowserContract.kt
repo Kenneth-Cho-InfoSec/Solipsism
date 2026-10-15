@@ -96,6 +96,8 @@ interface BrowserContract {
 
         fun showBrowserCoreSwitchFailed()
 
+        fun showAntaresCrashFallback()
+
         /**
          * Show the options menu for long pressing a link in the web page.
          */

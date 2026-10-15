@@ -9,6 +9,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.krystelligence.solipsism.BuildConfig
 import com.krystelligence.solipsism.R
 import com.krystelligence.solipsism.preference.UserPreferences
+import com.krystelligence.solipsism.utils.openUrlInOwnBrowser
 
 class ReleaseUpdateCoordinator(
     private val context: Context,
@@ -67,14 +68,14 @@ class ReleaseUpdateCoordinator(
             .setNegativeButton(R.string.action_not_now, null)
         release.preferredApk?.let { asset ->
             builder.setPositiveButton(R.string.update_download) { _, _ ->
-                context.startActivity(Intent(Intent.ACTION_VIEW, asset.browserDownloadUrl.toUri()))
+                context.openUrlInOwnBrowser(asset.browserDownloadUrl)
             }
         } ?: builder.setPositiveButton(R.string.release_notes_view_online) { _, _ -> openReleasePage(release) }
         builder.show()
     }
 
     private fun openReleasePage(release: ReleaseInfo) {
-        context.startActivity(Intent(Intent.ACTION_VIEW, release.htmlUrl.toUri()))
+        context.openUrlInOwnBrowser(release.htmlUrl)
     }
 
     private companion object {
