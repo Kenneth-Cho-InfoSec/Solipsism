@@ -35,7 +35,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 36
-        versionName = "9.3.1"
+        versionName = "9.4.0"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -101,7 +101,7 @@ android {
                 "\"480BED986E48910C5A028C60A207E85535AE00832AECDAEFA5C1BC2D68D80EEF\""
             )
             applicationId = "com.krystelligence.solipsism"
-            versionCode = 160
+            versionCode = 161
         }
     }
     packaging {

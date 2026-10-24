@@ -14,14 +14,14 @@
 
 Solipsism Browser is a privacy-focused Android WebView browser built around a rail-first, one-handed interface. Navigation, tabs, search, QR scanning, refresh, bookmarks, and browser tools live in a compact rail on the left or right, leaving the webpage as the main surface.
 
-Latest release: [**Solipsism Browser v9.3.0**](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest)<br>
+Latest release: [**Solipsism Browser v9.4.0**](https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest)<br>
 Application ID: `com.krystelligence.solipsism`<br>
 Developer: **Kenneth-Cho-InfoSec**
 
 ## Optional Antares browser core
 
-Solipsism 9.3.0 provides a unified browser experience with Android WebView as its stable core and
-**Antares 0.4.0** as an experimental in-house Servo-derived core. The engine ships bundled inside the
+Solipsism 9.4.0 provides a unified browser experience with Android WebView as its stable core and
+**Antares 0.5.0** as an experimental in-house Servo-derived core. The engine ships bundled inside the
 Solipsism APK; a separately installed signed ARM64 companion package is still recognised as a fallback
 so the engine can be updated and tested independently. Android WebView
 remains the stable fallback.
