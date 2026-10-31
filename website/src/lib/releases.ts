@@ -172,10 +172,12 @@ export async function fetchLatestRelease(): Promise<GitHubRelease> {
 }
 
 export async function fetchReleaseManifest(): Promise<ReleaseManifest> {
-  const response = await fetch(
-    `${import.meta.env.BASE_URL}release-manifest.json`,
-    { headers: requestHeaders() },
-  );
+  const basePath = import.meta.env.BASE_URL.endsWith('/')
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
+  const response = await fetch(`${basePath}release-manifest.json`, {
+    headers: requestHeaders(),
+  });
   if (!response.ok)
     throw new Error(`Release manifest request failed (${response.status}).`);
   const value = await response.json();

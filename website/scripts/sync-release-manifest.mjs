@@ -9,11 +9,14 @@ const headers = {
 
 const releases = [];
 for (let page = 1; ; page += 1) {
-  const response = await fetch(
+  const response = await globalThis.fetch(
     `${api}/releases?per_page=100&page=${page}`,
-    { headers },
+    {
+      headers,
+    },
   );
-  if (!response.ok) throw new Error(`GitHub release sync failed: ${response.status}`);
+  if (!response.ok)
+    throw new Error(`GitHub release sync failed: ${response.status}`);
   const pageReleases = await response.json();
   releases.push(...pageReleases.filter((release) => !release.draft));
   const link = response.headers.get('link') ?? '';

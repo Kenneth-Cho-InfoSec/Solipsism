@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+
+<BaseLayout
+  title="Project and support — Solipsism Browser"
+  description="Find the Solipsism Browser source, report a problem, review releases, and read its license."
+  path="/community/"
+>
+  <Header />
+  <main id="main">
+    <section class="archive-hero shell reference-hero">
+      <p class="kicker">Built in the open</p>
+      <h1>Find your way<br /><em>into the project.</em></h1>
+      <p>
+        Solipsism’s source, issue tracker, and release history are hosted on
+        GitHub. Start with the channel that matches what you need.
+      </p>
+    </section>
+
+    <section class="section shell community-grid" aria-label="Project links">
+      <article class="community-card">
+        <p class="kicker">Source</p>
+        <h2>Explore the code</h2>
+        <p>
+          Read the Android app source, project documentation, build
+          configuration, and current development history.
+        </p>
+        <a
+          class="text-link"
+          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism"
+          >Open the repository ↗</a
+        >
+      </article>
+      <article class="community-card">
+        <p class="kicker">Support</p>
+        <h2>Report a problem</h2>
+        <p>
+          Search existing reports or open an issue with the app version, Android
+          version, WebView provider, selected browser core, and steps to
+          reproduce. Keep browsing history and personal details out of public
+          reports.
+        </p>
+        <a
+          class="text-link"
+          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/issues"
+          >Browse GitHub Issues ↗</a
+        >
+      </article>
+      <article class="community-card">
+        <p class="kicker">Updates</p>
+        <h2>Review a release</h2>
+        <p>
+          Use the project’s release page for APKs, version notes, and the
+          current installation requirements.
+        </p>
+        <a
+          class="text-link"
+          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases"
+          >See releases ↗</a
+        >
+      </article>
+      <article class="community-card">
+        <p class="kicker">License</p>
+        <h2>Read the terms</h2>
+        <p>
+          The repository identifies the project as Mozilla Public License 2.0.
+          Review the actual license file for its terms.
+        </p>
+        <a
+          class="text-link"
+          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE"
+          >Read MPL 2.0 ↗</a
+        >
+      </article>
+    </section>
+
+    <section class="section privacy">
+      <div class="shell privacy-grid">
+        <div>
+          <p class="kicker">Before you post</p>
+          <h2>Share enough to reproduce it.</h2>
+        </div>
+        <div class="privacy-copy">
+          <p>
+            Include the release version, Android version, device model where
+            relevant, WebView provider, selected core, and the steps that led to
+            the issue. Redact private URLs, account details, API keys, and
+            browsing data from logs and screenshots.
+          </p>
+          <div class="link-cluster">
+            <a href={`${base}docs/#troubleshooting`}>Troubleshooting notes</a>
+            <a href={`${base}guides/getting-started/`}>Beginner guide</a>
+            <a
+              href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/README.md"
+              >Project README</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>
