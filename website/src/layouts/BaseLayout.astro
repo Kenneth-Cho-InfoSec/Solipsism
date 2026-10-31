@@ -18,6 +18,19 @@ const pageType =
     : path === '/docs/' || path === '/guides/getting-started/'
       ? 'TechArticle'
       : 'WebPage';
+const breadcrumbItems =
+  path === '/docs/'
+    ? [
+        { name: 'Home', item: Astro.site },
+        { name: 'Documentation', item: canonical },
+      ]
+    : path === '/guides/getting-started/'
+      ? [
+          { name: 'Home', item: Astro.site },
+          { name: 'Documentation', item: new URL('docs/', Astro.site) },
+          { name: 'Getting started', item: canonical },
+        ]
+      : [];
 const schema = {
   '@context': 'https://schema.org',
   '@type': pageType,
@@ -33,6 +46,19 @@ const schema = {
     name: 'Solipsism Browser',
     url: Astro.site,
   },
+  ...(breadcrumbItems.length
+    ? {
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: breadcrumbItems.map((item, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: item.name,
+            item: item.item,
+          })),
+        },
+      }
+    : {}),
   ...(path === '/'
     ? {
         license: 'https://www.mozilla.org/MPL/2.0/',
