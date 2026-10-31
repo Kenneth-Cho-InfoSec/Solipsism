@@ -122,13 +122,15 @@ const schema = {
       type="application/ld+json"
       set:html={JSON.stringify(schema)}
     />
-    {breadcrumbSchema && (
-      <script
-        is:inline
-        type="application/ld+json"
-        set:html={JSON.stringify(breadcrumbSchema)}
-      />
-    )}
+    {
+      breadcrumbSchema && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(breadcrumbSchema)}
+        />
+      )
+    }
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
