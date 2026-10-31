@@ -13,6 +13,13 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 >
   <Header />
   <main id="main">
+    <nav class="breadcrumbs shell" aria-label="Breadcrumb">
+      <a href={base}>Home</a>
+      <span aria-hidden="true">/</span>
+      <a href={`${base}docs/`}>Documentation</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Getting started</span>
+    </nav>
     <section class="archive-hero shell reference-hero">
       <h1>Set up Solipsism Browser on Android.</h1>
       <p>

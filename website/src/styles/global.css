@@ -61,6 +61,28 @@ select {
   width: var(--shell);
   margin-inline: auto;
 }
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-top: 22px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+.breadcrumbs a {
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.breadcrumbs a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+.breadcrumbs [aria-current='page'] {
+  color: var(--ink);
+}
 .skip-link {
   position: fixed;
   z-index: 100;
