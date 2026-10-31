@@ -18,7 +18,8 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
       data-nav-toggle
       aria-controls="primary-nav"
       aria-expanded="false"
-      aria-label="Open navigation">☰</button
+      aria-label="Open navigation"
+      ><span class="hamburger-icon" aria-hidden="true"></span></button
     >
     <nav id="primary-nav" data-mobile-nav aria-label="Primary navigation">
       <a href={`${base}features/`}>Features</a>

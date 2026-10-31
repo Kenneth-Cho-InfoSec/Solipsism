@@ -7,42 +7,34 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 
 const features = [
   {
-    number: '01',
     title: 'One-handed navigation',
     text: 'Move the compact browser rail to the left or right, choose a size, and keep tabs, search, refresh, QR scanning, and browser tools close to your hand.',
   },
   {
-    number: '02',
     title: 'Privacy controls',
     text: 'Manage cookies, site permissions, JavaScript, popups, tracking headers, and clear-on-exit data from the app settings.',
   },
   {
-    number: '03',
     title: 'Ad and tracker rules',
     text: 'Use host lists, custom filter rules, cosmetic filters, and an element picker. The filter support is a focused WebView-safe subset, not a complete uBlock Origin engine.',
   },
   {
-    number: '04',
     title: 'Userscripts',
     text: 'Import scripts from a local file or HTTPS URL and manage common metadata and supported injection points. This is not the full Tampermonkey API.',
   },
   {
-    number: '05',
     title: 'Download scanning',
     text: 'Local definitions-based scanning works without an API key. VirusTotal is optional and requires the user’s own key. No scanner is a guarantee that a file is safe.',
   },
   {
-    number: '06',
     title: 'A homepage you can shape',
     text: 'Arrange bookmarks, wallpapers, a clock, and custom motto text. Imported static HTML and CSS are sanitized and stored privately on-device.',
   },
   {
-    number: '07',
     title: 'Appearance and access',
     text: 'Choose light, dark, or AMOLED-black themes, accents, fonts, text size, reflow, and other reading controls.',
   },
   {
-    number: '08',
     title: 'Useful browser tools',
     text: 'Use find-in-page, screenshots, downloads, sharing, history, bookmarks, audio settings, and fullscreen video in one Android app.',
   },
@@ -50,15 +42,14 @@ const features = [
 ---
 
 <BaseLayout
-  title="Features — Solipsism Browser"
-  description="Verified Solipsism Browser features: one-handed rail navigation, privacy controls, ad blocking, userscripts, download scanning, and customization."
+  title="Solipsism Browser features — rail, privacy and blocking"
+  description="Features in Solipsism Browser: one-handed rail navigation, site permissions, content blocking, userscripts, download scanning and interface settings."
   path="/features/"
 >
   <Header />
   <main id="main">
     <section class="archive-hero shell reference-hero">
-      <p class="kicker">Solipsism 9.4.0</p>
-      <h1>Built around<br /><em>your hand.</em></h1>
+      <h1>One-handed controls for Android.</h1>
       <p>
         Solipsism is an Android browser that keeps frequent controls in a
         compact side rail and leaves the webpage as the main surface. Its
@@ -80,9 +71,8 @@ const features = [
     <section class="section why" aria-labelledby="feature-list-heading">
       <div class="shell">
         <div class="section-heading">
-          <p class="kicker">What’s included</p>
           <h2 id="feature-list-heading">
-            Everyday controls, without hiding the edges.
+            Features included in the Android app.
           </h2>
           <p>
             These capabilities are present in the project’s 9.4.0 documentation.
@@ -93,9 +83,6 @@ const features = [
           {
             features.map((feature) => (
               <article>
-                <span class="feature-icon" aria-hidden="true">
-                  {feature.number}
-                </span>
                 <h3>{feature.title}</h3>
                 <p>{feature.text}</p>
               </article>
@@ -108,8 +95,7 @@ const features = [
     <section class="section shell" aria-labelledby="core-heading">
       <div class="feature-split">
         <div>
-          <p class="kicker">Browser core</p>
-          <h2 id="core-heading">WebView is the stable path.</h2>
+          <h2 id="core-heading">WebView is the stable browser core.</h2>
           <p>
             Solipsism uses the Android WebView provider for its stable browser
             core. Rendering, Safe Browsing, and some web features depend on the
@@ -140,8 +126,7 @@ const features = [
     <section class="section privacy" aria-labelledby="limits-heading">
       <div class="shell privacy-grid">
         <div>
-          <p class="kicker">Known boundaries</p>
-          <h2 id="limits-heading">Platform support matters.</h2>
+          <h2 id="limits-heading">Android and WebView set the boundaries.</h2>
         </div>
         <div class="privacy-copy">
           <p>

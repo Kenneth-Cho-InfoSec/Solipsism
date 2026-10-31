@@ -69,8 +69,8 @@ function updateGlobalDownload(release: GitHubRelease): void {
     .querySelectorAll<HTMLElement>('[data-latest-meta]')
     .forEach((element) => {
       element.textContent = preferred
-        ? `${release.tag_name} · ${formatFileSize(preferred.size)}`
-        : `${release.tag_name} · No APK attached`;
+        ? `File size: ${formatFileSize(preferred.size)}`
+        : 'No APK attached';
     });
   const chooser = document.querySelector<HTMLElement>(
     '[data-architecture-chooser]',

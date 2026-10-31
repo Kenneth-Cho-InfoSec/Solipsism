@@ -7,15 +7,14 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 ---
 
 <BaseLayout
-  title="Getting started — Solipsism Browser"
-  description="Install Solipsism Browser from its official release, open your first page, set up the navigation rail, and find privacy controls."
+  title="Getting started with Solipsism Browser — Android guide"
+  description="Install Solipsism Browser on Android, open your first page, position the navigation rail, choose a theme, and set the privacy controls you use before browsing."
   path="/guides/getting-started/"
 >
   <Header />
   <main id="main">
     <section class="archive-hero shell reference-hero">
-      <p class="kicker">Beginner guide · Android</p>
-      <h1>Your web.<br /><em>Within reach.</em></h1>
+      <h1>Set up Solipsism Browser on Android.</h1>
       <p>
         Install Solipsism from the project’s official release, open a webpage,
         and place the controls where they work for you. The screenshots below
@@ -36,8 +35,7 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
     <div class="shell reference-layout">
       <article class="reference-content">
         <section id="install">
-          <p class="kicker">Step 1</p>
-          <h2>Install from the official release</h2>
+          <h2>Step 1. Install from the official release</h2>
           <ol class="guide-steps">
             <li>
               Open the <a
@@ -60,8 +58,7 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
         </section>
 
         <section id="first-page">
-          <p class="kicker">Step 2</p>
-          <h2>Open your first page</h2>
+          <h2>Step 2. Open your first page</h2>
           <ol class="guide-steps">
             <li>Keep Android WebView selected for the stable browser core.</li>
             <li>Tap the URL/search field in the side rail.</li>
@@ -81,8 +78,7 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
         </section>
 
         <section id="make-it-yours">
-          <p class="kicker">Step 3</p>
-          <h2>Set up the rail and homepage</h2>
+          <h2>Step 3. Set up the rail and homepage</h2>
           <p>
             Open Settings and use <strong>Rail &amp; Menu Studio</strong> to move
             supported actions between the rail and overflow menu. Reorder rail icons
@@ -98,8 +94,7 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
         </section>
 
         <section id="privacy-basics">
-          <p class="kicker">Step 4</p>
-          <h2>Choose your privacy settings</h2>
+          <h2>Step 4. Choose your privacy settings</h2>
           <ul>
             <li>
               Review cookie, JavaScript, popup, and site-permission controls in
@@ -127,8 +122,7 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
         </section>
 
         <section id="optional-core">
-          <p class="kicker">Optional · Experimental</p>
-          <h2>Try Antares only if you want to test it</h2>
+          <h2>Optional: test the experimental Antares core</h2>
           <p>
             Solipsism 9.4.0 includes Antares 0.5.0 as an experimental core. It
             is not required for normal browsing. Some complex pages, media, or
@@ -137,18 +131,17 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
           </p>
           <p>
             Do not install an Antares companion package from unofficial sources.
-            Read the <a
+            Read the{' '}<a
               href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/docs/ANTARES_ENGINE.md"
               >engine notes</a
             >
-            before enabling its diagnostic mode; that mode loads each page a second
-            time in a hidden WebView.
+            {' '}before enabling its diagnostic mode; that mode loads each page
+            a second time in a hidden WebView.
           </p>
         </section>
 
         <section id="troubleshooting">
-          <p class="kicker">If something goes wrong</p>
-          <h2>Quick checks</h2>
+          <h2>Quick troubleshooting checks</h2>
           <dl class="troubleshooting-list">
             <dt>A website does not load correctly</dt>
             <dd>
@@ -180,7 +173,7 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
       </article>
 
       <aside class="reference-toc">
-        <p class="kicker">In this guide</p>
+        <p class="toc-label">In this guide</p>
         <nav aria-label="Guide steps">
           <a href="#install">Install</a>
           <a href="#first-page">Open a page</a>
