@@ -12,17 +12,37 @@ const { title, description, path = '/' } = Astro.props;
 const canonical = new URL(path.replace(/^\//, ''), Astro.site);
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const socialImage = new URL(`${base}/assets/solipsism-logo.png`, Astro.site);
+const pageType =
+  path === '/'
+    ? 'SoftwareApplication'
+    : path === '/docs/' || path === '/guides/getting-started/'
+      ? 'TechArticle'
+      : 'WebPage';
 const schema = {
   '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Solipsism Browser',
-  applicationCategory: 'BrowserApplication',
-  operatingSystem: 'Android',
+  '@type': pageType,
+  name: path === '/' ? 'Solipsism Browser' : title,
+  ...(path === '/' ? { applicationCategory: 'BrowserApplication' } : {}),
+  ...(path === '/' ? { operatingSystem: 'Android' } : {}),
+  ...(path !== '/' ? { headline: title } : {}),
   description,
+  url: canonical,
+  image: socialImage,
+  isPartOf: {
+    '@type': 'WebSite',
+    name: 'Solipsism Browser',
+    url: Astro.site,
+  },
+  ...(path === '/'
+    ? {
+        license: 'https://www.mozilla.org/MPL/2.0/',
+        sameAs: 'https://github.com/Kenneth-Cho-InfoSec/Solipsism',
+      }
+    : {}),
   downloadUrl:
-    'https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest',
-  codeRepository: 'https://github.com/Kenneth-Cho-InfoSec/Solipsism',
-  license: 'https://www.mozilla.org/MPL/2.0/',
+    path === '/'
+      ? 'https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest'
+      : undefined,
 };
 ---
 
@@ -49,14 +69,17 @@ const schema = {
       href={`${base}/assets/solipsism-logo.png`}
     />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Solipsism Browser" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content="Solipsism Browser logo" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content="Solipsism Browser logo" />
     <title>{title}</title>
     <script is:inline>
       (() => {

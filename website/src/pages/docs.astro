@@ -7,15 +7,14 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 ---
 
 <BaseLayout
-  title="Technical documentation — Solipsism Browser"
-  description="Installation, Android permissions, browser-core behavior, privacy boundaries, development commands, and troubleshooting for Solipsism Browser."
+  title="Solipsism Browser documentation — setup and troubleshooting"
+  description="Installation, Android permissions, WebView behavior, privacy boundaries, development commands and troubleshooting for the Solipsism Browser project."
   path="/docs/"
 >
   <Header />
   <main id="main">
     <section class="archive-hero shell reference-hero">
-      <p class="kicker">Technical reference · v9.4.0</p>
-      <h1>Understand the<br /><em>browser underneath.</em></h1>
+      <h1>Install and develop Solipsism.</h1>
       <p>
         Solipsism is an Android application built around Android WebView. This
         guide covers installation, runtime requirements, permissions, the
@@ -35,7 +34,6 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
     <div class="shell reference-layout">
       <article class="reference-content">
         <section id="requirements">
-          <p class="kicker">01 · Install</p>
           <h2>Requirements and releases</h2>
           <ul>
             <li>Android 8.0 (API 26) or newer.</li>
@@ -50,17 +48,17 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
             </li>
           </ul>
           <p>
-            Get APKs from the project’s
+            Get APKs from the project’s{' '}
             <a href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases"
               >GitHub Releases</a
             >
-            page. Only install packages from a distribution channel you trust. Android
-            asks you to approve installs from the selected source; keep that permission
-            limited to the source you use.
+            {' '}page. Only install packages from a distribution channel you
+            trust. Android asks you to approve installs from the selected
+            source; keep that permission limited to the source you use.
           </p>
           <p>
             The package ID is <code>com.krystelligence.solipsism</code>. The
-            repository describes Solipsism as MPL 2.0; see the
+            repository describes Solipsism as MPL 2.0; see the{' '}
             <a
               href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE"
               >license file</a
@@ -69,7 +67,6 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
         </section>
 
         <section id="browser-cores">
-          <p class="kicker">02 · Rendering</p>
           <h2>WebView and Antares</h2>
           <p>
             Android WebView is the stable core. Web rendering, Safe Browsing,
@@ -103,19 +100,19 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
             </li>
           </ul>
           <p>
-            The project’s
+            The project’s{' '}
             <a
               href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/docs/ANTARES_ENGINE.md"
               >Antares engine notes</a
             >
-            describe package verification, supported devices, switching, and the optional
-            coordinate diagnostic. That diagnostic loads the same HTTP or HTTPS page
-            in a hidden WebView and makes additional requests; it is disabled by default.
+            {' '}describe package verification, supported devices, switching,
+            and the optional coordinate diagnostic. That diagnostic loads the
+            same HTTP or HTTPS page in a hidden WebView and makes additional
+            requests; it is disabled by default.
           </p>
         </section>
 
         <section id="permissions">
-          <p class="kicker">03 · Android access</p>
           <h2>Permissions and prompts</h2>
           <p>
             Solipsism declares a small set of permissions and requests several
@@ -178,7 +175,6 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
         </section>
 
         <section id="privacy-and-downloads">
-          <p class="kicker">04 · Data and downloads</p>
           <h2>Privacy controls have limits</h2>
           <ul>
             <li>
@@ -217,7 +213,6 @@ const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
         </section>
 
         <section id="developer-commands">
-          <p class="kicker">05 · Development</p>
           <h2>Build and test commands</h2>
           <p>
             The repository README lists these Android development tasks. They
@@ -236,7 +231,6 @@ python3 scripts/check_localized_resources.py</code></pre>
         </section>
 
         <section id="troubleshooting">
-          <p class="kicker">06 · Troubleshooting</p>
           <h2>Common issues</h2>
           <dl class="troubleshooting-list">
             <dt>A site is blank or missing a feature</dt>
@@ -273,7 +267,7 @@ python3 scripts/check_localized_resources.py</code></pre>
       </article>
 
       <aside class="reference-toc">
-        <p class="kicker">On this page</p>
+        <p class="toc-label">On this page</p>
         <nav aria-label="Technical documentation sections">
           <a href="#requirements">Requirements</a>
           <a href="#browser-cores">Browser cores</a>

@@ -9,64 +9,51 @@ const features = [
   [
     'Browsing & navigation',
     'Tabs and tab overview, a configurable left or right rail, QR scanning, fullscreen video and familiar browser tools.',
-    '↔',
   ],
   [
     'Privacy & security',
     'Incognito browsing, site permissions, cookie controls, Do Not Track, Safe Browsing and hardened URL handling.',
-    '◎',
   ],
   [
     'Ad & tracker blocking',
     'Host-based blocking, cosmetic filters, custom rules and an element picker — a focused WebView-safe subset, not full uBlock Origin.',
-    '⊘',
   ],
   [
     'Userscripts',
     'Import and manage scripts with familiar metadata and supported lifecycle injection. Experimental; not the complete Tampermonkey API.',
-    '{ }',
   ],
   [
     'Malware & download safety',
     'Local definitions-based scanning with optional VirusTotal assistance, explicit scan choices and DownloadManager support.',
-    '⌁',
   ],
   [
     'Appearance & accessibility',
     'Light, dark and AMOLED-black themes, accents, wallpapers, custom fonts, text reflow and sizing controls.',
-    '◑',
   ],
   [
     'Homepage customisation',
     'Bookmarks, motto, clock, wallpapers, or sanitised static HTML/CSS stored privately on-device.',
-    '⌂',
   ],
   [
     'Productivity tools',
     'Screenshots, find in page, sharing, bookmarks, history, downloads, audio equaliser presets and Decoy Mode.',
-    '✦',
   ],
 ];
 ---
 
 <BaseLayout
-  title="Solipsism Browser — the web, within reach"
-  description="A privacy-focused Android WebView browser with a rail-first interface for compact, one-handed browsing."
+  title="Solipsism Browser — Android browsing with rail controls"
+  description="Solipsism is an Android browser built on WebView. A side rail keeps tabs, navigation, site permissions and common controls within reach for one-handed browsing."
 >
   <Header />
   <main id="main">
     <section class="hero shell">
       <div class="hero-copy">
-        <div class="eyebrow">
-          <span class="pulse"></span> Android browser · <span
-            data-latest-version>Checking latest release…</span
-          >
-        </div>
-        <h1>The web,<br /><em>within reach.</em></h1>
+        <h1>Android browsing within reach.</h1>
         <p>
-          Solipsism is a privacy-focused Android browser shaped around your
-          hand. A compact side rail keeps the controls close and the webpage
-          centre stage.
+          Solipsism is an Android browser built on WebView. Its side rail keeps
+          tabs, navigation and common controls at the screen edge for one-handed
+          browsing.
         </p>
         <div class="hero-actions">
           <a
@@ -80,8 +67,11 @@ const features = [
             >View source on GitHub</a
           >
         </div>
-        <p class="download-meta" data-latest-meta>
-          Live version and file size from GitHub Releases
+        <p class="download-meta">
+          Version <span data-latest-version>Checking GitHub Releases…</span>{
+            ' '
+          }
+          ·{' '}<span data-latest-meta>APK size pending</span>
         </p>
         <div class="hero-resource-links" aria-label="Project guides">
           <a href={`${base}guides/getting-started/`}>Get started</a>
@@ -95,7 +85,6 @@ const features = [
         class="device-stage"
         aria-label="Solipsism Browser running on Android"
       >
-        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
         <div class="phone phone-screenshot">
           <img
             class="screenshot-light"
@@ -116,43 +105,40 @@ const features = [
             fetchpriority="high"
           />
         </div>
-        <p class="visual-note">Solipsism Browser on Android</p>
       </div>
     </section>
 
     <section class="section why" aria-labelledby="why-heading">
       <div class="shell">
         <div class="section-heading">
-          <p class="kicker">Why Solipsism</p><h2 id="why-heading">
-            A browser that works around you.
-          </h2><p>
+          <h2 id="why-heading">Keep tabs and controls at the edge.</h2><p>
             Frequent controls stay visible, powerful options remain
             understandable, and the page gets the space it deserves.
           </p>
         </div>
         <div class="benefit-grid">
           <article>
-            <span>01</span><h3>Reach, naturally</h3><p>
+            <h3>One-handed navigation</h3><p>
               Place the compact navigation rail on either side and choose the
               size that fits your grip.
             </p>
           </article><article>
-            <span>02</span><h3>Privacy you can see</h3><p>
+            <h3>Site privacy controls</h3><p>
               Manage cookies, site permissions, headers and clear-on-exit
               choices without hunting.
             </p>
           </article><article>
-            <span>03</span><h3>Power when wanted</h3><p>
+            <h3>Blocking and userscripts</h3><p>
               Custom filters, userscripts, malware checks and capture tools are
               built in and honestly scoped.
             </p>
           </article><article>
-            <span>04</span><h3>Yours to adapt</h3><p>
+            <h3>Interface settings</h3><p>
               Accessibility, colour, type and homepage controls make the
               experience personal.
             </p>
           </article><article class="open-source">
-            <span>05</span><h3>Open in every sense</h3><p>
+            <h3>Open source under MPL 2.0</h3><p>
               Source available under the Mozilla Public License 2.0, with public
               issues and development history.
             </p><a
@@ -170,22 +156,15 @@ const features = [
       aria-labelledby="features-heading"
     >
       <div class="section-heading">
-        <p class="kicker">Feature set</p><h2 id="features-heading">
-          Small footprint.<br />Serious capability.
-        </h2><p>
+        <h2 id="features-heading">Browser features and their limits.</h2><p>
           Purposeful browser features, grouped around what you want to do.
         </p>
       </div><div class="feature-grid">
         {
-          features.map(([title, text, icon]) => (
+          features.map(([title, text]) => (
             <article>
-              <>
-                <span class="feature-icon" aria-hidden="true">
-                  {icon}
-                </span>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </>
+              <h3>{title}</h3>
+              <p>{text}</p>
             </article>
           ))
         }
@@ -199,9 +178,7 @@ const features = [
     >
       <div class="shell privacy-grid">
         <div>
-          <p class="kicker">Privacy & transparency</p><h2 id="privacy-heading">
-            Clear about what the platform can — and cannot — do.
-          </h2>
+          <h2 id="privacy-heading">Browser limits, clearly stated.</h2>
         </div><div class="privacy-copy">
           <p>
             Solipsism is built on Android WebView. Rendering, Safe Browsing and
@@ -236,9 +213,7 @@ const features = [
     >
       <div class="section-heading row">
         <div>
-          <p class="kicker">From GitHub, live</p><h2 id="latest-heading">
-            Latest release
-          </h2>
+          <h2 id="latest-heading">Latest release and downloads</h2>
         </div><a class="text-link" href={`${base}releases/`}
           >Complete release archive →</a
         >
