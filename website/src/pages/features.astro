@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+
+const features = [
+  {
+    number: '01',
+    title: 'One-handed navigation',
+    text: 'Move the compact browser rail to the left or right, choose a size, and keep tabs, search, refresh, QR scanning, and browser tools close to your hand.',
+  },
+  {
+    number: '02',
+    title: 'Privacy controls',
+    text: 'Manage cookies, site permissions, JavaScript, popups, tracking headers, and clear-on-exit data from the app settings.',
+  },
+  {
+    number: '03',
+    title: 'Ad and tracker rules',
+    text: 'Use host lists, custom filter rules, cosmetic filters, and an element picker. The filter support is a focused WebView-safe subset, not a complete uBlock Origin engine.',
+  },
+  {
+    number: '04',
+    title: 'Userscripts',
+    text: 'Import scripts from a local file or HTTPS URL and manage common metadata and supported injection points. This is not the full Tampermonkey API.',
+  },
+  {
+    number: '05',
+    title: 'Download scanning',
+    text: 'Local definitions-based scanning works without an API key. VirusTotal is optional and requires the user’s own key. No scanner is a guarantee that a file is safe.',
+  },
+  {
+    number: '06',
+    title: 'A homepage you can shape',
+    text: 'Arrange bookmarks, wallpapers, a clock, and custom motto text. Imported static HTML and CSS are sanitized and stored privately on-device.',
+  },
+  {
+    number: '07',
+    title: 'Appearance and access',
+    text: 'Choose light, dark, or AMOLED-black themes, accents, fonts, text size, reflow, and other reading controls.',
+  },
+  {
+    number: '08',
+    title: 'Useful browser tools',
+    text: 'Use find-in-page, screenshots, downloads, sharing, history, bookmarks, audio settings, and fullscreen video in one Android app.',
+  },
+];
+---
+
+<BaseLayout
+  title="Features — Solipsism Browser"
+  description="Verified Solipsism Browser features: one-handed rail navigation, privacy controls, ad blocking, userscripts, download scanning, and customization."
+  path="/features/"
+>
+  <Header />
+  <main id="main">
+    <section class="archive-hero shell reference-hero">
+      <p class="kicker">Solipsism 9.4.0</p>
+      <h1>Built around<br /><em>your hand.</em></h1>
+      <p>
+        Solipsism is an Android browser that keeps frequent controls in a
+        compact side rail and leaves the webpage as the main surface. Its
+        features are adjustable; Android WebView and device support set the
+        boundaries.
+      </p>
+      <div class="page-actions">
+        <a
+          class="button"
+          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest"
+          >Download the latest APK</a
+        >
+        <a class="button button-secondary" href={`${base}docs/`}
+          >Read the technical guide</a
+        >
+      </div>
+    </section>
+
+    <section class="section why" aria-labelledby="feature-list-heading">
+      <div class="shell">
+        <div class="section-heading">
+          <p class="kicker">What’s included</p>
+          <h2 id="feature-list-heading">
+            Everyday controls, without hiding the edges.
+          </h2>
+          <p>
+            These capabilities are present in the project’s 9.4.0 documentation.
+            Experimental behavior and platform limits are called out below.
+          </p>
+        </div>
+        <div class="feature-grid feature-reference-grid">
+          {
+            features.map((feature) => (
+              <article>
+                <span class="feature-icon" aria-hidden="true">
+                  {feature.number}
+                </span>
+                <h3>{feature.title}</h3>
+                <p>{feature.text}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell" aria-labelledby="core-heading">
+      <div class="feature-split">
+        <div>
+          <p class="kicker">Browser core</p>
+          <h2 id="core-heading">WebView is the stable path.</h2>
+          <p>
+            Solipsism uses the Android WebView provider for its stable browser
+            core. Rendering, Safe Browsing, and some web features depend on the
+            installed provider and Android version.
+          </p>
+          <p>
+            Version 9.4.0 also offers Antares 0.5.0 as an experimental,
+            user-selected core. Site compatibility, media, and interaction can
+            differ. Switch back to WebView when a site does not work as
+            expected.
+          </p>
+        </div>
+        <aside class="feature-callout">
+          <span class="badge badge-warn">Experimental</span>
+          <h3>Antares is optional.</h3>
+          <p>
+            Core switching is explicit and global to the browser session. Page
+            history, form state, media state, and cookies are not promised to
+            transfer between engines.
+          </p>
+          <a class="text-link" href={`${base}docs/#browser-cores`}
+            >Read core notes →</a
+          >
+        </aside>
+      </div>
+    </section>
+
+    <section class="section privacy" aria-labelledby="limits-heading">
+      <div class="shell privacy-grid">
+        <div>
+          <p class="kicker">Known boundaries</p>
+          <h2 id="limits-heading">Platform support matters.</h2>
+        </div>
+        <div class="privacy-copy">
+          <p>
+            WebView does not expose or enforce every browser permission in the
+            same way. Site-permission entries marked Experimental are
+            best-effort signals, not a desktop-style permission sandbox.
+          </p>
+          <p>
+            Userscripts support common metadata and lifecycle hooks, but not the
+            complete Tampermonkey API. Cosmetic filters implement a subset of
+            filter syntax. Malware scanning can miss threats and should not
+            replace trusted downloads or Android security updates.
+          </p>
+          <div class="link-cluster">
+            <a href={`${base}docs/`}>Technical documentation</a>
+            <a href={`${base}guides/getting-started/`}>Beginner guide</a>
+            <a href={`${base}compare/`}>Compare browsers</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

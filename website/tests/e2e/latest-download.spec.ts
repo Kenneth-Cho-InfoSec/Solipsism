@@ -37,6 +37,9 @@ test('latest APK CTA uses the API-provided asset URL', async ({ page }) => {
         },
       }),
   );
+  await page.route('**/Solipsism/release-manifest.json', (route) =>
+    route.fulfill({ status: 503 }),
+  );
   await page.goto('/Solipsism/');
   const cta = page.locator('.hero [data-latest-download]');
   await expect(cta).toHaveAttribute('href', apkUrl);

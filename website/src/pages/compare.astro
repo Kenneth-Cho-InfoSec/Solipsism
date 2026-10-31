@@ -1,0 +1,242 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+
+<BaseLayout
+  title="Compare Android browsers — Solipsism Browser"
+  description="A sourced comparison of Solipsism Browser with Firefox, Brave, Cromite, and Vivaldi on Android, checked 31 October 2026."
+  path="/compare/"
+>
+  <Header />
+  <main id="main">
+    <section class="archive-hero shell reference-hero">
+      <p class="kicker">A practical comparison · checked 31 October 2026</p>
+      <h1>Choose the browser<br /><em>that fits your day.</em></h1>
+      <p>
+        These projects take different approaches to Android browsing. This is a
+        source-linked feature overview, not a benchmark or a ranking. Product
+        details can change; follow each project’s current documentation before
+        choosing or installing a browser.
+      </p>
+      <div class="page-actions">
+        <a
+          class="button"
+          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest"
+          >Get Solipsism</a
+        >
+        <a class="button button-secondary" href={`${base}features/`}
+          >See its features</a
+        >
+      </div>
+    </section>
+
+    <section
+      class="section shell comparison-section"
+      aria-labelledby="comparison-heading"
+    >
+      <div class="section-heading">
+        <p class="kicker">Different priorities</p>
+        <h2 id="comparison-heading">The browser is part of the choice.</h2>
+        <p>
+          Compare the core, controls, extensibility, and practical boundaries
+          each project documents.
+        </p>
+      </div>
+      <div
+        class="comparison-table-wrap"
+        role="region"
+        aria-label="Android browser comparison table"
+        tabindex="0"
+      >
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th scope="col">Browser</th>
+              <th scope="col">Core and availability</th>
+              <th scope="col">What its documentation emphasizes</th>
+              <th scope="col">Trade-offs to consider</th>
+              <th scope="col">Source and license</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Solipsism</th>
+              <td
+                >Android WebView is the stable core. Solipsism 9.4.0 also offers
+                the optional Antares 0.5.0 core as experimental.</td
+              >
+              <td
+                >Compact left or right navigation rail, privacy settings, host
+                and cosmetic filter subsets, userscripts, and local download
+                scanning.</td
+              >
+              <td
+                >Android-only. Web support depends on the device’s WebView
+                provider. Some permission controls are best-effort; Antares is
+                experimental, and userscripts and filters are not full desktop
+                equivalents.</td
+              >
+              <td
+                ><a href="https://github.com/Kenneth-Cho-InfoSec/Solipsism"
+                  >Project repository</a
+                ><br /><a
+                  href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE"
+                  >MPL 2.0</a
+                ></td
+              >
+            </tr>
+            <tr>
+              <th scope="row">Firefox for Android</th>
+              <td
+                >Firefox for Android, distributed by Mozilla; add-ons are
+                installed from its supported add-ons catalog.</td
+              >
+              <td
+                >Enhanced Tracking Protection and a curated Android add-on
+                catalog, with add-on availability documented by Mozilla.</td
+              >
+              <td
+                >Check whether the extensions you rely on are available for
+                Android; the mobile catalog is not the entire desktop add-on
+                ecosystem.</td
+              >
+              <td
+                ><a
+                  href="https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-android"
+                  >Tracking protection</a
+                ><br /><a
+                  href="https://support.mozilla.org/en-US/kb/find-and-install-add-ons-firefox-android"
+                  >Android add-ons</a
+                ><br /><a href="https://www.mozilla.org/en-US/MPL/">MPL 2.0</a
+                ></td
+              >
+            </tr>
+            <tr>
+              <th scope="row">Brave</th>
+              <td
+                >Brave Browser for Android uses Chromium and is distributed by
+                Brave.</td
+              >
+              <td
+                >Shields provides built-in controls for trackers, ads, cookies,
+                and related page protections, with per-site behavior documented
+                by Brave.</td
+              >
+              <td
+                >Shields defaults and compatibility choices may need adjustment
+                for individual sites. Brave’s browser product includes
+                project-specific services and policies; review its current
+                privacy information.</td
+              >
+              <td
+                ><a href="https://brave.com/shields/">Shields</a><br /><a
+                  href="https://brave.com/privacy/browser/">Privacy policy</a
+                ><br /><a
+                  href="https://github.com/brave/brave-browser/blob/master/LICENSE"
+                  >Source license</a
+                ></td
+              >
+            </tr>
+            <tr>
+              <th scope="row">Cromite</th>
+              <td
+                >Community-maintained Chromium fork with Android builds; consult
+                its current release notes for supported device architectures and
+                Android versions.</td
+              >
+              <td
+                >Built-in ad blocking and privacy-focused Chromium changes, as
+                described in its project documentation.</td
+              >
+              <td
+                >It is a separate browser distribution to install and keep
+                updated. Review the project’s build, update, compatibility, and
+                licensing notes for the exact release you use.</td
+              >
+              <td
+                ><a href="https://github.com/qwez-dev/cromite"
+                  >Project and release notes</a
+                ><br /><a
+                  href="https://github.com/qwez-dev/cromite/blob/master/LICENSE"
+                  >GPL 3.0</a
+                ></td
+              >
+            </tr>
+            <tr>
+              <th scope="row">Vivaldi</th>
+              <td
+                >Vivaldi Browser for Android is a Chromium-based browser
+                distributed by Vivaldi.</td
+              >
+              <td
+                >Its Android help documents tracker and ad blocking, tab tools,
+                and interface customization such as themes.</td
+              >
+              <td
+                >Vivaldi is proprietary software. Its vendor documents that the
+                browser is not wholly open source and that licensing varies
+                across Chromium modifications and third-party components.</td
+              >
+              <td
+                ><a href="https://help.vivaldi.com/android/">Android help</a><br
+                /><a
+                  href="https://help.vivaldi.com/android/android-privacy/android-tracker-and-ad-blocker/"
+                  >Tracker and ad blocker</a
+                ><br /><a
+                  href="https://help.vivaldi.com/android/android-appearance/themes-on-android/"
+                  >Themes</a
+                ><br /><a
+                  href="https://help.vivaldi.com/desktop/privacy/is-vivaldi-open-source/"
+                  >Open-source and license notes</a
+                ></td
+              >
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="comparison-note">
+        Comparison checked 31 October 2026 against the linked project
+        documentation. Feature descriptions summarize those sources; they do not
+        assess privacy practices, security, speed, or quality.
+      </p>
+    </section>
+
+    <section class="section comparison-guidance" aria-labelledby="fit-heading">
+      <div class="shell comparison-guidance-grid">
+        <div>
+          <p class="kicker">Finding a fit</p>
+          <h2 id="fit-heading">Start with the way you browse.</h2>
+        </div>
+        <div>
+          <p>
+            Solipsism may suit someone who wants an Android browser organized
+            around a configurable side rail and built-in controls, and who is
+            comfortable with WebView’s platform limits. Firefox may suit someone
+            who wants Mozilla’s Android add-on catalog. Brave documents
+            integrated Shields controls; Vivaldi emphasizes browser
+            customization. Cromite offers a Chromium fork for users willing to
+            manage a separate build and release channel.
+          </p>
+          <p>
+            Compare each browser’s current permissions, update process, privacy
+            information, compatibility, and license before installing. No
+            feature list can establish that one browser is safer or more private
+            for every person.
+          </p>
+          <div class="link-cluster">
+            <a href={`${base}docs/`}>Solipsism technical guide</a>
+            <a href={`${base}guides/getting-started/`}>Install guide</a>
+            <a href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/issues"
+              >Ask a project question</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,299 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+
+<BaseLayout
+  title="Technical documentation — Solipsism Browser"
+  description="Installation, Android permissions, browser-core behavior, privacy boundaries, development commands, and troubleshooting for Solipsism Browser."
+  path="/docs/"
+>
+  <Header />
+  <main id="main">
+    <section class="archive-hero shell reference-hero">
+      <p class="kicker">Technical reference · v9.4.0</p>
+      <h1>Understand the<br /><em>browser underneath.</em></h1>
+      <p>
+        Solipsism is an Android application built around Android WebView. This
+        guide covers installation, runtime requirements, permissions, the
+        optional Antares core, development, and known limits.
+      </p>
+      <div class="page-actions">
+        <a class="button" href={`${base}guides/getting-started/`}
+          >Start with the beginner guide</a
+        >
+        <a
+          class="button button-secondary"
+          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism">View source</a
+        >
+      </div>
+    </section>
+
+    <div class="shell reference-layout">
+      <article class="reference-content">
+        <section id="requirements">
+          <p class="kicker">01 · Install</p>
+          <h2>Requirements and releases</h2>
+          <ul>
+            <li>Android 8.0 (API 26) or newer.</li>
+            <li>
+              An installed Android System WebView provider for the stable
+              browser core.
+            </li>
+            <li>
+              The official 9.4.0 release contains one APK asset. Later releases
+              may change their assets or minimum requirements; check the release
+              notes before installing.
+            </li>
+          </ul>
+          <p>
+            Get APKs from the project’s
+            <a href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases"
+              >GitHub Releases</a
+            >
+            page. Only install packages from a distribution channel you trust. Android
+            asks you to approve installs from the selected source; keep that permission
+            limited to the source you use.
+          </p>
+          <p>
+            The package ID is <code>com.krystelligence.solipsism</code>. The
+            repository describes Solipsism as MPL 2.0; see the
+            <a
+              href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE"
+              >license file</a
+            >.
+          </p>
+        </section>
+
+        <section id="browser-cores">
+          <p class="kicker">02 · Rendering</p>
+          <h2>WebView and Antares</h2>
+          <p>
+            Android WebView is the stable core. Web rendering, Safe Browsing,
+            and some capabilities depend on the installed WebView provider and
+            Android version.
+          </p>
+          <p>
+            Solipsism 9.4.0 also includes Antares 0.5.0 as an experimental,
+            opt-in browser core. An official signed ARM64 companion package may
+            be used as a fallback where supported. Antares is not required to
+            run Solipsism, and WebView remains available as the stable choice.
+          </p>
+          <ul>
+            <li>
+              Antares requires Android 13 or newer and a supported 64-bit ARM or
+              x86 device.
+            </li>
+            <li>
+              The companion engine must have the expected package identity,
+              signing certificate, and protocol version before Solipsism enables
+              it.
+            </li>
+            <li>
+              Switching cores applies to all tabs in the session. History
+              stacks, form state, media state, and cookies are engine-private
+              and are not promised to carry over.
+            </li>
+            <li>
+              Some complex sites can have incomplete interaction, CAPTCHA, or
+              media playback in Antares. Choose WebView if a page does not work.
+            </li>
+          </ul>
+          <p>
+            The project’s
+            <a
+              href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/docs/ANTARES_ENGINE.md"
+              >Antares engine notes</a
+            >
+            describe package verification, supported devices, switching, and the optional
+            coordinate diagnostic. That diagnostic loads the same HTTP or HTTPS page
+            in a hidden WebView and makes additional requests; it is disabled by default.
+          </p>
+        </section>
+
+        <section id="permissions">
+          <p class="kicker">03 · Android access</p>
+          <h2>Permissions and prompts</h2>
+          <p>
+            Solipsism declares a small set of permissions and requests several
+            others only when a feature needs them. Android or the WebView
+            provider can show additional prompts.
+          </p>
+          <div
+            class="reference-table-wrap"
+            role="region"
+            aria-label="Permission purposes"
+            tabindex="0"
+          >
+            <table>
+              <thead
+                ><tr
+                  ><th>Permission</th><th>Purpose described by the project</th
+                  ></tr
+                ></thead
+              >
+              <tbody>
+                <tr
+                  ><th scope="row">Internet</th><td
+                    >Load webpages and access online resources.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row">Network state</th><td
+                    >Check connectivity state.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row">Notifications</th><td
+                    >Show download and scan notifications.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row">Camera</th><td
+                    >QR scanning and optional WebRTC video capture.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row">Microphone and audio settings</th><td
+                    >Optional WebRTC audio capture and audio controls.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row">Location</th><td
+                    >Website location requests when enabled and allowed by
+                    Android.</td
+                  ></tr
+                >
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Site-permission controls marked Experimental are best-effort policy
+            signals where WebView does not expose independent enforcement. Do
+            not treat them as a fully enforced desktop browser sandbox.
+          </p>
+        </section>
+
+        <section id="privacy-and-downloads">
+          <p class="kicker">04 · Data and downloads</p>
+          <h2>Privacy controls have limits</h2>
+          <ul>
+            <li>
+              Incognito browsing and separate cookie handling are available.
+            </li>
+            <li>
+              Cookies, history, cache, and web storage can be cleared
+              individually or on exit.
+            </li>
+            <li>
+              JavaScript, popups, cookies, and selected request headers have app
+              controls.
+            </li>
+            <li>
+              Safe Browsing is enabled when the installed WebView provider
+              supports it.
+            </li>
+            <li>
+              Navigation to sensitive Android schemes and app-generated local
+              pages has additional checks.
+            </li>
+          </ul>
+          <p>
+            Downloads use Android DownloadManager and browser handling. The
+            malware scanner combines local definitions with optional VirusTotal
+            assistance. Detection can be incomplete; the app itself warns that
+            this is an aid, not a replacement for other protections. Only use
+            the remote scan option if you understand the data sent to that
+            service and have configured your own key.
+          </p>
+          <p>
+            Userscripts are executable code. The manager supports common
+            metadata and lifecycle hooks, not the full Tampermonkey API. Only
+            install scripts whose source you trust.
+          </p>
+        </section>
+
+        <section id="developer-commands">
+          <p class="kicker">05 · Development</p>
+          <h2>Build and test commands</h2>
+          <p>
+            The repository README lists these Android development tasks. They
+            require the Android SDK, JDK 17 or newer, and the project’s compile
+            SDK; they are not needed to install the released APK.
+          </p>
+          <pre><code>./gradlew :app:assembleSolipsismBrowserDebug
+./gradlew :app:assembleSolipsismBrowserRelease
+./gradlew :app:testSolipsismBrowserDebugUnitTest
+python3 scripts/check_localized_resources.py</code></pre>
+          <p>
+            Release signing credentials are kept outside the repository. Do not
+            add signing keys, API keys, or private configuration to commits. The
+            source README and CI workflow contain the current build details.
+          </p>
+        </section>
+
+        <section id="troubleshooting">
+          <p class="kicker">06 · Troubleshooting</p>
+          <h2>Common issues</h2>
+          <dl class="troubleshooting-list">
+            <dt>A site is blank or missing a feature</dt>
+            <dd>
+              Check the Android System WebView provider and Android updates. If
+              you selected Antares, switch back to WebView and reload.
+            </dd>
+            <dt>A site permission does not behave as expected</dt>
+            <dd>
+              Review both Android app permissions and the site-specific setting.
+              Some WebView permissions are experimental and may not be
+              independently enforceable.
+            </dd>
+            <dt>An APK will not install</dt>
+            <dd>
+              Confirm the Android version meets the release requirement, use the
+              official release asset, and follow Android’s prompt for that
+              installation source.
+            </dd>
+            <dt>A scan blocks a download</dt>
+            <dd>
+              Read the detection details and verify the file source. The scanner
+              can produce false positives and can miss threats. Do not disable
+              scanning for an unknown file just to bypass a warning.
+            </dd>
+          </dl>
+          <p>
+            When reporting a problem, include the app version, Android version,
+            WebView provider, selected core, and steps to reproduce. Remove
+            browsing history, URLs, and personal data from screenshots or logs
+            before posting publicly.
+          </p>
+        </section>
+      </article>
+
+      <aside class="reference-toc">
+        <p class="kicker">On this page</p>
+        <nav aria-label="Technical documentation sections">
+          <a href="#requirements">Requirements</a>
+          <a href="#browser-cores">Browser cores</a>
+          <a href="#permissions">Permissions</a>
+          <a href="#privacy-and-downloads">Privacy and downloads</a>
+          <a href="#developer-commands">Development</a>
+          <a href="#troubleshooting">Troubleshooting</a>
+        </nav>
+        <div class="feature-callout">
+          <strong>New to Solipsism?</strong>
+          <p>
+            Install the official APK and take your first steps with the beginner
+            guide.
+          </p>
+          <a class="text-link" href={`${base}guides/getting-started/`}
+            >Open the guide →</a
+          >
+        </div>
+      </aside>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>

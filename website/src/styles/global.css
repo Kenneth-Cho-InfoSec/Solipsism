@@ -208,6 +208,21 @@ footer nav a:hover {
   max-width: 620px;
   color: var(--muted);
 }
+.hero-resource-links {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.hero-resource-links a {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-underline-offset: 0.22em;
+}
+.hero-resource-links a:hover {
+  color: var(--ink);
+}
 .hero-actions {
   display: flex;
   gap: 12px;
@@ -517,6 +532,7 @@ code {
   background: var(--surface-2);
   padding: 3px 7px;
   border-radius: 7px;
+  overflow-wrap: anywhere;
 }
 .badge {
   display: inline-block;
@@ -538,6 +554,7 @@ code {
   padding: 25px 0;
   color: var(--muted);
   max-width: 850px;
+  overflow-wrap: anywhere;
 }
 .release-notes h1,
 .release-notes h2,
@@ -549,6 +566,7 @@ code {
 }
 .release-notes a {
   color: var(--accent);
+  overflow-wrap: anywhere;
 }
 .release-notes pre {
   overflow: auto;
@@ -630,6 +648,209 @@ code {
   color: var(--muted);
   font-size: 1.1rem;
   max-width: 660px;
+}
+.page-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+.reference-hero {
+  max-width: 1180px;
+}
+.reference-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 72px;
+  align-items: start;
+  padding-bottom: 110px;
+}
+.reference-content {
+  min-width: 0;
+  max-width: 800px;
+}
+.reference-content section {
+  padding: 28px 0 42px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 100px;
+}
+.reference-content h2,
+.comparison-guidance h2 {
+  font:
+    700 clamp(1.7rem, 3.4vw, 2.5rem)/1.1 'Space Grotesk Variable',
+    sans-serif;
+  letter-spacing: -0.04em;
+}
+.reference-content p,
+.reference-content li,
+.reference-content dd,
+.comparison-guidance p {
+  color: var(--muted);
+}
+.reference-content li + li {
+  margin-top: 8px;
+}
+.reference-content a,
+.comparison-table a {
+  color: var(--accent);
+  text-underline-offset: 0.18em;
+}
+.reference-content pre {
+  overflow: auto;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-2);
+  line-height: 1.8;
+}
+.reference-content pre code {
+  padding: 0;
+  background: transparent;
+}
+.reference-toc {
+  position: sticky;
+  top: 102px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.reference-toc nav {
+  display: grid;
+  gap: 10px;
+}
+.reference-toc nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.reference-toc nav a:hover {
+  color: var(--ink);
+}
+.feature-callout {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--surface-2);
+}
+.feature-callout h3 {
+  margin-bottom: 8px;
+  font-family: 'Space Grotesk Variable', sans-serif;
+}
+.feature-callout p {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.feature-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.7fr);
+  gap: 56px;
+  align-items: center;
+}
+.feature-split h2,
+.privacy-grid h2 {
+  font:
+    700 clamp(2rem, 4vw, 3.5rem)/1.05 'Space Grotesk Variable',
+    sans-serif;
+  letter-spacing: -0.055em;
+}
+.feature-split > div > p:not(.kicker) {
+  color: var(--muted);
+}
+.feature-reference-grid article {
+  min-height: 225px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.feature-reference-grid h3 {
+  margin: 26px 0 8px;
+}
+.comparison-section {
+  padding-top: 30px;
+}
+.comparison-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  overscroll-behavior-inline: contain;
+}
+.comparison-table {
+  width: 100%;
+  min-width: 1040px;
+  border-collapse: collapse;
+  text-align: left;
+}
+.comparison-table th,
+.comparison-table td {
+  padding: 20px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.comparison-table thead th {
+  color: var(--muted);
+  background: var(--surface-2);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.comparison-table tbody th {
+  width: 150px;
+  font-family: 'Space Grotesk Variable', sans-serif;
+  font-size: 1.08rem;
+}
+.comparison-table td {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.comparison-table tr:last-child th,
+.comparison-table tr:last-child td {
+  border-bottom: 0;
+}
+.comparison-table a {
+  display: inline-block;
+  margin: 2px 0;
+}
+.comparison-note {
+  max-width: 800px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+.comparison-guidance {
+  background: var(--surface-2);
+}
+.comparison-guidance-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1fr);
+  gap: 64px;
+}
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding-bottom: 100px;
+}
+.community-card {
+  padding: clamp(24px, 4vw, 38px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+}
+.community-card h2 {
+  font:
+    700 clamp(1.55rem, 3vw, 2rem)/1.1 'Space Grotesk Variable',
+    sans-serif;
+  letter-spacing: -0.04em;
+}
+.community-card p:not(.kicker) {
+  max-width: 46ch;
+  color: var(--muted);
+}
+.community-card .text-link {
+  display: inline-block;
+  margin-top: 14px;
 }
 .archive-section {
   padding-bottom: 110px;
@@ -731,6 +952,19 @@ footer {
     grid-template-columns: 1fr;
     gap: 30px;
   }
+  .reference-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .reference-toc {
+    position: static;
+    grid-row: 1;
+  }
+  .feature-split,
+  .comparison-guidance-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
   .footer-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -777,6 +1011,15 @@ footer {
   }
   .section {
     padding-block: 76px;
+  }
+  .page-actions {
+    flex-direction: column;
+  }
+  .page-actions .button {
+    width: 100%;
+  }
+  .community-grid {
+    grid-template-columns: 1fr;
   }
   .benefit-grid,
   .feature-grid {
