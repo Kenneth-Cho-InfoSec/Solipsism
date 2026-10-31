@@ -31,6 +31,18 @@ const breadcrumbItems =
           { name: 'Getting started', item: canonical },
         ]
       : [];
+const breadcrumbSchema = breadcrumbItems.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbItems.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        item: item.item,
+      })),
+    }
+  : undefined;
 const schema = {
   '@context': 'https://schema.org',
   '@type': pageType,
@@ -46,19 +58,6 @@ const schema = {
     name: 'Solipsism Browser',
     url: Astro.site,
   },
-  ...(breadcrumbItems.length
-    ? {
-        breadcrumb: {
-          '@type': 'BreadcrumbList',
-          itemListElement: breadcrumbItems.map((item, index) => ({
-            '@type': 'ListItem',
-            position: index + 1,
-            name: item.name,
-            item: item.item,
-          })),
-        },
-      }
-    : {}),
   ...(path === '/'
     ? {
         license: 'https://www.mozilla.org/MPL/2.0/',
@@ -123,6 +122,13 @@ const schema = {
       type="application/ld+json"
       set:html={JSON.stringify(schema)}
     />
+    {breadcrumbSchema && (
+      <script
+        is:inline
+        type="application/ld+json"
+        set:html={JSON.stringify(breadcrumbSchema)}
+      />
+    )}
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
