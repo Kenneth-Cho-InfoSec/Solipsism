@@ -1,0 +1,404 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={['rail-play', className]}
+  data-rail-play
+  data-side="right"
+  data-size="regular"
+  data-stage="dark"
+  data-tabs="closed"
+>
+  <div class="rail-play__frame" data-ui>
+    <div class="rail-play__page">
+      <div class="rail-play__topbar">
+        <div class="rail-play__url" data-url>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <rect x="4" y="10" width="16" height="11" rx="1"></rect>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+          </svg>
+          <span data-url-text>solipsism.app/home</span>
+        </div>
+      </div>
+
+      <div class="rail-play__body">
+        <div class="rail-play__progress" data-progress aria-hidden="true"></div>
+        <p class="rail-play__eyebrow" data-page-eyebrow>Homepage</p>
+        <p class="rail-play__headline" data-page-title>
+          Quiet mornings, open tabs.
+        </p>
+        <div class="rail-play__tiles" aria-hidden="true">
+          <span class="rail-play__tile">Search</span>
+          <span class="rail-play__tile">Docs</span>
+          <span class="rail-play__tile">News</span>
+          <span class="rail-play__tile">Mail</span>
+          <span class="rail-play__tile">Notes</span>
+          <span class="rail-play__tile">More</span>
+        </div>
+      </div>
+
+      <div
+        class="rail-play__tabs"
+        data-tabs-panel
+        aria-hidden="true"
+        aria-label="Tab overview preview"
+      >
+        <div class="rail-play__tabs-head">
+          <span>3 tabs</span>
+          <span>Preview</span>
+        </div>
+        <button
+          class="rail-play__tab"
+          type="button"
+          data-tab
+          data-tab-title="Quiet mornings, open tabs."
+          data-tab-url="solipsism.app/home"
+          data-tab-eyebrow="Homepage"
+          aria-current="true"
+        >
+          <span class="rail-play__tab-dot" aria-hidden="true"></span>
+          Homepage
+        </button>
+        <button
+          class="rail-play__tab"
+          type="button"
+          data-tab
+          data-tab-title="Install and develop Solipsism."
+          data-tab-url="solipsism.app/docs"
+          data-tab-eyebrow="Documentation"
+        >
+          <span class="rail-play__tab-dot" aria-hidden="true"></span>
+          Documentation
+        </button>
+        <button
+          class="rail-play__tab"
+          type="button"
+          data-tab
+          data-tab-title="Solipsism Browser 9.4.0"
+          data-tab-url="github.com/…/releases"
+          data-tab-eyebrow="Release notes"
+        >
+          <span class="rail-play__tab-dot" aria-hidden="true"></span>
+          Release notes
+        </button>
+      </div>
+    </div>
+
+    <div class="rail-play__rail" role="toolbar" aria-label="Rail preview">
+      <button type="button" data-rail-action="back" aria-label="Go back">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <path d="M15 5l-7 7 7 7"></path>
+        </svg>
+      </button>
+      <button type="button" data-rail-action="forward" aria-label="Go forward">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <path d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+      <span class="rail-spacer"></span>
+      <button
+        type="button"
+        data-rail-action="tabs"
+        aria-label="Open tab overview"
+        aria-expanded="false"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <rect x="4" y="4" width="12" height="12"></rect>
+          <path d="M8 20h12V8"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        data-rail-action="refresh"
+        aria-label="Refresh page"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <path d="M20 11a8 8 0 1 0-2.3 5.7"></path>
+          <path d="M20 4v7h-7"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        data-rail-action="theme"
+        aria-label="Switch preview between light and dark"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="rail-play__controls">
+    <div class="rail-play__group" role="group" aria-label="Rail side">
+      <button type="button" data-side="left" aria-pressed="false">Left</button>
+      <button type="button" data-side="right" aria-pressed="true">Right</button>
+    </div>
+    <div class="rail-play__group" role="group" aria-label="Rail size">
+      <button type="button" data-size="compact" aria-pressed="false"
+        >Compact</button
+      >
+      <button type="button" data-size="regular" aria-pressed="true"
+        >Regular</button
+      >
+    </div>
+    <div class="rail-play__group" role="group" aria-label="Preview theme">
+      <button type="button" data-stage="light" aria-pressed="false"
+        >Light</button
+      >
+      <button type="button" data-stage="dark" aria-pressed="true">Dark</button>
+    </div>
+  </div>
+  <p class="rail-play__note">
+    A live preview of the rail. Every control works; changes stay on this page.
+  </p>
+</div>
+
+<style>
+  .rail-play[data-stage='dark'] .rail-play__frame {
+    --bg: #171715;
+    --bg-deep: #111110;
+    --surface: #1f1f1c;
+    --surface-2: #262622;
+    --surface-3: #2e2e29;
+    --ink: #f2f1ec;
+    --ink-soft: #d8d7cf;
+    --muted: #b6b7ae;
+    --line: #34342f;
+    --sage: #9db39b;
+    --on-sage: #14150f;
+    --field: #0e0e0d;
+  }
+
+  .rail-play[data-stage='light'] .rail-play__frame {
+    --bg: #e9e7df;
+    --bg-deep: #dedbd1;
+    --surface: #f4f2ec;
+    --surface-2: #e3e0d6;
+    --surface-3: #d8d4c8;
+    --ink: #1c1c1c;
+    --ink-soft: #33342f;
+    --muted: #5c5d57;
+    --line: #cfccc1;
+    --sage: #4f6b4e;
+    --on-sage: #f6f4ee;
+    --field: #fbfaf6;
+  }
+
+  .rail-play__progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--sage);
+    opacity: 0;
+  }
+
+  .rail-play[data-loading='true'] .rail-play__progress {
+    animation: rail-load 620ms var(--ease-out);
+  }
+
+  @keyframes rail-load {
+    0% {
+      width: 0;
+      opacity: 1;
+    }
+    70% {
+      width: 78%;
+      opacity: 1;
+    }
+    100% {
+      width: 100%;
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-rail-play]').forEach((root) => {
+    const frame = root.querySelector<HTMLElement>('.rail-play__frame');
+    const title = root.querySelector<HTMLElement>('[data-page-title]');
+    const eyebrow = root.querySelector<HTMLElement>('[data-page-eyebrow]');
+    const urlText = root.querySelector<HTMLElement>('[data-url-text]');
+    const tabsPanel = root.querySelector<HTMLElement>('[data-tabs-panel]');
+    const tabsButton = root.querySelector<HTMLButtonElement>(
+      '[data-rail-action="tabs"]',
+    );
+    const tabs = Array.from(
+      root.querySelectorAll<HTMLButtonElement>('[data-tab]'),
+    );
+
+    let index = 0;
+
+    function renderTab(selected: number) {
+      const tab = tabs[selected];
+      if (!tab) return;
+      index = selected;
+      tabs.forEach((item, itemIndex) =>
+        item.setAttribute('aria-current', String(itemIndex === selected)),
+      );
+      if (title) title.textContent = tab.dataset.tabTitle ?? '';
+      if (eyebrow) eyebrow.textContent = tab.dataset.tabEyebrow ?? '';
+      if (urlText) urlText.textContent = tab.dataset.tabUrl ?? '';
+    }
+
+    function setTabs(open: boolean) {
+      root.dataset.tabs = open ? 'open' : 'closed';
+      tabsButton?.setAttribute('aria-expanded', String(open));
+      tabsButton?.setAttribute(
+        'aria-label',
+        open ? 'Close tab overview' : 'Open tab overview',
+      );
+      tabsPanel?.setAttribute('aria-hidden', String(!open));
+      if (open) tabs[index]?.focus();
+    }
+
+    tabsButton?.addEventListener('click', () =>
+      setTabs(root.dataset.tabs !== 'open'),
+    );
+
+    tabs.forEach((tab, tabIndex) => {
+      tab.addEventListener('click', () => {
+        renderTab(tabIndex);
+        setTabs(false);
+        tabsButton?.focus();
+      });
+    });
+
+    root
+      .querySelector('[data-rail-action="back"]')
+      ?.addEventListener('click', () => {
+        renderTab((index - 1 + tabs.length) % tabs.length);
+      });
+
+    root
+      .querySelector('[data-rail-action="forward"]')
+      ?.addEventListener('click', () => {
+        renderTab((index + 1) % tabs.length);
+      });
+
+    root
+      .querySelector('[data-rail-action="refresh"]')
+      ?.addEventListener('click', () => {
+        root.dataset.loading = 'true';
+        frame?.animate([{ opacity: 0.82 }, { opacity: 1 }], {
+          duration: 520,
+          easing: 'ease-out',
+        });
+        setTimeout(() => {
+          root.dataset.loading = 'false';
+        }, 640);
+      });
+
+    root
+      .querySelector('[data-rail-action="theme"]')
+      ?.addEventListener('click', () => {
+        const next = root.dataset.stage === 'light' ? 'dark' : 'light';
+        root.dataset.stage = next;
+        root
+          .querySelectorAll<HTMLButtonElement>('[data-stage]')
+          .forEach((button) => {
+            button.setAttribute(
+              'aria-pressed',
+              String(button.dataset.stage === next),
+            );
+          });
+      });
+
+    root
+      .querySelectorAll<HTMLButtonElement>('[data-side]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          root.dataset.side = button.dataset.side ?? 'right';
+          root
+            .querySelectorAll<HTMLButtonElement>('[data-side]')
+            .forEach((item) =>
+              item.setAttribute(
+                'aria-pressed',
+                String(item.dataset.side === root.dataset.side),
+              ),
+            );
+        });
+      });
+
+    root
+      .querySelectorAll<HTMLButtonElement>('[data-size]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          root.dataset.size = button.dataset.size ?? 'regular';
+          root
+            .querySelectorAll<HTMLButtonElement>('[data-size]')
+            .forEach((item) =>
+              item.setAttribute(
+                'aria-pressed',
+                String(item.dataset.size === root.dataset.size),
+              ),
+            );
+        });
+      });
+
+    root
+      .querySelectorAll<HTMLButtonElement>('[data-stage]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          root.dataset.stage = button.dataset.stage ?? 'dark';
+          root
+            .querySelectorAll<HTMLButtonElement>('[data-stage]')
+            .forEach((item) =>
+              item.setAttribute(
+                'aria-pressed',
+                String(item.dataset.stage === root.dataset.stage),
+              ),
+            );
+        });
+      });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && root.dataset.tabs === 'open') {
+        setTabs(false);
+        tabsButton?.focus();
+      }
+    });
+  });
+</script>

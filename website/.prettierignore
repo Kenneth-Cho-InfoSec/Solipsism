@@ -1,0 +1,9 @@
+graphify-out/
+.taste-skill/
+dist/
+.astro/
+node_modules/
+playwright-report/
+test-results/
+.e2e-root/
+package-lock.json

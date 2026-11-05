@@ -1,0 +1,52 @@
+---
+const tiles = [
+  {
+    mark: '9.4.0',
+    label: 'Latest published release, 24 October 2026. One APK asset.',
+    accent: true,
+  },
+  {
+    mark: 'API 26',
+    label: 'Android 8.0 and newer. WebView is the stable core.',
+    accent: false,
+  },
+  {
+    mark: 'MPL 2.0',
+    label: 'Source available. Modifications to covered files stay open.',
+    accent: false,
+  },
+  {
+    mark: '0',
+    label: 'Analytics or third-party tracking scripts on this site.',
+    accent: true,
+  },
+];
+---
+
+<section class="section section--tight" aria-labelledby="proof-heading">
+  <div class="shell">
+    <div class="section-head">
+      <h2 id="proof-heading">What actually ships.</h2>
+      <p>
+        Numbers from the published release and the repository, not from a
+        marketing deck.
+      </p>
+    </div>
+    <div class="proof">
+      {
+        tiles.map((tile) => (
+          <div
+            class:list={[
+              'proof__tile',
+              'reveal',
+              tile.accent && 'proof__tile--accent',
+            ]}
+          >
+            <p class="proof__mark">{tile.mark}</p>
+            <p class="proof__label">{tile.label}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

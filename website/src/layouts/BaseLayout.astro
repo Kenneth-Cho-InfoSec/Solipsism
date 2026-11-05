@@ -1,48 +1,24 @@
 ---
-import '@fontsource-variable/manrope';
-import '@fontsource-variable/space-grotesk';
+import '@fontsource-variable/archivo';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description: string;
   path?: string;
+  type?: 'website' | 'article';
 }
-const { title, description, path = '/' } = Astro.props;
+const { title, description, path = '/', type = 'website' } = Astro.props;
 const canonical = new URL(path.replace(/^\//, ''), Astro.site);
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const socialImage = new URL(`${base}/assets/solipsism-logo.png`, Astro.site);
 const pageType =
   path === '/'
     ? 'SoftwareApplication'
-    : path === '/docs/' || path === '/guides/getting-started/'
+    : path.startsWith('/docs') || path.startsWith('/guides')
       ? 'TechArticle'
       : 'WebPage';
-const breadcrumbItems =
-  path === '/docs/'
-    ? [
-        { name: 'Home', item: Astro.site },
-        { name: 'Documentation', item: canonical },
-      ]
-    : path === '/guides/getting-started/'
-      ? [
-          { name: 'Home', item: Astro.site },
-          { name: 'Documentation', item: new URL('docs/', Astro.site) },
-          { name: 'Getting started', item: canonical },
-        ]
-      : [];
-const breadcrumbSchema = breadcrumbItems.length
-  ? {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: breadcrumbItems.map((item, index) => ({
-        '@type': 'ListItem',
-        position: index + 1,
-        name: item.name,
-        item: item.item,
-      })),
-    }
-  : undefined;
+
 const schema = {
   '@context': 'https://schema.org',
   '@type': pageType,
@@ -62,12 +38,10 @@ const schema = {
     ? {
         license: 'https://www.mozilla.org/MPL/2.0/',
         sameAs: 'https://github.com/Kenneth-Cho-InfoSec/Solipsism',
+        downloadUrl:
+          'https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest',
       }
     : {}),
-  downloadUrl:
-    path === '/'
-      ? 'https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest'
-      : undefined,
 };
 ---
 
@@ -79,13 +53,13 @@ const schema = {
     <meta name="description" content={description} />
     <meta
       name="theme-color"
-      content="#f7f6fb"
-      media="(prefers-color-scheme: light)"
+      content="#171715"
+      media="(prefers-color-scheme: dark)"
     />
     <meta
       name="theme-color"
-      content="#070709"
-      media="(prefers-color-scheme: dark)"
+      content="#e9e7df"
+      media="(prefers-color-scheme: light)"
     />
     <link rel="canonical" href={canonical} />
     <link
@@ -93,7 +67,7 @@ const schema = {
       type="image/png"
       href={`${base}/assets/solipsism-logo-128.png`}
     />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
     <meta property="og:site_name" content="Solipsism Browser" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -108,13 +82,17 @@ const schema = {
     <title>{title}</title>
     <script is:inline>
       (() => {
+        const modes = ['system', 'light', 'dark', 'amoled'];
         const saved = localStorage.getItem('solipsism-theme') || 'system';
+        const mode = modes.includes(saved) ? saved : 'system';
         const dark =
-          saved === 'dark' ||
-          (saved === 'system' &&
+          mode === 'dark' ||
+          mode === 'amoled' ||
+          (mode === 'system' &&
             matchMedia('(prefers-color-scheme: dark)').matches);
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-        document.documentElement.dataset.themeMode = saved;
+        document.documentElement.dataset.theme =
+          mode === 'amoled' ? 'amoled' : dark ? 'dark' : 'light';
+        document.documentElement.dataset.themeMode = mode;
       })();
     </script>
     <script
@@ -122,74 +100,140 @@ const schema = {
       type="application/ld+json"
       set:html={JSON.stringify(schema)}
     />
-    {
-      breadcrumbSchema && (
-        <script
-          is:inline
-          type="application/ld+json"
-          set:html={JSON.stringify(breadcrumbSchema)}
-        />
-      )
-    }
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <slot />
+
     <script>
-      const themeButton = document.querySelector<HTMLButtonElement>(
-        '[data-theme-control]',
-      );
-      const labels = {
+      import '../scripts/releases';
+
+      const modes = ['system', 'light', 'dark', 'amoled'] as const;
+      type Mode = (typeof modes)[number];
+
+      const labels: Record<Mode, string> = {
         system: 'Theme: system',
         light: 'Theme: light',
         dark: 'Theme: dark',
-      } as const;
-      function applyTheme(mode: keyof typeof labels) {
+        amoled: 'Theme: AMOLED black',
+      };
+
+      const root = document.documentElement;
+      const themeButton = document.querySelector<HTMLButtonElement>(
+        '[data-theme-control]',
+      );
+
+      function applyTheme(mode: Mode) {
         const dark =
           mode === 'dark' ||
+          mode === 'amoled' ||
           (mode === 'system' &&
             matchMedia('(prefers-color-scheme: dark)').matches);
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-        document.documentElement.dataset.themeMode = mode;
+        root.dataset.theme =
+          mode === 'amoled' ? 'amoled' : dark ? 'dark' : 'light';
+        root.dataset.themeMode = mode;
         localStorage.setItem('solipsism-theme', mode);
         if (themeButton) {
-          themeButton.textContent =
-            mode === 'system' ? '◐' : mode === 'dark' ? '●' : '○';
           themeButton.setAttribute('aria-label', labels[mode]);
           themeButton.title = labels[mode];
         }
       }
-      const initial = (localStorage.getItem('solipsism-theme') ||
-        'system') as keyof typeof labels;
-      applyTheme(initial in labels ? initial : 'system');
+
+      const stored = (localStorage.getItem('solipsism-theme') ||
+        'system') as Mode;
+      applyTheme(modes.includes(stored) ? stored : 'system');
+
       themeButton?.addEventListener('click', () => {
-        const mode = document.documentElement.dataset
-          .themeMode as keyof typeof labels;
-        applyTheme(
-          mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system',
-        );
+        const current = (root.dataset.themeMode || 'system') as Mode;
+        const next = modes[(modes.indexOf(current) + 1) % modes.length]!;
+        applyTheme(next);
       });
+
       matchMedia('(prefers-color-scheme: dark)').addEventListener(
         'change',
         () => {
-          if (document.documentElement.dataset.themeMode === 'system')
-            applyTheme('system');
+          if (root.dataset.themeMode === 'system') applyTheme('system');
         },
       );
+
+      /* Mobile navigation ------------------------------------------------- */
       const toggle =
         document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
       const nav = document.querySelector<HTMLElement>('[data-mobile-nav]');
+
+      function setNav(open: boolean) {
+        toggle?.setAttribute('aria-expanded', String(open));
+        toggle?.setAttribute(
+          'aria-label',
+          open ? 'Close navigation' : 'Open navigation',
+        );
+        if (open) nav?.setAttribute('data-open', '');
+        else nav?.removeAttribute('data-open');
+      }
+
       toggle?.addEventListener('click', () => {
-        const open = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!open));
-        nav?.toggleAttribute('data-open', !open);
+        setNav(toggle.getAttribute('aria-expanded') !== 'true');
       });
-      nav?.querySelectorAll('a').forEach((link) =>
-        link.addEventListener('click', () => {
-          toggle?.setAttribute('aria-expanded', 'false');
-          nav.removeAttribute('data-open');
-        }),
-      );
+
+      nav
+        ?.querySelectorAll('a')
+        .forEach((link) => link.addEventListener('click', () => setNav(false)));
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && nav?.hasAttribute('data-open')) {
+          setNav(false);
+          toggle?.focus();
+        }
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!nav?.hasAttribute('data-open')) return;
+        const target = event.target as Node;
+        if (!nav.contains(target) && !toggle?.contains(target)) setNav(false);
+      });
+
+      /* Scroll reveals ---------------------------------------------------- */
+      const reduceMotion = matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      ).matches;
+
+      if (!reduceMotion && 'IntersectionObserver' in window) {
+        root.classList.add('motion-ready');
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0.12 },
+        );
+        document
+          .querySelectorAll<HTMLElement>('.reveal')
+          .forEach((element) => observer.observe(element));
+      }
+
+      /* Code copy --------------------------------------------------------- */
+      document.querySelectorAll<HTMLElement>('.code-block').forEach((block) => {
+        const pre = block.querySelector('pre');
+        if (!pre) return;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'code-block__copy';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        button.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(pre.innerText);
+            button.textContent = 'Copied';
+            setTimeout(() => (button.textContent = 'Copy'), 1600);
+          } catch {
+            button.textContent = 'Select';
+          }
+        });
+        block.append(button);
+      });
     </script>
   </body>
 </html>

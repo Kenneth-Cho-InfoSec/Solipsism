@@ -2,223 +2,108 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import ReleaseMount from '../components/ReleaseMount.astro';
-const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+import RailPlayground from '../components/RailPlayground.astro';
+import FeatureBands from '../components/FeatureBands.astro';
+import FilterLab from '../components/FilterLab.astro';
+import Showcase from '../components/Showcase.astro';
+import CoreStory from '../components/CoreStory.astro';
+import ProofTiles from '../components/ProofTiles.astro';
+import FaqList from '../components/FaqList.astro';
+import CallToAction from '../components/CallToAction.astro';
+import { FAQS } from '../data/faqs';
+import { SITE, withBase } from '../data/site';
 
-const features = [
-  [
-    'Browsing & navigation',
-    'Tabs and tab overview, a configurable left or right rail, QR scanning, fullscreen video and familiar browser tools.',
-  ],
-  [
-    'Privacy & security',
-    'Incognito browsing, site permissions, cookie controls, Do Not Track, Safe Browsing and hardened URL handling.',
-  ],
-  [
-    'Ad & tracker blocking',
-    'Host-based blocking, cosmetic filters, custom rules and an element picker — a focused WebView-safe subset, not full uBlock Origin.',
-  ],
-  [
-    'Userscripts',
-    'Import and manage scripts with familiar metadata and supported lifecycle injection. Experimental; not the complete Tampermonkey API.',
-  ],
-  [
-    'Malware & download safety',
-    'Local definitions-based scanning with optional VirusTotal assistance, explicit scan choices and DownloadManager support.',
-  ],
-  [
-    'Appearance & accessibility',
-    'Light, dark and AMOLED-black themes, accents, wallpapers, custom fonts, text reflow and sizing controls.',
-  ],
-  [
-    'Homepage customisation',
-    'Bookmarks, motto, clock, wallpapers, or sanitised static HTML/CSS stored privately on-device.',
-  ],
-  [
-    'Productivity tools',
-    'Screenshots, find in page, sharing, bookmarks, history, downloads, audio equaliser presets and Decoy Mode.',
-  ],
-];
+const base = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout
-  title="Solipsism Browser — Android browsing with rail controls"
-  description="Solipsism is an Android browser built on WebView. A side rail keeps tabs, navigation, site permissions and common controls within reach for one-handed browsing."
+  title="Solipsism Browser · Android browsing within reach"
+  description="A privacy-focused Android browser built on WebView, with a rail-first interface that keeps tabs, search and controls within one-handed reach. Antares is an optional experimental core."
+  path="/"
 >
-  <Header />
+  <Header path="/" />
   <main id="main">
-    <section class="hero shell">
-      <div class="hero-copy">
-        <h1>Android browsing within reach.</h1>
-        <p>
-          Solipsism is an Android browser built on WebView. Its side rail keeps
-          tabs, navigation and common controls at the screen edge for one-handed
-          browsing.
-        </p>
-        <div class="hero-actions">
-          <a
-            class="button latest-download"
-            data-latest-download
-            href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest"
-            >Download latest APK</a
-          ><a
-            class="button button-secondary"
-            href="https://github.com/Kenneth-Cho-InfoSec/Solipsism"
-            >View source on GitHub</a
-          >
-        </div>
-        <p class="download-meta">
-          Version <span data-latest-version>Checking GitHub Releases…</span>{
-            ' '
-          }
-          ·{' '}<span data-latest-meta>APK size pending</span>
-        </p>
-        <div class="hero-resource-links" aria-label="Project guides">
-          <a href={`${base}guides/getting-started/`}>Get started</a>
-          <a href={`${base}docs/`}>Read documentation</a>
-          <a href={`${base}features/`}>Explore features</a>
-        </div>
-        <div class="architecture-chooser" data-architecture-chooser hidden>
-        </div>
-      </div>
-      <div
-        class="device-stage"
-        aria-label="Solipsism Browser running on Android"
-      >
-        <div class="phone phone-screenshot">
-          <img
-            class="screenshot-light"
-            src={`${base}assets/solipsism-browser-screenshot-light.jpeg`}
-            width="921"
-            height="2048"
-            alt="Solipsism Browser homepage in light mode with bookmark tiles and a right-side navigation rail"
-            loading="eager"
-            fetchpriority="high"
-          />
-          <img
-            class="screenshot-dark"
-            src={`${base}assets/solipsism-browser-screenshot.jpeg`}
-            width="921"
-            height="2048"
-            alt="Solipsism Browser homepage in AMOLED-black mode with bookmark tiles and a right-side navigation rail"
-            loading="eager"
-            fetchpriority="high"
-          />
-        </div>
-      </div>
-    </section>
-
-    <section class="section why" aria-labelledby="why-heading">
-      <div class="shell">
-        <div class="section-heading">
-          <h2 id="why-heading">Keep tabs and controls at the edge.</h2><p>
-            Frequent controls stay visible, powerful options remain
-            understandable, and the page gets the space it deserves.
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="shell hero__grid">
+        <div class="hero__copy">
+          <h1 id="hero-heading">Android browsing within reach.</h1>
+          <p class="hero__lead">
+            A privacy-focused Android browser built on WebView. Tabs, search and
+            controls sit in a rail at the screen edge, so one hand can do the
+            work of two.
           </p>
-        </div>
-        <div class="benefit-grid">
-          <article>
-            <h3>One-handed navigation</h3><p>
-              Place the compact navigation rail on either side and choose the
-              size that fits your grip.
-            </p>
-          </article><article>
-            <h3>Site privacy controls</h3><p>
-              Manage cookies, site permissions, headers and clear-on-exit
-              choices without hunting.
-            </p>
-          </article><article>
-            <h3>Blocking and userscripts</h3><p>
-              Custom filters, userscripts, malware checks and capture tools are
-              built in and honestly scoped.
-            </p>
-          </article><article>
-            <h3>Interface settings</h3><p>
-              Accessibility, colour, type and homepage controls make the
-              experience personal.
-            </p>
-          </article><article class="open-source">
-            <h3>Open source under MPL 2.0</h3><p>
-              Source available under the Mozilla Public License 2.0, with public
-              issues and development history.
-            </p><a
-              href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE"
-              >Read the licence ↗</a
+          <div class="hero__actions">
+            <a
+              class="button latest-download"
+              data-latest-download
+              href={SITE.latestRelease}>Download latest APK</a
             >
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section
-      class="section shell"
-      id="features"
-      aria-labelledby="features-heading"
-    >
-      <div class="section-heading">
-        <h2 id="features-heading">Browser features and their limits.</h2><p>
-          Purposeful browser features, grouped around what you want to do.
-        </p>
-      </div><div class="feature-grid">
-        {
-          features.map(([title, text]) => (
-            <article>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section
-      class="section privacy"
-      id="privacy"
-      aria-labelledby="privacy-heading"
-    >
-      <div class="shell privacy-grid">
-        <div>
-          <h2 id="privacy-heading">Browser limits, clearly stated.</h2>
-        </div><div class="privacy-copy">
-          <p>
-            Solipsism is built on Android WebView. Rendering, Safe Browsing and
-            some web capabilities therefore depend on your installed WebView
-            provider and Android version.
-          </p><p>
-            Experimental site-permission controls are best-effort policy signals
-            where WebView does not expose independent enforcement. Userscripts
-            support common metadata and lifecycle points, but not the complete
-            desktop Tampermonkey API. Cosmetic filtering is a focused subset,
-            not a complete uBlock Origin implementation.
-          </p><div class="link-cluster">
-            <a href="https://github.com/Kenneth-Cho-InfoSec/Solipsism"
-              >Source code ↗</a
-            ><a
-              href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE"
-              >Licence ↗</a
-            ><a href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/issues"
-              >Issues ↗</a
-            ><a href="https://github.com/Kenneth-Cho-InfoSec/Solipsism#readme"
-              >Documentation ↗</a
+            <a class="text-link" href={withBase(base, '/docs/')}
+              >Read the documentation</a
+            >
+          </div>
+          <p class="hero__meta">
+            <span
+              >Version <span data-latest-version>checking GitHub…</span></span
+            >
+            <span data-latest-meta>APK size pending</span>
+            <span>Android 8.0+</span>
+          </p>
+          <div class="hero__links" aria-label="Project links">
+            <a href={withBase(base, '/features/')}>Explore features</a>
+            <a href={withBase(base, '/guides/getting-started/')}
+              >Set up Solipsism</a
+            >
+            <a href={withBase(base, '/compare/')}>Compare browsers</a>
+            <a
+              href="https://github.com/Kenneth-Cho-InfoSec/Solipsism"
+              target="_blank"
+              rel="noopener noreferrer">Source ↗</a
             >
           </div>
         </div>
+
+        <div class="hero__stage">
+          <RailPlayground />
+        </div>
       </div>
     </section>
 
-    <section
-      class="section shell latest"
-      id="releases"
-      aria-labelledby="latest-heading"
-    >
-      <div class="section-heading row">
-        <div>
-          <h2 id="latest-heading">Latest release and downloads</h2>
-        </div><a class="text-link" href={`${base}releases/`}
-          >Complete release archive →</a
-        >
-      </div><ReleaseMount mode="latest" />
+    <section class="section section--flip" aria-labelledby="bands-heading">
+      <div class="shell section-head reveal">
+        <h2 id="bands-heading">Five controls you will actually use.</h2>
+        <p>
+          Every claim below maps to a setting in the Android app. The switches
+          are a preview of the real state, not a mock-up of grey bars.
+        </p>
+      </div>
+      <FeatureBands />
     </section>
+
+    <Showcase />
+
+    <FilterLab />
+
+    <CoreStory />
+
+    <ProofTiles />
+
+    <section class="section" aria-labelledby="faq-heading">
+      <div class="shell">
+        <div class="section-head reveal">
+          <h2 id="faq-heading">Before you install.</h2>
+          <p>
+            The questions that decide whether this browser suits your device and
+            your expectations.
+          </p>
+        </div>
+        <div class="reveal">
+          <FaqList items={FAQS} />
+        </div>
+      </div>
+    </section>
+
+    <CallToAction />
   </main>
   <Footer />
 </BaseLayout>

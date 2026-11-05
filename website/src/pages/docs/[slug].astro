@@ -1,0 +1,52 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import DocBlocks from '../../components/docs/DocBlocks.astro';
+import { DOC_PAGES } from '../../data/docs';
+
+export function getStaticPaths() {
+  return DOC_PAGES.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+
+const flat = [
+  { label: 'Overview', path: '/docs/' },
+  ...DOC_PAGES.map((item) => ({
+    label: item.nav,
+    path: `/docs/${item.slug}/`,
+  })),
+  { label: 'Getting started', path: '/guides/getting-started/' },
+];
+
+const index = flat.findIndex((item) => item.path === `/docs/${page.slug}/`);
+const prev = index > 0 ? flat[index - 1] : undefined;
+const next =
+  index >= 0 && index < flat.length - 1 ? flat[index + 1] : undefined;
+---
+
+<DocsLayout
+  title={`${page.title} · Solipsism Browser documentation`}
+  description={page.description}
+  path={`/docs/${page.slug}/`}
+  sections={page.sections.map((section) => ({
+    id: section.id,
+    heading: section.heading,
+  }))}
+  prev={prev}
+  next={next}
+>
+  <h1>{page.title}</h1>
+  <p>{page.lead}</p>
+
+  {
+    page.sections.map((section) => (
+      <section id={section.id}>
+        <h2>{section.heading}</h2>
+        <DocBlocks blocks={section.blocks} />
+      </section>
+    ))
+  }
+</DocsLayout>

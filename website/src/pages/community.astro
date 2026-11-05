@@ -2,96 +2,119 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { SITE, withBase } from '../data/site';
 
-const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const base = import.meta.env.BASE_URL;
+const href = (path: string) => withBase(base, path);
+
+const channels = [
+  {
+    title: 'Read the source',
+    body: 'The Android app, build configuration, preferences, tests and development history are public in a single repository.',
+    action: 'Open the repository',
+    url: SITE.repository,
+  },
+  {
+    title: 'Report a problem',
+    body: 'Search existing reports first, then include the app version, Android version, WebView provider, selected core and steps to reproduce.',
+    action: 'Browse GitHub Issues',
+    url: SITE.issues,
+  },
+  {
+    title: 'Review a release',
+    body: 'APKs, version notes and the current installation requirements live on the release page, not on this site.',
+    action: 'See releases',
+    url: SITE.releases,
+  },
+  {
+    title: 'Read the licence',
+    body: 'The project is Mozilla Public License 2.0. Read the actual licence file for its terms rather than a summary.',
+    action: 'Read MPL 2.0',
+    url: SITE.licence,
+  },
+  {
+    title: 'Read the engine notes',
+    body: 'Antares has its own architecture, verification and diagnostics documentation, including what a core switch does not carry over.',
+    action: 'Open the Antares notes',
+    url: SITE.antaresNotes,
+  },
+];
 ---
 
 <BaseLayout
-  title="Solipsism Browser — source, support and project links"
-  description="Find the Solipsism Browser source, report bugs, review Android releases, read the MPL 2.0 licence, and learn where users and contributors can get support."
+  title="Solipsism Browser · source, support and project links"
+  description="Find the Solipsism Browser source, report a bug, review Android releases, read the MPL 2.0 licence, and learn what to include in a useful bug report."
   path="/community/"
 >
-  <Header />
+  <Header path="/community/" />
   <main id="main">
-    <section class="archive-hero shell reference-hero">
-      <h1>Source code, support and releases.</h1>
+    <section class="page-head shell" aria-labelledby="community-heading">
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href={href('/')}>Home</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Community</span>
+      </nav>
+      <h1 id="community-heading" style="margin-top: 28px">
+        Built in the open, reported in the open.
+      </h1>
       <p>
-        Solipsism’s source, issue tracker, and release history are hosted on
-        GitHub. Start with the channel that matches what you need.
+        Source, issues and releases are hosted on GitHub. Start with the channel
+        that matches what you need; none of them require an account to read.
       </p>
     </section>
 
-    <section class="section shell community-grid" aria-label="Project links">
-      <article class="community-card">
-        <h2>Explore the code</h2>
-        <p>
-          Read the Android app source, project documentation, build
-          configuration, and current development history.
-        </p>
-        <a
-          class="text-link"
-          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism"
-          >Open the repository ↗</a
-        >
-      </article>
-      <article class="community-card">
-        <h2>Report a problem</h2>
-        <p>
-          Search existing reports or open an issue with the app version, Android
-          version, WebView provider, selected browser core, and steps to
-          reproduce. Keep browsing history and personal details out of public
-          reports.
-        </p>
-        <a
-          class="text-link"
-          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/issues"
-          >Browse GitHub Issues ↗</a
-        >
-      </article>
-      <article class="community-card">
-        <h2>Review a release</h2>
-        <p>
-          Use the project’s release page for APKs, version notes, and the
-          current installation requirements.
-        </p>
-        <a
-          class="text-link"
-          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases"
-          >See releases ↗</a
-        >
-      </article>
-      <article class="community-card">
-        <h2>Read the terms</h2>
-        <p>
-          The repository identifies the project as Mozilla Public License 2.0.
-          Review the actual license file for its terms.
-        </p>
-        <a
-          class="text-link"
-          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE"
-          >Read MPL 2.0 ↗</a
-        >
-      </article>
+    <section class="section section--tight" aria-labelledby="channels-heading">
+      <div class="shell">
+        <h2 id="channels-heading" class="sr-only">Project channels</h2>
+        <div class="channel-list">
+          {
+            channels.map((channel) => (
+              <a
+                class="channel"
+                href={channel.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <h2>{channel.title}</h2>
+                <p>{channel.body}</p>
+                <span>{channel.action} ↗</span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
     </section>
 
-    <section class="section privacy">
-      <div class="shell privacy-grid">
+    <section class="section section--flip" aria-labelledby="report-heading">
+      <div class="shell split">
         <div>
-          <h2>Share enough to reproduce it.</h2>
+          <h2 id="report-heading">Share enough to reproduce it.</h2>
         </div>
-        <div class="privacy-copy">
+        <div class="prose">
           <p>
-            Include the release version, Android version, device model where
-            relevant, WebView provider, selected core, and the steps that led to
-            the issue. Redact private URLs, account details, API keys, and
-            browsing data from logs and screenshots.
+            A useful report includes the release version, Android version,
+            device model where relevant, WebView provider, selected browser
+            core, and the steps that led to the issue.
           </p>
-          <div class="link-cluster">
-            <a href={`${base}docs/#troubleshooting`}>Troubleshooting notes</a>
-            <a href={`${base}guides/getting-started/`}>Beginner guide</a>
-            <a
-              href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/README.md"
-              >Project README</a
+          <p>
+            Redact private URLs, account details, API keys and browsing data
+            from logs and screenshots. Public issues are indexed; treat them as
+            public.
+          </p>
+          <div class="callout callout--warn">
+            <strong>Do not paste API keys</strong>
+            <p>
+              A VirusTotal key, a signing secret or a private URL in a public
+              issue is a disclosure. Remove it before you post, and rotate
+              anything that may already have leaked.
+            </p>
+          </div>
+          <div class="link-row">
+            <a class="text-link" href={href('/docs/troubleshooting/')}
+              >Troubleshooting notes</a
+            >
+            <a class="text-link" href={href('/guides/getting-started/')}
+              >Getting started</a
             >
           </div>
         </div>

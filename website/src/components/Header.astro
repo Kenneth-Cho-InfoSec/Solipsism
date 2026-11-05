@@ -1,53 +1,128 @@
 ---
-const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+import { NAV, SITE, withBase } from '../data/site';
+
+interface Props {
+  path: string;
+}
+const { path } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const href = (target: string) => withBase(base, target);
+const isActive = (target: string) =>
+  target === '/docs/'
+    ? path.startsWith('/docs/') || path.startsWith('/guides/')
+    : path === target;
 ---
 
 <header class="site-header">
   <div class="header-inner shell">
-    <a class="brand" href={base} aria-label="Solipsism Browser home">
+    <a class="brand" href={href('/')} aria-label="Solipsism Browser home">
       <img
-        src={`${base}assets/solipsism-logo-128.png`}
-        width="42"
-        height="42"
+        src={href('/assets/solipsism-logo-128.png')}
+        width="30"
+        height="30"
         alt=""
       />
       <span>Solipsism</span>
     </a>
+
     <button
-      class="nav-toggle icon-button"
+      class="icon-button nav-toggle"
       data-nav-toggle
       aria-controls="primary-nav"
       aria-expanded="false"
-      aria-label="Open navigation"
-      ><span class="hamburger-icon" aria-hidden="true"></span></button
+      aria-label="Open navigation"><span aria-hidden="true"></span></button
     >
-    <nav id="primary-nav" data-mobile-nav aria-label="Primary navigation">
-      <a href={`${base}features/`}>Features</a>
-      <a href={`${base}docs/`}>Docs</a>
-      <a href={`${base}guides/getting-started/`}>Get started</a>
-      <a href={`${base}compare/`}>Compare</a>
-      <a href={`${base}#privacy`}>Privacy</a>
-      <a href={`${base}releases/`}>Releases</a>
-      <a href={`${base}community/`}>Community</a>
+
+    <nav class="site-nav" id="primary-nav" data-mobile-nav aria-label="Primary">
+      {
+        NAV.map((item) => (
+          <a
+            href={href(item.path)}
+            aria-current={isActive(item.path) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
       <a
         href="https://github.com/Kenneth-Cho-InfoSec/Solipsism"
         target="_blank"
         rel="noopener noreferrer">GitHub</a
       >
     </nav>
+
     <div class="header-actions">
       <button
         class="icon-button theme-control"
         data-theme-control
         aria-label="Theme: system"
-        title="Theme: system">◐</button
+        title="Theme: system"
       >
+        <svg
+          class="theme-icon theme-icon--system"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <rect x="3" y="4" width="18" height="13" rx="1"></rect>
+          <path d="M8 21h8M12 17v4"></path>
+        </svg>
+        <svg
+          class="theme-icon theme-icon--light"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="4"></circle>
+          <path
+            d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"
+          ></path>
+        </svg>
+        <svg
+          class="theme-icon theme-icon--dark"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"></path>
+        </svg>
+        <svg
+          class="theme-icon theme-icon--amoled"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          aria-hidden="true"
+        >
+          <rect x="6" y="2.5" width="12" height="19" rx="1.5"></rect>
+          <path d="M10 18.5h4"></path>
+        </svg>
+      </button>
+
       <a
         class="button button-small latest-download"
         data-latest-download
-        href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest"
-        >Download latest APK</a
+        href={SITE.latestRelease}>Download APK</a
       >
     </div>
   </div>
 </header>
+
+<style>
+  .theme-icon {
+    display: none;
+  }
+
+  :global(html[data-theme-mode='system']) .theme-icon--system,
+  :global(html[data-theme-mode='light']) .theme-icon--light,
+  :global(html[data-theme-mode='dark']) .theme-icon--dark,
+  :global(html[data-theme-mode='amoled']) .theme-icon--amoled {
+    display: block;
+  }
+</style>

@@ -2,235 +2,250 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { SITE, withBase } from '../data/site';
 
-const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const base = import.meta.env.BASE_URL;
+const href = (path: string) => withBase(base, path);
+
+const rows = [
+  {
+    name: 'Solipsism',
+    core: 'Android WebView is the stable core. Solipsism 9.4.0 also supports the optional Antares 0.5.0 core as an experiment.',
+    emphasis:
+      'A left or right navigation rail, privacy settings, host and cosmetic filter subsets, userscripts and local download scanning.',
+    tradeoffs:
+      'Android only. Web support follows the device’s WebView provider. Some permission controls are best-effort. Antares is experimental, and filters and userscripts are not full desktop equivalents.',
+    links: [
+      { label: 'Repository', url: SITE.repository },
+      { label: 'MPL 2.0', url: SITE.licence },
+    ],
+  },
+  {
+    name: 'Firefox for Android',
+    core: 'Distributed by Mozilla. Add-ons install from its supported Android catalogue.',
+    emphasis:
+      'Enhanced Tracking Protection and a curated Android add-on catalogue, documented by Mozilla.',
+    tradeoffs:
+      'Check that the extensions you rely on exist for Android. The mobile catalogue is not the desktop ecosystem.',
+    links: [
+      {
+        label: 'Tracking protection',
+        url: 'https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-android',
+      },
+      {
+        label: 'Android add-ons',
+        url: 'https://support.mozilla.org/en-US/kb/find-and-install-add-ons-firefox-android',
+      },
+      { label: 'MPL 2.0', url: 'https://www.mozilla.org/en-US/MPL/' },
+    ],
+  },
+  {
+    name: 'Brave',
+    core: 'Chromium-based, distributed by Brave.',
+    emphasis:
+      'Shields provides built-in controls for trackers, ads, cookies and related page protections, with per-site behaviour documented by Brave.',
+    tradeoffs:
+      'Shield defaults and compatibility choices may need adjusting per site. Brave’s product includes project-specific services; review its current privacy information.',
+    links: [
+      { label: 'Shields', url: 'https://brave.com/shields/' },
+      { label: 'Privacy policy', url: 'https://brave.com/privacy/browser/' },
+      {
+        label: 'Source licence',
+        url: 'https://github.com/brave/brave-browser/blob/master/LICENSE',
+      },
+    ],
+  },
+  {
+    name: 'Cromite',
+    core: 'Community-maintained Chromium fork with Android builds. Check its release notes for supported architectures and Android versions.',
+    emphasis:
+      'Built-in ad blocking and privacy-focused Chromium changes, as described in its project documentation.',
+    tradeoffs:
+      'A separate browser to install and keep updated. Review build, update, compatibility and licensing notes for the exact release you use.',
+    links: [
+      { label: 'Project', url: 'https://github.com/qwez-dev/cromite' },
+      {
+        label: 'GPL 3.0',
+        url: 'https://github.com/qwez-dev/cromite/blob/master/LICENSE',
+      },
+    ],
+  },
+  {
+    name: 'Vivaldi',
+    core: 'Chromium-based, distributed by Vivaldi.',
+    emphasis:
+      'Android help documents tracker and ad blocking, tab tools and interface customisation such as themes.',
+    tradeoffs:
+      'Proprietary software. Vivaldi documents that the browser is not wholly open source and that licensing varies across Chromium modifications and third-party components.',
+    links: [
+      { label: 'Android help', url: 'https://help.vivaldi.com/android/' },
+      {
+        label: 'Tracker and ad blocker',
+        url: 'https://help.vivaldi.com/android/android-privacy/android-tracker-and-ad-blocker/',
+      },
+      {
+        label: 'Open-source notes',
+        url: 'https://help.vivaldi.com/desktop/privacy/is-vivaldi-open-source/',
+      },
+    ],
+  },
+];
 ---
 
 <BaseLayout
-  title="Solipsism Browser comparison — Android browser features"
-  description="A source-linked comparison of Solipsism Browser with Firefox, Brave, Cromite, and Vivaldi on Android, covering features, trade-offs and platform limits."
+  title="Solipsism Browser compared with other Android browsers"
+  description="A source-linked comparison of Solipsism Browser with Firefox, Brave, Cromite and Vivaldi on Android: browser cores, controls, extensibility and trade-offs."
   path="/compare/"
 >
-  <Header />
+  <Header path="/compare/" />
   <main id="main">
-    <section class="archive-hero shell reference-hero">
-      <h1>Android browser features and trade-offs.</h1>
+    <section class="page-head shell" aria-labelledby="compare-heading">
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href={href('/')}>Home</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Compare</span>
+      </nav>
+      <h1 id="compare-heading" style="margin-top: 28px">
+        Five browsers, five different bargains.
+      </h1>
       <p>
-        Checked 31 October 2026, this source-linked overview compares Android
-        browser cores, controls and extension support. It is not a benchmark or
-        a ranking. Product details can change; consult each project’s current
-        documentation before choosing or installing a browser.
+        Checked 31 October 2026 against each project’s documentation. This is
+        not a benchmark or a ranking. It compares cores, controls and the
+        trade-offs each project states for itself.
       </p>
-      <div class="page-actions">
+      <div class="page-head__actions">
         <a
-          class="button"
-          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest"
-          >Get Solipsism</a
+          class="button latest-download"
+          data-latest-download
+          href={SITE.latestRelease}>Get Solipsism</a
         >
-        <a class="button button-secondary" href={`${base}features/`}
-          >See its features</a
-        >
+        <a class="text-link" href={href('/features/')}>See its features</a>
       </div>
     </section>
 
-    <section
-      class="section shell comparison-section"
-      aria-labelledby="comparison-heading"
-    >
-      <div class="section-heading">
-        <h2 id="comparison-heading">
-          Compare cores, controls and extensibility.
-        </h2>
-        <p>
-          Compare the core, controls, extensibility, and practical boundaries
-          each project documents.
+    <section class="section section--tight" aria-labelledby="table-heading">
+      <div class="shell">
+        <h2 id="table-heading" class="sr-only">Comparison table</h2>
+
+        <div
+          class="compare-wrap reveal"
+          role="region"
+          aria-label="Android browser comparison"
+          tabindex="0"
+        >
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th scope="col">Browser</th>
+                <th scope="col">Core</th>
+                <th scope="col">What its documentation emphasises</th>
+                <th scope="col">Trade-offs</th>
+                <th scope="col">Sources</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                rows.map((row) => (
+                  <tr>
+                    <th scope="row">{row.name}</th>
+                    <td>{row.core}</td>
+                    <td>{row.emphasis}</td>
+                    <td>{row.tradeoffs}</td>
+                    <td>
+                      {row.links.map((link) => (
+                        <div>
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {link.label} ↗
+                          </a>
+                        </div>
+                      ))}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="compare-cards">
+          {
+            rows.map((row) => (
+              <article class="compare-card reveal">
+                <h2>{row.name}</h2>
+                <dl>
+                  <div>
+                    <dt>Core</dt>
+                    <dd>{row.core}</dd>
+                  </div>
+                  <div>
+                    <dt>Emphasis</dt>
+                    <dd>{row.emphasis}</dd>
+                  </div>
+                  <div>
+                    <dt>Trade-offs</dt>
+                    <dd>{row.tradeoffs}</dd>
+                  </div>
+                  <div>
+                    <dt>Sources</dt>
+                    <dd>
+                      {row.links.map((link) => (
+                        <div>
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {link.label} ↗
+                          </a>
+                        </div>
+                      ))}
+                    </dd>
+                  </div>
+                </dl>
+              </article>
+            ))
+          }
+        </div>
+
+        <p class="compare-note">
+          Feature descriptions summarise the linked project documentation. They
+          do not assess privacy practices, security, speed or quality. No
+          feature list can establish that one browser is safer for every person.
         </p>
       </div>
-      <div
-        class="comparison-table-wrap"
-        role="region"
-        aria-label="Android browser comparison table"
-        tabindex="0"
-      >
-        <table class="comparison-table">
-          <thead>
-            <tr>
-              <th scope="col">Browser</th>
-              <th scope="col">Core and availability</th>
-              <th scope="col">What its documentation emphasizes</th>
-              <th scope="col">Trade-offs to consider</th>
-              <th scope="col">Source and license</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Solipsism</th>
-              <td
-                >Android WebView is the stable core. Solipsism 9.4.0 also offers
-                the optional Antares 0.5.0 core as experimental.</td
-              >
-              <td
-                >Compact left or right navigation rail, privacy settings, host
-                and cosmetic filter subsets, userscripts, and local download
-                scanning.</td
-              >
-              <td
-                >Android-only. Web support depends on the device’s WebView
-                provider. Some permission controls are best-effort; Antares is
-                experimental, and userscripts and filters are not full desktop
-                equivalents.</td
-              >
-              <td
-                ><a href="https://github.com/Kenneth-Cho-InfoSec/Solipsism"
-                  >Project repository</a
-                ><br /><a
-                  href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/LICENSE"
-                  >MPL 2.0</a
-                ></td
-              >
-            </tr>
-            <tr>
-              <th scope="row">Firefox for Android</th>
-              <td
-                >Firefox for Android, distributed by Mozilla; add-ons are
-                installed from its supported add-ons catalog.</td
-              >
-              <td
-                >Enhanced Tracking Protection and a curated Android add-on
-                catalog, with add-on availability documented by Mozilla.</td
-              >
-              <td
-                >Check whether the extensions you rely on are available for
-                Android; the mobile catalog is not the entire desktop add-on
-                ecosystem.</td
-              >
-              <td
-                ><a
-                  href="https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-android"
-                  >Tracking protection</a
-                ><br /><a
-                  href="https://support.mozilla.org/en-US/kb/find-and-install-add-ons-firefox-android"
-                  >Android add-ons</a
-                ><br /><a href="https://www.mozilla.org/en-US/MPL/">MPL 2.0</a
-                ></td
-              >
-            </tr>
-            <tr>
-              <th scope="row">Brave</th>
-              <td
-                >Brave Browser for Android uses Chromium and is distributed by
-                Brave.</td
-              >
-              <td
-                >Shields provides built-in controls for trackers, ads, cookies,
-                and related page protections, with per-site behavior documented
-                by Brave.</td
-              >
-              <td
-                >Shields defaults and compatibility choices may need adjustment
-                for individual sites. Brave’s browser product includes
-                project-specific services and policies; review its current
-                privacy information.</td
-              >
-              <td
-                ><a href="https://brave.com/shields/">Shields</a><br /><a
-                  href="https://brave.com/privacy/browser/">Privacy policy</a
-                ><br /><a
-                  href="https://github.com/brave/brave-browser/blob/master/LICENSE"
-                  >Source license</a
-                ></td
-              >
-            </tr>
-            <tr>
-              <th scope="row">Cromite</th>
-              <td
-                >Community-maintained Chromium fork with Android builds; consult
-                its current release notes for supported device architectures and
-                Android versions.</td
-              >
-              <td
-                >Built-in ad blocking and privacy-focused Chromium changes, as
-                described in its project documentation.</td
-              >
-              <td
-                >It is a separate browser distribution to install and keep
-                updated. Review the project’s build, update, compatibility, and
-                licensing notes for the exact release you use.</td
-              >
-              <td
-                ><a href="https://github.com/qwez-dev/cromite"
-                  >Project and release notes</a
-                ><br /><a
-                  href="https://github.com/qwez-dev/cromite/blob/master/LICENSE"
-                  >GPL 3.0</a
-                ></td
-              >
-            </tr>
-            <tr>
-              <th scope="row">Vivaldi</th>
-              <td
-                >Vivaldi Browser for Android is a Chromium-based browser
-                distributed by Vivaldi.</td
-              >
-              <td
-                >Its Android help documents tracker and ad blocking, tab tools,
-                and interface customization such as themes.</td
-              >
-              <td
-                >Vivaldi is proprietary software. Its vendor documents that the
-                browser is not wholly open source and that licensing varies
-                across Chromium modifications and third-party components.</td
-              >
-              <td
-                ><a href="https://help.vivaldi.com/android/">Android help</a><br
-                /><a
-                  href="https://help.vivaldi.com/android/android-privacy/android-tracker-and-ad-blocker/"
-                  >Tracker and ad blocker</a
-                ><br /><a
-                  href="https://help.vivaldi.com/android/android-appearance/themes-on-android/"
-                  >Themes</a
-                ><br /><a
-                  href="https://help.vivaldi.com/desktop/privacy/is-vivaldi-open-source/"
-                  >Open-source and license notes</a
-                ></td
-              >
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="comparison-note">
-        Comparison checked 31 October 2026 against the linked project
-        documentation. Feature descriptions summarize those sources; they do not
-        assess privacy practices, security, speed, or quality.
-      </p>
     </section>
 
-    <section class="section comparison-guidance" aria-labelledby="fit-heading">
-      <div class="shell comparison-guidance-grid">
-        <div>
+    <section class="section section--flip" aria-labelledby="fit-heading">
+      <div class="shell split">
+        <div class="reveal">
           <h2 id="fit-heading">Choose by core support and features.</h2>
         </div>
-        <div>
+        <div class="prose reveal">
           <p>
-            Solipsism may suit someone who wants an Android browser organized
+            Solipsism may suit someone who wants an Android browser organised
             around a configurable side rail and built-in controls, and who is
-            comfortable with WebView’s platform limits. Firefox may suit someone
-            who wants Mozilla’s Android add-on catalog. Brave documents
-            integrated Shields controls; Vivaldi emphasizes browser
-            customization. Cromite offers a Chromium fork for users willing to
-            manage a separate build and release channel.
+            comfortable with WebView’s platform limits.
+          </p>
+          <p>
+            Firefox may suit someone who wants Mozilla’s Android add-on
+            catalogue. Brave documents integrated Shields controls. Vivaldi
+            emphasises browser customisation. Cromite offers a Chromium fork for
+            people willing to manage a separate build channel.
           </p>
           <p>
             Compare each browser’s current permissions, update process, privacy
-            information, compatibility, and license before installing. No
-            feature list can establish that one browser is safer or more private
-            for every person.
+            information, compatibility and licence before installing.
           </p>
-          <div class="link-cluster">
-            <a href={`${base}docs/`}>Solipsism technical guide</a>
-            <a href={`${base}guides/getting-started/`}>Install guide</a>
-            <a href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/issues"
-              >Ask a project question</a
+          <div class="link-row">
+            <a class="text-link" href={href('/docs/')}
+              >Technical documentation</a
+            >
+            <a class="text-link" href={href('/guides/getting-started/')}
+              >Install guide</a
             >
           </div>
         </div>

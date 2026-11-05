@@ -2,148 +2,116 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ScreenStrip from '../components/ScreenStrip.astro';
+import RailPlayground from '../components/RailPlayground.astro';
+import { FEATURE_GROUPS } from '../data/features';
+import { SITE, withBase } from '../data/site';
 
-const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
-
-const features = [
-  {
-    title: 'One-handed navigation',
-    text: 'Move the compact browser rail to the left or right, choose a size, and keep tabs, search, refresh, QR scanning, and browser tools close to your hand.',
-  },
-  {
-    title: 'Privacy controls',
-    text: 'Manage cookies, site permissions, JavaScript, popups, tracking headers, and clear-on-exit data from the app settings.',
-  },
-  {
-    title: 'Ad and tracker rules',
-    text: 'Use host lists, custom filter rules, cosmetic filters, and an element picker. The filter support is a focused WebView-safe subset, not a complete uBlock Origin engine.',
-  },
-  {
-    title: 'Userscripts',
-    text: 'Import scripts from a local file or HTTPS URL and manage common metadata and supported injection points. This is not the full Tampermonkey API.',
-  },
-  {
-    title: 'Download scanning',
-    text: 'Local definitions-based scanning works without an API key. VirusTotal is optional and requires the user’s own key. No scanner is a guarantee that a file is safe.',
-  },
-  {
-    title: 'A homepage you can shape',
-    text: 'Arrange bookmarks, wallpapers, a clock, and custom motto text. Imported static HTML and CSS are sanitized and stored privately on-device.',
-  },
-  {
-    title: 'Appearance and access',
-    text: 'Choose light, dark, or AMOLED-black themes, accents, fonts, text size, reflow, and other reading controls.',
-  },
-  {
-    title: 'Useful browser tools',
-    text: 'Use find-in-page, screenshots, downloads, sharing, history, bookmarks, audio settings, and fullscreen video in one Android app.',
-  },
-];
+const base = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout
-  title="Solipsism Browser features — rail, privacy and blocking"
-  description="Features in Solipsism Browser: one-handed rail navigation, site permissions, content blocking, userscripts, download scanning and interface settings."
+  title="Solipsism Browser features · rail, privacy and blocking"
+  description="Every feature in Solipsism Browser, grouped by job: rail navigation, privacy controls, content blocking, userscripts, download scanning, appearance and the optional Antares core."
   path="/features/"
 >
-  <Header />
+  <Header path="/features/" />
   <main id="main">
-    <section class="archive-hero shell reference-hero">
-      <h1>One-handed controls for Android.</h1>
-      <p>
-        Solipsism is an Android browser that keeps frequent controls in a
-        compact side rail and leaves the webpage as the main surface. Its
-        features are adjustable; Android WebView and device support set the
-        boundaries.
-      </p>
-      <div class="page-actions">
-        <a
-          class="button"
-          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest"
-          >Download the latest APK</a
-        >
-        <a class="button button-secondary" href={`${base}docs/`}
-          >Read the technical guide</a
-        >
+    <section
+      class="page-head shell page-head--split"
+      aria-labelledby="features-heading"
+    >
+      <div class="page-head__copy">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href={withBase(base, '/')}>Home</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">Features</span>
+        </nav>
+        <h1 id="features-heading" style="margin-top: 28px">
+          One rail. The rest is the page.
+        </h1>
+        <p>
+          Solipsism keeps frequent controls at the screen edge and leaves the
+          webpage as the main surface. Everything below is present in the 9.4.0
+          release; limits and experimental states are named next to the claim.
+        </p>
+        <div class="page-head__actions">
+          <a
+            class="button latest-download"
+            data-latest-download
+            href={SITE.latestRelease}>Download latest APK</a
+          >
+          <a class="text-link" href={withBase(base, '/docs/')}
+            >Read the technical documentation</a
+          >
+        </div>
       </div>
+      <RailPlayground class="page-head__play" />
     </section>
 
-    <section class="section why" aria-labelledby="feature-list-heading">
+    <section class="section section--tight" aria-labelledby="groups-heading">
       <div class="shell">
-        <div class="section-heading">
-          <h2 id="feature-list-heading">
-            Features included in the Android app.
-          </h2>
-          <p>
-            These capabilities are present in the project’s 9.4.0 documentation.
-            Experimental behavior and platform limits are called out below.
-          </p>
-        </div>
-        <div class="feature-grid feature-reference-grid">
-          {
-            features.map((feature) => (
-              <article>
-                <h3>{feature.title}</h3>
-                <p>{feature.text}</p>
-              </article>
-            ))
-          }
-        </div>
+        <h2 id="groups-heading" class="sr-only">Feature groups</h2>
+        {
+          FEATURE_GROUPS.map((group) => (
+            <div class="feature-group reveal" id={group.id}>
+              <div class="feature-group__intro">
+                <h2>{group.title}</h2>
+                <p>{group.summary}</p>
+              </div>
+              <div class="feature-list">
+                {group.items.map((item) => (
+                  <div class="feature-item">
+                    <h3>{item.name}</h3>
+                    <p>
+                      {item.detail}
+                      {item.limit && (
+                        <span class="feature-item__limit">{item.limit}</span>
+                      )}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
       </div>
     </section>
 
-    <section class="section shell" aria-labelledby="core-heading">
-      <div class="feature-split">
-        <div>
-          <h2 id="core-heading">WebView is the stable browser core.</h2>
+    <ScreenStrip />
+
+    <section class="section section--flip" aria-labelledby="core-heading">
+      <div class="shell split">
+        <div class="reveal">
+          <h2 id="core-heading">WebView is the core. Antares is optional.</h2>
+        </div>
+        <div class="prose reveal">
           <p>
-            Solipsism uses the Android WebView provider for its stable browser
-            core. Rendering, Safe Browsing, and some web features depend on the
+            Android System WebView renders every page by default. Rendering,
+            Safe Browsing and some web capabilities therefore follow your
             installed provider and Android version.
           </p>
           <p>
-            Version 9.4.0 also offers Antares 0.5.0 as an experimental,
-            user-selected core. Site compatibility, media, and interaction can
-            differ. Switch back to WebView when a site does not work as
-            expected.
-          </p>
-        </div>
-        <aside class="feature-callout">
-          <span class="badge badge-warn">Experimental</span>
-          <h3>Antares is optional.</h3>
-          <p>
-            Core switching is explicit and global to the browser session. Page
-            history, form state, media state, and cookies are not promised to
-            transfer between engines.
-          </p>
-          <a class="text-link" href={`${base}docs/#browser-cores`}
-            >Read core notes →</a
-          >
-        </aside>
-      </div>
-    </section>
-
-    <section class="section privacy" aria-labelledby="limits-heading">
-      <div class="shell privacy-grid">
-        <div>
-          <h2 id="limits-heading">Android and WebView set the boundaries.</h2>
-        </div>
-        <div class="privacy-copy">
-          <p>
-            WebView does not expose or enforce every browser permission in the
-            same way. Site-permission entries marked Experimental are
-            best-effort signals, not a desktop-style permission sandbox.
+            Solipsism 9.4.0 also supports Antares 0.5.0, an experimental
+            Servo-based core distributed as a separate signed package. It
+            requires Android 13 or newer and a supported 64-bit device, and it
+            is never selected automatically.
           </p>
           <p>
-            Userscripts support common metadata and lifecycle hooks, but not the
-            complete Tampermonkey API. Cosmetic filters implement a subset of
-            filter syntax. Malware scanning can miss threats and should not
-            replace trusted downloads or Android security updates.
+            <strong>Use WebView unless you are deliberately testing.</strong>
+            CAPTCHA, media and complex interaction can fail on Antares, and page history,
+            form state, media state and cookies are not promised across a core switch.
           </p>
-          <div class="link-cluster">
-            <a href={`${base}docs/`}>Technical documentation</a>
-            <a href={`${base}guides/getting-started/`}>Beginner guide</a>
-            <a href={`${base}compare/`}>Compare browsers</a>
+          <div class="link-row">
+            <a class="text-link" href={withBase(base, '/docs/antares/')}
+              >Read the Antares notes</a
+            >
+            <a
+              class="text-link"
+              href={SITE.antaresNotes}
+              target="_blank"
+              rel="noopener noreferrer">Engine documentation ↗</a
+            >
           </div>
         </div>
       </div>

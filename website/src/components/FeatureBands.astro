@@ -1,0 +1,83 @@
+---
+const bands = [
+  {
+    id: 'rail',
+    sentence: 'Keep every control under your thumb.',
+    consequence:
+      'The rail holds up to eight movable actions. Tabs and the menu stay fixed, so you never lose the way back.',
+    on: true,
+  },
+  {
+    id: 'cookies',
+    sentence: 'Stop third-party cookies before they start.',
+    consequence:
+      'Third-party cookies, Do Not Track and identifying-header removal are switches, not buried policy pages.',
+    on: true,
+  },
+  {
+    id: 'blocking',
+    sentence: 'Block the ad, then pick the element.',
+    consequence:
+      'Host lists, custom rules and an element picker. Cosmetic filtering is a WebView-safe subset, not a full uBlock Origin engine.',
+    on: false,
+  },
+  {
+    id: 'scanning',
+    sentence: 'Scan a download before Android opens it.',
+    consequence:
+      'Local definitions need no key. VirusTotal is optional and uses your own key. No scanner is a guarantee that a file is safe.',
+    on: false,
+  },
+  {
+    id: 'reading',
+    sentence: 'Make the browser read the way you do.',
+    consequence:
+      'Light, dark or true AMOLED black, a local font, text reflow, wide viewport and four rail sizes.',
+    on: false,
+  },
+];
+---
+
+<div class="bands" data-bands>
+  {
+    bands.map((band) => (
+      <div
+        class="band reveal"
+        data-band
+        data-on={String(band.on)}
+        data-band-id={band.id}
+      >
+        <div class="shell band__inner">
+          <div class="band__lead">
+            <p class="band__sentence">{band.sentence}</p>
+            <button
+              class="band__switch"
+              type="button"
+              role="switch"
+              aria-checked={band.on ? 'true' : 'false'}
+              aria-label={band.sentence}
+            />
+          </div>
+          <p class="band__consequence">{band.consequence}</p>
+        </div>
+      </div>
+    ))
+  }
+</div>
+<div class="shell">
+  <p class="bands__foot">
+    These switches preview settings that exist in the Android app. They change
+    this page only. Nothing is saved and no device setting is touched.
+  </p>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-band]').forEach((band) => {
+    const toggle = band.querySelector<HTMLButtonElement>('.band__switch');
+    toggle?.addEventListener('click', () => {
+      const next = band.dataset.on !== 'true';
+      band.dataset.on = String(next);
+      toggle.setAttribute('aria-checked', String(next));
+    });
+  });
+</script>

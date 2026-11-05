@@ -30,12 +30,34 @@ function assetMarkup(asset: GitHubReleaseAsset): string {
   return `<li class="asset-row"><div><strong>${escapeHtml(asset.name)}</strong><span>${formatFileSize(asset.size)} · ${asset.download_count.toLocaleString('en-GB')} downloads</span></div><a class="button ${apk ? '' : 'button-secondary'} button-small" href="${escapeHtml(asset.browser_download_url)}"${external} download>${apk ? 'Download APK' : 'Download asset'}</a></li>`;
 }
 
+/**
+ * Release notes often repeat the release name as their first heading. The card
+ * already prints the name, so drop that one heading instead of showing it twice.
+ */
+function stripDuplicateTitle(body: string, name: string): string {
+  const lines = body.split('\n');
+  const first = lines.findIndex((line) => line.trim() !== '');
+  if (first === -1) return body;
+  const heading = (lines[first] ?? '').match(/^#{1,3}\s+(.*)$/);
+  if (!heading?.[1]) return body;
+  const title = heading[1].trim().replace(/\s+/g, ' ').toLowerCase();
+  const release = name.trim().replace(/\s+/g, ' ').toLowerCase();
+  if (!title || !release) return body;
+  if (title === release || release.includes(title) || title.includes(release)) {
+    lines.splice(0, first + 1);
+    return lines.join('\n').trimStart();
+  }
+  return body;
+}
+
 async function releaseCard(
   release: GitHubRelease,
   latest = false,
 ): Promise<string> {
   const apks = findApkAssets(release);
-  const body = await renderReleaseMarkdown(release.body);
+  const body = await renderReleaseMarkdown(
+    stripDuplicateTitle(release.body ?? '', release.name || release.tag_name),
+  );
   const anchor = `release-${release.tag_name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   return `<article class="release-card" id="${anchor}">
     <header class="release-card-header"><div><div class="badges">${latest ? '<span class="badge">Latest release</span>' : ''}${release.prerelease ? '<span class="badge badge-warn">Prerelease</span>' : ''}</div><h3><a href="#${anchor}">${escapeHtml(release.name || release.tag_name)}</a></h3><p><code>${escapeHtml(release.tag_name)}</code> · <time datetime="${escapeHtml(release.published_at || release.created_at)}">${formatReleaseDate(release.published_at || release.created_at)}</time></p></div><a class="text-link" href="${escapeHtml(release.html_url)}"${external}>View on GitHub ↗</a></header>
@@ -81,8 +103,8 @@ function updateGlobalDownload(release: GitHubRelease): void {
   }
 }
 
-async function loadLatest(root: HTMLElement): Promise<void> {
-  const release = await withLocalCache('latest-v2', async () => {
+async function loadLatestRelease(): Promise<GitHubRelease> {
+  return withLocalCache('latest-v2', async () => {
     try {
       const manifest = await fetchReleaseManifest();
       return (
@@ -93,6 +115,10 @@ async function loadLatest(root: HTMLElement): Promise<void> {
       return fetchLatestRelease();
     }
   });
+}
+
+async function loadLatest(root: HTMLElement): Promise<void> {
+  const release = await loadLatestRelease();
   updateGlobalDownload(release);
   const list = root.querySelector<HTMLElement>('[data-release-list]');
   if (list) list.innerHTML = await releaseCard(release, true);
@@ -160,6 +186,21 @@ async function initialise(root: HTMLElement): Promise<void> {
   }
 }
 
-document
-  .querySelectorAll<HTMLElement>('[data-release-app]')
-  .forEach((root) => void initialise(root));
+const apps = Array.from(
+  document.querySelectorAll<HTMLElement>('[data-release-app]'),
+);
+
+if (apps.length) {
+  apps.forEach((root) => void initialise(root));
+} else if (
+  document.querySelector(
+    '[data-latest-download], [data-latest-version], [data-latest-meta]',
+  )
+) {
+  // Pages without a release list still get the exact APK URL and version.
+  void loadLatestRelease()
+    .then(updateGlobalDownload)
+    .catch(() => {
+      // The static fallbacks already point at the latest release page.
+    });
+}

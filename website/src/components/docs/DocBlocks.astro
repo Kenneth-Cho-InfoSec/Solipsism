@@ -1,0 +1,93 @@
+---
+import type { Block } from '../../data/docs';
+
+interface Props {
+  blocks: Block[];
+}
+const { blocks } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const resolve = (html: string) => html.replaceAll('{{base}}', base);
+---
+
+{
+  blocks.map((block) => {
+    switch (block.type) {
+      case 'p':
+        return <p set:html={resolve(block.html)} />;
+      case 'ul':
+        return (
+          <ul>
+            {block.items.map((item) => (
+              <li set:html={resolve(item)} />
+            ))}
+          </ul>
+        );
+      case 'ol':
+        return (
+          <ol>
+            {block.items.map((item) => (
+              <li set:html={resolve(item)} />
+            ))}
+          </ol>
+        );
+      case 'code':
+        return (
+          <div class="code-block">
+            <pre>
+              <code>{block.code}</code>
+            </pre>
+          </div>
+        );
+      case 'callout':
+        return (
+          <div
+            class:list={[
+              'callout',
+              block.tone !== 'note' && `callout--${block.tone}`,
+            ]}
+          >
+            <strong>{block.title}</strong>
+            <div set:html={resolve(block.html)} />
+          </div>
+        );
+      case 'table':
+        return (
+          <div class="table-wrap" role="region" tabindex="0">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  {block.head.map((cell) => (
+                    <th scope="col" set:html={resolve(cell)} />
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {block.rows.map((row) => (
+                  <tr>
+                    {row.map((cell, index) =>
+                      index === 0 ? (
+                        <th scope="row" set:html={resolve(cell)} />
+                      ) : (
+                        <td set:html={resolve(cell)} />
+                      ),
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      default:
+        return (
+          <dl class="def-list">
+            {block.items.map((item) => (
+              <div class="def-list__row">
+                <dt set:html={item.term} />
+                <dd set:html={resolve(item.html)} />
+              </div>
+            ))}
+          </dl>
+        );
+    }
+  })
+}

@@ -1,0 +1,88 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { DOC_PAGES } from '../../data/docs';
+import { withBase } from '../../data/site';
+
+const base = import.meta.env.BASE_URL;
+const href = (path: string) => withBase(base, path);
+const groups = DOC_PAGES.filter((page) => page.slug !== 'development');
+---
+
+<DocsLayout
+  title="Solipsism Browser documentation"
+  description="Installation, privacy controls, blocking, userscripts, appearance, the experimental Antares core, troubleshooting and development for Solipsism Browser."
+  path="/docs/"
+>
+  <h1>Install it. Then make it yours.</h1>
+  <p>
+    Solipsism is an Android application built around Android System WebView.
+    This documentation covers what ships, what each control actually does, and
+    where the platform sets the boundary.
+  </p>
+
+  <div class="callout">
+    <strong>The short version</strong>
+    <p>
+      Android 8.0 or newer. One signed APK from GitHub Releases. WebView is the
+      stable core; Antares 0.5.0 is an optional experiment that you install
+      separately and select deliberately.
+    </p>
+  </div>
+
+  <div class="docs-hub">
+    {
+      groups.map((page) => (
+        <a href={href(`/docs/${page.slug}/`)}>
+          <strong>{page.nav}</strong>
+          <span>{page.lead}</span>
+        </a>
+      ))
+    }
+    <a href={href('/guides/getting-started/')}>
+      <strong>Getting started</strong>
+      <span
+        >A five-step path from download to your first page, with the rail where
+        your thumb expects it.</span
+      >
+    </a>
+  </div>
+
+  <h2 id="what-ships">What ships in 9.4.0</h2>
+  <ul>
+    <li>
+      Android WebView as the stable core, plus support for the experimental
+      Antares 0.5.0 companion.
+    </li>
+    <li>
+      A rail you can move, resize and rearrange through Rail &amp; Menu Studio.
+    </li>
+    <li>
+      Privacy controls for cookies, headers, permissions and clear-on-exit
+      behaviour.
+    </li>
+    <li>Host-based blocking, cosmetic filter rules and an element picker.</li>
+    <li>An experimental userscript runtime with common metadata support.</li>
+    <li>
+      Local download scanning with optional VirusTotal assistance and your own
+      key.
+    </li>
+    <li>
+      Light, dark and AMOLED themes, custom fonts and a sandboxed custom
+      homepage.
+    </li>
+  </ul>
+
+  <h2 id="where-to-start">Where to start</h2>
+  <p>
+    If you have not installed it yet, read
+    <a href={href('/docs/installation/')}>Installation</a>. If you have, read
+    <a href={href('/docs/privacy/')}>Privacy controls</a> before you browse anything
+    sensitive, and
+    <a href={href('/docs/antares/')}>Antares</a> before you consider switching cores.
+  </p>
+  <p>
+    The
+    <a href={href('/docs/development/')}>development notes</a> cover building the
+    app and the website, the quality gates, and the release process.
+  </p>
+</DocsLayout>

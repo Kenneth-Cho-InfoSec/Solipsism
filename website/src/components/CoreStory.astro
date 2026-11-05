@@ -1,0 +1,152 @@
+---
+const statements = [
+  {
+    title: 'Start on the stable core.',
+    body: 'Android WebView renders every page by default. Rendering, Safe Browsing and some web capabilities follow your installed WebView provider and Android version.',
+    panel: 'webview',
+  },
+  {
+    title: 'Switch only when you mean to.',
+    body: 'Antares 0.5.0 is an experimental Servo core in a separate package. Solipsism checks the package name, signing digest and protocol before it enables anything.',
+    panel: 'antares',
+  },
+  {
+    title: 'Keep the way back.',
+    body: 'A core change applies to the whole session and is prepared before it commits. If preparation fails, your tabs stay where they are.',
+    panel: 'webview',
+  },
+];
+---
+
+<section class="section" aria-labelledby="story-heading">
+  <div class="shell story" data-story>
+    <div class="story__copy reveal">
+      <h2 id="story-heading">Two cores. One browser.</h2>
+      <div class="story__statements">
+        {
+          statements.map((statement, index) => (
+            <div
+              class="story__statement"
+              data-story-statement
+              data-panel={statement.panel}
+              data-active={index === 0 ? 'true' : 'false'}
+            >
+              <h3>{statement.title}</h3>
+              <p>{statement.body}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="story__stage reveal" aria-live="polite">
+      <div class="story__panel" data-story-panel="webview" data-visible="true">
+        <div class="story__panel-inner">
+          <div class="story__panel-title">
+            <h3>Android WebView</h3>
+            <span class="story__tag">Stable default</span>
+          </div>
+          <div class="story__rows">
+            <div class="story__row story__row--ok">
+              <span>Renderer</span><span>System WebView</span>
+            </div>
+            <div class="story__row">
+              <span>Safe Browsing</span><span>Provider dependent</span>
+            </div>
+            <div class="story__row">
+              <span>Availability</span><span>Every supported device</span>
+            </div>
+            <div class="story__row">
+              <span>Extra package</span><span>Not required</span>
+            </div>
+            <div class="story__row">
+              <span>Minimum Android</span><span>8.0 · API 26</span>
+            </div>
+          </div>
+          <p class="story__note">
+            The fallback is always one selection away. Nothing switches the core
+            automatically.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="story__panel story__panel--antares"
+        data-story-panel="antares"
+        data-visible="false"
+      >
+        <div class="story__panel-inner">
+          <div class="story__panel-title">
+            <h3>Antares 0.5.0</h3>
+            <span class="story__tag story__tag--warn">Experimental</span>
+          </div>
+          <div class="story__rows">
+            <div class="story__row story__row--warn">
+              <span>Requires</span><span>Android 13+</span>
+            </div>
+            <div class="story__row">
+              <span>Architecture</span><span>64-bit ARM or x86</span>
+            </div>
+            <div class="story__row story__row--ok">
+              <span>Verified</span><span>Package · signature · protocol</span>
+            </div>
+            <div class="story__row story__row--warn">
+              <span>State transfer</span><span>Not promised</span>
+            </div>
+            <div class="story__row">
+              <span>Distribution</span><span>Separate APK</span>
+            </div>
+          </div>
+          <p class="story__note">
+            CAPTCHA, media and complex interaction can fail. If a page does not
+            work, select WebView again.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const story = document.querySelector<HTMLElement>('[data-story]');
+  if (story) {
+    const statements = Array.from(
+      story.querySelectorAll<HTMLElement>('[data-story-statement]'),
+    );
+    const panels = Array.from(
+      story.querySelectorAll<HTMLElement>('[data-story-panel]'),
+    );
+
+    function activate(statement: HTMLElement) {
+      const target = statement.dataset.panel;
+      statements.forEach((item) =>
+        item.setAttribute('data-active', String(item === statement)),
+      );
+      panels.forEach((panel) =>
+        panel.setAttribute(
+          'data-visible',
+          String(panel.dataset.storyPanel === target),
+        ),
+      );
+    }
+
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) activate(entry.target as HTMLElement);
+          }
+        },
+        { rootMargin: '-42% 0px -42% 0px', threshold: 0 },
+      );
+      statements.forEach((statement) => observer.observe(statement));
+    }
+
+    statements.forEach((statement) => {
+      statement.tabIndex = 0;
+      statement.addEventListener('focus', () => activate(statement));
+      statement.addEventListener('mouseenter', () => activate(statement));
+    });
+  }
+</script>

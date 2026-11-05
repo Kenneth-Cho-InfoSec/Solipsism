@@ -1,0 +1,161 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { DOC_NAV } from '../data/docs';
+import { withBase as siteHref } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  sections?: { id: string; heading: string }[];
+  prev?: { label: string; path: string };
+  next?: { label: string; path: string };
+}
+const { title, description, path, sections = [], prev, next } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const href = (target: string) => siteHref(base, target);
+const isCurrent = (target: string) =>
+  target === '/docs/' ? path === '/docs/' : path === target;
+const crumb =
+  DOC_NAV.flatMap((group) => group.items).find((item) => item.path === path)
+    ?.label ?? title;
+---
+
+<BaseLayout title={title} description={description} path={path}>
+  <Header path={path} />
+  <main id="main">
+    <div class="shell docs">
+      <aside class="docs__side" data-docs-side data-collapsed="true">
+        <button
+          class="docs__toggle"
+          type="button"
+          data-docs-toggle
+          aria-expanded="false"
+          aria-controls="docs-nav"
+        >
+          Documentation
+        </button>
+        <label class="sr-only" for="docs-search">Search documentation</label>
+        <input
+          class="docs__search"
+          id="docs-search"
+          type="search"
+          placeholder="Search docs"
+          autocomplete="off"
+          data-docs-search
+        />
+        <nav id="docs-nav" aria-label="Documentation">
+          {
+            DOC_NAV.map((group) => (
+              <div class="docs__group" data-docs-group>
+                <p class="docs__group-label">{group.label}</p>
+                <div class="docs__nav">
+                  {group.items.map((item) => (
+                    <a
+                      href={href(item.path)}
+                      aria-current={isCurrent(item.path) ? 'page' : undefined}
+                      data-docs-link
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))
+          }
+        </nav>
+      </aside>
+
+      <article class="docs__content">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href={href('/')}>Home</a>
+          <span aria-hidden="true">/</span>
+          <a href={href('/docs/')}>Documentation</a>
+          {
+            path !== '/docs/' && (
+              <Fragment>
+                <span class="breadcrumbs__sep" aria-hidden="true">
+                  /
+                </span>
+                <span aria-current="page">{crumb}</span>
+              </Fragment>
+            )
+          }
+        </nav>
+        <slot />
+
+        {
+          (prev || next) && (
+            <nav class="docs__pager" aria-label="Documentation pages">
+              {prev && (
+                <a href={href(prev.path)}>
+                  <span>Previous</span>
+                  {prev.label}
+                </a>
+              )}
+              {next && (
+                <a href={href(next.path)}>
+                  <span>Next</span>
+                  {next.label}
+                </a>
+              )}
+            </nav>
+          )
+        }
+      </article>
+
+      {
+        sections.length > 0 && (
+          <aside class="docs__toc">
+            <p>On this page</p>
+            <nav aria-label="On this page">
+              {sections.map((section) => (
+                <a href={`#${section.id}`}>{section.heading}</a>
+              ))}
+            </nav>
+          </aside>
+        )
+      }
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script>
+  const side = document.querySelector<HTMLElement>('[data-docs-side]');
+  const toggle =
+    document.querySelector<HTMLButtonElement>('[data-docs-toggle]');
+  const search = document.querySelector<HTMLInputElement>('[data-docs-search]');
+
+  if (side && matchMedia('(min-width: 901px)').matches) {
+    side.dataset.collapsed = 'false';
+  }
+
+  toggle?.addEventListener('click', () => {
+    const collapsed = side?.dataset.collapsed !== 'false';
+    if (side) side.dataset.collapsed = String(!collapsed);
+    toggle.setAttribute('aria-expanded', String(collapsed));
+  });
+
+  search?.addEventListener('input', () => {
+    const query = search.value.trim().toLowerCase();
+    const links = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>('[data-docs-link]'),
+    );
+    links.forEach((link) => {
+      const matches =
+        !query || (link.textContent ?? '').toLowerCase().includes(query);
+      link.hidden = !matches;
+    });
+    document
+      .querySelectorAll<HTMLElement>('[data-docs-group]')
+      .forEach((group) => {
+        const visible = Array.from(
+          group.querySelectorAll<HTMLAnchorElement>('[data-docs-link]'),
+        ).some((link) => !link.hidden);
+        group.hidden = !visible;
+      });
+  });
+</script>

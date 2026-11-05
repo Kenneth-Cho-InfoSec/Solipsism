@@ -8,3 +8,8 @@ test-results/
 .env
 .env.*
 !.env.example
+
+# local tooling output
+.taste-skill/
+graphify-out/
+public/release-manifest.json

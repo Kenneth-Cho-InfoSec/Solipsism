@@ -1,0 +1,153 @@
+---
+const sample = `! Cosmetic rules, one per line
+example.com##.sponsored
+##[data-ad-slot]
+news.example#@#.promo
+||ads.example^$third-party`;
+---
+
+<section class="section section--tight" aria-labelledby="lab-heading">
+  <div class="shell section-head">
+    <h2 id="lab-heading">Paste a rule. See what it does.</h2>
+    <p>
+      Solipsism reads cosmetic filter rules in the uBlock-style syntax. Type
+      below and the parser explains each line.
+    </p>
+  </div>
+
+  <div class="lab reveal" data-lab>
+    <div class="lab__pane lab__pane--in">
+      <p class="lab__label">Rule input</p>
+      <label class="sr-only" for="lab-input">Cosmetic filter rules</label>
+      <textarea
+        class="lab__input"
+        id="lab-input"
+        data-lab-input
+        spellcheck="false"
+        rows="7"
+        aria-describedby="lab-hint">{sample}</textarea
+      >
+      <p class="lab__hint" id="lab-hint">
+        `##` hides a matching element. `#@#` makes an exception. A domain before
+        the separator scopes the rule to that site.
+      </p>
+    </div>
+
+    <div class="lab__pane lab__pane--out">
+      <p class="lab__label">Parsed by Solipsism</p>
+      <div
+        class="lab__result"
+        data-lab-result
+        aria-live="polite"
+        aria-atomic="false"
+      >
+      </div>
+      <p class="lab__count" data-lab-count></p>
+      <p class="lab__hint">
+        A parser preview. It does not install a rule or change the app.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const escape = (value: string) =>
+    value.replace(
+      /[&<>"']/g,
+      (character) =>
+        ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        })[character] ?? character,
+    );
+
+  type Kind = 'hide' | 'exception' | 'network' | 'skip';
+
+  interface Parsed {
+    kind: Kind;
+    scope: string;
+    detail: string;
+  }
+
+  const labels: Record<Kind, string> = {
+    hide: 'Hide',
+    exception: 'Allow',
+    network: 'Network',
+    skip: 'Skip',
+  };
+
+  function parseLine(line: string): Parsed | null {
+    const value = line.trim();
+    if (!value) return null;
+    if (value.startsWith('!') || value.startsWith('[')) {
+      return { kind: 'skip', scope: 'n/a', detail: value.slice(0, 64) };
+    }
+
+    const exceptionIndex = value.indexOf('#@#');
+    const hideIndex = value.indexOf('##');
+
+    if (exceptionIndex !== -1 || hideIndex !== -1) {
+      const index = exceptionIndex !== -1 ? exceptionIndex : hideIndex;
+      const separator = exceptionIndex !== -1 ? '#@#' : '##';
+      const scope = value.slice(0, index) || 'All sites';
+      const selector = value.slice(index + separator.length);
+      return {
+        kind: exceptionIndex !== -1 ? 'exception' : 'hide',
+        scope,
+        detail: selector || '(empty selector)',
+      };
+    }
+
+    if (/\|\||\^|\$/.test(value)) {
+      return { kind: 'network', scope: 'Request', detail: value };
+    }
+
+    return { kind: 'skip', scope: 'n/a', detail: value.slice(0, 64) };
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-lab]').forEach((lab) => {
+    const input = lab.querySelector<HTMLTextAreaElement>('[data-lab-input]');
+    const result = lab.querySelector<HTMLElement>('[data-lab-result]');
+    const count = lab.querySelector<HTMLElement>('[data-lab-count]');
+    if (!input || !result || !count) return;
+    const field = input;
+    const output = result;
+    const counter = count;
+
+    function render() {
+      const parsed = field.value
+        .split('\n')
+        .map(parseLine)
+        .filter((item): item is Parsed => item !== null)
+        .slice(0, 8);
+
+      if (!parsed.length) {
+        output.innerHTML =
+          '<p class="lab__empty">Nothing to parse yet. Add a rule above.</p>';
+        counter.textContent = '';
+        return;
+      }
+
+      output.innerHTML = parsed
+        .map(
+          (item) =>
+            `<div class="lab__row"><span class="lab__kind${item.kind === 'skip' ? ' lab__kind--skip' : ''}">${labels[item.kind]}</span><span class="lab__detail">${escape(item.scope)} · ${escape(item.detail)}</span></div>`,
+        )
+        .join('');
+
+      const active = parsed.filter((item) => item.kind !== 'skip').length;
+      counter.textContent = `${active} active ${active === 1 ? 'rule' : 'rules'} · ${parsed.length} lines read`;
+    }
+
+    let frame = 0;
+    field.addEventListener('input', () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(render);
+    });
+
+    render();
+  });
+</script>

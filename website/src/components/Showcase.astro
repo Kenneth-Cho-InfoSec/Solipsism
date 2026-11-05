@@ -1,0 +1,66 @@
+---
+import { withBase } from '../data/site';
+const base = import.meta.env.BASE_URL;
+const href = (path: string) => withBase(base, path);
+
+const screens = [
+  {
+    src: '/assets/screens/homepage.webp',
+    title: 'Homepage',
+    caption:
+      'Bookmark shortcuts, clock and motto over your own wallpaper, with the rail on the right.',
+    alt: 'Solipsism homepage in the light theme: six bookmark shortcuts above a wallpaper, the date, the name Solipsism Browser and the motto, with the navigation rail on the right.',
+  },
+  {
+    src: '/assets/screens/menu.webp',
+    title: 'Overflow menu',
+    caption:
+      'Quick actions, new tab, incognito, history, downloads, find in page and settings in one surface.',
+    alt: 'The Solipsism overflow menu open over the homepage, showing quick action icons and a list of commands including new tab, new incognito tab, history, downloads, bookmarks, find in page and settings.',
+  },
+  {
+    src: '/assets/screens/themes.webp',
+    title: 'App theme',
+    caption:
+      'Light, dark and true AMOLED black are one choice, not a hidden setting.',
+    alt: 'The App theme dialog in Solipsism graphics settings, offering Light theme, Dark theme and Black theme (AMOLED) with a radio button each.',
+  },
+  {
+    src: '/assets/screens/tabs.webp',
+    title: 'Tab overview',
+    caption:
+      'Tabs open as a full surface you can read, with the rail still holding the page controls.',
+    alt: 'The Solipsism tab overview, a dark full-screen panel listing a single Homepage tab with a close button, beside the navigation rail.',
+  },
+];
+---
+
+<section class="section section--tight" aria-labelledby="showcase-heading">
+  <div class="shell section-head reveal">
+    <h2 id="showcase-heading">The interface, at full size.</h2>
+    <p>
+      Four screens from 9.4.0, uncropped. No mock-ups and no device frames: this
+      is what the app draws.
+    </p>
+  </div>
+  <div class="shell showcase">
+    {
+      screens.map((screen) => (
+        <figure class="showcase__item reveal">
+          <img
+            src={href(screen.src)}
+            width="720"
+            height="1600"
+            alt={screen.alt}
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption>
+            <strong>{screen.title}</strong>
+            {screen.caption}
+          </figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</section>

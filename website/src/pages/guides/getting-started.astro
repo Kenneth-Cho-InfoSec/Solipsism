@@ -1,196 +1,201 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { SITE, withBase } from '../../data/site';
 
-const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const base = import.meta.env.BASE_URL;
+const href = (path: string) => withBase(base, path);
+
+const sections = [
+  { id: 'install', heading: 'Install' },
+  { id: 'first-page', heading: 'Open a page' },
+  { id: 'rail', heading: 'Shape the rail' },
+  { id: 'privacy', heading: 'Set privacy' },
+  { id: 'homepage', heading: 'Make a homepage' },
+  { id: 'antares', heading: 'Try Antares' },
+];
 ---
 
-<BaseLayout
-  title="Getting started with Solipsism Browser — Android guide"
-  description="Install Solipsism Browser on Android, open your first page, position the navigation rail, choose a theme, and set the privacy controls you use before browsing."
+<DocsLayout
+  title="Getting started with Solipsism Browser"
+  description="Install Solipsism on Android, open your first page, shape the rail, set the privacy controls you use, and decide whether to try the experimental Antares core."
   path="/guides/getting-started/"
+  sections={sections}
+  next={{ label: 'Privacy controls', path: '/docs/privacy/' }}
 >
-  <Header />
-  <main id="main">
-    <nav class="breadcrumbs shell" aria-label="Breadcrumb">
-      <a href={base}>Home</a>
-      <span aria-hidden="true">/</span>
-      <a href={`${base}docs/`}>Documentation</a>
-      <span aria-hidden="true">/</span>
-      <span aria-current="page">Getting started</span>
-    </nav>
-    <section class="archive-hero shell reference-hero">
-      <h1>Set up Solipsism Browser on Android.</h1>
+  <h1>Set up Solipsism in five minutes.</h1>
+  <p>
+    This is the short path: install the official build, open a page, move the
+    rail where your hand expects it, and choose the privacy settings you
+    actually use. Screenshots and labels match the 9.4.0 interface; wording can
+    change between releases.
+  </p>
+
+  <div class="page-head__actions">
+    <a
+      class="button latest-download"
+      data-latest-download
+      href={SITE.latestRelease}>Download latest APK</a
+    >
+    <a class="text-link" href={href('/docs/installation/')}
+      >Read the installation notes</a
+    >
+  </div>
+
+  <section id="install">
+    <h2>Install</h2>
+    <ol class="steps">
+      <li>
+        <div>
+          <h3>Get the official APK</h3>
+          <p>
+            Open the <a
+              href={SITE.releases}
+              target="_blank"
+              rel="noopener noreferrer">releases page</a
+            > and download the APK attached to the current release. In 9.4.0 that
+            is a single file, <code>Solipsism-Browser-v9.4.0.apk</code>.
+          </p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Approve the source, not the world</h3>
+          <p>
+            Android asks you to allow installs from the app you use to open the
+            file. Keep that permission limited to that app, and revoke it when
+            you are done.
+          </p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Launch it</h3>
+          <p>
+            Solipsism opens on its homepage with Android WebView selected. You
+            do not need Antares, an account, or any extra download to browse.
+          </p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="first-page">
+    <h2>Open a page</h2>
+    <ol class="steps">
+      <li>
+        <div>
+          <h3>Tap the URL field in the rail</h3>
+          <p>
+            The field expands into an editor. Type an address or a search phrase
+            and use the keyboard’s Go action.
+          </p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Open the tab overview</h3>
+          <p>
+            Tabs live in the rail. The overview is a full surface, not a strip
+            of favicons, so you can tell pages apart.
+          </p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Try a long press on refresh</h3>
+          <p>
+            Long-pressing refresh reloads with JavaScript disabled, useful for a
+            page that will not settle.
+          </p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="rail">
+    <h2>Shape the rail</h2>
+    <p>
+      Open Settings and choose <strong>Rail &amp; Menu Studio</strong>. Move
+      supported actions between the rail and the overflow menu, drag rail icons
+      into the order you want, choose the rail side and size, and restore the
+      default layout whenever you want.
+    </p>
+    <ul>
+      <li>Up to eight movable rail actions.</li>
+      <li>Five optional quick actions in the overflow menu.</li>
+      <li>Tabs and the menu action stay permanent.</li>
+      <li>
+        The same action cannot be duplicated across the rail and the menu.
+      </li>
+      <li>Small, Medium, Large and Super Compact sizes.</li>
+    </ul>
+  </section>
+
+  <section id="privacy">
+    <h2>Set privacy</h2>
+    <p>
+      Open <strong>Privacy</strong> and decide four things before you browse anything
+      sensitive:
+    </p>
+    <ul>
+      <li>
+        Whether third-party cookies are allowed, and whether cookies, history,
+        cache or web storage should clear on exit.
+      </li>
+      <li>Whether to send Do Not Track and strip identifying headers.</li>
+      <li>
+        Whether WebRTC should be available. It is off by default in the privacy
+        settings.
+      </li>
+      <li>
+        Which site permissions you grant, knowing that the entries marked
+        Experimental are best-effort where WebView does not enforce them.
+      </li>
+    </ul>
+    <div class="callout callout--warn">
+      <strong>Read the limits once</strong>
       <p>
-        Install Solipsism from the project’s official release, open a webpage,
-        and place the controls where they work for you. The screenshots below
-        match the v9.4.0 interface; labels can change between releases.
+        Solipsism does not hide your IP address, prevent fingerprinting, or make
+        an untrusted download safe. It gives you control over what WebView
+        exposes, and it says so.
       </p>
-      <div class="page-actions">
-        <a
-          class="button"
-          href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest"
-          >Get the latest APK</a
-        >
-        <a class="button button-secondary" href={`${base}docs/`}
-          >Read the technical guide</a
-        >
-      </div>
-    </section>
-
-    <div class="shell reference-layout">
-      <article class="reference-content">
-        <section id="install">
-          <h2>Step 1. Install from the official release</h2>
-          <ol class="guide-steps">
-            <li>
-              Open the <a
-                href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/releases/latest"
-                >Solipsism Releases page</a
-              > and download the APK attached to the current release.
-            </li>
-            <li>
-              Open the downloaded APK and follow Android’s installation prompt
-              for that file source.
-            </li>
-            <li>Launch Solipsism from your app list.</li>
-          </ol>
-          <p>
-            The project’s v9.4.0 release requires Android 8.0 (API 26) or newer
-            and contains a single APK asset. Use the release notes for the
-            requirements and assets of the version you install. Do not use APKs
-            copied from an unofficial download site.
-          </p>
-        </section>
-
-        <section id="first-page">
-          <h2>Step 2. Open your first page</h2>
-          <ol class="guide-steps">
-            <li>Keep Android WebView selected for the stable browser core.</li>
-            <li>Tap the URL/search field in the side rail.</li>
-            <li>
-              Type a website address or search phrase, then use the keyboard’s
-              Go action.
-            </li>
-            <li>
-              Open the tab overview from the rail to switch between pages.
-            </li>
-          </ol>
-          <p>
-            The rail can sit on either side of the screen. Solipsism’s compact
-            layout is designed so common controls stay within reach while the
-            webpage remains the main surface.
-          </p>
-        </section>
-
-        <section id="make-it-yours">
-          <h2>Step 3. Set up the rail and homepage</h2>
-          <p>
-            Open Settings and use <strong>Rail &amp; Menu Studio</strong> to move
-            supported actions between the rail and overflow menu. Reorder rail icons
-            by dragging them, choose the rail side and size, or restore the default
-            layout.
-          </p>
-          <p>
-            The homepage can show bookmarks, a clock, a motto, and a wallpaper.
-            You can also import static HTML and CSS. Custom homepage content is
-            sanitized, stored in app-private storage, and runs without scripts,
-            forms, frames, downloads, or remote resources.
-          </p>
-        </section>
-
-        <section id="privacy-basics">
-          <h2>Step 4. Choose your privacy settings</h2>
-          <ul>
-            <li>
-              Review cookie, JavaScript, popup, and site-permission controls in
-              Settings.
-            </li>
-            <li>
-              Choose whether to clear history, cookies, cache, or web storage on
-              exit.
-            </li>
-            <li>
-              Use the Adblocker settings for host lists and custom rules.
-              Cosmetic filters are a supported subset.
-            </li>
-            <li>
-              Install userscripts only from sources you trust. They are code
-              that runs in webpages.
-            </li>
-          </ul>
-          <p class="notice">
-            Solipsism uses Android WebView for its stable core. Some site
-            permissions are experimental best-effort signals. The download
-            scanner can miss malware and is not a substitute for trusted sources
-            or current Android security updates.
-          </p>
-        </section>
-
-        <section id="optional-core">
-          <h2>Optional: test the experimental Antares core</h2>
-          <p>
-            Solipsism 9.4.0 includes Antares 0.5.0 as an experimental core. It
-            is not required for normal browsing. Some complex pages, media, or
-            interactions may be incomplete. If a site does not work, select
-            Android WebView again in the browser-core chooser.
-          </p>
-          <p>
-            Do not install an Antares companion package from unofficial sources.
-            Read the{' '}<a
-              href="https://github.com/Kenneth-Cho-InfoSec/Solipsism/blob/main/docs/ANTARES_ENGINE.md"
-              >engine notes</a
-            >
-            {' '}before enabling its diagnostic mode; that mode loads each page
-            a second time in a hidden WebView.
-          </p>
-        </section>
-
-        <section id="troubleshooting">
-          <h2>Quick troubleshooting checks</h2>
-          <dl class="troubleshooting-list">
-            <dt>A website does not load correctly</dt>
-            <dd>
-              Update Android System WebView and Android. If you enabled Antares,
-              switch to WebView and try again.
-            </dd>
-            <dt>A camera or location prompt does not appear</dt>
-            <dd>
-              Check the Android app permission and the website’s own permission.
-              Availability also depends on the WebView provider and device.
-            </dd>
-            <dt>The APK does not install</dt>
-            <dd>
-              Check that your Android version meets the release requirement and
-              use the official release page.
-            </dd>
-          </dl>
-          <p>
-            For help, file an issue with the app version, Android version,
-            WebView provider, selected browser core, and steps to reproduce.
-            Remove personal browsing details from public reports.
-          </p>
-          <div class="link-cluster">
-            <a href={`${base}features/`}>Explore the features</a>
-            <a href={`${base}community/`}>Get help</a>
-            <a href={`${base}releases/`}>Browse releases</a>
-          </div>
-        </section>
-      </article>
-
-      <aside class="reference-toc">
-        <p class="toc-label">In this guide</p>
-        <nav aria-label="Guide steps">
-          <a href="#install">Install</a>
-          <a href="#first-page">Open a page</a>
-          <a href="#make-it-yours">Customize the rail</a>
-          <a href="#privacy-basics">Privacy basics</a>
-          <a href="#optional-core">Optional Antares core</a>
-          <a href="#troubleshooting">Troubleshooting</a>
-        </nav>
-      </aside>
     </div>
-  </main>
-  <Footer />
-</BaseLayout>
+  </section>
+
+  <section id="homepage">
+    <h2>Make a homepage</h2>
+    <p>
+      The homepage can show bookmarks, a wallpaper, a motto, a clock and a
+      configurable date. You can import static HTML and CSS or edit it in the
+      app.
+    </p>
+    <p>
+      Custom homepage content is sanitised and stored in app-private storage.
+      Scripts, forms, frames, downloads, remote resources and file access are
+      disabled for static custom homepages.
+    </p>
+  </section>
+
+  <section id="antares">
+    <h2>Try Antares, carefully</h2>
+    <p>
+      Antares is an experimental Servo core in a separate package. It requires
+      Android 13 or newer and a supported 64-bit device, and Solipsism verifies
+      the package name, signing digest and protocol before enabling it.
+    </p>
+    <p>
+      If you do try it, expect some sites to fail. CAPTCHA, media and complex
+      interaction are the usual problems. Select Android WebView again and
+      reload when that happens.
+    </p>
+    <div class="link-row">
+      <a class="text-link" href={href('/docs/antares/')}>Antares notes</a>
+      <a
+        class="text-link"
+        href={SITE.antaresNotes}
+        target="_blank"
+        rel="noopener noreferrer">Engine documentation ↗</a
+      >
+    </div>
+  </section>
+</DocsLayout>

@@ -1,0 +1,42 @@
+---
+import type { FaqItem } from '../data/faqs';
+
+interface Props {
+  items: FaqItem[];
+}
+const { items } = Astro.props;
+---
+
+<div class="faq" data-faq>
+  {
+    items.map((item, index) => (
+      <details class="faq__item" name="homepage-faq" open={index === 0}>
+        <summary>
+          <span>{item.question}</span>
+          <span class="faq__marker" aria-hidden="true" />
+        </summary>
+        <div class="faq__answer">
+          {item.answer.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-faq]').forEach((faq) => {
+    const items = Array.from(
+      faq.querySelectorAll<HTMLDetailsElement>('details'),
+    );
+    items.forEach((item) => {
+      item.addEventListener('toggle', () => {
+        if (!item.open) return;
+        items.forEach((other) => {
+          if (other !== item) other.open = false;
+        });
+      });
+    });
+  });
+</script>
