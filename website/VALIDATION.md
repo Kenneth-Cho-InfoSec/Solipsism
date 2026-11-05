@@ -32,6 +32,11 @@ real contracts:
 - the release archive loads its project-base manifest and stays within a
   390 px viewport (no horizontal overflow).
 
+**Deployment:** GitHub Actions run `42010833850` completed successfully
+(verify-and-build and deploy jobs). After deployment, all 15 routes,
+`/robots.txt` and `/sitemap.xml` returned HTTP 200 at
+`https://kenneth-cho-infosec.github.io/Solipsism/`.
+
 ## 2. Build output
 
 - 15 routes: `/`, `/features/`, `/docs/`, eight documentation articles,
