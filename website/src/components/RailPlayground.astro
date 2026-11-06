@@ -13,159 +13,190 @@ const { class: className = '' } = Astro.props;
   data-stage="dark"
   data-tabs="closed"
 >
-  <div class="rail-play__frame" data-ui>
-    <div class="rail-play__page">
-      <div class="rail-play__topbar">
-        <div class="rail-play__url" data-url>
+  <div class="rail-play__device" data-ui>
+    <div class="rail-play__frame" data-ui>
+      <div class="rail-play__page">
+        <div class="rail-play__topbar">
+          <div class="rail-play__url" data-url>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <rect x="4" y="10" width="16" height="11" rx="1"></rect>
+              <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+            </svg>
+            <span data-url-text>solipsism.app/home</span>
+          </div>
+        </div>
+
+        <div class="rail-play__body">
+          <div class="rail-play__progress" data-progress aria-hidden="true">
+          </div>
+          <p class="rail-play__eyebrow" data-page-eyebrow>Homepage</p>
+          <p class="rail-play__headline" data-page-title>
+            Quiet mornings, open tabs.
+          </p>
+          <div class="rail-play__search" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="6"></circle>
+              <path d="m16 16 4 4"></path>
+            </svg>
+            <span>Search or enter address</span>
+          </div>
+          <div class="rail-play__tiles" aria-hidden="true">
+            <span class="rail-play__tile">Search</span>
+            <span class="rail-play__tile">Docs</span>
+            <span class="rail-play__tile">News</span>
+            <span class="rail-play__tile">Mail</span>
+            <span class="rail-play__tile">Notes</span>
+            <span class="rail-play__tile">More</span>
+          </div>
+          <div class="rail-play__recents" aria-hidden="true">
+            <p class="rail-play__recents-label">Recent</p>
+            <div class="rail-play__recent">
+              <span>Privacy controls</span><span>docs</span>
+            </div>
+            <div class="rail-play__recent">
+              <span>Release notes</span><span>releases</span>
+            </div>
+            <div class="rail-play__recent">
+              <span>Blocking rules</span><span>docs</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="rail-play__tabs"
+          data-tabs-panel
+          aria-hidden="true"
+          aria-label="Tab overview preview"
+        >
+          <div class="rail-play__tabs-head">
+            <span>3 tabs</span>
+            <span>Preview</span>
+          </div>
+          <button
+            class="rail-play__tab"
+            type="button"
+            data-tab
+            data-tab-title="Quiet mornings, open tabs."
+            data-tab-url="solipsism.app/home"
+            data-tab-eyebrow="Homepage"
+            aria-current="true"
+          >
+            <span class="rail-play__tab-dot" aria-hidden="true"></span>
+            Homepage
+          </button>
+          <button
+            class="rail-play__tab"
+            type="button"
+            data-tab
+            data-tab-title="Install and develop Solipsism."
+            data-tab-url="solipsism.app/docs"
+            data-tab-eyebrow="Documentation"
+          >
+            <span class="rail-play__tab-dot" aria-hidden="true"></span>
+            Documentation
+          </button>
+          <button
+            class="rail-play__tab"
+            type="button"
+            data-tab
+            data-tab-title="Solipsism Browser 9.4.0"
+            data-tab-url="github.com/…/releases"
+            data-tab-eyebrow="Release notes"
+          >
+            <span class="rail-play__tab-dot" aria-hidden="true"></span>
+            Release notes
+          </button>
+        </div>
+      </div>
+
+      <div class="rail-play__rail" role="toolbar" aria-label="Rail preview">
+        <button type="button" data-rail-action="back" aria-label="Go back">
           <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="1.8"
             aria-hidden="true"
           >
-            <rect x="4" y="10" width="16" height="11" rx="1"></rect>
-            <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+            <path d="M15 5l-7 7 7 7"></path>
           </svg>
-          <span data-url-text>solipsism.app/home</span>
-        </div>
-      </div>
-
-      <div class="rail-play__body">
-        <div class="rail-play__progress" data-progress aria-hidden="true"></div>
-        <p class="rail-play__eyebrow" data-page-eyebrow>Homepage</p>
-        <p class="rail-play__headline" data-page-title>
-          Quiet mornings, open tabs.
-        </p>
-        <div class="rail-play__tiles" aria-hidden="true">
-          <span class="rail-play__tile">Search</span>
-          <span class="rail-play__tile">Docs</span>
-          <span class="rail-play__tile">News</span>
-          <span class="rail-play__tile">Mail</span>
-          <span class="rail-play__tile">Notes</span>
-          <span class="rail-play__tile">More</span>
-        </div>
-      </div>
-
-      <div
-        class="rail-play__tabs"
-        data-tabs-panel
-        aria-hidden="true"
-        aria-label="Tab overview preview"
-      >
-        <div class="rail-play__tabs-head">
-          <span>3 tabs</span>
-          <span>Preview</span>
-        </div>
-        <button
-          class="rail-play__tab"
-          type="button"
-          data-tab
-          data-tab-title="Quiet mornings, open tabs."
-          data-tab-url="solipsism.app/home"
-          data-tab-eyebrow="Homepage"
-          aria-current="true"
-        >
-          <span class="rail-play__tab-dot" aria-hidden="true"></span>
-          Homepage
         </button>
         <button
-          class="rail-play__tab"
           type="button"
-          data-tab
-          data-tab-title="Install and develop Solipsism."
-          data-tab-url="solipsism.app/docs"
-          data-tab-eyebrow="Documentation"
+          data-rail-action="forward"
+          aria-label="Go forward"
         >
-          <span class="rail-play__tab-dot" aria-hidden="true"></span>
-          Documentation
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <path d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+        <span class="rail-spacer"></span>
+        <button
+          type="button"
+          data-rail-action="tabs"
+          aria-label="Open tab overview"
+          aria-expanded="false"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <rect x="4" y="4" width="12" height="12"></rect>
+            <path d="M8 20h12V8"></path>
+          </svg>
         </button>
         <button
-          class="rail-play__tab"
           type="button"
-          data-tab
-          data-tab-title="Solipsism Browser 9.4.0"
-          data-tab-url="github.com/…/releases"
-          data-tab-eyebrow="Release notes"
+          data-rail-action="refresh"
+          aria-label="Refresh page"
         >
-          <span class="rail-play__tab-dot" aria-hidden="true"></span>
-          Release notes
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <path d="M20 11a8 8 0 1 0-2.3 5.7"></path>
+            <path d="M20 4v7h-7"></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-rail-action="theme"
+          aria-label="Switch preview between light and dark"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"></path>
+          </svg>
         </button>
       </div>
-    </div>
-
-    <div class="rail-play__rail" role="toolbar" aria-label="Rail preview">
-      <button type="button" data-rail-action="back" aria-label="Go back">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          aria-hidden="true"
-        >
-          <path d="M15 5l-7 7 7 7"></path>
-        </svg>
-      </button>
-      <button type="button" data-rail-action="forward" aria-label="Go forward">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          aria-hidden="true"
-        >
-          <path d="M9 5l7 7-7 7"></path>
-        </svg>
-      </button>
-      <span class="rail-spacer"></span>
-      <button
-        type="button"
-        data-rail-action="tabs"
-        aria-label="Open tab overview"
-        aria-expanded="false"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          aria-hidden="true"
-        >
-          <rect x="4" y="4" width="12" height="12"></rect>
-          <path d="M8 20h12V8"></path>
-        </svg>
-      </button>
-      <button
-        type="button"
-        data-rail-action="refresh"
-        aria-label="Refresh page"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          aria-hidden="true"
-        >
-          <path d="M20 11a8 8 0 1 0-2.3 5.7"></path>
-          <path d="M20 4v7h-7"></path>
-        </svg>
-      </button>
-      <button
-        type="button"
-        data-rail-action="theme"
-        aria-label="Switch preview between light and dark"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          aria-hidden="true"
-        >
-          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"></path>
-        </svg>
-      </button>
     </div>
   </div>
 
@@ -205,24 +236,24 @@ const { class: className = '' } = Astro.props;
     --ink-soft: #d8d7cf;
     --muted: #b6b7ae;
     --line: #34342f;
-    --sage: #9db39b;
-    --on-sage: #14150f;
+    --accent: #b7a4e6;
+    --on-accent: #171715;
     --field: #0e0e0d;
   }
 
   .rail-play[data-stage='light'] .rail-play__frame {
-    --bg: #e9e7df;
-    --bg-deep: #dedbd1;
-    --surface: #f4f2ec;
-    --surface-2: #e3e0d6;
-    --surface-3: #d8d4c8;
-    --ink: #1c1c1c;
-    --ink-soft: #33342f;
-    --muted: #5c5d57;
-    --line: #cfccc1;
-    --sage: #4f6b4e;
-    --on-sage: #f6f4ee;
-    --field: #fbfaf6;
+    --bg: #e6e6e1;
+    --bg-deep: #dcdcd6;
+    --surface: #f2f2ee;
+    --surface-2: #dfdfd9;
+    --surface-3: #d4d4ce;
+    --ink: #1a1a19;
+    --ink-soft: #30302e;
+    --muted: #4c4d48;
+    --line: #cbcbc4;
+    --accent: #6b4fa0;
+    --on-accent: #f3f1f6;
+    --field: #fbfbf8;
   }
 
   .rail-play__progress {
@@ -231,7 +262,7 @@ const { class: className = '' } = Astro.props;
     left: 0;
     height: 2px;
     width: 0;
-    background: var(--sage);
+    background: var(--accent);
     opacity: 0;
   }
 

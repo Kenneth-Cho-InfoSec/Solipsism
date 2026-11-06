@@ -24,7 +24,7 @@ Everything else — docs, releases, comparison, community — must support that 
 | Criterion                                    | Target                                                                  |
 | -------------------------------------------- | ----------------------------------------------------------------------- |
 | Product idea is demonstrable without reading | A working rail fragment above the fold                                  |
-| Visual identity                              | One charcoal/sage system, light + dark + AMOLED tier                    |
+| Visual identity                              | One charcoal/violet system, light + dark + AMOLED tier                  |
 | Motion                                       | Purposeful, reduced-motion-safe, no autoplay that cannot be paused      |
 | Docs                                         | Multi-page, searchable, sidebar navigation, code copy                   |
 | Accessibility                                | WCAG 2.2 AA, keyboard-complete, visible focus, `aria-current`           |
@@ -44,7 +44,7 @@ Adopted from the `product-performs` draw (seed `1070271504`):
 
 1. **The interface is the imagery.** No stock photos, no device mockups, no dashboard collage. Fragments of the real UI, at true size, doing real things.
 2. **Quiet column, then full-bleed bands.** The hero is a narrow left-aligned column with deliberate emptiness. Below it, sections may run edge to edge.
-3. **One accent.** Sage is the only chromatic accent. Colour elsewhere comes from state (success/warning) and from the product fragment itself.
+3. **One accent.** Violet is the only chromatic accent. Colour elsewhere comes from state (success/warning) and from the product fragment itself.
 4. **Type does the hierarchy.** Archivo at regular and medium weight, tight tracking on display, generous leading on body.
 5. **Motion explains state.** Nothing moves for decoration. The rail moves because the user moved it; the core story advances because the reader scrolled.
 
@@ -58,11 +58,11 @@ Adopted from the `product-performs` draw (seed `1070271504`):
 | `--ink`       | `#f2f1ec`      | `#1c1c1c` | primary text           |
 | `--muted`     | `#a3a49c`      | `#5c5d57` | secondary text         |
 | `--line`      | `#33332e`      | `#cfccc1` | hairlines              |
-| `--sage`      | `#9db39b`      | `#4f6b4e` | accent, focus          |
-| `--on-sage`   | `#171715`      | `#f4f2ec` | text on accent         |
+| `--accent`    | `#b7a4e6`      | `#6b4fa0` | accent, focus          |
+| `--on-accent` | `#171715`      | `#f6f4ee` | text on accent         |
 | `--amber`     | `#d9a566`      | `#8a5a1f` | experimental / warning |
 
-AMOLED tier: `--bg: #000`, `--surface: #0a0a09`, keeping sage. Selected via the theme control (`system → light → dark → amoled`).
+AMOLED tier: `--bg: #000`, `--surface: #0a0a09`, keeping violet. Selected via the theme control (`system → light → dark → amoled`).
 
 Contrast targets: body ≥ 7:1, muted ≥ 4.5:1, accent-on-ground ≥ 4.5:1, focus ring ≥ 3:1 against both adjacent colours.
 
@@ -94,16 +94,16 @@ No parallax, no cursor-follow, no autoplaying carousel that cannot be stopped.
 
 ### 3.1 Homepage — `features → showcase → how-it-works → proof → faq → cta → footer`
 
-| Section      | Direction blueprint               | Implementation                                                                                                                             |
-| ------------ | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Hero         | "Column on one line"              | Narrow left column at 27% on desktop; headline, one sentence, download + source links, version meta; rail fragment peeking from the bottom |
-| Features     | "Sentences with switches"         | Five full-bleed bands, each a sentence plus a real toggle; on-state reveals a consequence line with figures                                |
-| Showcase     | "Input half, output half"         | Filter lab: paste a rule on the left, see the parsed result on the right                                                                   |
-| How it works | "Pinned fragment, changing state" | Core story: WebView (stable) vs Antares (experimental) with three statements                                                               |
-| Proof        | "Large marks on tiles"            | 9.4.0 · MPL 2.0 · Android 8.0+ · 0 trackers · one APK                                                                                      |
-| FAQ          | "Question index, one answer"      | Six `<details>` questions, one open at a time                                                                                              |
-| CTA          | "First step, already open"        | Single download action plus docs link                                                                                                      |
-| Footer       | "A single quiet line"             | One sentence, one row of links, licence                                                                                                    |
+| Section      | Direction blueprint               | Implementation                                                                                                                                    |
+| ------------ | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hero         | "Column on one line"              | Narrow left column at 27% on desktop; headline, one sentence, download + source links, version meta; a phone-sized 9:21 rail preview on the right |
+| Features     | "Sentences with switches"         | Five full-bleed bands, each a sentence plus a real toggle; on-state reveals a consequence line with figures                                       |
+| Showcase     | "Input half, output half"         | Filter lab: paste a rule on the left, see the parsed result on the right                                                                          |
+| How it works | "Pinned fragment, changing state" | Core story: WebView (stable) vs Antares (experimental) with three statements                                                                      |
+| Proof        | "Large marks on tiles"            | 9.4.0 · MPL 2.0 · Android 8.0+ · 0 trackers · one APK                                                                                             |
+| FAQ          | "Question index, one answer"      | Six `<details>` questions, one open at a time                                                                                                     |
+| CTA          | "First step, already open"        | Single download action plus docs link                                                                                                             |
+| Footer       | "A single quiet line"             | One sentence, one row of links, licence                                                                                                           |
 
 ### 3.2 Features — `/features/`
 
@@ -199,7 +199,7 @@ This removes the three-way duplication identified in the audit.
 - Keyboard-complete: every control reachable, Escape closes menus and dialogs, focus returns to the trigger.
 - `aria-current="page"` on the active nav and sidebar item.
 - `aria-pressed` on toggles; `aria-expanded` on disclosures; `aria-live="polite"` on the release region and the filter-lab result.
-- Visible focus ring: 2 px `--sage` outline with 2 px offset, plus a light halo on dark surfaces.
+- Visible focus ring: 2 px `--accent` outline with 2 px offset, plus a light halo on dark surfaces.
 - Minimum 44×44 px touch targets for all interactive controls.
 - Headings form a single unbroken hierarchy per page.
 - Tables have captions and scoped headers; mobile comparison uses definition-style cards instead.

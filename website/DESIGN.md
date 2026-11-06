@@ -28,11 +28,11 @@ product and the house rules. The redraws matter more than the original draw.
 
 | Drawn                                           | Redrawn to                                                   | Why                                                                                                          |
 | ----------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Full-width editorial hero with a large image    | 5/7 split: quiet copy column, live rail fragment             | An empty right half fails the house rule; a working fragment earns the space.                                |
-| Warm cream light theme (`#e9e7df`)              | Neutral bone (`#e6e6e1`)                                     | Cream reads as a generic assistant palette; the product is grey-green, not yellow.                           |
+| Full-width editorial hero with a large image    | 5/7 split: quiet copy column, phone-sized rail fragment      | An empty right half fails the house rule; a working fragment earns the space.                                |
+| Warm cream light theme (`#e9e7df`)              | Neutral bone (`#e6e6e1`)                                     | Cream reads as a generic assistant palette; the product is charcoal and neutral, not warm yellow.            |
 | Rounded cards, soft shadows, glass header       | Square page surfaces, hairline borders, solid header         | Shadows and glass at rest were flagged and read as decoration; the product UI is flat and precise.           |
-| Six-step type scale with micro uppercase labels | Five visible sizes, sentence case throughout                 | Tracking-heavy eyebrows and 11 px labels were doing hierarchy that type weight should do.                    |
-| Gradient wash behind the hero                   | Flat charcoal ground, one sage accent                        | The gradient added atmosphere but no information, and failed the lint gate.                                  |
+| Six-step type scale with micro uppercase labels | Five-size page copy scale, sentence case throughout          | Tracking-heavy eyebrows and 11 px labels were doing hierarchy that type weight should do.                    |
+| Gradient wash behind the hero                   | Flat charcoal ground, one violet accent                      | The gradient added atmosphere but no information, and failed the lint gate.                                  |
 | Stock photography / device mockups              | Real screenshots from `docs/screenshots/`, converted to WebP | Only the shipped interface is honest imagery for a browser.                                                  |
 | Animated counters and numbered sections         | Large static marks on proof tiles                            | Numbers counting up implied measurement theatre; the figures are facts, not a performance.                   |
 | Scroll-jacked "how it works"                    | Sticky stage + IntersectionObserver state                    | The reader keeps control of the scroll; the panel changes because they arrived, not because they were moved. |
@@ -56,12 +56,12 @@ copied.
 | `--ink-soft`  | `#d8d7cf`      | `#30302e` | `#d8d7cf` | strong secondary text  |
 | `--muted`     | `#a3a49c`      | `#4c4d48` | `#9b9c94` | secondary text         |
 | `--line`      | `#34342f`      | `#cbcbc4` | `#242422` | borders                |
-| `--sage`      | `#9db39b`      | `#4a664a` | `#9db39b` | accent, focus          |
-| `--on-sage`   | `#14150f`      | `#edefea` | `#000000` | text on accent         |
+| `--accent`    | `#b7a4e6`      | `#6b4fa0` | `#b7a4e6` | accent, focus          |
+| `--on-accent` | `#171715`      | `#f3f1f6` | `#000000` | text on accent         |
 | `--amber`     | `#d9a566`      | `#7d5019` | `#d9a566` | experimental / warning |
 | `--danger`    | `#d98a7a`      | `#8d3b2c` | `#d98a7a` | destructive states     |
 
-Sage is the only chromatic accent on the page. Amber appears only where the
+Violet is the only chromatic accent on the page. Amber appears only where the
 product is experimental or a release needs a warning. Everything else is ink,
 surface or line.
 
@@ -123,17 +123,17 @@ Rules:
 
 `hero → features → showcase → how-it-works → proof → faq → cta → footer`
 
-| Section      | Composition                                                                                                                                                  |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Hero         | Narrow copy column (headline, one paragraph, two actions, version meta, four links) beside the rail fragment. Headline stays two lines at 1440, 768 and 390. |
-| Features     | Five full-bleed bands. Each is a sentence plus a real switch; the on state reveals a consequence line with a figure.                                         |
-| Showcase     | Four real screenshots at true aspect ratio, captioned by what they show, not by marketing names.                                                             |
-| Filter lab   | Input left, parsed output right. Typing changes the parse; the copy says it is a preview, not an install.                                                    |
-| How it works | WebView (stable) and Antares (experimental) panels with three statements each. The stable core is the default reading.                                       |
-| Proof        | Four large marks: 9.4.0 · MPL 2.0 · Android 8.0+ · one APK. No counters.                                                                                     |
-| FAQ          | Six `<details>` questions; opening one closes the others.                                                                                                    |
-| CTA          | One download action, one documentation link.                                                                                                                 |
-| Footer       | One sentence, one row of links, licence and source.                                                                                                          |
+| Section      | Composition                                                                                                                                                                |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hero         | Narrow copy column (headline, one paragraph, two actions, version meta, four links) beside a phone-sized 9:21 rail preview. Headline stays two lines at 1440, 768 and 390. |
+| Features     | Five full-bleed bands. Each is a sentence plus a real switch; the on state reveals a consequence line with a figure.                                                       |
+| Showcase     | Four real screenshots at true aspect ratio, captioned by what they show, not by marketing names.                                                                           |
+| Filter lab   | Input left, parsed output right. Typing changes the parse; the copy says it is a preview, not an install.                                                                  |
+| How it works | WebView (stable) and Antares (experimental) panels with three statements each. The stable core is the default reading.                                                     |
+| Proof        | Four large marks: 9.4.0 · MPL 2.0 · Android 8.0+ · one APK. No counters.                                                                                                   |
+| FAQ          | Six `<details>` questions; opening one closes the others.                                                                                                                  |
+| CTA          | One download action, one documentation link.                                                                                                                               |
+| Footer       | One sentence, one row of links, licence and source.                                                                                                                        |
 
 ### 4.2 Interior pages
 
@@ -153,11 +153,13 @@ Rules:
 Two components carry the "product performs" idea. Both are client-side and both
 degrade to readable static markup without JavaScript.
 
-**`RailPlayground.astro`** — a working rail: choose a side, choose a size, open
-the tab panel, switch tabs. The stage re-themes to dark or light inside its own
-frame so the fragment reads as an app, not as page chrome. All controls are
-buttons with `aria-pressed` / `aria-current`; the frame is `data-ui`, so it keeps
-the app's rounded controls without loosening the page's square system.
+**`RailPlayground.astro`** — a working rail inside a 9:21 phone frame: choose a
+side, choose a size, open the tab panel, switch tabs. The stage re-themes to dark
+or light inside its own screen so the fragment reads as an app, not as page
+chrome. All controls are buttons with `aria-pressed` / `aria-current`; the screen
+is `data-ui`, so it keeps the app's rounded controls without loosening the page's
+square system. The bezel and speaker slots are decorative; the screen is the
+demo.
 
 **`FilterLab.astro`** — a small parser for the cosmetic filter syntax the app
 documents. It classifies each line as hide, allow, network or skip, names the
@@ -183,7 +185,7 @@ next to them points to the documentation for the real behaviour.
    repository fact or a shipped release, it does not ship.
 2. Keep the page copy scale (13 / 17 / 20 / 24 / 40 / 56). If a new size is
    needed, replace one.
-3. Sage is the only accent. Amber is for experimental or warning states.
+3. Violet is the only accent. Amber is for experimental or warning states.
 4. Page surfaces stay square; rounded controls only inside `data-ui`.
 5. No shadows, gradients, glass or hairline decoration at rest.
 6. Any new motion gets a reduced-motion branch and must explain a state change.

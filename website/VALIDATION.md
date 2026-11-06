@@ -2,7 +2,8 @@
 
 **Branch:** `website` (base `4d30cde`)
 **Build:** Astro 7, static output, GitHub Pages base `/Solipsism`
-**Date:** 5 November 2026
+**Date:** 6 November 2026
+**Revision:** violet accent, 9:21 phone-sized rail stage, frame-aligned filter lab
 **Verdict:** ships. All gates pass; residuals are documented below rather than
 hidden.
 
@@ -22,8 +23,8 @@ numbers are from the local build and the rendered pages, not estimates.
 | End-to-end tests             | `npx playwright test`              | 2/2 pass                                    |
 | Formatting                   | `npm run format:check`             | pass                                        |
 | House-style source lint      | `lint.mjs src`                     | 0 FAIL, 0 WARN                              |
-| Rendered homepage inspection | `inspect.mjs /Solipsism/`          | 0 FAIL, 1 WARN (`no-footage`)               |
-| Rendered features inspection | `inspect.mjs /Solipsism/features/` | 0 FAIL, 2 WARN (`no-footage`, `still-page`) |
+| Rendered homepage inspection | `inspect.mjs /Solipsism/`          | 0 FAIL, 2 WARN (`no-footage`, `off-centre`) |
+| Rendered features inspection | `inspect.mjs /Solipsism/features/` | 0 FAIL, 1 WARN (`no-footage`)               |
 
 The two e2e tests are the ones that existed on the branch and still describe
 real contracts:
@@ -49,23 +50,26 @@ real contracts:
   then points at the sitemap.
 - Total `dist/` is about 3.7 MB, dominated by the APK-free docs and six WebP
   screenshots (9–43 KB each).
+- The filter lab is now a 1280 px band inside the page frame, not a viewport-
+  wide split, so its first line of copy starts on the same 80 px margin as the
+  header and hero at 1440 px.
 
 ## 3. Measured homepage
 
 From `inspect.mjs` at 1440 px, with tablet and phone re-measurement:
 
-| Measure             | Result                                                 |
-| ------------------- | ------------------------------------------------------ |
-| Hero headline       | “Android browsing within reach.”, 4 words, 2 lines     |
-| Hero at 768 px      | 2 lines, 46.8 px                                       |
-| Hero at 390 px      | 2 lines, 36 px                                         |
-| Typefaces           | Archivo Variable, 100%                                 |
-| Visible sizes       | 12 / 13 / 14 / 16 / 17 / 20 / 32 / 40 / 56 px          |
-| Body                | 17 px, leading 1.62                                    |
-| Page length         | 7.9 screens, 821 words, 5 images                       |
-| Headings            | 17, longest 2 lines, median 5 words                    |
-| Colour              | page `#e6e6e1`, sections `#dcdcd6` `#dfdfd9` `#4a664a` |
-| Horizontal overflow | none at 1440, 768 or 390                               |
+| Measure             | Result                                                         |
+| ------------------- | -------------------------------------------------------------- |
+| Hero headline       | “Android browsing within reach.”, 4 words, 2 lines             |
+| Hero at 768 px      | 2 lines, 46.8 px                                               |
+| Hero at 390 px      | 2 lines, 36 px                                                 |
+| Typefaces           | Archivo Variable, 100%                                         |
+| Visible sizes       | 12 / 13 / 14 / 16 / 17 / 20 / 32 / 40 / 56 px                  |
+| Body                | 17 px, leading 1.62                                            |
+| Page length         | 8.3 screens, 838 words, 5 images                               |
+| Headings            | 17, longest 2 lines, median 5 words                            |
+| Colour              | page `#e6e6e1`, sections `#dcdcd6` `#dfdfd9`, accent `#6b4fa0` |
+| Horizontal overflow | none at 1440, 768 or 390                                       |
 
 The 12 px entries are inside `data-ui` fragments and code blocks; page copy does
 not go below 13 px.
@@ -78,7 +82,7 @@ Checked by review and by keyboard walkthrough, not by an automated audit only.
   it. Skip link is the first focusable element and becomes visible on focus.
 - **Headings:** one `<h1>` per route; sections use `<h2>`/`<h3>` in order. The
   homepage has 17 headings and no level skips.
-- **Focus:** `:focus-visible` uses a 2 px sage ring with a 2 px offset, on both
+- **Focus:** `:focus-visible` uses a 2 px violet ring with a 2 px offset, on both
   light and dark grounds. Buttons, links, summary rows, the rail controls, the
   theme control and the filter textarea all take it.
 - **Keyboard:** the rail playground is buttons, not divs. The tab panel uses
@@ -88,8 +92,9 @@ Checked by review and by keyboard walkthrough, not by an automated audit only.
 - **Live regions:** filter output is `aria-live="polite"`; release loading
   states announce through text, not colour alone.
 - **Colour:** body text is `--ink` on `--bg` (about 14:1 dark, 14:1 light);
-  `--muted` is above 4.5:1 on every surface it is used on; sage on ground is
-  above 4.5:1; focus ring is above 3:1 against both adjacent colours.
+  `--muted` is above 4.5:1 on every surface it is used on; the violet accent is
+  above 4.5:1 on every ground it is used on; focus ring is above 3:1 against both
+  adjacent colours.
 - **Motion:** `prefers-reduced-motion: reduce` removes the rail transform
   transition, panel translate, section reveal offset and smooth scrolling. The
   core story still changes state, instantly.
@@ -136,14 +141,27 @@ and show the shipped 9.4.0 interface. When a real device capture exists, the
 right move is a muted loop with a poster frame in the showcase section — not a
 fabricated one now.
 
-### `still-page` (features)
+### `off-centre` (homepage)
 
-The features page is mostly a reading page: a split hero with the live rail, a
-four-up screen strip, then a two-column feature list. It has one interactive
-fragment (the rail) but not continuous motion. That is deliberate. Adding motion
-to a page whose job is comparison would make it harder to read, and the house
-rules forbid decoration-only movement. The homepage carries the interaction
-budget; the features page carries the detail.
+The structural frame is symmetric: at 1440 px the header inner, the hero grid,
+the filter lab and the footer all run from 80 px to 1360 px, so the shell has
+80 px on each side. The inspection derives its margins from the 2nd and 98th
+percentiles of text boxes, and the rightmost text sits inside controls and
+panels that have their own padding: the CTA button's label ends 16 px inside
+the frame, and the story panel's rows end 40 px inside it. The 98th percentile
+therefore lands on the button at 1344 px and reports a 96 px right margin.
+
+Removing the button's padding would make the metric agree with the frame, but it
+would also break the control. The frame, not the text inside padded controls, is
+the thing the rule is meant to protect, so this residual is kept and measured
+rather than hidden. The rule does not trigger at 768 px or 390 px.
+
+### `still-page` (features, resolved)
+
+The features page used to reveal each feature group as one block, which gave the
+probe 13 moving elements. Each feature heading and item now has its own reveal,
+with the existing 70/140/200 ms stagger, so the page enters by part rather than
+as a single fade. That clears the warning without adding decoration-only motion.
 
 ### Subpage heuristics
 

@@ -54,14 +54,14 @@ const base = import.meta.env.BASE_URL;
         <h2 id="groups-heading" class="sr-only">Feature groups</h2>
         {
           FEATURE_GROUPS.map((group) => (
-            <div class="feature-group reveal" id={group.id}>
-              <div class="feature-group__intro">
+            <div class="feature-group" id={group.id}>
+              <div class="feature-group__intro reveal">
                 <h2>{group.title}</h2>
                 <p>{group.summary}</p>
               </div>
               <div class="feature-list">
                 {group.items.map((item) => (
-                  <div class="feature-item">
+                  <div class="feature-item reveal">
                     <h3>{item.name}</h3>
                     <p>
                       {item.detail}
