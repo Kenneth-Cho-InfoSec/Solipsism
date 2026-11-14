@@ -1,0 +1,91 @@
+stages:
+  - test
+
+ios-kmp-spike:
+  stage: test
+  tags:
+    - ${KMP_IOS_RUNNER_TAG:-macos}
+  variables:
+    EXP_DIR: experiments/ios-kmp-ci-spike
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - experiments/ios-kmp-ci-spike/**/*
+        - .gitlab-ci.yml
+    - if: '$CI_COMMIT_BRANCH'
+      changes:
+        - experiments/ios-kmp-ci-spike/**/*
+        - .gitlab-ci.yml
+    - when: manual
+      allow_failure: true
+  script:
+    - set -euo pipefail
+    - |
+      echo "== iOS KMP CI spike =="
+      if [ "$(uname -s)" != "Darwin" ]; then
+        echo "ERROR: ios-kmp-spike requires a macOS runner with Xcode (uname=$(uname -s))."
+        echo "Set KMP_IOS_RUNNER_TAG to a macOS runner tag or register a self-managed macOS runner."
+        exit 1
+      fi
+      command -v xcodebuild >/dev/null 2>&1 || { echo "ERROR: xcodebuild not found. Install Xcode on the runner."; exit 1; }
+      command -v xcrun >/dev/null 2>&1 || { echo "ERROR: xcrun not found. Install Xcode command line tools."; exit 1; }
+    - uname -a
+    - xcodebuild -version
+    - xcrun simctl list devices available | head -40 || true
+    - cd "$EXP_DIR"
+    - mkdir -p artifacts
+    - chmod +x ./gradlew
+    - ./gradlew :shared:jvmTest --console=plain
+    - |
+      # Build Shared.framework for the host simulator architecture
+      ARCH="$(uname -m)"
+      if [ "$ARCH" = "arm64" ]; then
+        SIM_TASK=":shared:linkDebugFrameworkIosSimulatorArm64"
+        FW_DIR="$(pwd)/shared/build/bin/iosSimulatorArm64/debugFramework"
+      else
+        SIM_TASK=":shared:linkDebugFrameworkIosX64"
+        FW_DIR="$(pwd)/shared/build/bin/iosX64/debugFramework"
+      fi
+      echo "Building $SIM_TASK (arch=$ARCH)"
+      ./gradlew "$SIM_TASK" --console=plain
+      test -d "$FW_DIR/Shared.framework" || { echo "ERROR: Shared.framework not found at $FW_DIR"; ls -R shared/build/bin || true; exit 1; }
+      echo "FW_DIR=$FW_DIR" > artifacts/build.env
+      export FW_DIR
+    - |
+      # Pick an available iPhone simulator (prefer booted, else first available iPhone)
+      SIM_UDID="$(xcrun simctl list devices available iPhone 2>/dev/null | grep -Eo '[A-F0-9-]{36}' | head -n1 || true)"
+      if [ -z "$SIM_UDID" ]; then
+        SIM_UDID="$(xcrun simctl list devices available 2>/dev/null | grep -Eo '[A-F0-9-]{36}' | head -n1 || true)"
+      fi
+      if [ -z "$SIM_UDID" ]; then
+        echo "ERROR: No available iOS simulator found."; xcrun simctl list devices || true; exit 1
+      fi
+      echo "Using simulator $SIM_UDID"
+      xcrun simctl boot "$SIM_UDID" || true
+      xcrun simctl bootstatus "$SIM_UDID" -b
+      DERIVED="build/DerivedData"
+      xcodebuild \
+        -project iosApp/iosApp.xcodeproj \
+        -scheme iosApp \
+        -configuration Debug \
+        -destination "id=$SIM_UDID" \
+        -derivedDataPath "$DERIVED" \
+        FRAMEWORK_SEARCH_PATHS="$FW_DIR" \
+        build | tee artifacts/xcodebuild.log
+      APP_PATH="$DERIVED/Build/Products/Debug-iphonesimulator/iosApp.app"
+      if [ ! -d "$APP_PATH" ]; then
+        APP_PATH="$(/usr/bin/find "$DERIVED/Build/Products" -name 'iosApp.app' -type d | head -n1 || true)"
+      fi
+      test -d "$APP_PATH" || { echo "ERROR: iosApp.app not found under $DERIVED"; exit 1; }
+      xcrun simctl install "$SIM_UDID" "$APP_PATH"
+      # Launch and capture screenshot proving the app runs (displays shared Kotlin output)
+      xcrun simctl launch "$SIM_UDID" com.solipsism.spike.iosApp || true
+      sleep 5
+      xcrun simctl io "$SIM_UDID" screenshot artifacts/ios-spike.png || xcrun simctl io booted screenshot artifacts/ios-spike.png || true
+      echo "Screenshot saved to artifacts/ios-spike.png (expected UI text: KMP on iOS: OK)"
+      xcrun simctl shutdown "$SIM_UDID" || true
+  artifacts:
+    when: always
+    paths:
+      - experiments/ios-kmp-ci-spike/artifacts/
+    expire_in: 1 week
