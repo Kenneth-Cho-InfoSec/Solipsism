@@ -60,6 +60,8 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         tabs.addTab(tabs.newTab().setText("Elements"))
         tabs.addTab(tabs.newTab().setText("Network"))
         tabs.addTab(tabs.newTab().setText("Storage"))
+        tabs.setTabTextColors(0xFF49454F.toInt(), 0xFF6750A4.toInt())
+        tabs.setSelectedTabIndicatorColor(0xFF6750A4.toInt())
 
         tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -96,6 +98,34 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
                 input.text.clear()
             }
         }
+        // Syntax highlighting on the console input
+        val input = v.findViewById<android.widget.EditText>(R.id.console_input)
+        input.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (s == null) return
+                val text = s.toString()
+                // remove existing spans
+                s.getSpans(0, s.length, android.text.style.ForegroundColorSpan::class.java).forEach { s.removeSpan(it) }
+                // keywords
+                val keywords = listOf("function","var","let","const","if","else","return","for","while","true","false","null","undefined")
+                for (kw in keywords) {
+                    val regex = Regex("\\b$kw\\b")
+                    regex.findAll(text).forEach { m ->
+                        s.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), m.range.first, m.range.last+1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                }
+                // strings
+                Regex("\"[^\"]*\"|'[^']*'").findAll(text).forEach { m ->
+                    s.setSpan(android.text.style.ForegroundColorSpan(0xFF2E7D32.toInt()), m.range.first, m.range.last+1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                // numbers
+                Regex("\\b\\d+\\b").findAll(text).forEach { m ->
+                    s.setSpan(android.text.style.ForegroundColorSpan(0xFFE65100.toInt()), m.range.first, m.range.last+1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+            }
+        })
         host()?.consoleStore(tabId)?.entries()?.let { obs ->
             obs.observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
                 .subscribe { list -> consoleAdapter.submitList(list) }
@@ -105,7 +135,6 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
 
     private fun wireElements(v: View) {
         val toggle = v.findViewById<Button>(R.id.inspect_toggle)
-        val hint = v.findViewById<TextView>(R.id.inspect_hint)
         val tree = v.findViewById<RecyclerView>(R.id.dom_tree)
         val props = v.findViewById<TextView>(R.id.props_rows)
         tree.layoutManager = LinearLayoutManager(requireContext())
@@ -122,7 +151,6 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         toggle.setOnClickListener {
             val on = toggle.text.toString() == "Inspect"
             toggle.text = if (on) "Stop" else "Inspect"
-            hint.text = if (on) "Tap an element on the page to inspect" else "Inspect mode off"
             if (on) {
                 enableInspectMode()
             } else {

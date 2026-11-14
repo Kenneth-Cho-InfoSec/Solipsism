@@ -17,15 +17,6 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:text="Inspect" />
-
-        <TextView
-            android:id="@+id/inspect_hint"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:text="Tap an element on the page"
-            android:textSize="12sp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
