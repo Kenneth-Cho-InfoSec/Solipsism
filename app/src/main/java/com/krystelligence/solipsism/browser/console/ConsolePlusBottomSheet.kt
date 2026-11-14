@@ -140,11 +140,7 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         tree.layoutManager = LinearLayoutManager(requireContext())
         tree.adapter = domAdapter
 
-        val sampleTree = listOf(
-            "html", "  head", "  body", "    div.hero", "      h1 (Welcome to Demo Shop)", "      p (Inspect this page…)",
-            "    div.card", "      strong (Featured: Wireless Headphones)", "      p ($129.00 — In stock)",
-            "      button.btn (Buy now)", "    div.card", "      input#emailInput", "      button.btn (Subscribe)"
-        )
+        val sampleTree = listOf("(tap Inspect, then tap an element on the page)")
         domAdapter.submit(sampleTree)
         // props starts empty; populated on inspect
 
