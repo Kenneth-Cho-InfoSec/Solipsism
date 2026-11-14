@@ -70,6 +70,7 @@ ios-kmp-spike:
         -configuration Debug \
         -destination "id=$SIM_UDID" \
         -derivedDataPath "$DERIVED" \
+        -resultBundlePath artifacts/ResultBundle.xcresult \
         FRAMEWORK_SEARCH_PATHS="$FW_DIR" \
         build | tee artifacts/xcodebuild.log
       APP_PATH="$DERIVED/Build/Products/Debug-iphonesimulator/iosApp.app"
@@ -79,9 +80,20 @@ ios-kmp-spike:
       test -d "$APP_PATH" || { echo "ERROR: iosApp.app not found under $DERIVED"; exit 1; }
       xcrun simctl install "$SIM_UDID" "$APP_PATH"
       # Launch and capture screenshot proving the app runs (displays shared Kotlin output)
-      xcrun simctl launch "$SIM_UDID" com.solipsism.spike.iosApp || true
+      if ! xcrun simctl launch "$SIM_UDID" com.solipsism.spike.iosApp; then
+        echo "ERROR: failed to launch com.solipsism.spike.iosApp on simulator $SIM_UDID"
+        xcrun simctl shutdown "$SIM_UDID" || true
+        exit 1
+      fi
       sleep 5
-      xcrun simctl io "$SIM_UDID" screenshot artifacts/ios-spike.png || xcrun simctl io booted screenshot artifacts/ios-spike.png || true
+      if ! xcrun simctl io "$SIM_UDID" screenshot artifacts/ios-spike.png; then
+        xcrun simctl io booted screenshot artifacts/ios-spike.png
+      fi
+      if [ ! -s artifacts/ios-spike.png ]; then
+        echo "ERROR: expected non-empty screenshot at artifacts/ios-spike.png (UI should show: KMP on iOS: OK)"
+        xcrun simctl shutdown "$SIM_UDID" || true
+        exit 1
+      fi
       echo "Screenshot saved to artifacts/ios-spike.png (expected UI text: KMP on iOS: OK)"
       xcrun simctl shutdown "$SIM_UDID" || true
   artifacts:
