@@ -146,7 +146,7 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
             "      button.btn (Buy now)", "    div.card", "      input#emailInput", "      button.btn (Subscribe)"
         )
         domAdapter.submit(sampleTree)
-        props.text = "Tap \"Inspect\" then tap an element on the page"
+        // props starts empty; populated on inspect
 
         toggle.setOnClickListener {
             val on = toggle.text.toString() == "Inspect"
