@@ -12,11 +12,6 @@
         android:gravity="center_vertical"
         android:layout_marginBottom="8dp">
 
-        <Button
-            android:id="@+id/inspect_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="Inspect" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

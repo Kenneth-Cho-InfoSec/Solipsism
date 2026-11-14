@@ -131,25 +131,13 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun wireElements(v: View) {
-        val toggle = v.findViewById<Button>(R.id.inspect_toggle)
         val tree = v.findViewById<RecyclerView>(R.id.dom_tree)
         val props = v.findViewById<TextView>(R.id.props_rows)
         tree.layoutManager = LinearLayoutManager(requireContext())
         tree.adapter = domAdapter
-
-        val sampleTree = listOf("(tap Inspect, then tap an element on the page)")
-        domAdapter.submit(sampleTree)
-        // props starts empty; populated on inspect
-
-        toggle.setOnClickListener {
-            val on = toggle.text.toString() == "Inspect"
-            toggle.text = if (on) "Stop" else "Inspect"
-            if (on) {
-                enableInspectMode()
-            } else {
-                disableInspectMode()
-            }
-        }
+        domAdapter.submit(listOf("(tap an element on the page to inspect)"))
+        // Inspect is always on: inject the listener immediately.
+        enableInspectMode()
     }
 
     private fun enableInspectMode() {
