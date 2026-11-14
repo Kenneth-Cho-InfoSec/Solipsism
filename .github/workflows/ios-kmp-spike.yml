@@ -1,0 +1,116 @@
+name: iOS KMP CI spike
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/ios-kmp-ci-spike/**'
+      - '.github/workflows/ios-kmp-spike.yml'
+      - '.gitlab-ci.yml'
+  pull_request:
+    paths:
+      - 'experiments/ios-kmp-ci-spike/**'
+      - '.github/workflows/ios-kmp-spike.yml'
+      - '.gitlab-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  ios-kmp-spike:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: experiments/ios-kmp-ci-spike
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Show environment
+        working-directory: .
+        run: |
+          set -euo pipefail
+          uname -a
+          xcodebuild -version
+          xcrun simctl list devices available | head -40 || true
+
+      - name: Run shared JVM tests
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          ./gradlew :shared:jvmTest --console=plain
+
+      - name: Build shared framework for simulator
+        run: |
+          set -euo pipefail
+          ARCH="$(uname -m)"
+          if [ "$ARCH" = "arm64" ]; then
+            SIM_TASK=":shared:linkDebugFrameworkIosSimulatorArm64"
+            FW_DIR="$(pwd)/shared/build/bin/iosSimulatorArm64/debugFramework"
+          else
+            SIM_TASK=":shared:linkDebugFrameworkIosX64"
+            FW_DIR="$(pwd)/shared/build/bin/iosX64/debugFramework"
+          fi
+          echo "Building $SIM_TASK (arch=$ARCH)"
+          ./gradlew "$SIM_TASK" --console=plain
+          test -d "$FW_DIR/Shared.framework" || { echo "ERROR: Shared.framework not found at $FW_DIR"; ls -R shared/build/bin || true; exit 1; }
+          echo "FW_DIR=$FW_DIR" >> "$GITHUB_ENV"
+
+      - name: Build, launch, and screenshot iOS app
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          SIM_UDID="$(xcrun simctl list devices available iPhone 2>/dev/null | grep -Eo '[A-F0-9-]{36}' | head -n1 || true)"
+          if [ -z "$SIM_UDID" ]; then
+            SIM_UDID="$(xcrun simctl list devices available 2>/dev/null | grep -Eo '[A-F0-9-]{36}' | head -n1 || true)"
+          fi
+          if [ -z "$SIM_UDID" ]; then
+            echo "ERROR: No available iOS simulator found."; xcrun simctl list devices || true; exit 1
+          fi
+          echo "Using simulator $SIM_UDID"
+          xcrun simctl boot "$SIM_UDID" || true
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          DERIVED="build/DerivedData"
+          xcodebuild \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Debug \
+            -destination "id=$SIM_UDID" \
+            -derivedDataPath "$DERIVED" \
+            -resultBundlePath artifacts/ResultBundle.xcresult \
+            FRAMEWORK_SEARCH_PATHS="$FW_DIR" \
+            build | tee artifacts/xcodebuild.log
+          APP_PATH="$DERIVED/Build/Products/Debug-iphonesimulator/iosApp.app"
+          if [ ! -d "$APP_PATH" ]; then
+            APP_PATH="$(/usr/bin/find "$DERIVED/Build/Products" -name 'iosApp.app' -type d | head -n1 || true)"
+          fi
+          test -d "$APP_PATH" || { echo "ERROR: iosApp.app not found under $DERIVED"; exit 1; }
+          xcrun simctl install "$SIM_UDID" "$APP_PATH"
+          if ! xcrun simctl launch "$SIM_UDID" com.solipsism.spike.iosApp; then
+            echo "ERROR: failed to launch com.solipsism.spike.iosApp on simulator $SIM_UDID"
+            xcrun simctl shutdown "$SIM_UDID" || true
+            exit 1
+          fi
+          sleep 5
+          if ! xcrun simctl io "$SIM_UDID" screenshot artifacts/ios-spike.png; then
+            xcrun simctl io booted screenshot artifacts/ios-spike.png
+          fi
+          if [ ! -s artifacts/ios-spike.png ]; then
+            echo "ERROR: expected non-empty screenshot at artifacts/ios-spike.png (UI should show: KMP on iOS: OK)"
+            xcrun simctl shutdown "$SIM_UDID" || true
+            exit 1
+          fi
+          echo "Screenshot saved to artifacts/ios-spike.png (expected UI text: KMP on iOS: OK)"
+          xcrun simctl shutdown "$SIM_UDID" || true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-kmp-spike-artifacts
+          path: experiments/ios-kmp-ci-spike/artifacts/
+          if-no-files-found: warn
