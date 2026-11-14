@@ -18,12 +18,9 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
 
-    interface ConsoleHost {
-        data class TabRef(val tabId: Int, val engine: BrowserCore, val label: String)
-        fun consoleTabs(): List<TabRef>
-        fun consoleStore(tabId: Int): ConsoleStore?
-        fun evaluateConsole(tabId: Int, code: String): Boolean
+    interface ConsoleHost : ConsoleBottomSheet.ConsoleHost {
         fun currentWebView(): WebView?
+        fun currentUrl(): String
     }
 
     private var tabId: Int = -1
@@ -270,7 +267,7 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         val wv = host()?.currentWebView()
 
         fun loadCookies() {
-            val url = wv?.url ?: "https://example.com"
+            val url = host()?.currentUrl() ?: "https://example.com"
             val cookieStr = android.webkit.CookieManager.getInstance().getCookie(url) ?: ""
             val items = cookieStr.split(";").map { it.trim() }.filter { it.isNotEmpty() }
             kvAdapter.submit(if (items.isEmpty()) listOf("(no cookies)") else items)

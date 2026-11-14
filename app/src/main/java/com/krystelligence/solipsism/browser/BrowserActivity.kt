@@ -172,7 +172,7 @@ private const val MAX_BOOKMARK_ICON_DIMENSION_PX = 512
  * browsers.
  */
 abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View,
-    ConsoleBottomSheet.ConsoleHost, CookieManagerSheet.CookieHost {
+    ConsoleBottomSheet.ConsoleHost, ConsolePlusBottomSheet.ConsoleHost, CookieManagerSheet.CookieHost {
 
     private var textToSpeech: TextToSpeech? = null
     private var textToSpeechReady = false
@@ -1892,6 +1892,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
     override fun showConsolePlusSheet(tabId: Int) {
         ConsolePlusBottomSheet.newInstance(tabId).show(supportFragmentManager, CONSOLE_PLUS_TAG)
     }
+
+    override fun currentWebView(): android.webkit.WebView? = null
+
+    override fun currentUrl(): String = presenter.currentUrlForEditing().ifBlank { "https://example.com" }
 
     override fun consoleTabs(): List<ConsoleBottomSheet.ConsoleHost.TabRef> =
         presenter.consoleTabs()
