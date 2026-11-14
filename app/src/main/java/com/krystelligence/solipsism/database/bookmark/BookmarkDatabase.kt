@@ -228,7 +228,12 @@ class BookmarkDatabase @Inject constructor(
         }
 
     override fun deleteFolder(folderToDelete: String): Completable =
-        Completable.fromAction(renameFolder(folderToDelete, "")::subscribe)
+        Completable.fromAction {
+            // Removing a folder removes the bookmarks it contains. Renaming them to the
+            // root folder (the previous behaviour) silently duplicated dozens of entries
+            // into the main list (#59).
+            database.delete(TABLE_BOOKMARK, "$KEY_FOLDER=?", arrayOf(folderToDelete))
+        }
 
     override fun deleteAllBookmarks(): Completable = Completable.fromAction {
         database.run {

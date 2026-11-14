@@ -3,6 +3,7 @@ package com.krystelligence.solipsism.release
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.core.net.toUri
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -15,6 +16,7 @@ class ReleaseUpdateCoordinator(
     private val context: Context,
     private val preferences: UserPreferences,
     private val repository: ReleaseRepository = ReleaseRepository(),
+    private val installerPackage: String? = context.installerPackageName(),
 ) {
     suspend fun check(activity: AppCompatActivity) {
         val currentVersion = BuildConfig.VERSION_NAME
@@ -37,6 +39,9 @@ class ReleaseUpdateCoordinator(
         }
 
         if (!preferences.updateNotificationsEnabled || System.currentTimeMillis() < preferences.updateReminderSnoozeUntil) return
+        // Store builds update through the store. Offering the GitHub APK would install a
+        // package signed with a different key and break in-place updates (#57).
+        if (isStoreInstaller(installerPackage)) return
         val latest = repository.fetchLatestStable() ?: return
         if (latest.prerelease || ReleaseVersion.compare(currentVersion, latest.tagName) >= 0) return
         if (preferences.lastNotifiedReleaseTag == latest.tagName) return
@@ -82,3 +87,22 @@ class ReleaseUpdateCoordinator(
         const val SNOOZE_MS = 7 * 24 * 60 * 60 * 1000L
     }
 }
+
+/** Package names of the store clients that build and sign Solipsism themselves. */
+private val STORE_INSTALLER_PACKAGES = setOf(
+    "org.fdroid.fdroid",
+    "org.fdroid.basic",
+    "org.fdroid.fdroid.privileged",
+)
+
+internal fun isStoreInstaller(installerPackage: String?): Boolean =
+    installerPackage != null && installerPackage in STORE_INSTALLER_PACKAGES
+
+private fun Context.installerPackageName(): String? = runCatching {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        packageManager.getInstallSourceInfo(packageName).installingPackageName
+    } else {
+        @Suppress("DEPRECATION")
+        packageManager.getInstallerPackageName(packageName)
+    }
+}.getOrNull()

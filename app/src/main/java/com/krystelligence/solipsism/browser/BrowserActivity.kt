@@ -108,6 +108,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.CookieManager
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
@@ -1655,10 +1656,16 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
      * content. Returns false (after showing guidance) when pages cannot render.
      */
     private fun ensureWebViewProvider(): Boolean {
-        val provider = runCatching {
-            WebViewCompat.getCurrentWebViewPackage(this)?.packageName
-        }.getOrNull()
-        if (!provider.isNullOrBlank()) return true
+        val providerAvailable = runCatching {
+            // getCurrentWebViewPackage() keeps returning the package name after the
+            // provider has been uninstalled for the current user, so it cannot be used
+            // as a health check. CookieManager.getInstance() forces the provider to
+            // initialise and throws MissingWebViewPackageException when it is unusable,
+            // which is the same failure that crashed injection at #48.
+            CookieManager.getInstance()
+            WebViewCompat.getCurrentWebViewPackage(this) != null
+        }.getOrDefault(false)
+        if (providerAvailable) return true
         android.app.AlertDialog.Builder(this)
             .setTitle(R.string.webview_provider_missing_title)
             .setMessage(R.string.webview_provider_missing_message)

@@ -1568,8 +1568,10 @@ class BrowserPresenter @Inject constructor(
                     .subscribe { list ->
                         view?.updateState(viewState.copy(bookmarks = list))
                         if (currentTab?.url?.isBookmarkUrl() == true) {
+                            // Rebuild the bookmarks page in place. Calling goBack() here
+                            // dropped the user on whatever page preceded the bookmarks
+                            // overview (#59).
                             reload()
-                            currentTab?.goBack()
                         }
                     }
         }

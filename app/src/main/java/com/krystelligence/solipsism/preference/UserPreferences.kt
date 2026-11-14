@@ -238,7 +238,7 @@ class UserPreferences @Inject constructor(
     var popupsEnabled by preferences.booleanPreference(POPUPS, true)
 
     /** Block pop-up windows that were not initiated by a user gesture. */
-    var blockAutomaticPopups by preferences.booleanPreference(BLOCK_AUTOMATIC_POPUPS, false)
+    var blockAutomaticPopups by preferences.booleanPreference(BLOCK_AUTOMATIC_POPUPS, true)
 
     /**
      * True if the app should remember which browser tabs were open and restore them if the browser

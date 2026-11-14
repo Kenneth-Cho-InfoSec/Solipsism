@@ -135,7 +135,11 @@ class WebViewFactory @Inject constructor(
 
         if (userPreferences.javaScriptEnabled) {
             settings.javaScriptEnabled = true
-            settings.javaScriptCanOpenWindowsAutomatically = userPreferences.popupsEnabled
+            // Scripts may only open windows without a user gesture when automatic pop-ups
+            // are allowed. Sites such as eBay call window.open() from filter handlers and
+            // otherwise leave a trail of blank tabs behind (#58).
+            settings.javaScriptCanOpenWindowsAutomatically =
+                userPreferences.popupsEnabled && !userPreferences.blockAutomaticPopups
         } else {
             settings.javaScriptEnabled = false
             settings.javaScriptCanOpenWindowsAutomatically = false
