@@ -160,70 +160,76 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun enableInspectMode() {
-        val wv = host()?.currentWebView() ?: return
-        // Inject bridge
-        wv.addJavascriptInterface(InspectBridge { json ->
-            activity?.runOnUiThread {
-                try {
-                    val o = org.json.JSONObject(json)
-                    val tag = o.optString("tag")
-                    val cls = o.optString("cls")
-                    val rect = o.optJSONObject("rect")
-                    val styles = o.optJSONObject("styles")
-                    val props = view?.findViewById<TextView>(R.id.props_rows)
-                    val sb = StringBuilder()
-                    sb.append("<$tag${if (cls.isNotEmpty()) " class=\"$cls\"" else ""}>\n")
-                    if (rect != null) sb.append("rect: ${rect.optInt("w")}×${rect.optInt("h")} @ (${rect.optInt("x")},${rect.optInt("y")})\n")
-                    if (styles != null) {
-                        val keys = styles.keys()
-                        while (keys.hasNext()) {
-                            val k = keys.next()
-                            sb.append("$k: ${styles.optString(k)}\n")
-                        }
-                    }
-                    val txt = sb.toString().trim()
-                    val span = android.text.SpannableString(txt)
-                    // color keys (before ':') purple, values orange; html tags blue/attr purple/strings green
-                    val lines = txt.split("\n")
-                    var idx = 0
-                    for (line in lines) {
-                        if (line.startsWith("<")) {
-                            // tag name
-                            val tagEnd = line.indexOfAny(charArrayOf(' ', '>'))
-                            val te = if (tagEnd < 0) line.length else tagEnd
-                            span.setSpan(android.text.style.ForegroundColorSpan(0xFF1565C0.toInt()), idx, idx + te, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                            // attributes: name="value"
-                            Regex("""(\w+)=("([^"]*)")""").findAll(line).forEach { m ->
-                                val nameStart = idx + m.range.first
-                                val nameEnd = nameStart + (m.groupValues[1].length)
-                                span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), nameStart, nameEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                val valStart = idx + m.range.first + m.groupValues[1].length + 1
-                                val valEnd = valStart + m.groupValues[2].length
-                                span.setSpan(android.text.style.ForegroundColorSpan(0xFF2E7D32.toInt()), valStart, valEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val script = "(function(){ if(window.__cpInspect) return; window.__cpInspect=true; " +
+            "document.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation();" +
+            "var el=e.target; var r=el.getBoundingClientRect(); var s=getComputedStyle(el);" +
+            "var payload={tag:el.tagName,cls:el.className,rect:{x:Math.round(r.left),y:Math.round(r.top),w:Math.round(r.width),h:Math.round(r.height)}," +
+            "styles:{width:s.width,height:s.height,color:s.color,'background-color':s.backgroundColor,'font-size':s.fontSize,'border-radius':s.borderRadius,display:s.display}};" +
+            "console.log('__CP_INSPECT__'+JSON.stringify(payload));" +
+            "}, true); })();"
+        val wv = host()?.currentWebView()
+        if (wv != null) wv.evaluateJavascript(script, null) else host()?.evaluateConsole(tabId, script)
+        host()?.consoleStore(tabId)?.entries()?.let { obs ->
+            obs.observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe { list ->
+                    val last = list.lastOrNull() ?: return@subscribe
+                    if (!last.message.startsWith("__CP_INSPECT__")) return@subscribe
+                    val json = last.message.removePrefix("__CP_INSPECT__")
+                    try {
+                        val o = org.json.JSONObject(json)
+                        val tag = o.optString("tag")
+                        val cls = o.optString("cls")
+                        val rect = o.optJSONObject("rect")
+                        val styles = o.optJSONObject("styles")
+                        val sb = StringBuilder()
+                        sb.append("<$tag${if (cls.isNotEmpty()) " class=\"$cls\"" else ""}>\n")
+                        if (rect != null) sb.append("rect: ${rect.optInt("w")}x${rect.optInt("h")} @ (${rect.optInt("x")},${rect.optInt("y")})\n")
+                        if (styles != null) {
+                            val keys = styles.keys()
+                            while (keys.hasNext()) {
+                                val k = keys.next()
+                                sb.append("$k: ${styles.optString(k)}\n")
                             }
-                            // brackets
-                            for (i in line.indices) {
-                                if (line[i] == '<' || line[i] == '>') {
-                                    span.setSpan(android.text.style.ForegroundColorSpan(0xFF79747E.toInt()), idx + i, idx + i + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        }
+                        val txt = sb.toString().trim()
+                        val span = android.text.SpannableString(txt)
+                        val lines = txt.split("\n")
+                        var idx = 0
+                        for (line in lines) {
+                            if (line.startsWith("<")) {
+                                val tagEnd = line.indexOfAny(charArrayOf(' ', '>'))
+                                val te = if (tagEnd < 0) line.length else tagEnd
+                                span.setSpan(android.text.style.ForegroundColorSpan(0xFF1565C0.toInt()), idx, idx + te, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                Regex("""(\w+)=("([^"]*)")""").findAll(line).forEach { m ->
+                                    val nameStart = idx + m.range.first
+                                    val nameEnd = nameStart + m.groupValues[1].length
+                                    span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), nameStart, nameEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                    val valStart = idx + m.range.first + m.groupValues[1].length + 1
+                                    val valEnd = valStart + m.groupValues[2].length
+                                    span.setSpan(android.text.style.ForegroundColorSpan(0xFF2E7D32.toInt()), valStart, valEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                }
+                                for (i in line.indices) {
+                                    if (line[i] == '<' || line[i] == '>') {
+                                        span.setSpan(android.text.style.ForegroundColorSpan(0xFF79747E.toInt()), idx + i, idx + i + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                    }
+                                }
+                            } else {
+                                val colon = line.indexOf(":")
+                                if (colon > 0) {
+                                    span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), idx, idx + colon, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                    span.setSpan(android.text.style.ForegroundColorSpan(0xFFE65100.toInt()), idx + colon + 1, idx + line.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 }
                             }
-                        } else {
-                            val colon = line.indexOf(":")
-                            if (colon > 0) {
-                                span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), idx, idx + colon, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                span.setSpan(android.text.style.ForegroundColorSpan(0xFFE65100.toInt()), idx + colon + 1, idx + line.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                            }
+                            idx += line.length + 1
                         }
-                        idx += line.length + 1
+                        val props = view?.findViewById<TextView>(R.id.props_rows)
+                        props?.text = span
+                        android.widget.Toast.makeText(requireContext(), "Inspected: <$tag>", android.widget.Toast.LENGTH_SHORT).show()
+                    } catch (e: Exception) {
+                        android.widget.Toast.makeText(requireContext(), "Inspect failed: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
                     }
-                    props?.text = span
-                    showToast("Inspected: <$tag>")
-                } catch (e: Exception) {
-                    showToast("Inspect failed: ${e.message}")
-                }
-            }
-        }, "ConsolePlusBridge")
-        wv.evaluateJavascript(INSPECT_SCRIPT, null)
+                }.let { disposables.add(it) }
+        }
     }
 
     private fun disableInspectMode() {
