@@ -5,6 +5,7 @@ ios-kmp-spike:
   stage: test
   tags:
     - saas-macos-medium-m1
+  image: macos-26-xcode-26
   variables:
     EXP_DIR: experiments/ios-kmp-ci-spike
   rules:
