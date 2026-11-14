@@ -252,17 +252,26 @@ class TabWebViewClient @AssistedInject constructor(
         view: WebView,
         request: WebResourceRequest
     ): WebResourceResponse? {
-        if (shouldBlockRequest(currentUrl, request.url.toString())) {
-            val empty = ByteArrayInputStream(emptyResponseByteArray)
-            return WebResourceResponse(BLOCKED_RESPONSE_MIME_TYPE, BLOCKED_RESPONSE_ENCODING, empty)
+        val url = request.url.toString()
+        val start = System.currentTimeMillis()
+        val result = run {
+            if (shouldBlockRequest(currentUrl, url)) {
+                val empty = ByteArrayInputStream(emptyResponseByteArray)
+                return WebResourceResponse(BLOCKED_RESPONSE_MIME_TYPE, BLOCKED_RESPONSE_ENCODING, empty)
+            }
+            if (request.url.path?.startsWith(files.path) == true) {
+                filesStoragePathHandler.handle(request.url.path!!.substring(files.path.length))
+            } else if (request.url.path?.startsWith(cache.path) == true) {
+                cacheStoragePathHandler.handle(request.url.path!!.substring(cache.path.length))
+            } else {
+                super.shouldInterceptRequest(view, request)
+            }
         }
-        return if (request.url.path?.startsWith(files.path) == true) {
-            filesStoragePathHandler.handle(request.url.path!!.substring(files.path.length))
-        } else if (request.url.path?.startsWith(cache.path) == true) {
-            cacheStoragePathHandler.handle(request.url.path!!.substring(cache.path.length))
-        } else {
-            super.shouldInterceptRequest(view, request)
-        }
+        val duration = System.currentTimeMillis() - start
+        val size = (result?.data?.available() ?: 0).toLong()
+        val status = if (result == null) 200 else 200
+        com.krystelligence.solipsism.browser.console.NetworkLog.record(url, status, size, duration)
+        return result
     }
 
     private fun SslError.getAllSslErrorMessageCodes(): List<Int> {

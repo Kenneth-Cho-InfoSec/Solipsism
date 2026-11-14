@@ -185,17 +185,17 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         val list = v.findViewById<RecyclerView>(R.id.net_list)
         list.layoutManager = LinearLayoutManager(requireContext())
         list.adapter = netAdapter
-        val sample = listOf(
-            "200  GET  /demo  4.2KB  120ms",
-            "200  GET  /app.css  18.4KB  95ms",
-            "200  GET  /app.js  62.1KB  140ms",
-            "404  GET  /api/recommendations  0.3KB  310ms",
-            "200  GET  /hero.jpg  184KB  420ms"
-        )
-        netAdapter.submit(sample)
-        v.findViewById<Button>(R.id.thr_none).setOnClickListener { }
-        v.findViewById<Button>(R.id.thr_slow).setOnClickListener { }
-        v.findViewById<Button>(R.id.thr_off).setOnClickListener { }
+        fun refresh() {
+            val items = NetworkLog.all().map { e ->
+                val short = e.url.removePrefix("https://").removePrefix("http://").take(40)
+                "${e.status}  $short  ${e.sizeBytes}B  ${e.durationMs}ms"
+            }
+            netAdapter.submit(if (items.isEmpty()) listOf("(no requests yet)") else items)
+        }
+        refresh()
+        v.findViewById<Button>(R.id.thr_none).setOnClickListener { refresh() }
+        v.findViewById<Button>(R.id.thr_slow).setOnClickListener { refresh() }
+        v.findViewById<Button>(R.id.thr_off).setOnClickListener { refresh() }
     }
 
     private fun wireStorage(v: View) {
