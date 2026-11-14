@@ -46,8 +46,12 @@
         android:id="@+id/console_plus_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:tabIndicatorGravity="bottom"
+        app:tabIndicatorHeight="3dp"
         app:tabMode="fixed"
-        app:tabGravity="fill" />
+        app:tabGravity="fill"
+        app:tabIndicatorFullWidth="true" />
 
     <FrameLayout
         android:id="@+id/console_plus_container"

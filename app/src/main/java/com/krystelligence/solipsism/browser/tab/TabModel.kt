@@ -310,6 +310,12 @@ interface TabModel {
     val engine: BrowserCore
 
     /**
+     * The underlying WebView for this tab, if it is a WebView-backed tab.
+     * Used by Console+ for operations that need a result callback.
+     */
+    fun webViewForConsole(): android.webkit.WebView? = null
+
+    /**
      * Runs console [code] in the page, recording COMMAND/RESULT entries.
      * Returns false when this engine cannot evaluate with a result.
      */

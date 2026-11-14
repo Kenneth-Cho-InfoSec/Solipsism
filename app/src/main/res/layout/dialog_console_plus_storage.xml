@@ -11,9 +11,9 @@
         android:orientation="horizontal"
         android:layout_marginBottom="8dp">
 
-        <Button android:id="@+id/store_cookies" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:text="Cookies" android:textSize="11sp" />
-        <Button android:id="@+id/store_local" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:text="localStorage" android:textSize="11sp" android:layout_marginStart="4dp" />
-        <Button android:id="@+id/store_session" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:text="sessionStorage" android:textSize="11sp" android:layout_marginStart="4dp" />
+        <Button android:id="@+id/store_cookies" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:text="Cookies" android:textColor="?android:attr/textColorPrimary" android:textSize="11sp" />
+        <Button android:id="@+id/store_local" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:text="localStorage" android:textColor="?android:attr/textColorPrimary" android:textSize="11sp" android:layout_marginStart="4dp" />
+        <Button android:id="@+id/store_session" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:text="sessionStorage" android:textColor="?android:attr/textColorPrimary" android:textSize="11sp" android:layout_marginStart="4dp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

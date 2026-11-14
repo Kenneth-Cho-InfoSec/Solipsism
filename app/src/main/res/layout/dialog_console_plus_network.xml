@@ -11,9 +11,9 @@
         android:orientation="horizontal"
         android:layout_marginBottom="8dp">
 
-        <Button android:id="@+id/thr_none" android:layout_width="wrap_content" android:layout_height="32dp" android:text="No throttle" android:textSize="11sp" />
-        <Button android:id="@+id/thr_slow" android:layout_width="wrap_content" android:layout_height="32dp" android:text="Slow 3G" android:textSize="11sp" android:layout_marginStart="4dp" />
-        <Button android:id="@+id/thr_off" android:layout_width="wrap_content" android:layout_height="32dp" android:text="Offline" android:textSize="11sp" android:layout_marginStart="4dp" />
+        <Button android:id="@+id/thr_none" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:text="No throttle" android:textColor="?android:attr/textColorPrimary" android:textSize="11sp" />
+        <Button android:id="@+id/thr_slow" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:layout_marginStart="4dp" android:text="Slow 3G" android:textColor="?android:attr/textColorPrimary" android:textSize="11sp" />
+        <Button android:id="@+id/thr_off" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:layout_marginStart="4dp" android:text="Offline" android:textColor="?android:attr/textColorPrimary" android:textSize="11sp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

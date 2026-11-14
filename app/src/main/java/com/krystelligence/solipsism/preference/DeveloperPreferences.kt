@@ -29,10 +29,14 @@ class DeveloperPreferences @Inject constructor(
 
     var checkedForTor by preferences.booleanPreference(INITIAL_CHECK_FOR_TOR, false)
 
+    /** Pretty-print/indent HTML in Console+ Elements view. */
+    var elementsHtmlBeautify by preferences.booleanPreference(ELEMENTS_HTML_BEAUTIFY, true)
+
     // var checkedForI2P by preferences.booleanPreference(INITIAL_CHECK_FOR_I2P, false)
 }
 
 private const val LEAK_CANARY = "leakCanary"
 private const val ANTARES_COORDINATE_BRIDGE = "antaresCoordinateBridge"
+private const val ELEMENTS_HTML_BEAUTIFY = "elementsHtmlBeautify"
 private const val INITIAL_CHECK_FOR_TOR = "checkForTor"
 // private const val INITIAL_CHECK_FOR_I2P = "checkForI2P"

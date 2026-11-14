@@ -65,3 +65,4 @@ hs_err_pid*.log
 replay_pid*.log
 /artifacts/
 /website/public/release-manifest.json
+graphify-out/

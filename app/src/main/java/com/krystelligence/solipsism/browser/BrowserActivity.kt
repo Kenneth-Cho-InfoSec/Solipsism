@@ -1893,9 +1893,12 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         ConsolePlusBottomSheet.newInstance(tabId).show(supportFragmentManager, CONSOLE_PLUS_TAG)
     }
 
-    override fun currentWebView(): android.webkit.WebView? = null
+    override fun currentWebView(): android.webkit.WebView? = presenter.currentWebViewForConsole()
 
     override fun currentUrl(): String = presenter.currentUrlForEditing().ifBlank { "https://example.com" }
+
+    override fun elementsHtmlBeautify(): Boolean =
+        getSharedPreferences("developer_settings", 0).getBoolean("elementsHtmlBeautify", true)
 
     override fun consoleTabs(): List<ConsoleBottomSheet.ConsoleHost.TabRef> =
         presenter.consoleTabs()

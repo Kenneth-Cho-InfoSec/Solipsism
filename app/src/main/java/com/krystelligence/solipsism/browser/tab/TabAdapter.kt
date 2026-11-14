@@ -531,6 +531,8 @@ class TabAdapter @AssistedInject constructor(
         }
     }
 
+    override fun webViewForConsole(): android.webkit.WebView? = webView
+
     /**
      * Runs console input in the page and records COMMAND/RESULT entries.
      * Wraps evaluation so thrown errors (including their stacks) come back as

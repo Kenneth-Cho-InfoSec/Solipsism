@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 9.4.3 *(2026-11-14)*
+----------------------------
+- Added Console+ developer tools sheet with Console, Elements, Network, and Storage tabs.
+- Elements now shows full-page HTML with beautify-on-by-default formatting, syntax highlighting, scrolling, and a Debug setting toggle ("Beautify Elements HTML").
+- Network panel logs intercepted requests and refreshes on demand; Storage panel displays cookies, localStorage, and sessionStorage for the current tab.
+- Improved Console+ usability and styling: console `clear` clears history, Console moved to the overflow menu, and dark-mode contrast/tab/button alignment refinements.
+
 Version 5.1.4 *(2026-05-10)*
 ----------------------------
 - Fixed fullscreen video layout so landscape video can occupy the full screen.

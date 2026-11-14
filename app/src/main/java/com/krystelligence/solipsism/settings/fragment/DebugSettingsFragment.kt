@@ -43,6 +43,11 @@ class DebugSettingsFragment : AbstractSettingsFragment() {
             },
         )
         togglePreference(
+            preference = ELEMENTS_HTML_BEAUTIFY,
+            isChecked = developerPreferences.elementsHtmlBeautify,
+            onCheckChange = { developerPreferences.elementsHtmlBeautify = it },
+        )
+        togglePreference(
             preference = LEAK_CANARY,
             isChecked = developerPreferences.useLeakCanary,
             onCheckChange = { change ->
@@ -69,6 +74,7 @@ class DebugSettingsFragment : AbstractSettingsFragment() {
     companion object {
         private const val ANTARES_COORDINATE_BRIDGE = "antares_coordinate_bridge"
         private const val BROWSER_CORE = "browser_core"
+        private const val ELEMENTS_HTML_BEAUTIFY = "elements_html_beautify"
         private const val LEAK_CANARY = "leak_canary_enabled"
     }
 }

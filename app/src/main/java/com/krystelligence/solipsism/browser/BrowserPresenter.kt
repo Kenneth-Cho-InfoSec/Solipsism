@@ -1495,6 +1495,12 @@ class BrowserPresenter @Inject constructor(
     fun evaluateConsole(tabId: Int, code: String): Boolean =
         model.tabsList.firstOrNull { it.id == tabId }?.evaluateForConsole(code) ?: false
 
+    fun webViewForConsole(tabId: Int): android.webkit.WebView? =
+        model.tabsList.firstOrNull { it.id == tabId }?.webViewForConsole()
+
+    fun currentWebViewForConsole(): android.webkit.WebView? =
+        currentTab?.webViewForConsole()
+
     private fun String.toConsoleLabel(): String {
         if (isBlank()) return "Tab"
         return runCatching { java.net.URI(this).host?.removePrefix("www.") }.getOrNull()

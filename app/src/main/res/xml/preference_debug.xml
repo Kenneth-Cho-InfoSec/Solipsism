@@ -12,6 +12,12 @@
             android:summary="@string/debug_antares_coordinate_bridge_summary"
             android:title="@string/debug_antares_coordinate_bridge" />
         <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_settings_debug"
+            android:key="elements_html_beautify"
+            android:summary="@string/debug_elements_html_beautify_summary"
+            android:title="@string/debug_elements_html_beautify"/>
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:icon="@drawable/ic_settings_debug"
             android:key="leak_canary_enabled"

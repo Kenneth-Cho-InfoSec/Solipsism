@@ -21,6 +21,7 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
     interface ConsoleHost : ConsoleBottomSheet.ConsoleHost {
         fun currentWebView(): WebView?
         fun currentUrl(): String
+        fun elementsHtmlBeautify(): Boolean
     }
 
     private var tabId: Int = -1
@@ -32,10 +33,8 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
 
     private fun host(): ConsoleHost? = activity as? ConsoleHost
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        dialog.setCanceledOnTouchOutside(false)
-        return dialog
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.dialog_console_plus, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,13 +58,22 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         tabs.addTab(tabs.newTab().setText("Elements"))
         tabs.addTab(tabs.newTab().setText("Network"))
         tabs.addTab(tabs.newTab().setText("Storage"))
-        tabs.setTabTextColors(0xFF49454F.toInt(), 0xFF6750A4.toInt())
-        tabs.setSelectedTabIndicatorColor(0xFF6750A4.toInt())
+        val selectedColor = 0xFFFFFFFF.toInt()
+        val normalColor = 0xB3FFFFFF.toInt() // white, ~70% opacity when unfocused
+        tabs.setTabTextColors(normalColor, selectedColor)
+        tabs.setSelectedTabIndicatorColor(selectedColor)
+        tabs.isTabIndicatorFullWidth = true
+        tabs.setBackgroundColor(android.graphics.Color.TRANSPARENT)
 
+        var elementsLoaded = false
         tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val i = tab?.position ?: 0
                 panels.forEachIndexed { idx, v -> v.visibility = if (idx == i) View.VISIBLE else View.GONE }
+                if (i == 1 && !elementsLoaded) {
+                    elementsLoaded = true
+                    loadElementsHtml(panels[1])
+                }
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -74,8 +82,18 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         close.setOnClickListener { dismiss() }
 
         // Console panel wiring
+        // Hide duplicated chrome: Console+ provides the drag handle, title, and close.
+        val consolePanel = panels[0] as? ViewGroup
+        consolePanel?.getChildAt(0)?.visibility = View.GONE // drag handle
+        (consolePanel?.getChildAt(1) as? ViewGroup)?.let { header ->
+            // title TextView (index 0), context (index 1), spacer (index 2), clear (index 3), close (index 4)
+            header.getChildAt(0)?.visibility = View.GONE
+            header.findViewById<View>(R.id.console_context)?.visibility = View.GONE
+            header.findViewById<View>(R.id.console_clear)?.visibility = View.GONE
+            header.findViewById<View>(R.id.console_close)?.visibility = View.GONE
+        }
         wireConsole(panels[0])
-        // Elements
+        // Elements (lazy-loaded when tab selected)
         wireElements(panels[1])
         // Network
         wireNetwork(panels[2])
@@ -89,13 +107,24 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         list.adapter = consoleAdapter
         v.findViewById<View>(R.id.console_clear).setOnClickListener { host()?.consoleStore(tabId)?.clear() }
         v.findViewById<View>(R.id.console_close).setOnClickListener { dismiss() }
-        v.findViewById<View>(R.id.console_run).setOnClickListener {
+        fun runCommand() {
             val input = v.findViewById<android.widget.EditText>(R.id.console_input)
             val code = input.text.toString()
-            if (code.isNotBlank()) {
+            val trimmed = code.trim()
+            if (trimmed.isEmpty()) return
+            if (trimmed == "clear") {
+                host()?.consoleStore(tabId)?.clear()
+            } else {
                 host()?.evaluateConsole(tabId, code)
-                input.text.clear()
             }
+            input.text.clear()
+        }
+        v.findViewById<View>(R.id.console_run).setOnClickListener { runCommand() }
+        v.findViewById<android.widget.EditText>(R.id.console_input).setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEND ||
+                actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                runCommand(); true
+            } else false
         }
         // Syntax highlighting on the console input
         val input = v.findViewById<android.widget.EditText>(R.id.console_input)
@@ -125,9 +154,13 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
                 }
             }
         })
+        val emptyView = v.findViewById<View>(R.id.console_empty)
         host()?.consoleStore(tabId)?.entries()?.let { obs ->
             obs.observeOn(io.reactivex.rxjava3.android.schedulers.AndroidSchedulers.mainThread())
-                .subscribe { list -> consoleAdapter.submitList(list) }
+                .subscribe { list ->
+                    consoleAdapter.submitList(list)
+                    emptyView?.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+                }
                 .let { disposables.add(it) }
         }
     }
@@ -137,35 +170,202 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         val props = v.findViewById<TextView>(R.id.props_rows)
         tree.layoutManager = LinearLayoutManager(requireContext())
         tree.adapter = domAdapter
-        domAdapter.submit(listOf("(full page HTML below)"))
+        domAdapter.submit(listOf("(select Elements to load page HTML)"))
+        props?.text = ""
+    }
 
-        fun loadHtml() {
-            val js = "(function(){ try { return document.documentElement.outerHTML; } catch(e){ return '<error: '+e.message+'>'; } })();"
-            val cb: (String?) -> Unit = { res ->
+    private fun loadElementsHtml(v: View) {
+        val props = v.findViewById<TextView>(R.id.props_rows)
+        domAdapter.submit(listOf("(loading page HTML…)"))
+        props?.text = ""
+
+        val js = "(function(){ try { return document.documentElement.outerHTML; } catch(e){ return '<error: '+e.message+'>'; } })();"
+        val beautify = host()?.elementsHtmlBeautify() ?: true
+        val cb: (String?) -> Unit = { res ->
+            Thread {
+                val raw = res?.let {
+                    try { org.json.JSONArray("[$it]").optString(0) } catch (_: Exception) { it.trim('"') }
+                } ?: ""
+                val max = 20_000
+                val truncated = raw.length > max
+                var html = if (truncated) raw.take(max) else raw
+                if (beautify) html = beautifyHtmlCode(html)
+                if (truncated) html += "\n\n… (truncated, ${raw.length} chars total)"
+                val highlighted: CharSequence = try {
+                    highlightHtmlWithEmbedded(html)
+                } catch (_: Throwable) {
+                    html
+                }
                 activity?.runOnUiThread {
-                    val html = res?.let {
-                        try { org.json.JSONArray("[$it]").optString(0) } catch (e: Exception) { it.trim('"') }
-                    } ?: ""
-                    val span = android.text.SpannableString(html)
-                    Regex("</?[a-zA-Z][a-zA-Z0-9]*").findAll(html).forEach { m ->
-                        span.setSpan(android.text.style.ForegroundColorSpan(0xFF1565C0.toInt()), m.range.first, m.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    if (!isAdded) return@runOnUiThread
+                    try {
+                        domAdapter.submit(listOf(if (truncated) "Full page HTML (truncated, beautified=${beautify})" else "Full page HTML (beautified=${beautify})"))
+                        props?.text = highlighted
+                    } catch (_: Throwable) {
+                        domAdapter.submit(listOf("(failed to display page HTML)"))
                     }
-                    Regex("""\s[a-zA-Z-]+=""").findAll(html).forEach { m ->
-                        span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), m.range.first + 1, m.range.last, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+            }.start()
+        }
+        val wv = host()?.currentWebView()
+        if (wv != null) wv.evaluateJavascript(js, android.webkit.ValueCallback { r -> cb(r) })
+        else domAdapter.submit(listOf("(page HTML unavailable for this tab)"))
+    }
+
+    private fun beautifyHtmlCode(input: String): String {
+        val s = input.replace("\r\n", "\n")
+        val voidTags = setOf("area","base","br","col","embed","hr","img","input","link","meta","param","source","track","wbr")
+        val out = StringBuilder(s.length + 256)
+        var i = 0
+        var indent = 0
+        fun appendIndent() { repeat(indent.coerceAtLeast(0)) { out.append("  ") } }
+        while (i < s.length) {
+            when {
+                s.startsWith("<!--", i) -> {
+                    val end = s.indexOf("-->", i + 4).let { if (it == -1) s.length else it + 3 }
+                    appendIndent(); out.append(s.substring(i, end)).append('\n')
+                    i = end
+                }
+                s.startsWith("<?", i) -> {
+                    val end = s.indexOf("?>", i + 2).let { if (it == -1) s.length else it + 2 }
+                    val block = s.substring(i, end)
+                    block.lines().forEach { line ->
+                        appendIndent(); out.append(line.trimEnd()).append('\n')
                     }
-                    Regex("""="[^"]*"""").findAll(html).forEach { m ->
-                        span.setSpan(android.text.style.ForegroundColorSpan(0xFF2E7D32.toInt()), m.range.first, m.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    i = end
+                }
+                s.startsWith("</", i) -> {
+                    val end = s.indexOf('>', i).let { if (it == -1) s.length else it + 1 }
+                    indent = (indent - 1).coerceAtLeast(0)
+                    appendIndent(); out.append(s.substring(i, end).trim()).append('\n')
+                    i = end
+                }
+                s[i] == '<' -> {
+                    val end = s.indexOf('>', i).let { if (it == -1) s.length else it + 1 }
+                    val tag = s.substring(i, end)
+                    val nameMatch = Regex("^<\\s*([a-zA-Z0-9:-]+)").find(tag)
+                    val name = nameMatch?.groupValues?.get(1)?.lowercase() ?: ""
+                    val selfClosing = tag.trimEnd().endsWith("/>") || name in voidTags
+                    appendIndent(); out.append(tag.trim()).append('\n')
+                    if (name == "script" || name == "style") {
+                        val closeTag = "</$name>"
+                        val closeIdx = s.indexOf(closeTag, end, ignoreCase = true)
+                        val contentEnd = if (closeIdx == -1) s.length else closeIdx
+                        val content = s.substring(end, contentEnd)
+                        if (content.isNotBlank()) {
+                            indent++
+                            content.trim('\n', '\r').lines().forEach { line ->
+                                if (line.isBlank()) out.append('\n') else { appendIndent(); out.append(line.trimEnd()).append('\n') }
+                            }
+                            indent = (indent - 1).coerceAtLeast(0)
+                        }
+                        if (closeIdx != -1) {
+                            val cEnd = s.indexOf('>', closeIdx).let { if (it == -1) s.length else it + 1 }
+                            appendIndent(); out.append(s.substring(closeIdx, cEnd).trim()).append('\n')
+                            i = cEnd
+                        } else {
+                            i = contentEnd
+                        }
+                        continue
                     }
-                    Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL).findAll(html).forEach { m ->
-                        span.setSpan(android.text.style.ForegroundColorSpan(0xFF79747E.toInt()), m.range.first, m.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    if (!selfClosing && name.isNotEmpty() && !name.startsWith("!")) indent++
+                    i = end
+                }
+                else -> {
+                    val next = s.indexOf('<', i).let { if (it == -1) s.length else it }
+                    val text = s.substring(i, next)
+                    if (text.isNotBlank()) {
+                        text.trim('\n', '\r').lines().forEach { line ->
+                            if (line.isNotBlank()) { appendIndent(); out.append(line.trim()).append('\n') }
+                        }
                     }
-                    props?.text = span
+                    i = next
                 }
             }
-            val wv = host()?.currentWebView()
-            if (wv != null) wv.evaluateJavascript(js, android.webkit.ValueCallback { r -> cb(r) }) else host()?.evaluateConsole(tabId, js)
         }
-        loadHtml()
+        return out.toString().trimEnd()
+    }
+
+    private fun highlightHtmlWithEmbedded(html: String): CharSequence {
+        val span = android.text.SpannableString(html)
+        // Base HTML highlighting
+        Regex("</?[a-zA-Z][a-zA-Z0-9:-]*").findAll(html).forEach { m ->
+            span.setSpan(android.text.style.ForegroundColorSpan(0xFF4FC3F7.toInt()), m.range.first, m.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        Regex("\\s([a-zA-Z_:][-a-zA-Z0-9_:.]*)\\s*=").findAll(html).forEach { m ->
+            val g = m.groups[1] ?: return@forEach
+            span.setSpan(android.text.style.ForegroundColorSpan(0xFFCE93D8.toInt()), g.range.first, g.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        Regex("=\\s*(\"[^\"]*\"|'[^']*')").findAll(html).forEach { m ->
+            val g = m.groups[1] ?: return@forEach
+            span.setSpan(android.text.style.ForegroundColorSpan(0xFFA5D6A7.toInt()), g.range.first, g.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL).findAll(html).forEach { m ->
+            span.setSpan(android.text.style.ForegroundColorSpan(0xFF9E9E9E.toInt()), m.range.first, m.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        // PHP blocks
+        Regex("<\\?(?:php|=)?[\\s\\S]*?\\?>", RegexOption.IGNORE_CASE).findAll(html).forEach { m ->
+            highlightPhp(span, html, m.range.first, m.range.last + 1)
+        }
+        // <style> blocks
+        Regex("<style\\b[^>]*>([\\s\\S]*?)</style>", RegexOption.IGNORE_CASE).findAll(html).forEach { m ->
+            val g = m.groups[1] ?: return@forEach
+            highlightCss(span, html, g.range.first, g.range.last + 1)
+        }
+        // <script> blocks
+        Regex("<script\\b[^>]*>([\\s\\S]*?)</script>", RegexOption.IGNORE_CASE).findAll(html).forEach { m ->
+            val g = m.groups[1] ?: return@forEach
+            highlightJs(span, html, g.range.first, g.range.last + 1)
+        }
+        return span
+    }
+
+    private fun highlightCss(span: android.text.SpannableString, html: String, start: Int, end: Int) {
+        val region = html.substring(start, end)
+        fun color(regex: String, c: Int, group: Int = 0) {
+            Regex(regex, setOf(RegexOption.DOT_MATCHES_ALL)).findAll(region).forEach { m ->
+                val g = if (group == 0) m.range else (m.groups[group]?.range ?: return@forEach)
+                span.setSpan(android.text.style.ForegroundColorSpan(c), start + g.first, start + g.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+        color("/\\*.*?\\*/", 0xFF9E9E9E.toInt()) // comments
+        color("\"[^\"]*\"|'[^']*'", 0xFFA5D6A7.toInt()) // strings
+        color("#[0-9a-fA-F]{3,8}\\b", 0xFFFFCC80.toInt()) // colors
+        color("\\b\\d+(?:\\.\\d+)?(?:px|em|rem|%|vh|vw|s|ms)?\\b", 0xFFFFCC80.toInt()) // numbers/units
+        color("\\b[a-zA-Z-]+(?=\\s*:)", 0xFF80DEEA.toInt()) // properties
+        color("[.#]?[a-zA-Z_][\\w-]*(?=\\s*[{,])", 0xFFFFF59D.toInt()) // selectors (rough)
+    }
+
+    private fun highlightJs(span: android.text.SpannableString, html: String, start: Int, end: Int) {
+        val region = html.substring(start, end)
+        fun color(regex: String, c: Int, group: Int = 0) {
+            Regex(regex, setOf(RegexOption.MULTILINE)).findAll(region).forEach { m ->
+                val g = if (group == 0) m.range else (m.groups[group]?.range ?: return@forEach)
+                span.setSpan(android.text.style.ForegroundColorSpan(c), start + g.first, start + g.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+        color("//.*", 0xFF9E9E9E.toInt()) // single-line comments
+        color("/\\*[\\s\\S]*?\\*/", 0xFF9E9E9E.toInt()) // block comments
+        color("\"(?:\\\\.|[^\"])*\"|'(?:\\\\.|[^'])*'|`(?:\\\\.|[^`])*`", 0xFFA5D6A7.toInt()) // strings
+        color("\\b(function|var|let|const|if|else|return|for|while|do|switch|case|break|continue|try|catch|finally|throw|new|class|extends|import|export|default|async|await|typeof|instanceof|in|of|true|false|null|undefined|this)\\b", 0xFFCE93D8.toInt()) // keywords
+        color("\\b\\d+(?:\\.\\d+)?\\b", 0xFFFFCC80.toInt()) // numbers
+        color("\\b([a-zA-Z_$][\\w$]*)(?=\\s*\\()", 0xFF80DEEA.toInt(), 1) // function calls
+    }
+
+    private fun highlightPhp(span: android.text.SpannableString, html: String, start: Int, end: Int) {
+        val region = html.substring(start, end)
+        fun color(regex: String, c: Int, group: Int = 0, opts: Set<RegexOption> = setOf(RegexOption.MULTILINE)) {
+            Regex(regex, opts).findAll(region).forEach { m ->
+                val g = if (group == 0) m.range else (m.groups[group]?.range ?: return@forEach)
+                span.setSpan(android.text.style.ForegroundColorSpan(c), start + g.first, start + g.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+        color("//.*", 0xFF9E9E9E.toInt())
+        color("#.*", 0xFF9E9E9E.toInt())
+        color("/\\*[\\s\\S]*?\\*/", 0xFF9E9E9E.toInt(), 0, setOf(RegexOption.DOT_MATCHES_ALL))
+        color("\"(?:\\\\.|[^\"])*\"|'(?:\\\\.|[^'])*'", 0xFFA5D6A7.toInt())
+        color("\\$[a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*", 0xFFFFCC80.toInt()) // variables
+        color("\\b(echo|print|function|return|if|else|elseif|foreach|for|while|switch|case|break|continue|class|public|private|protected|static|new|use|namespace|require|include|require_once|include_once|array|true|false|null)\\b", 0xFFCE93D8.toInt(), 0, setOf(RegexOption.IGNORE_CASE))
     }
 
     private fun enableInspectMode() {
@@ -264,11 +464,13 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         list.layoutManager = LinearLayoutManager(requireContext())
         list.adapter = netAdapter
         fun refresh() {
-            val items = NetworkLog.all().map { e ->
-                val short = e.url.removePrefix("https://").removePrefix("http://").take(40)
-                "${e.status}  $short  ${e.sizeBytes}B  ${e.durationMs}ms"
+            val entries = NetworkLog.all()
+            val items = entries.map { e ->
+                val short = e.url.removePrefix("https://").removePrefix("http://").take(48)
+                val status = if (e.status <= 0) "—" else e.status.toString()
+                "$status  $short  ${e.sizeBytes}B  ${e.durationMs}ms"
             }
-            netAdapter.submit(if (items.isEmpty()) listOf("(no requests yet)") else items)
+            netAdapter.submit(if (items.isEmpty()) listOf("(no intercepted requests yet — reload the page to capture)") else items)
         }
         refresh()
         v.findViewById<Button>(R.id.thr_none).setOnClickListener { refresh() }
@@ -280,38 +482,39 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         val list = v.findViewById<RecyclerView>(R.id.kv_list)
         list.layoutManager = LinearLayoutManager(requireContext())
         list.adapter = kvAdapter
-        val wv = host()?.currentWebView()
+
+        fun currentWv(): WebView? = host()?.currentWebView()
 
         fun loadCookies() {
-            val url = host()?.currentUrl() ?: "https://example.com"
+            val url = host()?.currentUrl() ?: currentWv()?.url ?: ""
+            if (url.isBlank()) {
+                kvAdapter.submit(listOf("(no URL available for cookies)"))
+                return
+            }
             val cookieStr = android.webkit.CookieManager.getInstance().getCookie(url) ?: ""
             val items = cookieStr.split(";").map { it.trim() }.filter { it.isNotEmpty() }
-            kvAdapter.submit(if (items.isEmpty()) listOf("(no cookies)") else items)
+            kvAdapter.submit(if (items.isEmpty()) listOf("(no cookies for $url)") else items)
         }
-        fun loadLocal() {
-            wv?.evaluateJavascript("(function(){try{return JSON.stringify(Object.keys(localStorage).map(function(k){return k+' = '+localStorage.getItem(k);}));}catch(e){return '[]';}})();") { res ->
-            activity?.runOnUiThread {
-                val cleaned = res?.trim('"')?.replace("\\\"", "\"") ?: "[]"
-                val arr = try { org.json.JSONArray(cleaned) } catch (e: Exception) { org.json.JSONArray() }
-                val items = (0 until arr.length()).map { arr.optString(it) }
-                kvAdapter.submit(if (items.isEmpty()) listOf("(empty)") else items)
+        fun loadJsonStorage(kind: String) {
+            val wv = currentWv()
+            if (wv == null) {
+                kvAdapter.submit(listOf("($kind unavailable: no WebView for this tab)"))
+                return
             }
-        }
-        }
-        fun loadSession() {
-            wv?.evaluateJavascript("(function(){try{return JSON.stringify(Object.keys(sessionStorage).map(function(k){return k+' = '+sessionStorage.getItem(k);}));}catch(e){return '[]';}})();") { res ->
-            activity?.runOnUiThread {
-                val cleaned = res?.trim('"')?.replace("\\\"", "\"") ?: "[]"
-                val arr = try { org.json.JSONArray(cleaned) } catch (e: Exception) { org.json.JSONArray() }
-                val items = (0 until arr.length()).map { arr.optString(it) }
-                kvAdapter.submit(if (items.isEmpty()) listOf("(empty)") else items)
+            val js = "(function(){try{return JSON.stringify(Object.keys($kind).map(function(k){return k+' = '+$kind.getItem(k);}));}catch(e){return JSON.stringify(['<error: '+e.message+'>']);}})();"
+            wv.evaluateJavascript(js) { res ->
+                activity?.runOnUiThread {
+                    val arrJson = try { org.json.JSONArray("[$res]").optString(0, "[]") } catch (_: Exception) { "[]" }
+                    val arr = try { org.json.JSONArray(arrJson) } catch (_: Exception) { org.json.JSONArray() }
+                    val items = (0 until arr.length()).map { arr.optString(it) }
+                    kvAdapter.submit(if (items.isEmpty()) listOf("(empty)") else items)
+                }
             }
-        }
         }
         loadCookies()
         v.findViewById<Button>(R.id.store_cookies).setOnClickListener { loadCookies() }
-        v.findViewById<Button>(R.id.store_local).setOnClickListener { loadLocal() }
-        v.findViewById<Button>(R.id.store_session).setOnClickListener { loadSession() }
+        v.findViewById<Button>(R.id.store_local).setOnClickListener { loadJsonStorage("localStorage") }
+        v.findViewById<Button>(R.id.store_session).setOnClickListener { loadJsonStorage("sessionStorage") }
     }
 
     override fun onDestroy() {
@@ -347,6 +550,19 @@ class SimpleTextAdapter : RecyclerView.Adapter<SimpleTextAdapter.VH>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val tv = android.widget.TextView(parent.context).apply {
             setPadding(8, 6, 8, 6); textSize = 12f; typeface = android.graphics.Typeface.MONOSPACE
+            val typedValue = android.util.TypedValue()
+            val theme = context.theme
+            val resolved = theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+                || theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
+            if (resolved) {
+                setTextColor(typedValue.data)
+            } else {
+                val night = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+                setTextColor(if (night) 0xFFFFFFFF.toInt() else 0xFF1C1B1F.toInt())
+            }
+            // Ensure good contrast in dark-themed sheets
+            val night = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            if (night) setTextColor(0xFFECECEC.toInt())
         }
         return VH(tv)
     }
