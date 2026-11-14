@@ -137,9 +137,35 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         val props = v.findViewById<TextView>(R.id.props_rows)
         tree.layoutManager = LinearLayoutManager(requireContext())
         tree.adapter = domAdapter
-        domAdapter.submit(listOf("(tap an element on the page to inspect)"))
-        // Inspect is always on: inject the listener immediately.
-        enableInspectMode()
+        domAdapter.submit(listOf("(full page HTML below)"))
+
+        fun loadHtml() {
+            val js = "(function(){ try { return document.documentElement.outerHTML; } catch(e){ return '<error: '+e.message+'>'; } })();"
+            val cb: (String?) -> Unit = { res ->
+                activity?.runOnUiThread {
+                    val html = res?.let {
+                        try { org.json.JSONArray("[$it]").optString(0) } catch (e: Exception) { it.trim('"') }
+                    } ?: ""
+                    val span = android.text.SpannableString(html)
+                    Regex("</?[a-zA-Z][a-zA-Z0-9]*").findAll(html).forEach { m ->
+                        span.setSpan(android.text.style.ForegroundColorSpan(0xFF1565C0.toInt()), m.range.first, m.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                    Regex("""\s[a-zA-Z-]+=""").findAll(html).forEach { m ->
+                        span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), m.range.first + 1, m.range.last, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                    Regex("""="[^"]*"""").findAll(html).forEach { m ->
+                        span.setSpan(android.text.style.ForegroundColorSpan(0xFF2E7D32.toInt()), m.range.first, m.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                    Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL).findAll(html).forEach { m ->
+                        span.setSpan(android.text.style.ForegroundColorSpan(0xFF79747E.toInt()), m.range.first, m.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                    props?.text = span
+                }
+            }
+            val wv = host()?.currentWebView()
+            if (wv != null) wv.evaluateJavascript(js, android.webkit.ValueCallback { r -> cb(r) }) else host()?.evaluateConsole(tabId, js)
+        }
+        loadHtml()
     }
 
     private fun enableInspectMode() {
