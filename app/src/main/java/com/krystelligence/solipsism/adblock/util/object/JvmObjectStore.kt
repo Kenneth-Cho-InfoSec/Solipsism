@@ -36,19 +36,19 @@ class JvmObjectStore<T>(
     override suspend fun retrieve(): T? = withContext(objectStoreDispatcher) {
         val storageFile = createStorageFile()
         if (storageFile.exists()) {
-            val fileInputStream = FileInputStream(storageFile)
-            val objectInputStream = ObjectInputStream(fileInputStream)
-            val stored = objectInputStream.safeUse {
-                runCatching {
-                    @Suppress("UNCHECKED_CAST")
-                    it.readObject() as T
-                }.getOrNull()
-            }
+            val stored = runCatching {
+                FileInputStream(storageFile).use { fis ->
+                    ObjectInputStream(fis).use { ois ->
+                        @Suppress("UNCHECKED_CAST")
+                        ois.readObject() as T
+                    }
+                }
+            }.getOrNull()
             if (stored != null) {
                 return@withContext stored
             }
-            // Unreadable (corrupt or foreign) cache: drop it so callers rebuild
-            // instead of crashing on a stale ClassCastException downstream.
+            // Unreadable (corrupt, empty, or foreign) cache: drop it so callers
+            // rebuild instead of crashing on a stale file downstream.
             storageFile.delete()
         }
 
