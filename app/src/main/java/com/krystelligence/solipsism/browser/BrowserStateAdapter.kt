@@ -177,6 +177,10 @@ class BrowserStateAdapter(private val browserActivity: BrowserActivity) : Browse
         browserActivity.showConsole(tabId)
     }
 
+    override fun showConsolePlusSheet(tabId: Int) {
+        browserActivity.showConsolePlusSheet(tabId)
+    }
+
     override fun showScreenshot(bitmap: android.graphics.Bitmap) {
         browserActivity.showScreenshot(bitmap)
     }

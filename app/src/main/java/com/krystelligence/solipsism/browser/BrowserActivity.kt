@@ -1889,7 +1889,7 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         ConsoleBottomSheet.newInstance(tabId).show(supportFragmentManager, CONSOLE_TAG)
     }
 
-    fun showConsolePlus(tabId: Int) {
+    override fun showConsolePlusSheet(tabId: Int) {
         ConsolePlusBottomSheet.newInstance(tabId).show(supportFragmentManager, CONSOLE_PLUS_TAG)
     }
 

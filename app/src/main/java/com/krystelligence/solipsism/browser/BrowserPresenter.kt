@@ -1469,7 +1469,11 @@ class BrowserPresenter @Inject constructor(
     }
 
     fun onConsoleClick() {
-        currentTab?.let { view?.showConsole(it.id) }
+        currentTab?.let { view?.showConsolePlusSheet(it.id) }
+    }
+
+    fun onConsolePlusClick() {
+        currentTab?.let { view?.showConsolePlusSheet(it.id) }
     }
 
     fun consoleTabs(): List<ConsoleBottomSheet.ConsoleHost.TabRef> {

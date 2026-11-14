@@ -171,6 +171,11 @@ interface BrowserContract {
          */
         fun showConsole(tabId: Int)
 
+        /**
+         * Show the Console+ panel (console + elements + network + storage) for the tab.
+         */
+        fun showConsolePlusSheet(tabId: Int)
+
         fun showScreenshot(bitmap: Bitmap)
 
         fun showScreenshotCaptureFailed()
