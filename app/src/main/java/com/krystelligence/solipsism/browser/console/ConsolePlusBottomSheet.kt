@@ -181,7 +181,22 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
                             sb.append("$k: ${styles.optString(k)}\n")
                         }
                     }
-                    props?.text = sb.toString().trim()
+                    val txt = sb.toString().trim()
+                    val span = android.text.SpannableString(txt)
+                    // color keys (before ':') purple, values orange, tags blue
+                    val lines = txt.split("\n")
+                    var idx = 0
+                    for (line in lines) {
+                        val colon = line.indexOf(":")
+                        if (colon > 0 && !line.startsWith("<")) {
+                            span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), idx, idx + colon, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            span.setSpan(android.text.style.ForegroundColorSpan(0xFFE65100.toInt()), idx + colon + 1, idx + line.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        } else if (line.startsWith("<")) {
+                            span.setSpan(android.text.style.ForegroundColorSpan(0xFF1565C0.toInt()), idx, idx + line.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        }
+                        idx += line.length + 1
+                    }
+                    props?.text = span
                     showToast("Inspected: <$tag>")
                 } catch (e: Exception) {
                     showToast("Inspect failed: ${e.message}")
