@@ -36,6 +36,14 @@ class UBlockOriginFilterListTest {
     }
 
     @Test
+    fun `wildcard rules with query strings compile and match`() {
+        val filterList = UBlockOriginFilterList.parse(sequenceOf("?zoneId=*&sponsor"))
+
+        assertThat(filterList.shouldBlock("https://example.com/ad?zoneId=123&sponsor=true")).isTrue()
+        assertThat(filterList.shouldBlock("https://example.com/page")).isFalse()
+    }
+
+    @Test
     fun `youtube rules block ad-tagged googlevideo requests only on youtube pages`() {
         val pageUrl = "https://m.youtube.com/watch?v=test"
         val adRequest = "https://rr1---sn.googlevideo.com/videoplayback?id=1&oad=1&ctier=A"

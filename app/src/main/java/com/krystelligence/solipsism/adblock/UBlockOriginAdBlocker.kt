@@ -229,12 +229,25 @@ sealed class UBlockOriginRule {
             }
 
             if (rule.contains('*') || rule.contains('^')) {
+                // uBlock wildcards `*` and `^` must be translated to regex while
+                // every other regex metacharacter in the rule (notably `?`, which
+                // appears in query strings) is escaped first. Translating before
+                // escaping turned `?zoneId=*&sponsor` into an invalid pattern and
+                // threw PatternSyntaxException on every matching request.
+                val starSentinel = "\u0001"
+                val caretSentinel = "\u0002"
                 val regex = rule
                     .removePrefix("|")
-                    .replace(".", "\\.")
-                    .replace("*", ".*")
-                    .replace("^", "[^A-Za-z0-9_%.:-]")
-                return WildcardRule(Regex(regex, RegexOption.IGNORE_CASE))
+                    .replace("*", starSentinel)
+                    .replace("^", caretSentinel)
+                    .replace(Regex("""[\\.+?()\[\]{}|]""")) { "\\" + it.value }
+                    .replace(starSentinel, ".*")
+                    .replace(caretSentinel, "[^A-Za-z0-9_%.:-]")
+                return try {
+                    WildcardRule(Regex(regex, RegexOption.IGNORE_CASE))
+                } catch (exception: Exception) {
+                    null
+                }
             }
 
             return UrlContainsRule(rule)
