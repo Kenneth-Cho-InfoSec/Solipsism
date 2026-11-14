@@ -183,16 +183,36 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
                     }
                     val txt = sb.toString().trim()
                     val span = android.text.SpannableString(txt)
-                    // color keys (before ':') purple, values orange, tags blue
+                    // color keys (before ':') purple, values orange; html tags blue/attr purple/strings green
                     val lines = txt.split("\n")
                     var idx = 0
                     for (line in lines) {
-                        val colon = line.indexOf(":")
-                        if (colon > 0 && !line.startsWith("<")) {
-                            span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), idx, idx + colon, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                            span.setSpan(android.text.style.ForegroundColorSpan(0xFFE65100.toInt()), idx + colon + 1, idx + line.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        } else if (line.startsWith("<")) {
-                            span.setSpan(android.text.style.ForegroundColorSpan(0xFF1565C0.toInt()), idx, idx + line.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        if (line.startsWith("<")) {
+                            // tag name
+                            val tagEnd = line.indexOfAny(charArrayOf(' ', '>'))
+                            val te = if (tagEnd < 0) line.length else tagEnd
+                            span.setSpan(android.text.style.ForegroundColorSpan(0xFF1565C0.toInt()), idx, idx + te, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            // attributes: name="value"
+                            Regex("""(\w+)=("([^"]*)")""").findAll(line).forEach { m ->
+                                val nameStart = idx + m.range.first
+                                val nameEnd = nameStart + (m.groupValues[1].length)
+                                span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), nameStart, nameEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                val valStart = idx + m.range.first + m.groupValues[1].length + 1
+                                val valEnd = valStart + m.groupValues[2].length
+                                span.setSpan(android.text.style.ForegroundColorSpan(0xFF2E7D32.toInt()), valStart, valEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            }
+                            // brackets
+                            for (i in line.indices) {
+                                if (line[i] == '<' || line[i] == '>') {
+                                    span.setSpan(android.text.style.ForegroundColorSpan(0xFF79747E.toInt()), idx + i, idx + i + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                }
+                            }
+                        } else {
+                            val colon = line.indexOf(":")
+                            if (colon > 0) {
+                                span.setSpan(android.text.style.ForegroundColorSpan(0xFF6750A4.toInt()), idx, idx + colon, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                span.setSpan(android.text.style.ForegroundColorSpan(0xFFE65100.toInt()), idx + colon + 1, idx + line.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            }
                         }
                         idx += line.length + 1
                     }

@@ -25,19 +25,12 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/props_rows"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="?attr/colorSurfaceVariant"
-        android:padding="10dp"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:id="@+id/props_rows"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:textSize="11sp" />
-    </LinearLayout>
+        android:fontFamily="monospace"
+        android:textSize="11sp"
+        android:layout_marginTop="8dp"
+        android:padding="4dp" />
 </LinearLayout>
