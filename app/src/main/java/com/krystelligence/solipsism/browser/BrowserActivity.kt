@@ -11,6 +11,7 @@ import com.krystelligence.solipsism.browser.image.ImageLoader
 import com.krystelligence.solipsism.browser.keys.KeyEventAdapter
 import com.krystelligence.solipsism.browser.menu.MenuItemAdapter
 import com.krystelligence.solipsism.browser.console.ConsoleBottomSheet
+import com.krystelligence.solipsism.browser.console.ConsolePlusBottomSheet
 import com.krystelligence.solipsism.browser.console.ConsoleStore
 import com.krystelligence.solipsism.browser.data.CookieManagerSheet
 import com.krystelligence.solipsism.browser.menu.MenuSelection
@@ -1888,6 +1889,10 @@ abstract class BrowserActivity : ThemableBrowserActivity(), BrowserContract.View
         ConsoleBottomSheet.newInstance(tabId).show(supportFragmentManager, CONSOLE_TAG)
     }
 
+    fun showConsolePlus(tabId: Int) {
+        ConsolePlusBottomSheet.newInstance(tabId).show(supportFragmentManager, CONSOLE_PLUS_TAG)
+    }
+
     override fun consoleTabs(): List<ConsoleBottomSheet.ConsoleHost.TabRef> =
         presenter.consoleTabs()
 
@@ -3134,4 +3139,5 @@ private const val ADDRESS_EDITOR_IME_RETRY_DELAY_MS = 120L
 private const val ADDRESS_EDITOR_IME_MAX_RETRIES = 6
 private const val TTS_CHUNK_LENGTH = 3500
 private const val CONSOLE_TAG = "browser_console"
+private const val CONSOLE_PLUS_TAG = "console_plus"
 private const val COOKIE_MANAGER_TAG = "cookie_manager"
