@@ -117,15 +117,58 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
             "      button.btn (Buy now)", "    div.card", "      input#emailInput", "      button.btn (Subscribe)"
         )
         domAdapter.submit(sampleTree)
+        props.text = "Tap \"Inspect\" then tap an element on the page"
 
         toggle.setOnClickListener {
             val on = toggle.text.toString() == "Inspect"
             toggle.text = if (on) "Stop" else "Inspect"
-            hint.text = if (on) "Tap an element on the page" else "Inspect mode off"
-            if (on) injectInspectScript()
+            hint.text = if (on) "Tap an element on the page to inspect" else "Inspect mode off"
+            if (on) {
+                enableInspectMode()
+            } else {
+                disableInspectMode()
+            }
         }
+    }
 
-        props.text = "width: 96px\nheight: 40px\ncolor: #FFFFFF\nbackground-color: #6750A4\nfont-size: 14px\nborder-radius: 20px\ndisplay: inline-block"
+    private fun enableInspectMode() {
+        val wv = host()?.currentWebView() ?: return
+        // Inject bridge
+        wv.addJavascriptInterface(InspectBridge { json ->
+            activity?.runOnUiThread {
+                try {
+                    val o = org.json.JSONObject(json)
+                    val tag = o.optString("tag")
+                    val cls = o.optString("cls")
+                    val rect = o.optJSONObject("rect")
+                    val styles = o.optJSONObject("styles")
+                    val props = view?.findViewById<TextView>(R.id.props_rows)
+                    val sb = StringBuilder()
+                    sb.append("<$tag${if (cls.isNotEmpty()) " class=\"$cls\"" else ""}>\n")
+                    if (rect != null) sb.append("rect: ${rect.optInt("w")}×${rect.optInt("h")} @ (${rect.optInt("x")},${rect.optInt("y")})\n")
+                    if (styles != null) {
+                        val keys = styles.keys()
+                        while (keys.hasNext()) {
+                            val k = keys.next()
+                            sb.append("$k: ${styles.optString(k)}\n")
+                        }
+                    }
+                    props?.text = sb.toString().trim()
+                    showToast("Inspected: <$tag>")
+                } catch (e: Exception) {
+                    showToast("Inspect failed: ${e.message}")
+                }
+            }
+        }, "ConsolePlusBridge")
+        wv.evaluateJavascript(INSPECT_SCRIPT, null)
+    }
+
+    private fun disableInspectMode() {
+        host()?.currentWebView()?.evaluateJavascript("window.__cpInspect=false;", null)
+    }
+
+    private fun showToast(msg: String) {
+        android.widget.Toast.makeText(requireContext(), msg, android.widget.Toast.LENGTH_SHORT).show()
     }
 
     private fun injectInspectScript() {
@@ -159,17 +202,38 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
         val list = v.findViewById<RecyclerView>(R.id.kv_list)
         list.layoutManager = LinearLayoutManager(requireContext())
         list.adapter = kvAdapter
-        val sample = listOf(
-            "session_id = abc123xyz",
-            "theme = light",
-            "consent = accepted",
-            "cart = {\"items\":1}",
-            "lastVisit = 2026-11-14"
-        )
-        kvAdapter.submit(sample)
-        v.findViewById<Button>(R.id.store_cookies).setOnClickListener { kvAdapter.submit(sample) }
-        v.findViewById<Button>(R.id.store_local).setOnClickListener { kvAdapter.submit(listOf("cart = {\"items\":1}", "lastVisit = 2026-11-14")) }
-        v.findViewById<Button>(R.id.store_session).setOnClickListener { kvAdapter.submit(listOf("scrollY = 120")) }
+        val wv = host()?.currentWebView()
+
+        fun loadCookies() {
+            val url = wv?.url ?: "https://example.com"
+            val cookieStr = android.webkit.CookieManager.getInstance().getCookie(url) ?: ""
+            val items = cookieStr.split(";").map { it.trim() }.filter { it.isNotEmpty() }
+            kvAdapter.submit(if (items.isEmpty()) listOf("(no cookies)") else items)
+        }
+        fun loadLocal() {
+            wv?.evaluateJavascript("(function(){try{return JSON.stringify(Object.keys(localStorage).map(function(k){return k+' = '+localStorage.getItem(k);}));}catch(e){return '[]';}})();") { res ->
+            activity?.runOnUiThread {
+                val cleaned = res?.trim('"')?.replace("\\\"", "\"") ?: "[]"
+                val arr = try { org.json.JSONArray(cleaned) } catch (e: Exception) { org.json.JSONArray() }
+                val items = (0 until arr.length()).map { arr.optString(it) }
+                kvAdapter.submit(if (items.isEmpty()) listOf("(empty)") else items)
+            }
+        }
+        }
+        fun loadSession() {
+            wv?.evaluateJavascript("(function(){try{return JSON.stringify(Object.keys(sessionStorage).map(function(k){return k+' = '+sessionStorage.getItem(k);}));}catch(e){return '[]';}})();") { res ->
+            activity?.runOnUiThread {
+                val cleaned = res?.trim('"')?.replace("\\\"", "\"") ?: "[]"
+                val arr = try { org.json.JSONArray(cleaned) } catch (e: Exception) { org.json.JSONArray() }
+                val items = (0 until arr.length()).map { arr.optString(it) }
+                kvAdapter.submit(if (items.isEmpty()) listOf("(empty)") else items)
+            }
+        }
+        }
+        loadCookies()
+        v.findViewById<Button>(R.id.store_cookies).setOnClickListener { loadCookies() }
+        v.findViewById<Button>(R.id.store_local).setOnClickListener { loadLocal() }
+        v.findViewById<Button>(R.id.store_session).setOnClickListener { loadSession() }
     }
 
     override fun onDestroy() {
@@ -183,6 +247,19 @@ class ConsolePlusBottomSheet : BottomSheetDialogFragment() {
             arguments = Bundle().apply { putInt(ARG_TAB_ID, tabId) }
         }
     }
+}
+
+private const val INSPECT_SCRIPT = "(function(){ if(window.__cpInspect) return; window.__cpInspect=true; " +
+    "document.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation();" +
+    "var el=e.target; var r=el.getBoundingClientRect(); var s=getComputedStyle(el);" +
+    "var payload={tag:el.tagName,cls:el.className,rect:{x:Math.round(r.left),y:Math.round(r.top),w:Math.round(r.width),h:Math.round(r.height)}," +
+    "styles:{width:s.width,height:s.height,color:s.color,'background-color':s.backgroundColor,'font-size':s.fontSize,'border-radius':s.borderRadius,display:s.display}};" +
+    "if(window.ConsolePlusBridge) window.ConsolePlusBridge.onInspect(JSON.stringify(payload));" +
+    "}, true); })();"
+
+class InspectBridge(private val cb: (String) -> Unit) {
+    @android.webkit.JavascriptInterface
+    fun onInspect(json: String) = cb(json)
 }
 
 class SimpleTextAdapter : RecyclerView.Adapter<SimpleTextAdapter.VH>() {
